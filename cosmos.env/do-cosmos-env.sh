@@ -33,12 +33,12 @@ nxt="tgz"
 ext="tar.gz"
 nme="cosmopolitan"
 pkg="$nme-$lstv.$ext"
-test -e "$pkgd/$pkg" || wget -c $durl/cosmo/$pkg -O $pkgd/$pkg
+test -e "$pkgd/$pkg" || wget -nc $durl/cosmo/$pkg -O $pkgd/$pkg
 ln -sf $pkg $pkgd/$nme.tgz
 
 for pkg in cosmocc; do
     if [ ! -e $pkgd/$pkg.zip ]; then
-        wget -c $durl/$pkg/$pkg.zip -o $pkgd/$pkg.zip
+        wget -nc $durl/$pkg/$pkg.zip -o $pkgd/$pkg.zip
     fi
     printf "\n> INFO: decompressing $pkgd/$pkg.zip ... "
     unzip -o $pkgd/$pkg.zip | wc -l | tr -d '\n'
@@ -48,13 +48,14 @@ done
 ext="zip"
 nme="cosmos"
 pkg="$nme.$ext"
-test -e "$pkgd/$pkg" || wget -c $durl/$nme/$ext/$pkg -O $pkgd/$pkg
+test -e "$pkgd/$pkg" || wget -nc $durl/$nme/$ext/$pkg -O $pkgd/$pkg
 printf "\n> INFO: decompressing $pkgd/$pkg ... "
 unzip -o $pkgd/$pkg | wc -l | tr -d '\n'
 printf " files\n"
 
+sysarch=$(uname -m)
 errstrn="run-detectors: unable to find an interpreter"
-xelfape="bin/ape-$(uname -m).elf"
+xelfape="bin/ape-$sysarch.elf"
 destbin="/usr/bin/ape"
 sysregf="/proc/sys/fs/binfmt_misc/register"
 wslregf="/proc/sys/fs/binfmt_misc/WSLInterop"
@@ -95,9 +96,12 @@ rm -f hello.com.dbg hello.*.elf hello.c hello
 mkdir -p com
 for com in emulator.com tinyemu.com; do
     test -e com/$com ||\
-        wget https://justine.lol/$com -O com/$com &&
+        wget -nc https://justine.lol/$com -O com/$com &&
             chmod +x com/$com
 done
+printf "\n> INFO: downloading toybox ... \n\n"
+wget -nc https://landley.net/toybox/bin/toybox-$sysarch -O bin/toybox
+chmod a+x bin/toybox; bin/toybox; printf "\n$(du -ks bin/toybox)\n"
 
-printf "\n> INFO: done.\n\n"
+printf "\n> INFO: everything done.\n\n"
     
