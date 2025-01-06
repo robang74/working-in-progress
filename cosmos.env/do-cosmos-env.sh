@@ -24,7 +24,7 @@ ccfn="cosmocc.zip"
 bdir="cosmos.env"
 pkgd="pkg.d"
 
-printf "\n> INFO: creating cosmos enviroment in $bdir...\n"
+printf "\n> INFO: creating cosmos enviroment in $bdir ...\n"
 
 mkdir -p $bdir/$pkgd; cd $bdir
 
@@ -40,38 +40,46 @@ for pkg in cosmocc; do
     if [ ! -e $pkgd/$pkg.zip ]; then
         wget -c $durl/$pkg/$pkg.zip -o $pkgd/$pkg.zip
     fi
-    #unzip -o $pkgd/$pkg.zip
+    printf "\n> INFO: decompressing $pkgd/$pkg.zip ... "
+    unzip -o $pkgd/$pkg.zip | wc -l | tr -d '\n'
+    printf " files\n"
 done
 
 ext="zip"
 nme="cosmos"
 pkg="$nme.$ext"
 test -e "$pkgd/$pkg" || wget -c $durl/$nme/$ext/$pkg -O $pkgd/$pkg
-#unzip -o $pkgd/$pkg
+printf "\n> INFO: decompressing $pkgd/$pkg ... "
+unzip -o $pkgd/$pkg | wc -l | tr -d '\n'
+printf " files\n"
 
 errstrn="run-detectors: unable to find an interpreter"
 xelfape="bin/ape-$(uname -m).elf"
 destbin="/usr/bin/ape"
 sysregf="/proc/sys/fs/binfmt_misc/register"
+wslregf="/proc/sys/fs/binfmt_misc/WSLInterop"
 apestr1=":APE:M::MZqFpD::$destbin:"
 apestr2=":APE-jart:M::jartsr::$destbin:"
 cosmocc="bin/cosmocc"
 
-printf "\n> INFO: testing the $cosmocc compiler...\n"
+test -e $sysregf || sysregf="/dev/null"
+test -e $wslregf || wslregf="/dev/null"
+
+printf "\n> INFO: testing the $cosmocc compiler ... "
 printf '#include <stdio.h>\nint main() { printf("hello world\\n"); }' >hello.c
 if $cosmocc -o hello hello.c 2>&1 | grep "$errstrn" >&2; then
-    printf "\n\n> WARNING: this shell has not ape support, trying to solve...\n"
+    printf "\n\n> WARNING: this shell has not ape support, trying to solve ...\n"
     if [ -x bin/$xelfape ]; then
         for cmd in "cp -f $xelfape $destbin" "chmod +x $destbin" \
                          "bash -c \"echo '$apestr1' >$sysregf\"" \
-                         "bash -c \"echo '$apestr2' >$sysregf\"" ;
+                         "bash -c \"echo '$apestr2' >$sysregf\"" \
+                         "bash -c \"echo '-1' >$wslregf\"" ;
         do
             echo "sudo $cmd <- execute? CTRL-C otherwise"
             read; eval sudo "$cmd"
         done
         $cosmocc -o hello hello.c
         if ./hello | grep "hello world"; then
-            rm -f hello.com.dbg hello.*.elf hello.c hello
             echo
         else
             printf "\n\n> ERROR: $xelfape is missing or cannot run\n" >&2
@@ -79,7 +87,10 @@ if $cosmocc -o hello hello.c 2>&1 | grep "$errstrn" >&2; then
     else
         printf "\n\n> ERROR: $cosmocc is missing or cannot run\n" >&2
     fi
+else
+    printf " ok\n"
 fi
+rm -f hello.com.dbg hello.*.elf hello.c hello
 
 printf "\n> INFO: done.\n\n"
     
