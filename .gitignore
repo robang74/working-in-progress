@@ -1,0 +1,13 @@
+cosmos.env/LICENSE.gpl2
+cosmos.env/LICENSE.gpl3
+cosmos.env/LICENSE.lgpl2
+cosmos.env/LICENSE.lgpl3
+cosmos.env/README.md
+cosmos.env/aarch64-linux-cosmo/
+cosmos.env/bin/
+cosmos.env/include/
+cosmos.env/index.html
+cosmos.env/lib/
+cosmos.env/libexec/
+cosmos.env/pkg.d/
+cosmos.env/x86_64-linux-cosmo/
