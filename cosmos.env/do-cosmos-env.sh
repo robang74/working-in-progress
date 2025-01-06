@@ -92,5 +92,12 @@ else
 fi
 rm -f hello.com.dbg hello.*.elf hello.c hello
 
+mkdir -p com
+for com in emulator.com tinyemu.com; do
+    test -e com/$com ||\
+        wget https://justine.lol/$com -O com/$com &&
+            chmod +x com/$com
+done
+
 printf "\n> INFO: done.\n\n"
     
