@@ -216,7 +216,18 @@ rafrand_one:
 
 rafrand_ubf:
 
-  Another way to introducing task switching uncertainty settings scheduling
+  Another way to introduce task switching uncertainty settings scheduling
   policy and priorities. Both should be tuned or rely on templates specific
-  for the target architecture and customisable for the specific system.
+  for the target architecture and customisable for the specific system. This
+  approach has a good chance to "collect entropy" also from simpler CPUs.
+
+  By the way, leveraging a "complex" scheduler is an assumption rather than
+  just having a simply rotating tasks scheduler into the OS. However, rotating
+  tasks may introduce some glitches which bring in those "stochastics" features
+  we would like to have.
+
+  It is worth to note that because of just a small portion of the zipped data
+  stream is taken in account, it is hard to believe that this would have a
+  practical effect unless hashing chunks would not also included into that
+  data flows mixing process.
 
