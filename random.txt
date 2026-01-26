@@ -138,14 +138,18 @@ rafrand_zro() {
   echo $((33 + ${1:-$RANDOM}%32))
 }
 
+rafrand_ubf() {
+  cmd=""; if [ -n "$1" ]; then cmd="chrt -$1"; fi; shift
+  ionice -c3 $cmd stdbuf -o0 -e0 "$@"
+}
+
 rafrand_one() {
-  ubf="stdbuf -o0 -e0"
   k=$(rafrand_zro ${1:-})
   echo ${1:-} & ( set -x
-    $ubf dd if=/dev/random bs=$k count=1 & {
+    rafrand_ubf "" dd if=/dev/random bs=$k count=1 &
+    rafrand_ubf "i 0" tail -n$((k*16)) /var/log/syslog & {
       for f in $(ls -1 /proc/cmdline /proc/*stat /init*)
-        do $ubf cat "$f" & done &
-      $ubf tail -n$((k*16)) /var/log/syslog &
+        do rafrand_ubf "b 0" cat $f & done &
     }
   ) 2>&1
 }
@@ -203,8 +207,14 @@ for goal in that system.
 
 rafrand_one:
 
-  it spawns many processes, it uses "2>&1", "set -x", to mix by a time task
+  It spawns many processes, it uses "2>&1", "set -x", to mix by a time task
   switch unpredictable sequence different data flow which can potentially be
   interlivead "stdbuf" into a single output stream not only because task
   switching but also because output buffering suppresion (or changes).
+
+rafrand_ubf:
+
+  Another way to introducing task switching uncertainty settings scheduling
+  policy and priorities. Both should be tuned or rely on templates specific
+  for the target architecture and customisable for the specific system.
 
