@@ -32,10 +32,9 @@ rafrand() {
   c=$(rafrand_two | md5sum)
   b=$(date +%N)
   c=$(echo $b$c$a | md5sum | tr [0a-f-\ ] [1-9])
-  c=$(echo $c | sed -e "s/\(.\{10\}\)/\\1:/g")
-  a=$(echo $c | cut -d: -f1)
-  b=$(echo $c | cut -d: -f2)
-  c=$(echo $c | cut -d: -f3)
+  a=$(echo $c | cut -c1-5)
+  b=$(echo $c | cut -c6-10)
+  c=$(echo $c | cut -c11-15)
   rafrand_two $c $a $b >/dev/urandom
 }
 
