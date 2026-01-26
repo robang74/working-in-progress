@@ -79,6 +79,9 @@ A small number rests on a non-white noise number but Cauchy^2 distributed is
 theoretically totally flat in terms of distribution, and also in practice when
 the T >> dT >> %dt is related by a 4x or 10x rations like the LSB of 32-bit.
 
+  https://github.com/robang74/roberto-a-foglietta/
+    /blob/main/data/Tesi_Foglietta-051a.pdf (jitter)
+
 Two functions are great to multiply "entropy": we cannot create entropy by a
 determinist system but we can multiply it because we can spread that little bit
 of randomness over a larger set of bits with a hash and zip algorithm.
@@ -245,6 +248,13 @@ there are few randonmess here because execution time varies between 4 and 8 -05s
 on my tests which are 4.5 digits 5E4 combinations, less than 16 bits of "entropy"
 because everyhting else is correlated at that 4.5 digits of informations.
 
+  rafgen5sum() {
+      n=${1:-5}; echo | while true; do
+          let n-- || break;
+          dd bs=1 count=1k 2>&1 | md5sum
+      done
+  }
+
 Since rafgen5sum() runs that dd five times, it creates a data stream with 64+ bits
 of unstructured information (randomness) which is enough to fill the 128 md5sum.
 
@@ -252,19 +262,14 @@ of unstructured information (randomness) which is enough to fill the 128 md5sum.
 
   ng() { { ug;ug;ug;ug; }| pigz -11cp8 | dd bs=32 skip=1 count=2 status=none; }
 
-Thsi below a more convoluted way of doing the same probably over-engineered.
+Here below a convoluted way of doing the same of ng() probably over-engineered.
 
-rafgen5sum() {
-    n=${1:-5}; echo | while true; do
-        let n-- || break;
-        dd bs=1 count=1k 2>&1 | md5sum
-    done
-}
+  rafrand_tiny() {
+    for i in $(seq 1 ${1:-4}); do
+      rafgen5sum | pigz -1cp8 | md5sum
+    done | pigz -11cp8 |\
+      dd bs=32 skip=1 count=2 status=none
+  }
 
-rafrand_tiny() {
-  for i in $(seq 1 ${1:-4}); do
-    rafgen5sum | pigz -1cp8 | md5sum
-  done | pigz -11cp8 |\
-    dd bs=32 skip=1 count=2 status=none
-}
+Hint: commands "wc -c" and "od -x" are your friends.
 
