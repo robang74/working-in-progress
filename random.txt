@@ -141,7 +141,7 @@ rafrand_zro() {
 rafrand_one() {
   k=$(rafrand_zro ${1:-}); echo ${1:-}
   dd if=/dev/random bs=$k count=1 2>&1
-  cat /proc/cmdline /proc/*stat /init*
+  cat /proc/cmdline /proc/*stat /init* 2>&1
 }
 
 rafrand_two() {
@@ -165,11 +165,30 @@ rafrand() {
 
 ### apparent issues ###########################
 
-1. The tr Command Entropy Bias (!Critical)
+1. The "tr" Command Entropy Bias
 
 Theoretically correct to arise a "bias issue" but that string is splitted
 in 3 parts and that parts are used as seed for other strong-level randomness
 production tasks. While the randomness seed seems very essential, the values
 used in that process are relatively small compared to the 5 digits (%32 to %3)
 hence it doesn't matter because reminders are those that really matter.
+
+2. The "dd" skipping on Compressed Stream
+
+The variable "n" controls the read size of the compressed data and it creates
+a dependency where if the compressed output is smaller than $n (unlikely here
+but possible in other contexts), the command fails/outputs nothing.
+
+Which is correct, in theory. However, the main issue relies in "cat" files that
+can be void or not existent which is the reason because 2>&1 has been used to
+"at least" collect something and the "echo ${1:-}" has been added for a little
+more data because cat might partially or totally fail while /dev/random is not
+supposed to provide a lot of data but just a bit of extra-initial randomness.
+
+However, the shell implementation is just a PoC because the C-language is
+the way. Even in the laziest option, the shell implementation should be
+contextualised on the target system which, for example, it might not have
+"pigz" or not having a multi-thread processor but a "dumb" 32-bit micro
+which provides no significant jitters or "pigz" would be almost useless
+for goal in that system.
 
