@@ -139,24 +139,31 @@ rafrand_zro() {
 }
 
 rafrand_one() {
-  k=$(rafrand_zro ${1:-}); echo ${1:-}
-  dd if=/dev/random bs=$k count=1 2>&1
-  cat /proc/cmdline /proc/*stat /init* 2>&1
+  ubf="stdbuf -o0 -e0"
+  k=$(rafrand_zro ${1:-})
+  echo ${1:-} & ( set -x
+    $ubf dd if=/dev/random bs=$k count=1 & {
+      for f in $(ls -1 /proc/cmdline /proc/*stat /init*)
+        do $ubf cat "$f" & done &
+      $ubf tail -n$((k*16)) /var/log/syslog &
+    }
+  ) 2>&1
 }
 
 rafrand_two() {
   n=$(rafrand_zro ${1:-})
   m=$((9 - ${2:-$RANDOM}%9))
-  rafrand_one ${3:-} |\
-    pigz -${m}cp$((4 * $(nproc))) -b128 |\
-      dd ibs=$n skip=1 obs=64 count=1 status=none
+  rafrand_one ${3:-} |{\
+    pigz -${m}cp$((4 * $(nproc))) -b32 |\
+      dd bs=1 skip=$n count=64
+    } 2>/dev/null
 }
 
 rafrand() {
   a=$(date +%N)
   c=$(rafrand_two | md5sum)
   b=$(date +%N)
-  c=$(echo $b$c$a | md5sum | tr [0a-f-\ ] [1-9])
+  c=$(echo $b$a$c | md5sum | tr [0a-f-\ ] [1-9])
   a=$(echo $c | cut -c1-5)
   b=$(echo $c | cut -c6-10)
   c=$(echo $c | cut -c11-15)
@@ -191,4 +198,13 @@ contextualised on the target system which, for example, it might not have
 "pigz" or not having a multi-thread processor but a "dumb" 32-bit micro
 which provides no significant jitters or "pigz" would be almost useless
 for goal in that system.
+
+### updates ###################################
+
+rafrand_one:
+
+  it spawns many processes, it uses "2>&1", "set -x", to mix by a time task
+  switch unpredictable sequence different data flow which can potentially be
+  interlivead "stdbuf" into a single output stream not only because task
+  switching but also because output buffering suppresion (or changes).
 
