@@ -163,3 +163,13 @@ rafrand() {
   rafrand_two $c $a $b >/dev/urandom
 }
 
+### apparent issues ###########################
+
+1. The tr Command Entropy Bias (!Critical)
+
+Theoretically correct to arise a "bias issue" but that string is splitted
+in 3 parts and that parts are used as seed for other strong-level randomness
+production tasks. While the randomness seed seems very essential, the values
+used in that process are relatively small compared to the 5 digits (%32 to %3)
+hence it doesn't matter because reminders are those that really matter.
+
