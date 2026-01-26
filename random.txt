@@ -231,3 +231,40 @@ rafrand_ubf:
   practical effect unless hashing chunks would not also included into that
   data flows mixing process.
 
+### tiny random generator #####################
+
+The rafrand_tiny() leverages rafgen5sum() which produce random output by
+multiplying I/O task jittering like dd output like this:
+
+  echo | dd
+  0+1 records in
+  0+1 records out
+  1 byte copied, 4.5698e-05 s, 21.9 kB/s
+
+there are few randonmess here because execution time varies between 4 and 8 -05s
+on my tests which are 4.5 digits 5E4 combinations, less than 16 bits of "entropy"
+because everyhting else is correlated at that 4.5 digits of informations.
+
+Since rafgen5sum() runs that dd five times, it creates a data stream with 64+ bits
+of unstructured information (randomness) which is enough to fill the 128 md5sum.
+
+  ug() { rafgen5sum | md5sum; }  # 128-bit random
+
+  ng() { { ug;ug;ug;ug; }| pigz -11cp8 | dd bs=32 skip=1 count=2 status=none; }
+
+Thsi below a more convoluted way of doing the same probably over-engineered.
+
+rafgen5sum() {
+    n=${1:-5}; echo | while true; do
+        let n-- || break;
+        dd bs=1 count=1k 2>&1 | md5sum
+    done
+}
+
+rafrand_tiny() {
+  for i in $(seq 1 ${1:-4}); do
+    rafgen5sum | pigz -1cp8 | md5sum
+  done | pigz -11cp8 |\
+    dd bs=32 skip=1 count=2 status=none
+}
+
