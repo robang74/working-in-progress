@@ -113,6 +113,11 @@ If a process like the one described here is operated by the CPU microcode, it
 would be safe bounded by the CPU itself, a modern CPUs can be seen as very good
 random generators because their jitter unpredictability in executing tasks.
 
+How good thsi kind of random generator bease on CPU arch and  microcode be good
+at providing unbreakable cryptography assuming the whole process is made at the
+state of art? Who design the chip (or made the chip) and deliver the microcode
+can definetely have access at every cyphered communications no matter what.
+
 ### original function (2023) ##################
 
 {
