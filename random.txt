@@ -14,7 +14,7 @@ rafrand_zro() {
 }
 
 rafrand_one() {
-  k=$(rafrand_zro ${1:-})
+  k=$(rafrand_zro ${1:-}); echo ${1:-}
   dd if=/dev/random bs=$k count=1 2>&1
   cat /proc/cmdline /proc/*stat /init*
 }
@@ -22,7 +22,7 @@ rafrand_one() {
 rafrand_two() {
   n=$(rafrand_zro ${1:-})
   m=$((9 - ${2:-$RANDOM}%9))
-  rafrand_one |\
+  rafrand_one ${3:-} |\
     pigz -${m}cp$((4 * $(nproc))) |\
       dd ibs=$n skip=1 status=none
 }
