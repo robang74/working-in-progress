@@ -1,0 +1,36 @@
+
+# original function (2023)
+{
+  n=$((33 + ${RANDOM:-15}%32))
+  dd if=/dev/random bs=$n count=1 2>&1
+  cat /proc/cmdline /proc/*stat /init*
+} | pigz -$((1 + n%9))c > /dev/urandom &
+
+rafrand_zro() {
+  echo $((33 + ${1:-$RANDOM}%32))
+}
+
+rafrand_one() {
+  k=$(rafrand_zro ${1:-})
+  dd if=/dev/random bs=$k count=1 2>&1
+  cat /proc/cmdline /proc/*stat /init*
+}
+
+rafrand_two() {
+  n=$(rafrand_zro ${1:-})
+  m=$(rafrand_zro ${2:-})
+  rafrand_one |\
+    pigz -p$((4 * $(nproc))) -$((1 + m%9))c |\
+      dd ibs=1 skip=$n status=none
+}
+
+rafrand() {
+  a=$(date +%N)
+  rafrand_two >/dev/null
+  b=$(date +%N)
+  c=$((1000000001+b-a))
+  d=$((1+c+(b+a)%c))
+  rafrand_two $c $d $b >/dev/urandom
+  e=$(date +%N)
+}
+
