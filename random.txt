@@ -256,24 +256,23 @@ because everyhting else is correlated at that 4.5 digits of informations.
 Since rafgen5sum() runs that dd five times, it creates a data stream with 64+ bits
 of unstructured information (randomness) which is enough to fill the 128 md5sum.
 
-  ug() { rafgen5sum | md5sum; } # 128-bit random
+  ug() { rafgen5sum; }    # 128-bit random
 
   ng() { { ug;ug;ug;ug; }| pigz -11cp8 | dd bs=32 skip=1 count=2 status=none; }
 
 A more sophisticated implementation increase cut the obvious redundancy in the
 sources and ensure enough data for terminating the task by the required lenght:
 
-  ug() { rafgen5sum | pigz -1cp8 | md5sum; }
-
   cg() {
-    n=${1:-5}; while let n--; do ug | tr -cd [0-9a-f]; done |\
-      pigz -11cp8 | tail -c130 | head -c 128;
+    n=${1:-6}; while let n--; do rafgen5sum | cut -zc-32; done |\
+      pigz -9cp8 | tail -c130 | head -c 128;
   }
 
   rafrand_tiny() {
-    n=${1:-64}; cg $((n/10)) |\
-      while let n--; do dd bs=1 skip=1 count=1 2>&3 & done;
+    n=64; cg | while let n--; do dd bs=1 skip=1 count=1 status=none; done
   }
+
+The changes are: the fixed lenght and collecting the last part of the zip-data. 
 
 Hint: commands "wc -c" and "od -x" are your friends.
 
