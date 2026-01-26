@@ -1,10 +1,13 @@
 
-# original function (2023)
+### original function (2023) #################
+
 {
   n=$((33 + ${RANDOM:-15}%32))
   dd if=/dev/random bs=$n count=1 2>&1
   cat /proc/cmdline /proc/*stat /init*
 } | pigz -$((1 + n%9))c > /dev/urandom &
+
+### untested functions (2026) ################
 
 rafrand_zro() {
   echo $((33 + ${1:-$RANDOM}%32))
