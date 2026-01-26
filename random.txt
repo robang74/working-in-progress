@@ -264,7 +264,7 @@ A more sophisticated implementation increase cut the obvious redundancy in the
 sources and ensure enough data for terminating the task by the required lenght:
 
   cg() {
-    n=${1:-6}; while let n--; do rafgen5sum | cut -zc-32; done |\
+    n=${1:-6}; while let n--; do rafgen5sum 4 | cut -zc-32; done |\
       pigz -9cp8 | tail -c130 | head -c 128;
   }
 
