@@ -183,30 +183,30 @@ rafrand() {
 
 1. The "tr" Command Entropy Bias
 
-Theoretically correct to arise a "bias issue" but that string is splitted
-in 3 parts and that parts are used as seed for other strong-level randomness
-production tasks. While the randomness seed seems very essential, the values
-used in that process are relatively small compared to the 5 digits (%32 to %3)
-hence it doesn't matter because reminders are those that really matter.
+  Theoretically correct to arise a "bias issue" but that string is splitted
+  in 3 parts and that parts are used as seed for other strong-level randomness
+  production tasks. While the randomness seed seems very essential, the values
+  used in that process are relatively small compared to the 5 digits (%32 to %3)
+  hence it doesn't matter because reminders are those that really matter.
 
 2. The "dd" skipping on Compressed Stream
 
-The variable "n" controls the read size of the compressed data and it creates
-a dependency where if the compressed output is smaller than $n (unlikely here
-but possible in other contexts), the command fails/outputs nothing.
+  The variable "n" controls the read size of the compressed data and it creates
+  a dependency where if the compressed output is smaller than $n (unlikely here
+  but possible in other contexts), the command fails/outputs nothing.
 
-Which is correct, in theory. However, the main issue relies in "cat" files that
-can be void or not existent which is the reason because 2>&1 has been used to
-"at least" collect something and the "echo ${1:-}" has been added for a little
-more data because cat might partially or totally fail while /dev/random is not
-supposed to provide a lot of data but just a bit of extra-initial randomness.
+  Which is correct, in theory. However, the main issue relies in "cat" files that
+  can be void or not existent which is the reason because 2>&1 has been used to
+  "at least" collect something and the "echo ${1:-}" has been added for a little
+  more data because cat might partially or totally fail while /dev/random is not
+  supposed to provide a lot of data but just a bit of extra-initial randomness.
 
-However, the shell implementation is just a PoC because the C-language is
-the way. Even in the laziest option, the shell implementation should be
-contextualised on the target system which, for example, it might not have
-"pigz" or not having a multi-thread processor but a "dumb" 32-bit micro
-which provides no significant jitters or "pigz" would be almost useless
-for goal in that system.
+  However, the shell implementation is just a PoC because the C-language is
+  the way. Even in the laziest option, the shell implementation should be
+  contextualised on the target system which, for example, it might not have
+  "pigz" or not having a multi-thread processor but a "dumb" 32-bit micro
+  which provides no significant jitters or "pigz" would be almost useless
+  for goal in that system.
 
 ### updates ###################################
 
@@ -249,26 +249,30 @@ on my tests which are 4.5 digits 5E4 combinations, less than 16 bits of "entropy
 because everyhting else is correlated at that 4.5 digits of informations.
 
   rafgen5sum() {
-      n=${1:-5}; echo | while true; do
-          let n-- || break;
-          dd bs=1 count=1k 2>&1 | md5sum
-      done
+      n=${1:-5}; echo | while let n--; do
+          dd bs=1 count=1k 2>&1 | md5sum; done
   }
 
 Since rafgen5sum() runs that dd five times, it creates a data stream with 64+ bits
 of unstructured information (randomness) which is enough to fill the 128 md5sum.
 
-  ug() { rafgen5sum | md5sum; }  # 128-bit random
+  ug() { rafgen5sum | md5sum; } # 128-bit random
 
   ng() { { ug;ug;ug;ug; }| pigz -11cp8 | dd bs=32 skip=1 count=2 status=none; }
 
-Here below a convoluted way of doing the same of ng() probably over-engineered.
+A more sophisticated implementation increase cut the obvious redundancy in the
+sources and ensure enough data for terminating the task by the required lenght:
+
+  ug() { rafgen5sum | pigz -1cp8 | md5sum; }
+
+  cg() {
+    n=${1:-5}; while let n--; do ug | tr -cd [0-9a-f]; done |\
+      pigz -11cp8 | tail -c130 | head -c 128;
+  }
 
   rafrand_tiny() {
-    for i in $(seq 1 ${1:-4}); do
-      rafgen5sum | pigz -1cp8 | md5sum
-    done | pigz -11cp8 |\
-      dd bs=32 skip=1 count=2 status=none
+    n=${1:-64}; cg $((n/10)) |\
+      while let n--; do dd bs=1 skip=1 count=1 2>&3 & done;
   }
 
 Hint: commands "wc -c" and "od -x" are your friends.
