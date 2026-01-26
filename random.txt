@@ -21,9 +21,9 @@ rafrand_one() {
 
 rafrand_two() {
   n=$(rafrand_zro ${1:-})
-  m=$(rafrand_zro ${2:-})
+  m=$((9 - ${2:-$RANDOM}%9))
   rafrand_one |\
-    pigz -p$((4 * $(nproc))) -$((1 + m%9))c |\
+    pigz -${m}cp$((4 * $(nproc))) |\
       dd ibs=$n skip=1 status=none
 }
 
