@@ -1,6 +1,6 @@
 (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, CC ND-BY-NC 4.0
 
-### rationale #################################
+### rationale ##################################################################
 
 Collecting entropy is a metaphor because only information can be "collected"
 ergo stored in a precise notation like the number 123 or a string of bits. The
@@ -129,7 +129,7 @@ the state of art? Who design the chip (or made the chip) and deliver the
 microcode can definitely have access to every ciphered communications no matter
 what.
 
-### original function (2023) ##################
+### original function (2023) ###################################################
 
 {
   n=$((33 + ${RANDOM:-15}%32))
@@ -137,7 +137,7 @@ what.
   cat /proc/cmdline /proc/*stat /init*
 } | pigz -$((1 + n%9))c > /dev/urandom &
 
-### untested functions (2026) #################
+### untested functions (2026) ##################################################
 
 rafrand_zro() {
   echo $((33 + ${1:-$RANDOM}%32))
@@ -179,7 +179,7 @@ rafrand() {
   rafrand_two $c $a $b >/dev/urandom
 }
 
-### apparent issues ###########################
+### apparent issues ############################################################
 
 1. The "tr" Command Entropy Bias
 
@@ -208,7 +208,7 @@ rafrand() {
   which provides no significant jitters or "pigz" would be almost useless
   for goal in that system.
 
-### updates ###################################
+### updates ####################################################################
 
 rafrand_one:
 
@@ -234,7 +234,7 @@ rafrand_ubf:
   practical effect unless hashing chunks would not also included into that
   data flows mixing process.
 
-### tiny random generator #####################
+### tiny random generator ########################################################
 
 The rafrand_tiny() leverages rafgen5sum() which produce random output by
 multiplying I/O task jittering like dd output like this:
@@ -272,7 +272,52 @@ sources and ensure enough data for terminating the task by the required lenght:
     n=64; cg | while let n--; do dd bs=1 skip=1 count=1 status=none; done
   }
 
-The changes are: the fixed lenght and collecting the last part of the zip-data. 
+The changes are: the fixed lenght and collecting the last part of the zip-data.
 
-Hint: commands "wc -c" and "od -x" are your friends.
+### information density ########################################################
+
+The "pigz -11" is peculiar because is one of the most extreme non-lossing
+compression easily available. Thus is strong enough to provide a reasonable
+quantisation of the information contained into chunk of data becuase it removes
+redundancy. It adds a file header but the size is fix (10 byte) thus irrelevant.
+
+  tg () { n=${1:-5}; echo | while let n--; do dd bs=1 count=1k 2>&1; done | $FUNC; }
+
+  info: { tg;tg;tg;tg;tg; } | cut -d' ' -f1 | pigz -11cp8 | wc -c;  # -10b
+
+  32ch: { tg;tg;tg;tg;tg; } | cut -c-32 | pigz -11cp8 | wc -c;      # -10b
+
+  size: { tg;tg;tg;tg;tg; } | wc -c
+
+The function above are made to check the impact of the hashing function, here below:
+
+       | file |  cat |  md5 | sha1 | sha256 | sha512 |
+  full |  10  | +210 | +122 | +144 |  +205  |  +367  |
+  32ch |  10  |  n/a | +122 | +122 |  +122  |  +122  |
+  size | n/a  | 1752 |  180 |  220 |   340  |   660  |
+  cr%  | n/a  |  12% |  68% |  65% |   60%  |   56%  |
+  ir%  | n/a  |  n/a |   1  |  85% |   59%  |   33%  |
+
+The hash function doesn't matter provided that it is good enough as hash function.
+
+The hash function matters for avoid collisions in forensic signature but in terms
+of diffusion have not any impact. The lenght of the output has impact on the size
+of the output but taking this as a general principle we would use the clear text.
+
+The numbers in the table above show that there is no advantage to use a longer
+hash because in any case the total randomness injected remains the same but
+diluited. Among these hash fuctions md5 is the simplest, sha256 has cr:ci = 1. 
+
+  hg () { n=${1:-5}; echo | while let n--; do dd bs=1 count=1k 2>&1; done; }
+
+  h5 () { { hg;hg;hg;hg; } | sha512sum | cut -d' ' -f1; }
+
+  cg () { { h5;h5; } | pigz -9cp8 | tail -c130 | head -c 128; }
+
+With this set of funcitona above tuned for the sha512, the rafrand_tiny() is 2x
+faster than using the md5sum (ca. 2.5x before its md5sum 85% optimisation).
+
+However, the winner is the sha512 because of it scale better on a 8-core CPU due
+to a multi-thread apporoch. In fact, the algorithm is newer and heavier but also
+its implementation is better suited for modern CPUs.
 
