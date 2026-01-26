@@ -3,41 +3,43 @@
 Collecting entrophy is a metaphora becuase only information can be "collected"
 ergo stored in a precise notation like the number 123 or a string of bits. The
 aim of "collectiong entrophy" is to have a sequence of numbers (information)
-which cannot be anticipitated. However, as you can imagine because that serie
-of numbers is stored somewhere, it is possible to anticipate because is known.
+which cannot be anticipitated. However, as you can imagine because that serie of
+numbers is stored somewhere, it is possible to anticipate because is known.
 
 The fundamental point is about WHO can access that information and HOW that
-information is structured. The structure of information is fundamental for
-avoid (or minimise) the risk of someone can guess the sequence. For example,
-we can use the Fibonacci serie and decide to start from a specific number of
-the original serie instead from 1. Unfortunately everyone that can see or guess
-a single number of the serie knows all the rest of the serie. We can use the
-Fibonacci serie from N and step 2, or step N-4, or whatever, it has a structure.
+information is structured. The structure of information is fundamental for avoid
+(or minimise) the risk of someone can guess the sequence. For example, we can
+use the Fibonacci serie and decide to start from a specific number of the
+original serie instead from 1. Unfortunately everyone that can see or guess a
+single number of the serie knows all the rest of the serie. We can use the
+Fibonacci serie from N and step 2, or step N-4, or whatever, it has a
+structure.
 
-A structured information can be guessed, it is just a matter of how much
-diffult is to make that guess (or given a unit of computation power per second,
-how many seconds it will takes). This related to how much complicated is the
-relationship between a number and the number after e.g. Fibonacci(N, 4). When
-this relationship is "random" and in particular "white noise random" it means
-that every next 8-bit (or 16-bit, or 32-bit) of information are totally
-uncorelated with anything before and after thus the chance to guess the next
-8-bit string is 1:2^8 (it cannot be more). This is randomness, white noise.
+A structured information can be guessed, it is just a matter of how much diffult
+is to make that guess (or given a unit of computation power per second, how many
+seconds it will takes). This related to how much complicated is the relationship
+between a number and the number after e.g. Fibonacci(N, 4). When this
+relationship is "random" and in particular "white noise random" it means that
+every next 8-bit (or 16-bit, or 32-bit) of information are totally uncorelated
+with anything before and after thus the chance to guess the next 8-bit string is
+1:2^8 (it cannot be more). This is randomness, white noise.
 
 The 'drama' is about HOW to generate a random sequence of numbers from a system
 that has been designed to be predictable and deterministic (and also error auto
 correcting like ECC memory, for example). The "easiest" answer is having a very
 sensitive termometer (e.g. 0.00001°C precision) and collect each dT-time the
-least meaning signfiicative digit of temperature measuring. Each dT is a fix
-and repetitive timing and precision is a supposition plus the wires are EM
+least meaning signfiicative digit of temperature measuring. Each dT is a fix and
+repetitive timing and precision is a supposition plus the wires are EM
 emmitters. Which in practice is easier to sniff than we might suppose because
-extracting "entrophy" from heat requires physical work (L) or a Maxwell's devil.
+extracting "entrophy" from heat requires physical work (L) or a Maxwell's
+devil.
 
-Under this perspective what is really matters, it is the predictability from
-the known (so how hard is to guess from the know or plausible known) and how
+Under this perspective what is really matters, it is the predictability from the
+known (so how hard is to guess from the know or plausible known) and how
 difficult is to access at that information (storing safety). Is stored inside
-the CPU registry? The chip is the safe boundary. Into the memory? The EM S/N
-of conductive tracks between CPU and RAM is the safe boundary. In the kernel
-space or in the user-land? For a local attacker, it the root priviledge local
+the CPU registry? The chip is the safe boundary. Into the memory? The EM S/N of
+conductive tracks between CPU and RAM is the safe boundary. In the kernel space
+or in the user-land? For a local attacker, it the root priviledge local
 escalation, the safe boundary. For a remote, wait... here is the MAIN point.
 
 This "obscurity by randomness" is not used to protect the root password secret
@@ -49,40 +51,43 @@ despite the algoritm for de/cypher is public (or desveiled, because leaked).
 
 Therefore about randomness, everything is about HOW hard is to predict or sniff
 the sequence of numbers from what we know already or can reasonably supporsing
-and checking in a very short time, short enough to be useful: 1s or 1E(1E100)s?
+and checking in a very short time, short enough to be useful: 1s or
+1E(1E100)s?
 
 In modern system the CPU is a multi-core, multi-thread, multi-branch and all of
 these "feature" are multi-layered cached. Many tasks are running even if the
 whole userland system is "doing nothing" and task prehemption can kick in at any
-time, creating latencies in HOW long a deterministic task takes. Because also
-in complex systems is often requires a very-low latency (e.g. industry and CNC),
-also these lantency aren't very impredictable, and usually they aren't but low.
+time, creating latencies in HOW long a deterministic task takes. Because also in
+complex systems is often requires a very-low latency (e.g. industry and CNC),
+also these lantency aren't very impredictable, and usually they aren't but
+low.
 
 Fortunately, the latency isn't ALWAYS the same nanoseconds precise and the
-variance of a latency is its jitter, e.g. a latency in [ 80, 120 ] ns has a
-20 (or 40) ns of maximum jitter. Usully, the distribution is a Bell curve so
-the dt = 1ns (actual jitter) is more frequent than dt = 10ns. The main idea
-could be that within [ 95, 105 ] ns the jitter distribution is almost flat so
-every value in that range is almost the same probable to pop-up. When the value
-is read outside that interval then it is discarded thus not stored. At the next
-turn it might be discarded again and the chance of a continous rejection which
-stops the sequence has a not-zero probability to happen. But dT % 10 is always
-flat when the averate is 100 and the latency is 40 (T >> dT >> %dt).
+variance of a latency is its jitter, e.g. a latency in [ 80, 120 ] ns has a 20
+(or 40) ns of maximum jitter. Usully, the distribution is a Bell curve so the dt
+= 1ns (actual jitter) is more frequent than dt = 10ns. The main idea could be
+that within [ 95, 105 ] ns the jitter distribution is almost flat so every value
+in that range is almost the same probable to pop-up. When the value is read
+outside that interval then it is discarded thus not stored. At the next turn it
+might be discarded again and the chance of a continous rejection which stops the
+sequence has a not-zero probability to happen. But dT % 10 is always flat when
+the averate is 100 and the latency is 40 (T >> dT >> %dt).
 
 A small number rest of a non-white noise number but Cauchy^2 distributed is
 theoretically totally flat in term of distribution, and also in practice when
 the T >> dT >> %dt is related by a 4x or 10x rations like the LSB of 32-bit.
 
-Two functions are great to multiply "entrophy": we cannot create entrophy by
-a determinist system but we can multiply it because we can spread that little
-bits of randomness over a larger set of bits with hash and zip algorithm.
+Two functions are great to multiply "entrophy": we cannot create entrophy by a
+determinist system but we can multiply it because we can spread that little bits
+of randomness over a larger set of bits with hash and zip algorithm.
 
 Because the hash "diffuses" in a fast way but NP-hard to recover way, and the
 zip algoritm provides a nearly flat distribution of values which are "hard" to
 guess when the first part of the output (the table) is lost (until the next
 chunk). For example if 128Kb is the input chunk and 4x is the max compression
 rate expected in a single chunk the output chunk will be 32Kb thus a 64b pick
-has a great chance to fall somewhere the unpredictibility is almost random flat.
+has a great chance to fall somewhere the unpredictibility is almost random
+flat.
 
 The zip algoritm provides a (1) nearly flat distribution of values which is (2)
 hard to guess without knowing the encoding table by definition of "zip" itself.
@@ -98,11 +103,11 @@ scatered among internal computational pipes and caches, interupted and
 pre-empted is a great "random" generator in terms of nanosecods fluattuation.
 
 Thus the PT start, stop time in nanosecods are not related in the least
-significative stop digits. Expressed these two numbers in digits 0-9 then
-the string $stop$start has the LSB randomness in the middle of the string
-which will be something like: nnXnnx. Because the start can be guessed apart
-few nanoseconds but the relative large jitter cause the LSB stop part to have
-many more digits that can be considered strongly random in their nature.
+significative stop digits. Expressed these two numbers in digits 0-9 then the
+string $stop$start has the LSB randomness in the middle of the string which will
+be something like: nnXnnx. Because the start can be guessed apart few
+nanoseconds but the relative large jitter cause the LSB stop part to have many
+more digits that can be considered strongly random in their nature.
 
 Once a string which the random nature of nnXnnx is hashed the result is XXXXXX
 becuase nobody can anymore say (once the start/stop are lost) how the randomness
