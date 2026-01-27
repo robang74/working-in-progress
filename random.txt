@@ -291,6 +291,7 @@ redundancy. It adds a file header but the size is fix (10 byte) thus irrelevant.
 The function above are made to check the impact of the hashing function, here below:
 
        | file |  cat |  md5 | sha1 | sha256 | sha512 |
+  byte |      |      |   16 |   20 |    32  |    64  |
   full |  10  | +210 | +122 | +144 |  +205  |  +367  |
   32ch |  10  |  n/a | +122 | +122 |  +122  |  +122  |
   size | n/a  | 1752 |  180 |  220 |   340  |   660  |
@@ -350,7 +351,7 @@ number of "dd" instances are are 10% less 6 x 3 x 3 < 5 x 4 x 2 but the concurre
 among the instances is uprises to 8 to 18 which clog also a 8-core CPU increasing
 the jitter amplitude thus the randomness (as per unpredictability).
 
-  hc() { pigz -cp$(nproc) "$@" | tail -c+32; }                          # run.29
+  hc() { pigz -cp$(nproc) "$@" | tail -c+10; }                          # run.30
 
   hs() { sha512sum | xxd -r -p; }
   
