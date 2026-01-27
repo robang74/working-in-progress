@@ -306,7 +306,7 @@ of the output but taking this as a general principle we would use the clear text
 
 The numbers in the table above show that there is no advantage to use a longer
 hash because in any case the total randomness injected remains the same but
-diluited. Among these hash fuctions md5 is the simplest, sha256 has cr:ci = 1. 
+diluited. Among these hash fuctions md5 is the simplest, sha256 has cr:ci = 1.
 
   hg () { n=${1:-5}; echo | while let n--; do dd bs=1 count=1k 2>&1; done; }
 
@@ -316,7 +316,13 @@ diluited. Among these hash fuctions md5 is the simplest, sha256 has cr:ci = 1.
 
 With this set of funcitona above tuned for the sha512, the rafrand_tiny() is 2x
 faster than using the md5sum (ca. 2.5x before its md5sum 85% optimisation).
+  h1 () { echo | dd bs=32 count=32 2>&1; }
 
+  h6 () { { h1; h1; } & { h1; h1; } & { h1; h1; } }
+
+  h2 () { { h6 & h6 & h6; } | sha512sum -b | cut -d' ' -f1; }
+
+  cg () { { h2 & h2; } | pigz -9c | tail -c130 | head -c128; }
 However, the winner is the sha512 because of it scale better on a 8-core CPU due
 to a multi-thread apporoch. In fact, the algorithm is newer and heavier but also
 its implementation is better suited for modern CPUs.
@@ -324,7 +330,7 @@ its implementation is better suited for modern CPUs.
 Also, the sha256 alternative is fine:
 
   h2 () { { hg & hg; } | sha256sum | cut -d' ' -f1; }
-  
+
   cg () { { h2 & h2 & h2 & h2; } | pigz -9c -J4 -p auto | tail -c130 | head -c 128; }
 
 This variation that leverage the sha256 has cr:ci = 1 and the 8 cores parallelism
@@ -334,5 +340,33 @@ is about 4x faster than the first stable version based on md5sum.
 
 The above function is the reference to compare with becuase $RANDOM is the default
 source of pseudorandom numbers. If the approach leveraging jitters is faster and/or
-provide better quality "entrophy" the reference test is passed (not kernel, shell!).
+provide better quality "entropy" the reference test is passed: !kernel but shell!
+
+### randomness density #########################################################
+
+Stronger gc() variance with 2x randomeness density (rnd/bit) even if the total
+number of "dd" instances are are 10% less 6 x 3 x 3 < 5 x 4 x 2 but the concurrency
+among the istances is uprises to 8 to 18 which clog also a 8-core CPU increasing
+the jitter amplitude thus the randomness (as per unpredicability).
+
+  h1 () { { time echo | dd bs=32 count=32; } 2>&1; }
+
+  h6 () { h1 & h1 & h1 & h1; }
+
+  h2 () { { h6 & h6 & h6; } | sha512sum -b | cut -d' ' -f1; }
+
+  cg () { { h2 & h2; } | pigz -9c | tail -c130 | head -c128; }
+
+Then included time in h1() in order to add 3 digits more of randomness, at least.
+By a raw estimation the single h1() call provides 26 bit of randomness x 24 calls.
+
+Which is a particular good balance because N calls * N bit: N² >= 512 --> N = 23.
+In practice over 165 bytes, only 128 are selected and trimmed down to 64 (1:1).
+
+In this scenario 165 x 8 = 1320, and 24 x 26 = 624 but because the zip table the
+first 32 (instead of 10, the file header) are providing lower randomness density.
+
+A raw estimation indicates a need of randomness betwenn 600 and 630 bits in total.
+The main principle behind is hash and zip provide their best in diffuse and level
+the values when they can work in their sweet spot 1:2 aka cr% and ci% around 50%.
 
