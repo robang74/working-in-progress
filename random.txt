@@ -350,13 +350,13 @@ number of "dd" instances are are 10% less 6 x 3 x 3 < 5 x 4 x 2 but the concurre
 among the instances is uprises to 8 to 18 which clog also a 8-core CPU increasing
 the jitter amplitude thus the randomness (as per unpredictability).
 
-  hc() { pigz -cp$(nproc) "$@"; }
+  hc() { pigz -cp$(nproc) "$@" | tail -c+32; }                          # run.28
 
-  hs() { sha512sum | cut -d' ' -f1 | tr -d '\n' | xxd -r -p; }
+  hs() { sha512sum | cut -d' ' -zf1 | xxd -r -p; }
   
   hg() { { time echo | dd bs=32 count=32; } 2>&1; }
 
-  h4() { hg & hg & hg & hg; }
+  h4() { { hg & hg & hg & hg; } | hs; }
 
   h3() { { h4 & h4 & h4; } | hc -1; }
 
@@ -377,7 +377,7 @@ the values when they can work in their sweet spot 1:2 aka cr% and ci% around 50%
 
 --------------------------------------------------------------------------------
 
-let nr++
+let nr++; echo run.$nr
 while sleep 0.01; do cg >> run.$nr; done & 
 while sleep   60; do ent   run.$nr; done
 
