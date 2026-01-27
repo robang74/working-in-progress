@@ -325,8 +325,14 @@ Also, the sha256 alternative is fine:
 
   h2 () { { hg & hg; } | sha256sum | cut -d' ' -f1; }
   
-  cg () { { h2 & h2 & h2 & h2; } | pigz -9cp8 | tail -c130 | head -c 128; }
+  cg () { { h2 & h2 & h2 & h2; } | pigz -9c -J4 -p auto | tail -c130 | head -c 128; }
 
 This variation that leverage the sha256 has cr:ci = 1 and the 8 cores parallelism
 is about 4x faster than the first stable version based on md5sum.
+
+  hg() { printf "%05d" $RANDOM; }
+
+The above function is the reference to compare with becuase $RANDOM is the default
+source of pseudorandom numbers. If the approach leveraging jitters is faster and/or
+provide better quality "entrophy" the reference test is passed (not kernel, shell!).
 
