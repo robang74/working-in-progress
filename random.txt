@@ -351,7 +351,7 @@ number of "dd" instances are are 10% less 6 x 3 x 3 < 5 x 4 x 2 but the concurre
 among the instances is uprises to 8 to 18 which clog also a 8-core CPU increasing
 the jitter amplitude thus the randomness (as per unpredictability).
 
-  hc() { pigz -cp$(nproc) "$@" | tail -c+24; }                          # run.32
+  hc() { pigz -cp$(nproc) "$@" | tail -c+16 | head -c-8; }              # run.33
 
   hs() { sha512sum | xxd -r -p; }
   
@@ -376,7 +376,7 @@ A raw estimation indicates a need of randomness between 600 and 630 bits in tota
 The main principle behind is hash and zip provide their best in diffuse and level
 the values when they can work in their sweet spot 1:2 aka cr% and ci% around 50%.
 
---------------------------------------------------------------------------------
+-- RUN 28 ----------------------------------------------------------------------
 
 let nr++; echo run.$nr
 while sleep 0.01; do cg >> run.$nr; done &
