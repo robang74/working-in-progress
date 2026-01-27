@@ -6,7 +6,7 @@ Collecting entropy is a metaphor because only information can be "collected"
 ergo stored in a precise notation like the number 123 or a string of bits. The
 aim of "collecting entropy" is to have a sequence of numbers (information) which
 cannot be anticipated. However, as you can imagine because that series of
-numbers is stored somewhere, it is possible to anticipate because it is known.
+numbers are stored somewhere, it is possible to anticipate because it is known.
 
 The fundamental point is about WHO can access that information and HOW that
 information is structured. The structure of information is fundamental to avoid
@@ -46,18 +46,17 @@ escalation, the safe boundary. For a remote, wait... Here is the MAIN point.
 This "obscurity by randomness" is not used to protect the root password secret
 only but mainly to protect the ciphering of the communications. Because a crypto
 algorithm can be extremely hard to break unless guessing the seed of the random
-numbers generator is easy instead. Because the idea behind the cripto-safety is
+numbers generator is easy instead. Because the idea behind the crypto-safety is
 about who knows the key (a string of bits) can de/cypher the message (Enigma,
-WW2) despite the algorithm for de/cypher being public (or desveiled, because
+WW2) despite the algorithm for de/cypher being public (or deveiled, because
 leaked).
 
 Therefore about randomness, everything is about HOW hard it is to predict or
 sniff the sequence of numbers from what we already know or can reasonably
-supporsing and check in a very short time, short enough to be useful: 1s or
-1E(1E100)s?
+support and check in a very short time, short enough to be useful: 1s or 1E100s?
 
 In modern systems the CPU is a multi-core, multi-thread, multi-branch and all of
-these "features" are multi-layered cached. Many tasks are running even if the
+these "features" are multi-layered caches. Many tasks are running even if the
 whole userland system is "doing nothing" and task preemption can kick in at any
 time, creating latencies in HOW long a deterministic task takes. Because also in
 complex systems it often requires a very-low latency (e.g. industry and CNC),
@@ -115,7 +114,7 @@ but the relatively large jitter causes the LSB stop part to have many more
 digits that can be considered strongly random in their nature.
 
 Once a string which the random nature of nnXnnx is hashed the result is XXXXXX
-becuase nobody can anymore say (once the start/stop are lost) how the randomness
+because nobody can anymore say (once the start/stop are lost) how the randomness
 has been diffused into the checksum string length, it is everywhere making each
 bit totally unpredictable in the same manner (multiplication by diffusion).
 
@@ -186,8 +185,8 @@ rafrand() {
   Theoretically correct to arise a "bias issue" but that string is splitted
   in 3 parts and that parts are used as seed for other strong-level randomness
   production tasks. While the randomness seed seems very essential, the values
-  used in that process are relatively small compared to the 5 digits (%32 to %3)
-  hence it doesn't matter because reminders are those that really matter.
+  used in that process are relatively small compared to the 5 digits (%32 to %3).
+  Hence, it doesn't matter because reminders are those that really matter.
 
 2. The "dd" skipping on Compressed Stream
 
@@ -214,8 +213,8 @@ rafrand_one:
 
   It spawns many processes, it uses "2>&1", "set -x", to mix by a time task
   switch unpredictable sequence different data flow which can potentially be
-  interlivead "stdbuf" into a single output stream not only because task
-  switching but also because output buffering suppresion (or changes).
+  interleaved "stdbuf" into a single output stream not only because task
+  switching but also because output buffering suppression (or changes).
 
 rafrand_ubf:
 
@@ -244,9 +243,9 @@ multiplying I/O task jittering like dd output like this:
   0+1 records out
   1 byte copied, 4.5698e-05 s, 21.9 kB/s
 
-there are few randonmess here because execution time varies between 4 and 8 -05s
+there are few randomness here because execution time varies between 4 and 8 -05s
 on my tests which are 4.5 digits 5E4 combinations, less than 16 bits of "entropy"
-because everyhting else is correlated at that 4.5 digits of informations.
+because everything else is correlated at that 4.5 digits of information.
 
   rafgen5sum() {
       n=${1:-5}; echo | while let n--; do
@@ -261,7 +260,7 @@ of unstructured information (randomness) which is enough to fill the 128 md5sum.
   ng() { { ug;ug;ug;ug; }| pigz -11cp8 | dd bs=32 skip=1 count=2 status=none; }
 
 A more sophisticated implementation increase cut the obvious redundancy in the
-sources and ensure enough data for terminating the task by the required lenght:
+sources and ensure enough data for terminating the task by the required length:
 
   cg() {
     n=${1:-6}; while let n--; do rafgen5sum 4 | cut -zc-32; done |\
@@ -272,13 +271,13 @@ sources and ensure enough data for terminating the task by the required lenght:
     n=64; cg | while let n--; do dd bs=1 skip=1 count=1 status=none; done
   }
 
-The changes are: the fixed lenght and collecting the last part of the zip-data.
+The changes are: the fixed length and collecting the last part of the zip-data.
 
 ### information density ########################################################
 
 The "pigz -11" is peculiar because is one of the most extreme non-lossing
 compression easily available. Thus is strong enough to provide a reasonable
-quantisation of the information contained into chunk of data becuase it removes
+quantisation of the information contained into chunk of data because it removes
 redundancy. It adds a file header but the size is fix (10 byte) thus irrelevant.
 
   tg () { n=${1:-5}; echo | while let n--; do dd bs=1 count=1k 2>&1; done | $FUNC; }
@@ -298,15 +297,15 @@ The function above are made to check the impact of the hashing function, here be
   cr%  | n/a  |  12% |  68% |  65% |   60%  |   56%  |
   ir%  | n/a  |  n/a |   1  |  85% |   59%  |   33%  |
 
-The hash function doesn't matter provided that it is good enough as hash function.
+The hash function doesn't matter provided that it is good enough as a hash function.
 
-The hash function matters for avoid collisions in forensic signature but in terms
-of diffusion have not any impact. The lenght of the output has impact on the size
+The hash function matters for avoid collisions in forensic signature but in terms of
+diffusion has not any impact. The length of the output has impact on the size
 of the output but taking this as a general principle we would use the clear text.
 
 The numbers in the table above show that there is no advantage to use a longer
 hash because in any case the total randomness injected remains the same but
-diluited. Among these hash fuctions md5 is the simplest, sha256 has cr:ci = 1.
+diluted. Among these hash functions md5 is the simplest, sha256 has cr:ci = 1.
 
   hg () { n=${1:-5}; echo | while let n--; do dd bs=1 count=1k 2>&1; done; }
 
@@ -314,8 +313,8 @@ diluited. Among these hash fuctions md5 is the simplest, sha256 has cr:ci = 1.
 
   cg () { { h5;h5; } | pigz -9cp8 | tail -c130 | head -c 128; }
 
-With this set of funcitona above tuned for the sha512, the rafrand_tiny() is 2x
-faster than using the md5sum (ca. 2.5x before its md5sum 85% optimisation).
+With this set of functions above tuned for the sha512, the rafrand_tiny() is 2x
+faster than using the md5sum (ca. 2.5x before its md5sum 85% optimization).
   h1 () { echo | dd bs=32 count=32 2>&1; }
 
   h6 () { { h1; h1; } & { h1; h1; } & { h1; h1; } }
@@ -324,7 +323,7 @@ faster than using the md5sum (ca. 2.5x before its md5sum 85% optimisation).
 
   cg () { { h2 & h2; } | pigz -9c | tail -c130 | head -c128; }
 However, the winner is the sha512 because of it scale better on a 8-core CPU due
-to a multi-thread apporoch. In fact, the algorithm is newer and heavier but also
+to a multi-thread approach. In fact, the algorithm is newer and heavier but also
 its implementation is better suited for modern CPUs.
 
 Also, the sha256 alternative is fine:
@@ -338,16 +337,16 @@ is about 4x faster than the first stable version based on md5sum.
 
   hg() { printf "%05d" $RANDOM; }
 
-The above function is the reference to compare with becuase $RANDOM is the default
+The above function is the reference to compare with because $RANDOM is the default
 source of pseudorandom numbers. If the approach leveraging jitters is faster and/or
 provide better quality "entropy" the reference test is passed: !kernel but shell!
 
 ### randomness density #########################################################
 
-Stronger gc() variance with 2x randomeness density (rnd/bit) even if the total
+Stronger gc() variance with 2x randomness density (rnd/bit) even if the total
 number of "dd" instances are are 10% less 6 x 3 x 3 < 5 x 4 x 2 but the concurrency
-among the istances is uprises to 8 to 18 which clog also a 8-core CPU increasing
-the jitter amplitude thus the randomness (as per unpredicability).
+among the instances is uprises to 8 to 18 which clog also a 8-core CPU increasing
+the jitter amplitude thus the randomness (as per unpredictability).
 
   h1 () { { time echo | dd bs=32 count=32; } 2>&1; }
 
@@ -366,7 +365,7 @@ In practice over 165 bytes, only 128 are selected and trimmed down to 64 (1:1).
 In this scenario 165 x 8 = 1320, and 24 x 26 = 624 but because the zip table the
 first 32 (instead of 10, the file header) are providing lower randomness density.
 
-A raw estimation indicates a need of randomness betwenn 600 and 630 bits in total.
+A raw estimation indicates a need of randomness between 600 and 630 bits in total.
 The main principle behind is hash and zip provide their best in diffuse and level
 the values when they can work in their sweet spot 1:2 aka cr% and ci% around 50%.
 
