@@ -395,3 +395,5 @@ Criptographics need of randomness is a self solving problem. Create an algorithm
 
 It is a self-sustaining unpredictability engine: it makes running the wheels and kept "warm" the abitacle at the same time with the same fuel.
 
+This is masterchef, not IT anymore? Right, because of the day in which "entropy" word gets into the discourse: who said entropy, shame on them!
+
