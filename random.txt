@@ -377,6 +377,10 @@ the values when they can work in their sweet spot 1:2 aka cr% and ci% around 50%
 
 --------------------------------------------------------------------------------
 
+let nr++
+while sleep 0.01; do cg >> run.$nr; done & 
+while sleep   60; do ent   run.$nr; done
+
 Evolution of the statistics from 62K to 360K file size using the "ent" command:
 
 File size     :       61696 -->      359552 byte
