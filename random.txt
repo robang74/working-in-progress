@@ -381,3 +381,17 @@ Classic example the 7 hits of a ball in a biliard game. If an attacker can predi
 
 So, I am not inventing anything just repeat the mistakes of the past to create conditions that usally people avoid like unpredicatibility. Curiously, while we -- as humans -- are avoiding to face unpredictability, at the same time we are seeking uncertanty for safety. This is a clear psicological pathema: we run away from our fears to embrace the fundamental uncertanty as our comfort zone and it is an illusion, orchestrated or not.
 
+Another wrong belief is that structured information in input of a deterministic algorithm will created a structured in output, or at least, the output will continue to carry on some characteristics of the original structure. Boiling a fishtank will provide a fishsoup, reversing this process isn't feaseable. Blender and mix fruits and milk, provide a milk-fruit smoothie, reversing this process isn't feaseable.
+
+However, in IT the backdoor is about what if analysing the output I could discover the "receipe" and the "ingredient" like how the blender works or which was the fishtank population? Which is the same of asking how well the blender and the mixer are working? Are the hash good? Are the zipper good? We know tasting the smoothie and the taste of the smoothie can be replicated, for sure. It is deterministic.
+
+What is not deterministic, is the "information collected" on the surface of the boiling bubble, the glitches of the mixer blades sound in cutting the fruit. Those information have been collected but at the same time lost because mixed with the soup and the smoothie. Despite someone can argue that s/he can clearly determine it is a fishsoup rather than a fruit milkshake, doesn't help.
+
+What remained of the previous input information structure is enough for clear some uncertainty but still does not provide a useful predictability. The watermark of the compression, even if survived by 1-took-1-lost isn't predictable. Saying this is pigz compression output at p8 9c seems magical but give nothing. In the same manner we know how chypers works they keep the data secret if the secret of the seed is kept.
+
+Then, the military grade "white noise" is achieve using a good and quick chyphers, chyper the blender output and forget the key. Violating a safe to find a fishsoup or a milkshake recipe is worth the effort? Or it can be done the opposite, chyper the input before blend and mix. When the blender and the mixer are working good enough to compete with /dev/random, there is a good reason to think that adding another NP-layer would easily reach the /dev/urandom and behyond.
+
+Criptographics need of randomness is a self solving problem. Create an algorithm that while it cyphers or decyphers (risky, the input can be manipulated by the attacker) is also creating unpredictable randomness at no extra cost because every work (L) produce entropy so the cyphering as well, just collect it. In fact, observing the 1-took-1-lost process it does 64 times a "dd" which creates on the stderr the same kind of "entropy" we started from initially.
+
+It is a self-sustaining unpredictability engine: it makes running the wheels and kept "warm" the abitacle at the same time with the same fuel.
+
