@@ -371,31 +371,90 @@ the values when they can work in their sweet spot 1:2 aka cr% and ci% around 50%
 
 ### rationale 2nd part #########################################################
 
-Almost all security by ciphering is based on the principle that TRUE security relies on fundamental uncertainty. So, supposing we have a source of fundamental uncertainty, we will not be able to find out that it is a real fundamental uncertainty or a tricking system that catches our attempts and shuffles the answers. There is no way out of this dilemma, apparently.
+Almost all security by ciphering is based on the principle that TRUE security
+relies on fundamental uncertainty. So, supposing we have a source of fundamental
+uncertainty, we will not be able to find out that it is a real fundamental
+uncertainty or a tricking system that catches our attempts and shuffles the
+answers. There is no way out of this dilemma, apparently.
 
-Unless, a change of paradigma kicks in. Uncertainty is just A way to achieve unpredictability. But in reality, classic deterministic systems can evolve in a state for which unpredictability is a fundamental trait. Theory of chaos and theory of the constrained systems control are complementary NOT mutually exclusive. Keeping a system (or bringing for a little while a system) into an unpredictability zone is possible and it is possible to verify in a useful timeframe / delay that it is working in that zone.
+Unless, a change of paradigma kicks in. Uncertainty is just A way to achieve
+unpredictability. But in reality, classic deterministic systems can evolve in a
+state for which unpredictability is a fundamental trait. Theory of chaos and
+theory of the constrained systems control are complementary NOT mutually
+exclusive. Keeping a system (or bringing for a little while a system) into an
+unpredictability zone is possible and it is possible to verify in a useful
+timeframe / delay that it is working in that zone.
 
-Classic example is the 7 hits of a ball in a billiard game. If an attacker can predict 7 moves but NOT the 8+ then the attacker is done. Because this means that whatever s/he manages to hook the system, the system will get out of predictability shortly despite any attempts of keeping under observation. It means that when a system is hooked, it is already out of the observation scope and the attacker is just looking at something in the past.
+Classic example is the 7 hits of a ball in a billiard game. If an attacker can
+predict 7 moves but NOT the 8+ then the attacker is done. Because this means
+that whatever s/he manages to hook the system, the system will get out of
+predictability shortly despite any attempts of keeping under observation. It
+means that when a system is hooked, it is already out of the observation scope
+and the attacker is just looking at something in the past.
 
-A move in chess is a letter, a number, another letter and another number (bare plainly encodable in 12 bits). Let's say that 512 bits (of unpredictability) is not an entire game but enough to check this assumption (43 chess moves vs billiard 7-cushion). Failing in check with 64 bytes, means that 128 enter into the scene. Useless trying on high ground of 128 bytes. If it works, it will work at 32 or 64 bytes. That's my bold assumption and it is not so bold considering what I wrote here. The history of physics is full of classic systems of unpredictability running-away.
+A move in chess is a letter, a number, another letter and another number (bare
+plainly encodable in 12 bits). Let's say that 512 bits (of unpredictability) is
+not an entire game but enough to check this assumption (43 chess moves vs
+billiard 7-cushion). Failing in check with 64 bytes, means that 128 enter into
+the scene. Useless trying on high ground of 128 bytes. If it works, it will work
+at 32 or 64 bytes. That's my bold assumption and it is not so bold considering
+what I wrote here. The history of physics is full of classic systems of
+unpredictability running-away.
 
-So, I am not inventing anything, just repeating the mistakes of the past to create conditions that usually people avoid like unpredictability. Curiously, while we -- as humans -- are avoiding to face unpredictability, at the same time we are seeking uncertainty for safety. This is a clear psychological pathema: we run away from our fears to embrace the fundamental uncertainty as our comfort zone and it is an illusion, orchestrated or not.
+So, I am not inventing anything, just repeating the mistakes of the past to
+create conditions that usually people avoid like unpredictability. Curiously,
+while we -- as humans -- are avoiding to face unpredictability, at the same time
+we are seeking uncertainty for safety. This is a clear psychological pathema: we
+run away from our fears to embrace the fundamental uncertainty as our comfort
+zone and it is an illusion, orchestrated or not.
 
 ### the masterchef cusine ######################################################
 
-Another wrong belief is that structured information in input of a deterministic algorithm will create a structure in output, or at least, the output will continue to carry on some characteristics of the original structure. Boiling a fish tank will provide a fish soup, reversing this process isn't feasible. Blender and mix fruits and milk, provide a milk-fruit smoothie, reversing this process isn't feasible.
+Another wrong belief is that structured information in input of a deterministic
+algorithm will create a structure in output, or at least, the output will
+continue to carry on some characteristics of the original structure. Boiling a
+fish tank will provide a fish soup, reversing this process isn't feasible.
+Blender and mix fruits and milk, provide a milk-fruit smoothie, reversing this
+process isn't feasible.
 
-However, in IT the backdoor is about what if analysing the output I could discover the "recipe" and the "ingredient" like how the blender works or which was the fishtank population? Which is the same as asking how well the blender and the mixer are working? Is the hash good? Are the zippers good? We know tasting the smoothie and the taste of the smoothie can be replicated, for sure. It is deterministic.
+However, in IT the backdoor is about what if analysing the output I could
+discover the "recipe" and the "ingredient" like how the blender works or which
+was the fishtank population? Which is the same as asking how well the blender
+and the mixer are working? Is the hash good? Are the zippers good? We know
+tasting the smoothie and the taste of the smoothie can be replicated, for sure.
+It is deterministic.
 
-What is not deterministic, is the "information collected" on the surface of the boiling bubble, the glitches of the mixer blades sound in cutting the fruit. Those information have been collected but at the same time lost because mixed with the soup and the smoothie. Although someone can argue that s/he can clearly determine it is a fish soup rather than a fruit milkshake, it doesn't help.
+What is not deterministic, is the "information collected" on the surface of the
+boiling bubble, the glitches of the mixer blades sound in cutting the fruit.
+Those information have been collected but at the same time lost because mixed
+with the soup and the smoothie. Although someone can argue that s/he can clearly
+determine it is a fish soup rather than a fruit milkshake, it doesn't help.
 
-What remains of the previous input information structure is enough to clear some uncertainty but still does not provide a useful predictability. The watermark of the compression, even if survived by 1-took-1-lost, isn't predictable. Saying this is pigz compression output at "-p8 -9c" seems magical but gives nothing. In the same manner we know how ciphers work: they keep the data secret if the secret of the seed is kept.
+What remains of the previous input information structure is enough to clear some
+uncertainty but still does not provide a useful predictability. The watermark of
+the compression, even if survived by 1-took-1-lost, isn't predictable. Saying
+this is pigz compression output at "-p8 -9c" seems magical but gives nothing. In
+the same manner we know how ciphers work: they keep the data secret if the
+secret of the seed is kept.
 
-Then, the military grade "white noise" is achieved using good and quick ciphers, cypher the blender output and forget the key. Violating a safe to find a fish soup or a milkshake recipe is worth the effort? Or it can be done the opposite, cypher the input before blend and mix. When the blender and the mixer are working good enough to compete with /dev/random, there is a good reason to think that adding another NP-layer would easily reach the /dev/urandom and beyond.
+Then, the military grade "white noise" is achieved using good and quick ciphers,
+cypher the blender output and forget the key. Violating a safe to find a fish
+soup or a milkshake recipe is worth the effort? Or it can be done the opposite,
+cypher the input before blend and mix. When the blender and the mixer are
+working good enough to compete with /dev/random, there is a good reason to think
+that adding another NP-layer would easily reach the /dev/urandom and beyond.
 
-Criptographics' need for randomness is a self solving problem. Create an algorithm that while it ciphers or deciphers (risky, the input can be manipulated by the attacker) is also creating unpredictable randomness at no extra cost because every work (L) produces entropy so the ciphering as well, just collects it. In fact, observing the 1-took-1-lost process it does 64 times a "dd" which creates on the stderr the same kind of "entropy" we started from initially.
+Criptographics' need for randomness is a self solving problem. Create an
+algorithm that while it ciphers or deciphers (risky, the input can be
+manipulated by the attacker) is also creating unpredictable randomness at no
+extra cost because every work (L) produces entropy so the ciphering as well,
+just collects it. In fact, observing the 1-took-1-lost process it does 64 times
+a "dd" which creates on the stderr the same kind of "entropy" we started from
+initially.
 
-It is a self-sustaining unpredictability engine: it makes running the wheels and keeps "warm" the habitacle at the same time with the same fuel.
+It is a self-sustaining unpredictability engine: it makes running the wheels and
+keeps "warm" the habitacle at the same time with the same fuel.
 
-This is masterchef, not IT anymore? Right, because of the day in which "entropy" word gets into the discourse: who said entropy, shame on them!
+This is masterchef, not IT anymore? Right, because of the day in which "entropy"
+word gets into the discourse: who said entropy, shame on them!
 
