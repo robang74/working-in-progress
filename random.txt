@@ -377,18 +377,18 @@ the values when they can work in their sweet spot 1:2 aka cr% and ci% around 50%
 
 --------------------------------------------------------------------------------
 
-Entropy = 7.996529 bits per byte.
+Evolution of the statistics from 62K to 360K file size using the "ent" command:
 
-Optimum compression would reduce the size of this 61696 byte file by 0 percent.
-
-Chi square distribution for 61696 samples is 296.75, and randomly
-  would exceed this value 3.71 percent of the times.
-
-Arithmetic mean value of data bytes is 127.5678 (127.5 = random).
-
-Monte Carlo value for Pi is 3.175646761 (error 1.08 percent).
-
-Serial correlation coefficient is -0.006375 (totally uncorrelated = 0.0).
+File size     :       61696 -->      359552 byte
+Entropy       :    7.996529 -->    7.999392 bits per byte.
+ \missing gap :    -0.04339% -->   -0.00760%
+Chi square    :      296.75 -->      303.19
+ \dev. freq.  :       3.71% -->       2.06%
+Average       :    127.5678 -->    127.4090
+ \Err. on avg.:      0.053% -->      0.071%
+Monte Carlo Pi: 3.175646761 --> 3.143662912
+ \Err. on Pi  :       1.08% -->       0.07%
+Correlation   :   -0.006375 -->   -0.001009 (0: 100% uncorrelated)
 
 ### rationale 2nd part #########################################################
 
@@ -450,7 +450,7 @@ boiling bubble, the glitches of the mixer blades sound in cutting the fruit.
 Those information have been collected but at the same time lost because mixed
 with the soup and the smoothie. Although someone can argue that s/he can clearly
 determine it is a fish soup rather than a fruit milkshake, it doesn't help.
-
+§ùùùùhhhhhhhhhh
 What remains of the previous input information structure is enough to clear some
 uncertainty but still does not provide a useful predictability. The watermark of
 the compression, even if survived by 1-took-1-lost, isn't predictable. Saying
