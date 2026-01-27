@@ -321,3 +321,12 @@ However, the winner is the sha512 because of it scale better on a 8-core CPU due
 to a multi-thread apporoch. In fact, the algorithm is newer and heavier but also
 its implementation is better suited for modern CPUs.
 
+Also, the sha256 alternative is fine:
+
+  h2 () { { hg & hg; } | sha256sum | cut -d' ' -f1; }
+  
+  cg () { { h2 & h2 & h2 & h2; } | pigz -9cp8 | tail -c130 | head -c 128; }
+
+This variation that leverage the sha256 has cr:ci = 1 and the 8 cores parallelism
+is about 4x faster than the first stable version based on md5sum.
+
