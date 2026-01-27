@@ -369,3 +369,15 @@ A raw estimation indicates a need of randomness between 600 and 630 bits in tota
 The main principle behind is hash and zip provide their best in diffuse and level
 the values when they can work in their sweet spot 1:2 aka cr% and ci% around 50%.
 
+### rationale 2nd part #########################################################
+
+Almost all security by cyphering is based on the principle that TRUE security relies on fundamental uncertanty. So, supposing we have a source of fundamental uncertanty, we will not be able to find out that it is a real fundamental uncertanty or a tricking system that catch our attempts and shuffle the answers. There is no way out of this dilemma, apparently.
+
+Unless, a change of paradigma kick in. Uncertanty is just A way to achieve unpredictability. But in reality, classic deterministic systems can be evolve in state for which unpredictibility is a fundamental traits. Theory of the chaos and theory of the constrained systems control are complementary NOT mutually esclusive. Keeping a system (or bringing for a little while a system) into unpredicatability zone is possible and it is possibly verify in a useful timeframe / delay that it is working in that zone.
+
+Classic example the 7 hits of a ball in a biliard game. If an attacker can predict 7 moves but NOT the 8+ then the attacker is done. Because this means that whatever s/he manage to hook the system, the system will get out of predictability short soon despite any attemps of keeping under observation. It means that when a system is hooked, it is already out of the observation scope and the attacker is just looking at something in the past.
+
+8 move in chess are a letter a number, another letter and another number. Let say that 64 bit of unpredictability is not an entire game but enough to check this assumption. Failing in check with 64 bit, means that 128 enter into the scene. Useless trying on high ground of 128 bit. If it works, it will works at 32 bit or 64 bit. That's my bold assumption and it is not so bold considering what I wrote here. The history of physics is plenty of classic systems of unpredicability running-away.
+
+So, I am not inventing anything just repeat the mistakes of the past to create conditions that usally people avoid like unpredicatibility. Curiously, while we -- as humans -- are avoiding to face unpredictability, at the same time we are seeking uncertanty for safety. This is a clear psicological pathema: we run away from our fears to embrace the fundamental uncertanty as our comfort zone and it is an illusion, orchestrated or not.
+
