@@ -315,13 +315,15 @@ diluted. Among these hash functions md5 is the simplest, sha256 has cr:ci = 1.
 
 With this set of functions above tuned for the sha512, the rafrand_tiny() is 2x
 faster than using the md5sum (ca. 2.5x before its md5sum 85% optimization).
-  h1 () { echo | dd bs=32 count=32 2>&1; }
 
-  h6 () { { h1; h1; } & { h1; h1; } & { h1; h1; } }
+  hg () { echo | dd bs=32 count=32 2>&1; }
+
+  h6 () { { hg; hg; } & { hg; hg; } & { hg; hg; } }
 
   h2 () { { h6 & h6 & h6; } | sha512sum -b | cut -d' ' -f1; }
 
   cg () { { h2 & h2; } | pigz -9c | tail -c130 | head -c128; }
+
 However, the winner is the sha512 because of it scale better on a 8-core CPU due
 to a multi-thread approach. In fact, the algorithm is newer and heavier but also
 its implementation is better suited for modern CPUs.
@@ -348,16 +350,20 @@ number of "dd" instances are are 10% less 6 x 3 x 3 < 5 x 4 x 2 but the concurre
 among the instances is uprises to 8 to 18 which clog also a 8-core CPU increasing
 the jitter amplitude thus the randomness (as per unpredictability).
 
-  h1 () { { time echo | dd bs=32 count=32; } 2>&1; }
+  hc() { pigz -cp$(nproc) "$@"; }
 
-  h6 () { h1 & h1 & h1 & h1; }
+  hs() { sha512sum | cut -d' ' -f1 | tr -d '\n' | xxd -r -p; }
+  
+  hg() { { time echo | dd bs=32 count=32; } 2>&1; }
 
-  h2 () { { h6 & h6 & h6; } | sha512sum -b | cut -d' ' -f1; }
+  h4() { hg & hg & hg & hg; }
 
-  cg () { { h2 & h2; } | pigz -9c | tail -c130 | head -c128; }
+  h3() { { h4 & h4 & h4; } | hc -1; }
 
-Then included time in h1() in order to add 3 digits more of randomness, at least.
-By a raw estimation the single h1() call provides 26 bit of randomness x 24 calls.
+  cg() { { h3 & h3; } | hc -9 | hs; }
+
+Then included time in hg() in order to add 3 digits more of randomness, at least.
+By a raw estimation the single hg() call provides 26 bit of randomness x 24 calls.
 
 Which is a particular good balance because N calls * N bit: N² >= 512 --> N = 23.
 In practice over 165 bytes, only 128 are selected and trimmed down to 64 (1:1).
@@ -368,6 +374,21 @@ first 32 (instead of 10, the file header) are providing lower randomness density
 A raw estimation indicates a need of randomness between 600 and 630 bits in total.
 The main principle behind is hash and zip provide their best in diffuse and level
 the values when they can work in their sweet spot 1:2 aka cr% and ci% around 50%.
+
+--------------------------------------------------------------------------------
+
+Entropy = 7.996529 bits per byte.
+
+Optimum compression would reduce the size of this 61696 byte file by 0 percent.
+
+Chi square distribution for 61696 samples is 296.75, and randomly
+  would exceed this value 3.71 percent of the times.
+
+Arithmetic mean value of data bytes is 127.5678 (127.5 = random).
+
+Monte Carlo value for Pi is 3.175646761 (error 1.08 percent).
+
+Serial correlation coefficient is -0.006375 (totally uncorrelated = 0.0).
 
 ### rationale 2nd part #########################################################
 
