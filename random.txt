@@ -379,7 +379,7 @@ the values when they can work in their sweet spot 1:2 aka cr% and ci% around 50%
 --------------------------------------------------------------------------------
 
 let nr++; echo run.$nr
-while sleep 0.01; do cg >> run.$nr; done & 
+while sleep 0.01; do cg >> run.$nr; done &
 while sleep   60; do ent   run.$nr; done
 
 Evolution of the statistics from 62K to 360K file size using the "ent" command:
@@ -455,7 +455,7 @@ boiling bubble, the glitches of the mixer blades sound in cutting the fruit.
 Those information have been collected but at the same time lost because mixed
 with the soup and the smoothie. Although someone can argue that s/he can clearly
 determine it is a fish soup rather than a fruit milkshake, it doesn't help.
-§ùùùùhhhhhhhhhh
+
 What remains of the previous input information structure is enough to clear some
 uncertainty but still does not provide a useful predictability. The watermark of
 the compression, even if survived by 1-took-1-lost, isn't predictable. Saying
