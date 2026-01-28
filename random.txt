@@ -812,13 +812,13 @@ Why? Because the shell starts first the last command at the end of the pipe,
 and this is a multi-process single out pipe, thus "perl" as per the last in
 pipe rules over all.
 
-ph() { ionice -c3 nice -n19 stdbuf -o0 -e0 -i0 "$@"; }                         # run.52
+  ph() { ionice -c3 nice -n19 stdbuf -o0 -e0 -i0 "$@"; }                        # run.52
 
-ud() { ph dd status=none bs=1 "$@"; }
+  ud() { ph dd status=none bs=1 "$@"; }
 
-pl() { h9 | ph perl -0777 -pe "$@"; }
+  pl() { h9 | ph perl -0777 -pe "$@"; }
 
-cg() { ( pl 's/.(.)(.)/$2$1/gs' & pl 's/(.).(.)/$1$2/gs' & pl 's/(.)(.)./$2$1/gs' ); }
+  cg() { ( pl 's/.(.)(.)/$2$1/gs' & pl 's/(.).(.)/$1$2/gs' & pl 's/(.)(.)./$2$1/gs' ); }
 
 Moreover, the last three symmethric workloads get imbalanced by the middle one
 which was making two replacement (2x1) instead of one double (1x2). Fixed and
@@ -837,25 +837,27 @@ that can be faced in pragmatic way: aggregate the outputs from all the runs from
 and the #52. In theory, they have the same nature and aim to mash down the blocks
 watermarks that make those two tests fails without any other regression.
 
-Entropy = 7.998822 bits per byte.
-Chi square distribution for 138933 samples is 227.03, and randomly
-would exceed this value 89.57 percent of the times.
-Arithmetic mean value of data bytes is 127.3380 (127.5 = random).
-Monte Carlo value for Pi is 3.145065861 (error 0.11 percent).
+  Entropy = 7.998822 bits per byte.
+  Chi square distribution for 138933 samples is 227.03, and randomly
+  would exceed this value 89.57 percent of the times.
+  Arithmetic mean value of data bytes is 127.3380 (127.5 = random).
+  Monte Carlo value for Pi is 3.145065861 (error 0.11 percent).
 
-Entropy = 7.999343 bits per byte.
-Chi square distribution for 288358 samples is 261.56, and randomly
-would exceed this value 37.54 percent of the times.
-Arithmetic mean value of data bytes is 127.3903 (127.5 = random).
-Monte Carlo value for Pi is 3.150294430 (error 0.28 percent).
+  Entropy = 7.999343 bits per byte.
+  Chi square distribution for 288358 samples is 261.56, and randomly
+  would exceed this value 37.54 percent of the times.
+  Arithmetic mean value of data bytes is 127.3903 (127.5 = random).
+  Monte Carlo value for Pi is 3.150294430 (error 0.28 percent).
 
-Entropy = 7.999493 bits per byte.
-Chi square distribution for 384291 samples is 269.03, and randomly
-would exceed this value 26.12 percent of the times.
-Arithmetic mean value of data bytes is 127.4673 (127.5 = random).
-Monte Carlo value for Pi is 3.144079440 (error 0.08 percent).
+  Entropy = 7.999493 bits per byte.
+  Chi square distribution for 384291 samples is 269.03, and randomly
+  would exceed this value 26.12 percent of the times.
+  Arithmetic mean value of data bytes is 127.4673 (127.5 = random).
+  Monte Carlo value for Pi is 3.144079440 (error 0.08 percent).
 
 --------------------------------------------------------------------------------
+
+This run includes the evolutions after the introduction of "perl" into the #42 code.
 
   ph() { ionice -c3 nice -n19 stdbuf -o0 -e0 -i0 "$@"; }                        # run.53
 
@@ -876,4 +878,206 @@ Monte Carlo value for Pi is 3.144079440 (error 0.08 percent).
   pl() { h9 | ph perl -0777 -pe "$@"; }
 
   cg() { ( pl 's/.(.)(.)/$2$1/gs' & pl 's/(.).(.)/$1$2/gs' & pl 's/(.)(.)./$2$1/gs' ); }
+
+  Entropy = 7.996935 bits per byte.
+  Chi square distribution for 61662 samples is 259.76, and randomly
+  would exceed this value 40.56 percent of the times.
+  Arithmetic mean value of data bytes is 127.3414 (127.5 = random).
+  Monte Carlo value for Pi is 3.153449450 (error 0.38 percent).
+
+  Entropy = 7.998560 bits per byte.
+  Chi square distribution for 139836 samples is 278.41, and randomly
+  would exceed this value 15.02 percent of the times.
+  Arithmetic mean value of data bytes is 127.5823 (127.5 = random).
+  Monte Carlo value for Pi is 3.140307217 (error 0.04 percent).
+
+  Entropy = 7.999242 bits per byte.
+  Chi square distribution for 261870 samples is 274.40, and randomly
+  would exceed this value 19.28 percent of the times.
+  Arithmetic mean value of data bytes is 127.6031 (127.5 = random).
+  Monte Carlo value for Pi is 3.145285829 (error 0.12 percent).
+
+--------------------------------------------------------------------------------
+
+Removed the byte swap inhtered from the previous integration.                   # run.54
+
+  cg() { ( pl 's/.(.)(.)/$1$2/gs' & pl 's/(.).(.)/$1$2/gs' & pl 's/(.)(.)./$1$2/gs' ); }
+
+  Entropy = 7.999521 bits per byte.
+  Chi square distribution for 360168 samples is 238.75, and randomly
+  would exceed this value 75.99 percent of the times.
+  Arithmetic mean value of data bytes is 127.6702 (127.5 = random).
+  Monte Carlo value for Pi is 3.126940761 (error 0.47 percent).
+
+  Entropy = 7.999584 bits per byte.
+  Chi square distribution for 439503 samples is 253.44, and randomly
+  would exceed this value 51.59 percent of the times.
+  Arithmetic mean value of data bytes is 127.6404 (127.5 = random).
+  Monte Carlo value for Pi is 3.131139932 (error 0.33 percent).
+
+--------------------------------------------------------------------------------
+
+Aligned the I/O waiting schedule policy into the #42 without other changes.     # run.55
+
+  ph() { ionice -c3 nice -n19 stdbuf -o0 -e0 -i0 "$@"; }
+
+  ud() { ph dd status=none bs=1 "$@"; }
+
+  hc() { pigz -cp$(nproc) "$@" | tail -c+16 | head -c-8; }
+
+  hs() { sha512sum | xxd -r -p; }
+  
+  hx() { { cat -; date +%N; } | ud; }
+
+  hg() { { time echo | ud status=progress count=1k; } 2>&1 | hx; }
+
+  h1() { { hg & hg & hg; } | hc -1 | ud; }
+
+  h9() { { h1 & h1 & h1; } | hc -9 | hs | ud; }
+  
+  he() { for i in $(seq 64); do dd status=none bs=1 skip=1 count=2; done; }
+
+  cg() { { h9 & h9 & h9; } | he; }
+
+  Entropy = 7.996953 bits per byte.
+  Chi square distribution for 65710 samples is 276.48, and randomly
+  would exceed this value 16.98 percent of the times.
+  Arithmetic mean value of data bytes is 127.9424 (127.5 = random).
+  Monte Carlo value for Pi is 3.140535111 (error 0.03 percent).
+
+  Entropy = 7.998868 bits per byte.
+  Chi square distribution for 161536 samples is 252.94, and randomly
+  would exceed this value 52.46 percent of the times.
+  Arithmetic mean value of data bytes is 127.5995 (127.5 = random).
+  Monte Carlo value for Pi is 3.151028898 (error 0.30 percent).
+
+--------------------------------------------------------------------------------
+
+  he() { for i in $(seq 64); do ud skip=1 count=2; done; }                      # run.56
+
+  Entropy = 7.996751 bits per byte.
+  Chi square distribution for 61222 samples is 274.07, and randomly
+  would exceed this value 19.67 percent of the times.
+  Arithmetic mean value of data bytes is 127.9878 (127.5 = random).
+  Monte Carlo value for Pi is 3.141428991 (error 0.01 percent).
+
+  Entropy = 7.996778 bits per byte.
+  Chi square distribution for 65812 samples is 293.32, and randomly
+  would exceed this value 4.97 percent of the times.
+  Arithmetic mean value of data bytes is 128.0031 (127.5 = random).
+  Monte Carlo value for Pi is 3.142961342 (error 0.04 percent).
+
+  Entropy = 7.997713 bits per byte.
+  Chi square distribution for 91008 samples is 288.87, and randomly
+  would exceed this value 7.11 percent of the times.
+  Arithmetic mean value of data bytes is 127.7922 (127.5 = random).
+  Monte Carlo value for Pi is 3.147151899 (error 0.18 percent).
+
+--------------------------------------------------------------------------------
+
+  ph() { ionice -c2 -n 7 nice -n19 stdbuf -o0 -e0 -i0 "$@"; }                   # run.57
+
+  he() { for i in $(seq 64); do ud skip=1 count=2; done; }
+
+  Entropy = 7.997226 bits per byte.
+  Chi square distribution for 62082 samples is 238.16, and randomly
+  would exceed this value 76.82 percent of the times.
+  Arithmetic mean value of data bytes is 127.6162 (127.5 = random).
+  Monte Carlo value for Pi is 3.132888760 (error 0.28 percent).
+
+  Entropy = 7.998932 bits per byte.
+  Chi square distribution for 161826 samples is 239.77, and randomly
+  would exceed this value 74.50 percent of the times.
+  Arithmetic mean value of data bytes is 127.3880 (127.5 = random).
+  Monte Carlo value for Pi is 3.144562678 (error 0.09 percent).
+
+  Entropy = 7.998951 bits per byte.
+  Chi square distribution for 175338 samples is 255.24, and randomly
+  would exceed this value 48.39 percent of the times.
+  Arithmetic mean value of data bytes is 127.3931 (127.5 = random).
+  Monte Carlo value for Pi is 3.143140677 (error 0.05 percent).
+
+--------------------------------------------------------------------------------# run.58
+
+  ud() { ionice -c2 -n7 nice -n19 stdbuf -o0 -e0 -i0 dd status=none bs=1 "$@"; }
+
+  hc() { pigz -cp$(nproc) "$@" | tail -c+16 | head -c-8; }
+
+  hs() { sha512sum | xxd -r -p; }
+
+  hx() { { cat -; date +%N; } | ud; }
+
+  hg() { { time echo | dd status=progress bs=1 count=1k; } 2>&1 | hx; }
+
+  h1() { { hg & hg & hg; } | hc -1 | ud; }
+
+  h9() { { h1 & h1 & h1; } | hc -9 | hs | ud; }
+
+  he() { for i in $(seq 64); do dd status=none bs=1 skip=1 count=2; done; }
+
+  cg() { { h9 & h9 & h9; } | he; }
+
+  Entropy = 7.997129 bits per byte.
+  Chi square distribution for 61184 samples is 244.34, and randomly
+  would exceed this value 67.33 percent of the times.
+  Arithmetic mean value of data bytes is 127.6604 (127.5 = random).
+  Monte Carlo value for Pi is 3.134647445 (error 0.22 percent).
+
+  Entropy = 7.998812 bits per byte.
+  Chi square distribution for 161792 samples is 264.89, and randomly
+  would exceed this value 32.21 percent of the times.
+  Arithmetic mean value of data bytes is 127.4235 (127.5 = random).
+  Monte Carlo value for Pi is 3.148080846 (error 0.21 percent).
+
+  Entropy = 7.999226 bits per byte.
+  Chi square distribution for 239872 samples is 257.01, and randomly
+  would exceed this value 45.30 percent of the times.
+  Arithmetic mean value of data bytes is 127.4084 (127.5 = random).
+  Monte Carlo value for Pi is 3.146230427 (error 0.15 percent).
+
+--------------------------------------------------------------------------------# run.59
+
+  ud() { ionice -c2 -n7 stdbuf -o0 -e0 -i0 dd status=none bs=1 "$@"; }
+
+  Entropy = 7.996902 bits per byte.
+  Chi square distribution for 61202 samples is 261.35, and randomly
+  would exceed this value 37.89 percent of the times.
+  Arithmetic mean value of data bytes is 127.8528 (127.5 = random).
+  Monte Carlo value for Pi is 3.147843137 (error 0.20 percent).
+
+  Entropy = 7.997805 bits per byte.
+  Chi square distribution for 94976 samples is 287.67, and randomly
+  would exceed this value 7.80 percent of the times.
+  Arithmetic mean value of data bytes is 127.8038 (127.5 = random).
+  Monte Carlo value for Pi is 3.135510771 (error 0.19 percent).
+
+--------------------------------------------------------------------------------# run.60
+
+The same #42 but without the nice -n19 in the ud-dd function:
+
+  ud() { ionice -c2 -n7 stdbuf -o0 -e0 dd status=none bs=1 "$@"; }
+
+  Entropy = 7.997045 bits per byte.
+  Chi square distribution for 61824 samples is 253.73, and randomly
+  would exceed this value 51.07 percent of the times.
+  Arithmetic mean value of data bytes is 127.6420 (127.5 = random).
+  Monte Carlo value for Pi is 3.121506211 (error 0.64 percent).
+
+  Entropy = 7.998922 bits per byte.
+  Chi square distribution for 161280 samples is 241.05, and randomly
+  would exceed this value 72.57 percent of the times.
+  Arithmetic mean value of data bytes is 127.5677 (127.5 = random).
+  Monte Carlo value for Pi is 3.134672619 (error 0.22 percent).
+  
+  Entropy = 7.999440 bits per byte.
+  Chi square distribution for 361484 samples is 281.06, and randomly
+  would exceed this value 12.58 percent of the times.
+  Arithmetic mean value of data bytes is 127.3748 (127.5 = random).
+  Monte Carlo value for Pi is 3.142463525 (error 0.03 percent).
+
+  Entropy = 7.999731 bits per byte.
+  Chi square distribution for 720930 samples is 269.09, and randomly
+  would exceed this value 26.04 percent of the times.
+  Arithmetic mean value of data bytes is 127.4533 (127.5 = random).
+  Monte Carlo value for Pi is 3.143805917 (error 0.07 percent).
 
