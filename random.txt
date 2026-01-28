@@ -354,7 +354,7 @@ the jitter amplitude thus the randomness (as per unpredictability).
   hc() { pigz -cp$(nproc) "$@" | tail -c+16 | head -c-8; }              # run.33
 
   hs() { sha512sum | xxd -r -p; }
-  
+
   hg() { { time echo | dd bs=1 count=1k; } 2>&1; }
 
   h4() { { hg & hg & hg & hg; } | hs; }
@@ -394,6 +394,34 @@ Average       :    127.5678 -->    127.4090
 Monte Carlo Pi: 3.175646761 --> 3.143662912
  \Err. on Pi  :       1.08% -->       0.07%
 Correlation   :   -0.006375 -->   -0.001009 (0: 100% uncorrelated)
+
+-- RUN 34: very flat and slow --------------------------------------------------
+
+  ud() { ionice -c3 stdbuf -o0 -e0 dd status=none bs=1 "$@"; }
+
+  hc() { pigz -cp$(nproc) "$@" | tail -c+16 | head -c-8 | ud; }         # run.34
+
+  hs() { sha512sum | xxd -r -p | ud; }
+
+  hg() { { time echo | ud count=1k; } 2>&1 | ud; }
+
+  h4() { { hg & hg & hg & hg; } | hs; }
+
+  h3() { { h4 & h4 & h4; } | hc -1; }      # h3( i:192 --> hc(-c+24) --> o:192 )
+
+  cg() { { h3 & h3; } | hc -9 | hs; }
+
+Entropy = 7.999784 bits per byte.
+
+Optimum compression would reduce the size
+of this 912512 byte file by 0 percent.
+
+Chi square distribution for 912512 samples is 273.68, and randomly
+would exceed this value 20.13 percent of the times.
+
+Arithmetic mean value of data bytes is 127.5867 (127.5 = random).
+Monte Carlo value for Pi is 3.141427491 (error 0.01 percent).
+Serial correlation coefficient is -0.001818 (totally uncorrelated = 0.0).
 
 ### rationale 2nd part #########################################################
 
