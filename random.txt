@@ -407,7 +407,7 @@ entgr() { ent "$@" | grep -E "error|samples|127.5 |Entropy|exceed"; }
 
 Statistics from 'ent' are clearly indicates that functions set below is better.
 
-  ud() { ionice -c2 -n7 stdbuf -o0 -e0 dd status=none bs=4 "$@"; }      # run.37
+  ud() { ionice -c2 -n7 stdbuf -o0 -e0 dd status=none bs=1 "$@"; }      # run.38
 
   hc() { pigz -cp$(nproc) "$@" | tail -c+16 | head -c-8; }
 
@@ -553,6 +553,10 @@ diehard_count_1s_str|   0|     24000|     100|0.00000000|  FAILED
 203 -t 24000
 # The file file_input_raw was rewound 2 times
       rgb_lagged_sum|   0|     24000|     100|0.46743392|  PASSED
+
+Due to these two failure, the bs=2^n should be avoided in favour of prime numbers
+in which the 3 and 5 should also escluded then 1 (the most I/O stressful) and the
+other best candidates like 7, 13 or 31. Considering speed is not a KPI here, bs=1.
 
 ### the masterchef cusine ######################################################
 
