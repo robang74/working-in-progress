@@ -205,7 +205,7 @@ rafrand() {
   contextualised on the target system which, for example, it might not have
   "pigz" or not having a multi-thread processor but a "dumb" 32-bit micro
   which provides no significant jitters or "pigz" would be almost useless
-  for goal in that system.
+  for the goal in that system.
 
 ### updates ####################################################################
 
@@ -288,7 +288,7 @@ redundancy. It adds a file header but the size is fix (10 byte) thus irrelevant.
 
   size: { tg;tg;tg;tg;tg; } | wc -c
 
-The function above are made to check the impact of the hashing function, here below:
+The functions above are made to check the impact of the hashing function, here below:
 
        | file |  cat |  md5 | sha1 | sha256 | sha512 |
   byte |      |      |   16 |   20 |    32  |    64  |
@@ -405,7 +405,7 @@ entgr() { ent "$@" | grep -E "error|samples|127.5 |Entropy|exceed"; }
   Arithmetic mean value of data bytes is 127.4732 (127.5 = random).
   Monte Carlo value for Pi is 3.140808301 (error 0.02 percent).
 
-Statistics from 'ent' are clearly indicates that functions set below is better.
+Statistics from 'ent' clearly indicate that functions set below are better.
 
   ud() { ionice -c2 -n7 stdbuf -o0 -e0 dd status=none bs=1 "$@"; }      # run.38
 
@@ -462,7 +462,7 @@ exclusive. Keeping a system (or bringing for a little while a system) into an
 unpredictability zone is possible and it is possible to verify in a useful
 timeframe / delay that it is working in that zone.
 
-Classic example is the 7 hits of a ball in a billiard game. If an attacker can
+A classic example is the 7 hits of a ball in a billiard game. If an attacker can
 predict 7 moves but NOT the 8+ then the attacker is done. Because this means
 that whatever s/he manages to hook the system, the system will get out of
 predictability shortly despite any attempts of keeping under observation. It
@@ -491,8 +491,8 @@ date +%F.%N; let nr++; echo run.$nr; \
 while sleep 0.01; do cg || break; done >>run.$nr
 
 First of all, data size should be collected into a file. While a complete test
-would requires something like 250GB a preliminary simple test can be provided
-with a 4MB. But it seems that two are fail and require deeper investigation.
+would require something like 250GB a preliminary simple test can be provided
+with 4MB. But it seems that two are failing and require deeper investigation.
 
 dhtest() {
   test -n "${1:-}" || return 1
@@ -505,7 +505,7 @@ dhtest() {
   done
 }
 
-Becuase it re-run over the same data at 4-bytes per 32-bit random numbers, the
+Because it re-run over the same data at 4-bytes per 32-bit random numbers, the
 size of the file should be 2^22 + 1, so the offset is even and it will introduce
 a +1 shift for 4 rounds before repeating (16MB window repeat).
 
@@ -513,14 +513,14 @@ tf=run.set; cat run.[0-9]* >$tf; echo >>$tf; du -ks $tf; dhtest $tf
 
 -- first attempt results -------------------------------------------------------
 
-The two failed are complementary as described in this document before. Thus, the
+The two failures are complementary as described in this document before. Thus, the
 most probable reason because they fail is the hash as ultimate stage of elaboration
-while a further jitter-based scrambler should adopted to msquerede it. Anyway,
+while a further jitter-based scrambler should be adopted to masquerade it. Anyway,
 as long as the hash is NP-hard cannot be reverted and if reverted what is found
 is not the n-1 layer of a process than cannot be reverted by previous jittering
-arbitrary operations. This obviously support the idea that it might be more
-predictable than a pure stocastic white noise, or simple because it is provided
-in chunk of exact 64 bytes. Or because one previous run was not strong enough.
+arbitrary operations. This obviously supports the idea that it might be more
+predictable than a pure stochastic white noise, or simple because it is provided
+in chunks of exactly 64 bytes. Or because one previous run was not strong enough.
 
 run.set := run.28 run.29 run.3*  # run.set made appending data from 29 to run.37
 3900	run.set
@@ -555,10 +555,10 @@ diehard_count_1s_str|   0|     24000|     100|0.00000000|  FAILED
       rgb_lagged_sum|   0|     24000|     100|0.46743392|  PASSED
 
 Due to these two failure, the bs=2^n should be avoided in favour of prime numbers
-in which the 3 and 5 should also escluded then 1 (the most I/O stressful) and the
+in which the 3 and 5 should also exclude then 1 (the most I/O stressful) and the
 other best candidates like 7, 13 or 31. Considering speed is not a KPI here, bs=1.
 
-### the masterchef cusine ######################################################
+### the masterchef cuisine ######################################################
 
 Another wrong belief is that structured information in input of a deterministic
 algorithm will create a structure in output, or at least, the output will
@@ -570,7 +570,7 @@ process isn't feasible.
 However, in IT the backdoor is about what if analysing the output I could
 discover the "recipe" and the "ingredient" like how the blender works or which
 was the fishtank population? Which is the same as asking how well the blender
-and the mixer are working? Is the hash good? Are the zippers good? We know
+and the mixer is working? Is the hash good? Are the zippers good? We know
 tasting the smoothie and the taste of the smoothie can be replicated, for sure.
 It is deterministic.
 
@@ -588,7 +588,7 @@ the same manner we know how ciphers work: they keep the data secret if the
 secret of the seed is kept.
 
 Then, the military grade "white noise" is achieved using good and quick ciphers,
-cypher the blender output and forget the key. Violating a safe to find a fish
+cipher the blender output and forget the key. Violating a safe to find a fish
 soup or a milkshake recipe is worth the effort? Or it can be done the opposite,
 cypher the input before blend and mix. When the blender and the mixer are
 working good enough to compete with /dev/random, there is a good reason to think
@@ -598,7 +598,7 @@ Criptographics' need for randomness is a self solving problem. Create an
 algorithm that while it ciphers or deciphers (risky, the input can be
 manipulated by the attacker) is also creating unpredictable randomness at no
 extra cost because every work (L) produces entropy so the ciphering as well,
-just collects it. In fact, observing the 1-took-1-lost process it does 64 times
+just collect it. In fact, observing the 1-took-1-lost process it does 64 times
 a "dd" which creates on the stderr the same kind of "entropy" we started from
 initially.
 
@@ -820,22 +820,22 @@ pipe rules over all.
 
   cg() { ( pl 's/.(.)(.)/$2$1/gs' & pl 's/(.).(.)/$1$2/gs' & pl 's/(.)(.)./$2$1/gs' ); }
 
-Moreover, the last three symmethric workloads get imbalanced by the middle one
-which was making two replacement (2x1) instead of one double (1x2). Fixed and
+Moreover, the last three symmetric workloads get imbalanced by the middle one
+which was making two replacements (2x1) instead of one double (1x2). Fixed and
 added a byteswap in the first and in the third, not in the middle, for symmetry.
 
-Is all of this makes sense? Is it fragility? To answer these questions in a proper
-manner we need to establish what these functions sets are: a sophisticated clockwork.
+Is all of this make sense? Is it fragility? To answer these questions in a proper
+manners we need to establish what these function sets are: a sophisticated clockwork.
 
-In a mechanic clockwork there is no input just output, here as well. An imbalance in
+In a mechanical clockwork there is no input, just output, here as well. An imbalance in
 the mechanism created artifacts. Even when they do not break the overall nature of
-the output, with sophisitcated statistical tools is possible to see these watermarks.
+the output, with sophisticated statistical tools is possible to see these watermarks.
 
 Under this point of view, the #42 is the reference and the #52 seems the other
-reasonable candidate. Finally, do the watermarks make fail the tests? A good question
+reasonable candidate. Finally, do the watermarks make the tests fail? A good question
 that can be faced in pragmatic way: aggregate the outputs from all the runs from #42
 and the #52. In theory, they have the same nature and aim to mash down the blocks
-watermarks that make those two tests fails without any other regression.
+watermarks that make those two tests fail without any other regression.
 
   Entropy = 7.998822 bits per byte.
   Chi square distribution for 138933 samples is 227.03, and randomly
@@ -1221,4 +1221,5 @@ Preparing to run test 208.  ntuple = 0
        dab_filltree2|   1|   5000000|       1|0.99092681|  PASSED  
 Preparing to run test 209.  ntuple = 0
         dab_monobit2|  12|  65000000|       1|0.48313795|  PASSED  
+
 
