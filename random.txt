@@ -395,33 +395,29 @@ Monte Carlo Pi: 3.175646761 --> 3.143662912
  \Err. on Pi  :       1.08% -->       0.07%
 Correlation   :   -0.006375 -->   -0.001009 (0: 100% uncorrelated)
 
--- RUN 34: very flat and slow --------------------------------------------------
+-- RUN 35  ---------------------------------------------------------------------
 
-  ud() { ionice -c3 stdbuf -o0 -e0 dd status=none bs=1 "$@"; }
+Statistics from 'ent' are clearly indicates that functions set below is better.
 
-  hc() { pigz -cp$(nproc) "$@" | tail -c+16 | head -c-8 | ud; }         # run.34
+  ud() { ionice -c3 stdbuf -o0 -e0 dd status=none bs=16 "$@"; }         # run.35
 
-  hs() { sha512sum | xxd -r -p | ud; }
+  hc() { pigz -cp$(nproc) "$@" | tail -c+16 | head -c-8; }
 
-  hg() { { time echo | ud count=1k; } 2>&1 | ud; }
+  hs() { sha512sum | xxd -r -p; }
 
-  h4() { { hg & hg & hg & hg; } | hs; }
+  hg() { { time echo | ud status=progress count=64; } 2>&1 | ud; }
 
-  h3() { { h4 & h4 & h4; } | hc -1; }      # h3( i:192 --> hc(-c+24) --> o:192 )
+  h4() { { hg & hg & hg & hg; } | hs | ud; }
+
+  h3() { { h4 & h4 & h4; } | hc -1 | ud; } # h3( i:192 --> hc(-c+24) --> o:192 )
 
   cg() { { h3 & h3; } | hc -9 | hs; }
 
-Entropy = 7.999784 bits per byte.
-
-Optimum compression would reduce the size
-of this 912512 byte file by 0 percent.
-
-Chi square distribution for 912512 samples is 273.68, and randomly
-would exceed this value 20.13 percent of the times.
-
-Arithmetic mean value of data bytes is 127.5867 (127.5 = random).
-Monte Carlo value for Pi is 3.141427491 (error 0.01 percent).
-Serial correlation coefficient is -0.001818 (totally uncorrelated = 0.0).
+Entropy = 7.999350 bits per byte.
+Chi square distribution for 281664 samples is 253.64, and randomly
+would exceed this value 51.22 percent of the times.
+Arithmetic mean value of data bytes is 127.3589 (127.5 = random).
+Monte Carlo value for Pi is 3.134287662 (error 0.23 percent).
 
 ### rationale 2nd part #########################################################
 
