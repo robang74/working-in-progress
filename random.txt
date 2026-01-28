@@ -380,7 +380,7 @@ the values when they can work in their sweet spot 1:2 aka cr% and ci% around 50%
 
 let nr++; echo run.$nr
 while sleep 0.01; do cg >> run.$nr; done &
-while sleep   60; do ent   run.$nr; done
+while sleep   60; do entgr run.$nr; done
 
 Evolution of the statistics from 62K to 360K file size using the "ent" command:
 
@@ -395,11 +395,19 @@ Monte Carlo Pi: 3.175646761 --> 3.143662912
  \Err. on Pi  :       1.08% -->       0.07%
 Correlation   :   -0.006375 -->   -0.001009 (0: 100% uncorrelated)
 
--- RUN 35  ---------------------------------------------------------------------
+-- RUN 36  ---------------------------------------------------------------------
+
+entgr() { ent "$@" | grep -E "error|samples|127.5 |Entropy|exceed"; }
+
+  Entropy = 7.999497 bits per byte.
+  Chi square distribution for 363136 samples is 253.84, and randomly
+  would exceed this value 50.88 percent of the times.
+  Arithmetic mean value of data bytes is 127.4732 (127.5 = random).
+  Monte Carlo value for Pi is 3.140808301 (error 0.02 percent).
 
 Statistics from 'ent' are clearly indicates that functions set below is better.
 
-  ud() { ionice -c3 stdbuf -o0 -e0 dd status=none bs=16 "$@"; }         # run.35
+  ud() { ionice -c2 -n7 stdbuf -o0 -e0 dd status=none bs=8 "$@"; }      # run.36
 
   hc() { pigz -cp$(nproc) "$@" | tail -c+16 | head -c-8; }
 
@@ -413,11 +421,30 @@ Statistics from 'ent' are clearly indicates that functions set below is better.
 
   cg() { { h3 & h3; } | hc -9 | hs; }
 
-Entropy = 7.999350 bits per byte.
-Chi square distribution for 281664 samples is 253.64, and randomly
-would exceed this value 51.22 percent of the times.
-Arithmetic mean value of data bytes is 127.3589 (127.5 = random).
-Monte Carlo value for Pi is 3.134287662 (error 0.23 percent).
+"The Chaos Engine is independent of specific cryptographic primitives. While
+ sha512sum (SHA-512/NSA, 2001) and pigz (DEF/LZ77, 2007) are used for performance
+ and diffusion width, the system maintains high entropy density even when reverted
+ to legacy primitives like md5sum (MD5/RSA, 1991) and gzip (LZ77/HC, 1992), proving
+ that the stochasticity is derived from system-level task-switching jitter."
+
+It is also 10^5 slower than reading from /dev/random. Which is fine, considering
+it is a PoC in shell script written in two days of work by a solo man. It is worth
+noting that it proves that good RNDG were available more than 30 years ago.
+
+In fact, replacing the stochastics from the CPU/scheduler jitters with the NIC/network
+jitters. The plus of using the CPU is that by "dd" jitters from ud(), despite they are
+not collected yet, the process is capable of self-sustaining (aka producing new entropy
+while it is delivering the entropy produced).
+
+It is also a proof that can be realised in VHDL / FPGA because md5sum and gzip are way
+simpler than CSPRNG, SHA-512, etc. By the way, MD5 and LM77/Huffman are for certainty
+expired in terms of patents (which applies to hardware and chips) plus being exportable
+"technologies / ideas". These aspects have an immense impact when a PoC needs to fulfill
+those niches of the market for which world-wide exportability and low entry barriers
+aren't optionals but MUST to have.
+
+"In few word, it has hit the Strategic Trifecta of hardware design: Patent Immunity,
+ Regulatory Compliance (Exportability), and Gate-Efficiency."
 
 ### rationale 2nd part #########################################################
 
