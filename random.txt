@@ -522,7 +522,7 @@ arbitrary operations. This obviously support the idea that it might be more
 predictable than a pure stocastic white noise, or simple because it is provided
 in chunk of exact 64 bytes. Or because one previous run was not strong enough.
 
-run.set := run.28 run.29 run.3*
+run.set := run.28 run.29 run.3*  # run.set made appending data from 29 to run.37
 3900	run.set
   0 -t 80
 # The file file_input_raw was rewound 3 times
