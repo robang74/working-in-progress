@@ -407,13 +407,13 @@ entgr() { ent "$@" | grep -E "error|samples|127.5 |Entropy|exceed"; }
 
 Statistics from 'ent' are clearly indicates that functions set below is better.
 
-  ud() { ionice -c2 -n7 stdbuf -o0 -e0 dd status=none bs=8 "$@"; }      # run.36
+  ud() { ionice -c2 -n7 stdbuf -o0 -e0 dd status=none bs=4 "$@"; }      # run.37
 
   hc() { pigz -cp$(nproc) "$@" | tail -c+16 | head -c-8; }
 
   hs() { sha512sum | xxd -r -p; }
 
-  hg() { { time echo | ud status=progress count=64; } 2>&1 | ud; }
+  hg() { { time echo | ud status=progress count=1k; } 2>&1 | ud; }
 
   h4() { { hg & hg & hg & hg; } | hs | ud; }
 
@@ -478,12 +478,81 @@ at 32 or 64 bytes. That's my bold assumption and it is not so bold considering
 what I wrote here. The history of physics is full of classic systems of
 unpredictability running-away.
 
-So, I am not inventing anything, just repeating the mistakes of the past to
+So, I am not inventing anything, just using a new way what seen from the past to
 create conditions that usually people avoid like unpredictability. Curiously,
 while we -- as humans -- are avoiding to face unpredictability, at the same time
 we are seeking uncertainty for safety. This is a clear psychological pathema: we
 run away from our fears to embrace the fundamental uncertainty as our comfort
 zone and it is an illusion, orchestrated or not.
+
+### mini test suite ############################################################
+
+date +%F.%N; let nr++; echo run.$nr; \
+while sleep 0.01; do cg || break; done >>run.$nr
+
+First of all, data size should be collected into a file. While a complete test
+would requires something like 250GB a preliminary simple test can be provided
+with a 4MB. But it seems that two are fail and require deeper investigation.
+
+dhtest() {
+  test -n "${1:-}" || return 1
+  dht="dieharder -g 201 -k 0 -f $1"
+  declare -A tsmpl; tsmpl[0]=80; tsmpl[2]=1000; tsmpl[6]=12000
+  for i in 0 1 2 6 8 10 15 100 101 203; do
+    tsmpl[$i]=${tsmpl[$i]:-24000}
+    printf "%3d -t ${tsmpl[$i]}\n" $i;
+    $dht -t ${tsmpl[$i]} -d $i | grep -e "rewound" -e "[A-Z]\{3,8\}"
+  done
+}
+
+Becuase it re-run over the same data at 4-bytes per 32-bit random numbers, the
+size of the file should be 2^22 + 1, so the offset is even and it will introduce
+a +1 shift for 4 rounds before repeating (16MB window repeat).
+
+tf=run.set; cat run.[0-9]* >$tf; echo >>$tf; du -ks $tf; dhtest $tf
+
+-- first attempt results -------------------------------------------------------
+
+The two failed are complementary as described in this document before. Thus, the
+most probable reason because they fail is the hash as ultimate stage of elaboration
+while a further jitter-based scrambler should adopted to msquerede it. Anyway,
+as long as the hash is NP-hard cannot be reverted and if reverted what is found
+is not the n-1 layer of a process than cannot be reverted by previous jittering
+arbitrary operations. This obviously support the idea that it might be more
+predictable than a pure stocastic white noise, or simple because it is provided
+in chunk of exact 64 bytes. Or because one previous run was not strong enough.
+
+run.set := run.28 run.29 run.3*
+3900	run.set
+  0 -t 80
+# The file file_input_raw was rewound 3 times
+   diehard_birthdays|   0|        80|     100|0.96911308|  PASSED
+  1 -t 24000
+# The file file_input_raw was rewound 2 times
+      diehard_operm5|   0|     24000|     100|0.17361806|  PASSED
+  2 -t 1000
+# The file file_input_raw was rewound 3 times
+  diehard_rank_32x32|   0|      1000|     100|0.23196575|  PASSED
+  6 -t 12000
+        diehard_oqso|   0|     12000|     100|0.00000000|  FAILED
+  8 -t 24000
+diehard_count_1s_str|   0|     24000|     100|0.00000000|  FAILED
+ 10 -t 24000
+# The file file_input_raw was rewound 2 times
+ diehard_parking_lot|   0|     12000|     100|0.43595334|  PASSED
+ 15 -t 24000
+# The file file_input_raw was rewound 2 times
+        diehard_runs|   0|     24000|     100|0.10702158|  PASSED
+        diehard_runs|   0|     24000|     100|0.61463637|  PASSED
+100 -t 24000
+# The file file_input_raw was rewound 2 times
+         sts_monobit|   1|     24000|     100|0.76843735|  PASSED
+101 -t 24000
+# The file file_input_raw was rewound 2 times
+            sts_runs|   2|     24000|     100|0.10684301|  PASSED
+203 -t 24000
+# The file file_input_raw was rewound 2 times
+      rgb_lagged_sum|   0|     24000|     100|0.46743392|  PASSED
 
 ### the masterchef cusine ######################################################
 
