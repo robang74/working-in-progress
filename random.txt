@@ -1081,13 +1081,20 @@ The same #42 but without the nice -n19 in the ud-dd function:
   Arithmetic mean value of data bytes is 127.4533 (127.5 = random).
   Monte Carlo value for Pi is 3.143805917 (error 0.07 percent).
 
-#### testin the output #########################################################
+#### testing the output ########################################################
 
-for i in $(seq 42 60); do cat run.$i >> run.all; done; echo >> run.all
+Collecting all the output from #42 an #60 provided two results:
 
-$  du -ks run.all --> 6104	run.all
+- 1. check for implementation variants
+- 2. simulate different system scheduling conditions
 
-$ dieharder -a -f run.all
+Both were essential to establish how the "clockwork" is resilient and reliable.
+
+  for i in $(seq 42 60); do cat run.$i >> run.all; done; echo >> run.all
+
+  $  du -ks run.all --> 6104	run.all
+
+  $ dieharder -a -f run.all
 
 #=============================================================================#
 #            dieharder version 3.31.1 Copyright 2003 Robert G. Brown          #
@@ -1214,5 +1221,4 @@ Preparing to run test 208.  ntuple = 0
        dab_filltree2|   1|   5000000|       1|0.99092681|  PASSED  
 Preparing to run test 209.  ntuple = 0
         dab_monobit2|  12|  65000000|       1|0.48313795|  PASSED  
-
 
