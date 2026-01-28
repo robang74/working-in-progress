@@ -417,9 +417,9 @@ Statistics from 'ent' are clearly indicates that functions set below is better.
 
   h4() { { hg & hg & hg & hg; } | hs | ud; }
 
-  h3() { { h4 & h4 & h4; } | hc -1 | ud; } # h3( i:192 --> hc(-c+24) --> o:192 )
-
-  cg() { { h3 & h3; } | hc -9 | hs; }
+  h3() { { h4 & h4 & h4; } | hc -1 | hs | ud; }  # h3(i:192-->hc(-c+24)-->o:192)
+  
+  cg() { { h3 & h3; } | hc -9; }
 
 "The Chaos Engine is independent of specific cryptographic primitives. While
  sha512sum (SHA-512/NSA, 2001) and pigz (DEF/LZ77, 2007) are used for performance
@@ -607,4 +607,42 @@ keeps "warm" the habitacle at the same time with the same fuel.
 
 This is masterchef, not IT anymore? Right, because of the day in which "entropy"
 word gets into the discourse: who said entropy, shame on them!
+
+################################################################################
+
+The last operation he() can be improved in terms of execution speed using perl.
+
+  ud() { ionice -c2 -n7 nice -n19 stdbuf -o0 -e0 dd status=none bs=1 "$@"; }      # run.42
+
+  hc() { pigz -cp$(nproc) "$@" | tail -c+16 | head -c-8; }
+
+  hs() { sha512sum | xxd -r -p; }
+  
+  hx() { { cat -; date +%N; } | ud; }
+
+  hg() { { time echo | ud status=progress count=1k; } 2>&1 | hx; }
+
+  h1() { { hg & hg & hg; } | hc -1 | ud; }
+
+  h9() { { h1 & h1 & h1; } | hc -9 | hs | ud; }
+  
+  he() { for i in $(seq 64); do dd status=none bs=1 skip=1 count=2; done; }
+
+  cg() { { h9 & h9 & h9; } | he; }
+
+Entropy = 7.997272 bits per byte.
+Chi square distribution for 62638 samples is 236.23, and randomly
+would exceed this value 79.47 percent of the times.
+Arithmetic mean value of data bytes is 127.4066 (127.5 = random).
+Monte Carlo value for Pi is 3.139381167 (error 0.07 percent).
+
+Entropy = 7.999878 bits per byte.
+Chi square distribution for 1489024 samples is 251.80, and randomly
+would exceed this value 54.49 percent of the times.
+Arithmetic mean value of data bytes is 127.5715 (127.5 = random).
+Monte Carlo value for Pi is 3.140234517 (error 0.04 percent).
+
+  hE() { for i in $(seq 64); do dd status=none bs=3 cbs=2 conv=block count=1; done; }
+  he() { perl -0777 -pe 's/.(..)/$1/gs'; }
+  he() { perl -0777 -pe 's/(..)./$1/gs'; }
 
