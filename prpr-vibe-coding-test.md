@@ -40,3 +40,9 @@ The whole development covered a time frame of 5h15m but it includes writing this
 
 Just one final note, the buffer inversion function remained but the related functionality silently disappeared without any AI warning. So far, everyone who is using the AI for coding needs to run a full unit test at each AI change, for the file involved or a system test if the whole project is involved.
 
+---
+
+### Copyright
+
+(c) 2026, Roberto A. Foglietta &lt;roberto.foglietta@gmail.com&gt;, CC BY-NC-ND 4.0
+
