@@ -1,5 +1,7 @@
 ## Chaos Shell Engine
 
+The [Chaos Shell Engine](random.txt) is the laboratory note about a Proof-of-Concept to introduce a novel perspective in terms of crypthocraphic security underlining the difference between unceranty and unpredicatability, between entropy and information but not in the most general terms, specifically declined for information tecnology.
+
 - [Structural Synthetic Analysis prompt](https://robang74.github.io/chatbots-for-fun/html/collection-of-useful-prompts-by-raf.html#1-structural-synthetic-analysis-prompt)
 
 - [The document in attachment: radom.txt](https://github.com/robang74/working-in-progress/blob/380528f78559c1bb4aa072ab455db7ce4fafdc59/random.txt) (commit 380528f)
