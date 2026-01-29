@@ -3,8 +3,9 @@
 #include <unistd.h>
 #include <errno.h>
 
+#define MAX_BLOCK_SIZE 512
+
 int main(int argc, char *argv[]) {
-    size_t MAX_PAGE_SIZE = getpagesize();
     int opt;
     long o_size = 0; // Signed offset/slice value
     size_t w_size = 0; // Window (stride) size
@@ -18,8 +19,8 @@ int main(int argc, char *argv[]) {
     }
 
     // Constraints check
-    if (w_size == 0 || w_size > MAX_PAGE_SIZE) {
-        fprintf(stderr, "Error: Window (-w) must be between 1 and %ld\n", MAX_PAGE_SIZE);
+    if (w_size == 0 || w_size > MAX_BLOCK_SIZE) {
+        fprintf(stderr, "Error: Window (-w) must be between 1 and %d\n", MAX_BLOCK_SIZE);
         exit(EXIT_FAILURE);
     }
 
@@ -29,7 +30,7 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    unsigned char buffer[MAX_PAGE_SIZE];
+    unsigned char buffer[MAX_BLOCK_SIZE];
     unsigned char *output_ptr;
     size_t bytes_to_write;
 
