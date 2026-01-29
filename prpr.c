@@ -5,10 +5,22 @@
 
 #define MAX_BLOCK_SIZE 512
 
+/**
+ * Reverses a buffer of a given size in-place.
+ */
+void reverse_buffer(unsigned char *buf, size_t size) {
+    size_t i, j;
+    for (i = 0, j = size - 1; i < j; i++, j--) {
+        unsigned char temp = buf[i];
+        buf[i] = buf[j];
+        buf[j] = temp;
+    }
+}
+
 int main(int argc, char *argv[]) {
     int opt;
-    long o_size = 0; // Signed offset/slice value
-    size_t w_size = 0; // Window (stride) size
+    long o_size = 0; 
+    size_t w_size = 0;
 
     while ((opt = getopt(argc, argv, "o:w:")) != -1) {
         switch (opt) {
@@ -18,7 +30,6 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    // Constraints check
     if (w_size == 0 || w_size > MAX_BLOCK_SIZE) {
         fprintf(stderr, "Error: Window (-w) must be between 1 and %d\n", MAX_BLOCK_SIZE);
         exit(EXIT_FAILURE);
@@ -31,27 +42,13 @@ int main(int argc, char *argv[]) {
     }
 
     unsigned char buffer[MAX_BLOCK_SIZE];
-    unsigned char *output_ptr;
-    size_t bytes_to_write;
-
-    // Logic, considering -w 4: 
-    // -o  3: print first 3 (buffer, len 3)
-    // -o -1: print last 1 (buffer + (4-1), len 1)
-    if (o_size >= 0) {
-        output_ptr = buffer;
-        bytes_to_write = (size_t)o_size;
-    } else {
-        output_ptr = buffer + (w_size - abs_o_size);
-        bytes_to_write = abs_o_size;
-    }
     
     while (1) {
         size_t bytes_read = 0;
 
-        // Fill the window
         while (bytes_read < w_size) {
             ssize_t n = read(STDIN_FILENO, buffer + bytes_read, w_size - bytes_read);
-            if (n == 0) return 0; // End of stream
+            if (n == 0) return 0; 
             if (n < 0) {
                 if (errno == EINTR) continue;
                 perror("read");
@@ -60,15 +57,34 @@ int main(int argc, char *argv[]) {
             bytes_read += n;
         }
 
-        // Write the slice
-        if (bytes_to_write > 0) {
-            ssize_t nw = write(STDOUT_FILENO, output_ptr, bytes_to_write);
-            if (nw < 0) {
+        // --- New Logic: Reverse vs Slice ---
+        if (abs_o_size == w_size) {
+            // Case: Full window reverse
+            reverse_buffer(buffer, w_size);
+            if (write(STDOUT_FILENO, buffer, w_size) < 0) {
                 perror("write");
                 exit(EXIT_FAILURE);
             }
+        } else {
+            // Case: Standard slicing (head or tail)
+            unsigned char *output_ptr;
+            size_t bytes_to_write;
+
+            if (o_size >= 0) {
+                output_ptr = buffer;
+                bytes_to_write = (size_t)o_size;
+            } else {
+                output_ptr = buffer + (w_size - abs_o_size);
+                bytes_to_write = abs_o_size;
+            }
+
+            if (bytes_to_write > 0) {
+                if (write(STDOUT_FILENO, output_ptr, bytes_to_write) < 0) {
+                    perror("write");
+                    exit(EXIT_FAILURE);
+                }
+            }
         }
     }
-
     return 0;
 }
