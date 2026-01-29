@@ -38,151 +38,151 @@ Structural Index with Commented Sections (Step 4 of the prompt)
 
 #### Rationale
 
-Foundational framing of “entropy” as stored information; unpredictability depends on **access control + structure**, not metaphysics. Introduces core tension: deterministic systems vs randomness, predictability vs secrecy.
+* Foundational framing of “entropy” as stored information; unpredictability depends on **access control + structure**, not metaphysics. Introduces core tension: deterministic systems vs randomness, predictability vs secrecy.
 
 #### Structured Information and Guessability
 
-Explains why structured sequences (Fibonacci variants, deterministic relations) are guessable; difficulty scales with computational cost, not impossibility. Introduces **white noise** as the reference model.
+* Explains why structured sequences (Fibonacci variants, deterministic relations) are guessable; difficulty scales with computational cost, not impossibility. Introduces **white noise** as the reference model.
 
 #### The Randomness Generation Problem
 
-Central problem: generating unpredictability from deterministic, error-correcting hardware. Physical entropy sources (temperature, EM noise) are critiqued as leaky, sniffable, or operationally expensive.
+* Central problem: generating unpredictability from deterministic, error-correcting hardware. Physical entropy sources (temperature, EM noise) are critiqued as leaky, sniffable, or operationally expensive.
 
 #### Threat Model and Security Boundaries
 
-Defines entropy security relative to **who can observe what**: CPU registers, RAM buses, kernel/userland, local vs remote attacker. Introduces the *main point*: randomness protects crypto keys more than passwords.
+* Defines entropy security relative to **who can observe what**: CPU registers, RAM buses, kernel/userland, local vs remote attacker. Introduces the *main point*: randomness protects crypto keys more than passwords.
 
 #### Cryptography and Seed Vulnerability
 
-Classic crypto principle restated: algorithms can be public, keys must remain secret. RNG seed predictability collapses crypto strength regardless of cipher robustness.
+* Classic crypto principle restated: algorithms can be public, keys must remain secret. RNG seed predictability collapses crypto strength regardless of cipher robustness.
 
 #### Timing, Latency, and Jitter
 
-Modern CPUs as latent entropy sources: multitasking, caching, preemption. Defines **latency jitter** and argues small, flat sub-ranges can yield exploitable unpredictability.
+* Modern CPUs as latent entropy sources: multitasking, caching, preemption. Defines **latency jitter** and argues small, flat sub-ranges can yield exploitable unpredictability.
 
 #### Jitter Distribution and Statistical Filtering
 
-Bell-curve latency distributions; rejection sampling to isolate near-flat regions. Introduces theoretical grounding (Cauchy²-like behavior, LSB extraction).
+* Bell-curve latency distributions; rejection sampling to isolate near-flat regions. Introduces theoretical grounding (Cauchy²-like behavior, LSB extraction).
 
 #### Entropy Multiplication via Hash and Compression
 
-Key conceptual move: entropy cannot be created but **multiplied by diffusion**. Hashes spread unpredictability; compression flattens distributions when tables are unknown.
+* Key conceptual move: entropy cannot be created but **multiplied by diffusion**. Hashes spread unpredictability; compression flattens distributions when tables are unknown.
 
 #### Compression as Entropy Amplifier
 
-Zip/pigz properties: redundancy destruction, table dependency, flat output distribution. Compression quality tied to unpredictability, not size alone.
+* Zip/pigz properties: redundancy destruction, table dependency, flat output distribution. Compression quality tied to unpredictability, not size alone.
 
 #### Process-Based Jitter Harvesting
 
-Describes PT processes creating jitter through CPU contention, scheduling, cache scattering. Start/stop timing LSBs treated as high-quality entropy seeds.
+* Describes PT processes creating jitter through CPU contention, scheduling, cache scattering. Start/stop timing LSBs treated as high-quality entropy seeds.
 
 #### Hash Diffusion Effect
 
-Once jitter-derived strings are hashed, original structure becomes irrecoverable; randomness is diffused across all output bits.
+* Once jitter-derived strings are hashed, original structure becomes irrecoverable; randomness is diffused across all output bits.
 
 #### Trust Boundary of Microcode
 
-Critical trust argument: CPU designers and microcode vendors remain ultimate observers; hardware RNGs inherit manufacturer trust assumptions.
+* Critical trust argument: CPU designers and microcode vendors remain ultimate observers; hardware RNGs inherit manufacturer trust assumptions.
 
 #### Original Function (2023)
 
-Early shell PoC combining `/dev/random`, system files, compression, and `/dev/urandom` injection. Serves as baseline concept.
+* Early shell PoC combining `/dev/random`, system files, compression, and `/dev/urandom` injection. Serves as baseline concept.
 
 #### Untested Functions (2026)
 
-Expanded shell framework (`rafrand_*`): scheduling manipulation, I/O mixing, multi-source entropy pooling. Emphasis on OS-level chaos.
+* Expanded shell framework (`rafrand_*`): scheduling manipulation, I/O mixing, multi-source entropy pooling. Emphasis on OS-level chaos.
 
 #### Apparent Issues
 
-Identified weaknesses: `tr` bias, compressed stream skipping, fragile shell assumptions. Acknowledges PoC limitations and system dependency.
+* Identified weaknesses: `tr` bias, compressed stream skipping, fragile shell assumptions. Acknowledges PoC limitations and system dependency.
 
 #### Updates
 
-Refinements to process spawning, buffering suppression, scheduler exploitation. Goal: maximize interleaving and unpredictability.
+* Refinements to process spawning, buffering suppression, scheduler exploitation. Goal: maximize interleaving and unpredictability.
 
 #### Tiny Random Generator
 
-Minimalistic entropy construction using `dd` timing variance; quantified entropy per call. Shows sufficiency of small randomness multiplied via hashing.
+* Minimalistic entropy construction using `dd` timing variance; quantified entropy per call. Shows sufficiency of small randomness multiplied via hashing.
 
 #### Information Density Experiments
 
-Compression and hashing impact measured; table comparing md5/sha* effects. Conclusion: **hash choice secondary to entropy source quality**.
+* Compression and hashing impact measured; table comparing md5/sha* effects. Conclusion: **hash choice secondary to entropy source quality**.
 
 #### Hash Selection and Performance Scaling
 
-Empirical comparison: md5 vs sha256 vs sha512. Multi-core scalability favors sha512; entropy density conserved regardless of hash length.
+* Empirical comparison: md5 vs sha256 vs sha512. Multi-core scalability favors sha512; entropy density conserved regardless of hash length.
 
 #### `$RANDOM` as Baseline Reference
 
-Shell PRNG used as comparison benchmark; goal is to exceed or match quality without kernel RNG reliance.
+* Shell PRNG used as comparison benchmark; goal is to exceed or match quality without kernel RNG reliance.
 
 #### Randomness Density Optimization
 
-Increased concurrency raises jitter amplitude; entropy per bit doubled through orchestration. Introduces N² heuristic for entropy sufficiency.
+* Increased concurrency raises jitter amplitude; entropy per bit doubled through orchestration. Introduces N² heuristic for entropy sufficiency.
 
 #### Statistical Validation (ent, Monte Carlo, correlation)
 
-Long-run statistical tests demonstrate near-ideal entropy metrics. Evidence that approach converges toward white-noise behavior.
+* Long-run statistical tests demonstrate near-ideal entropy metrics. Evidence that approach converges toward white-noise behavior.
 
 #### Chaos Engine Abstraction
 
-Core claim: randomness derives from **system-level stochasticity**, not cryptographic primitives. Primitive replacement does not collapse entropy quality.
+* Core claim: randomness derives from **system-level stochasticity**, not cryptographic primitives. Primitive replacement does not collapse entropy quality.
 
 #### Hardware and Regulatory Implications
 
-FPGA/VHDL feasibility, expired patents, exportability advantages. Introduces “Strategic Trifecta”: patent immunity, compliance, gate efficiency.
+* FPGA/VHDL feasibility, expired patents, exportability advantages. Introduces “Strategic Trifecta”: patent immunity, compliance, gate efficiency.
 
 #### Rationale – Second Part
 
-Paradigm shift: unpredictability can arise from deterministic chaos, not only fundamental uncertainty. Introduces chaos theory as cryptographic ally.
+* Paradigm shift: unpredictability can arise from deterministic chaos, not only fundamental uncertainty. Introduces chaos theory as cryptographic ally.
 
 #### Billiard / Chess Analogy
 
-Finite predictability horizon as security guarantee. Once system exits predictability window, attacker loses observational leverage.
+* Finite predictability horizon as security guarantee. Once system exits predictability window, attacker loses observational leverage.
 
 #### Mini Test Suite
 
-Dieharder testing methodology and constraints. Explains sample sizing, rewind effects, and observed failures.
+* Dieharder testing methodology and constraints. Explains sample sizing, rewind effects, and observed failures.
 
 #### Failure Analysis
 
-Identifies block-structure artifacts and hash-finalization weaknesses. Suggests further jitter scrambling instead of abandoning approach.
+* Identifies block-structure artifacts and hash-finalization weaknesses. Suggests further jitter scrambling instead of abandoning approach.
 
 #### Block Size and Prime Selection
 
-Avoidance of power-of-two block sizes; primes reduce structural resonance. Performance sacrificed for statistical robustness.
+* Avoidance of power-of-two block sizes; primes reduce structural resonance. Performance sacrificed for statistical robustness.
 
 #### Masterchef Metaphor
 
-Blender/soup analogy for irreversible mixing. Output may reveal class (zip, hash) but not ingredients or sequence.
+* Blender/soup analogy for irreversible mixing. Output may reveal class (zip, hash) but not ingredients or sequence.
 
 #### Self-Sustaining Entropy Engine
 
-Key insight: entropy generation and consumption can be coupled. Ciphering work itself produces further unpredictability.
+* Key insight: entropy generation and consumption can be coupled. Ciphering work itself produces further unpredictability.
 
 #### Clockwork Quality vs System Variance
 
-Introduces mechanical-system analogy: imbalance creates detectable artifacts. Perl interpreter introduces dominance and skew.
+* Introduces mechanical-system analogy: imbalance creates detectable artifacts. Perl interpreter introduces dominance and skew.
 
 #### Perl Integration Experiments
 
-Multiple pipeline permutations tested; interpreter scheduling affects entropy symmetry. Highlights sensitivity of last-pipe dominance.
+* Multiple pipeline permutations tested; interpreter scheduling affects entropy symmetry. Highlights sensitivity of last-pipe dominance.
 
 #### Symmetry Restoration Attempts
 
-Byte-swapping, workload balancing, priority tuning. Goal: reduce statistical watermarks without entropy loss.
+* Byte-swapping, workload balancing, priority tuning. Goal: reduce statistical watermarks without entropy loss.
 
 #### Aggregation Strategy
 
-Combining multiple generator variants to mask individual weaknesses. Empirical improvement shown.
+* Combining multiple generator variants to mask individual weaknesses. Empirical improvement shown.
 
 #### Final Stabilized Variants
 
-Refined scheduling, buffering, and process orchestration. Achieves stable high entropy across large samples.
+* Refined scheduling, buffering, and process orchestration. Achieves stable high entropy across large samples.
 
 #### Closing Perspective
 
-Shell-based chaos engines validate long-standing feasibility of non-hardware RNGs. Emphasizes unpredictability zones over purity of randomness.
+* Shell-based chaos engines validate long-standing feasibility of non-hardware RNGs. Emphasizes unpredictability zones over purity of randomness.
 
 ---
 
