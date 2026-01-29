@@ -2,6 +2,12 @@
 
 - (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, CC ND-BY-NC 4.0
 
+> [!NOTE]
+> 
+> This presentation has been created from a solo man 3 days of work, or more precisely 66h.
+
+---
+
 ### Abstract
 
 The [Chaos Shell Engine](random.txt) is the laboratory note about a Proof-of-Concept to introduce a novel perspective in terms of crypthocraphic security underlining the difference between unceranty and unpredicatability, between entropy and information but not in the most general terms, specifically declined for information tecnology.
@@ -12,10 +18,6 @@ The [Chaos Shell Engine](random.txt) is the laboratory note about a Proof-of-Con
 
 - [The ChatGPT session providing the essay](https://chatgpt.com/share/697aacca-dafc-8012-a331-48e94e4e1cd5)
 
-> [!INFO]
-> 
-> This presentation has been created from a solo man 3 days of work, or more precisely 66h.
-
 ```text
 commit 50b4845e
 Date:  Mon Jan 26 06:52:33 2026 +0100
@@ -25,6 +27,7 @@ commit 7d59a912
 Date:  Thu Jan 29 00:04:23 2026 +0100
 random.txt: dieharder, all test passed
 ```
+---
 
 ### Introduction
 
@@ -258,7 +261,9 @@ The “masterchef cuisine” metaphor crystallizes the document’s thesis. Mixi
 
 This leads to the final synthesis: a **self-sustaining entropy engine**, where the act of producing cryptographic output also produces new unpredictability (via I/O timing, scheduling noise, and execution variance). In this view, entropy generation and consumption are no longer separate stages but a coupled dynamical system.
 
-#### Final Implication
+---
+
+### Final Implication
 
 By the end, the document has quietly dismantled two entrenched assumptions:
 
