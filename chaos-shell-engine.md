@@ -16,7 +16,7 @@ The [Chaos Shell Engine](random.txt) is the laboratory note about a Proof-of-Con
 
 - [The document in attachment: radom.txt](https://github.com/robang74/working-in-progress/blob/380528f78559c1bb4aa072ab455db7ce4fafdc59/random.txt) (commit 380528f)
 
-- [Experimentation background, jitter paper](https://github.com/robang74/roberto-a-foglietta/blob/main/data/Tesi_Foglietta-051a.pdf) (2006)
+- [Experimentation background, jitter paper](https://github.com/robang74/roberto-a-foglietta/blob/main/data/Tesi_Foglietta-051a.pdf) (2007)
 
 - [The ChatGPT session providing the essay](https://chatgpt.com/share/697aacca-dafc-8012-a331-48e94e4e1cd5)
 
