@@ -257,7 +257,9 @@ Watermarks do not affect statistically sound generated data; they simply fail to
 
 * Watermarks such that, found in the wild, could more likely indicate stenography rather than a class of implementation.
 
-In this context, implementation watermarks are nothing more than transient peaks of load or peculiar system conditions that may occur during generation without affecting either the local acceptability or the global statistical quality of the output. From this perspective, watermarks merely reveal that certain values were produced by a class of possible implementations. Such information constitutes a meaningful leak only if that class is cryptographically broken or if an attacker can deliberately induce the system conditions required to force the chaos engine into a predictable regime. This is why watermarks are actively sought **by dieharder** and rejected **only when they introduce predictability by circularity**, rather than merely indicating provenance.
+In this context, implementation watermarks are nothing more than transient peaks of load or peculiar system conditions that may occur during generation without affecting either the local acceptability or the global statistical quality of the output. From this perspective, watermarks merely reveal that certain values were produced by a class of possible implementations. Such information constitutes a meaningful leak only if that class is cryptographically broken or if an attacker can deliberately induce the system conditions required to force the chaos engine into a predictable regime.
+
+* This is why watermarks are actively sought **by dieharder** and rejected **only when they introduce predictability by circularity**, rather than merely indicating provenance.
 
 #### Deterministic Chaos vs Fundamental Uncertainty
 
