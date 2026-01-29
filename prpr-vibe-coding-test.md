@@ -24,11 +24,11 @@ Once I get in touch with the AI, the real work is starting: adding functionality
 
 - Starting with a simple skeleton on which add functionalities helps the AI to work on as short as possible CoT and avoid mistakes that will waste time and disrupt confidence of both parties in being able to work as Extreme Programming peers. In the meantime unit test suite is growing.
 
-- Gemini chat sharing [link](https://lnkd.in/dPdfrvDj)
+- Gemini chat sharing [link](https://gemini.google.com/share/1a68ccb34779)
 
 In order to have an idea of the overall process, this is the commits history
 
-- rprp.c commits [history](https://lnkd.in/dXt2ij2F)
+- rprp.c commits [history](https://github.com/robang74/working-in-progress/commits/main/prpr.c)
 
 ### CONCLUSION
 
@@ -37,4 +37,6 @@ The AI continues to change the file in a way that it should be tested every time
 The vibe coding in C-language makes sense only if the code to write is totally boring. The AI is for the 1st draft canvas (templating) or to work on a specific piece of code (routines or functions). I prefer not to write any comment about working on a project or a git repo because it is NOT that place a LLM/AI belongs to. Unsurprisingly for Gemini, the same can be said the same said about Copilot but Gemini has no any access to git repository.
 
 The whole development covered a time frame of 5h15m but it includes writing this documentation, the test suite, the code final revision and related testing, plus a full hour of pause and few tasks in the middle. In total, about three hours which is time in which everything could have been done without the AI.
+
+Just one final note, the buffer inversion function remained but the related functionality silently disappeared without any AI warning. So far, everyone who is using the AI for coding needs to run a full unit test at each AI change, for the file involved or a system test if the whole project is involved.
 
