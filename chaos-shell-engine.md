@@ -4,7 +4,7 @@
 
 > [!NOTE]
 > 
-> This presentation has been created from a solo man 3 days of work, or more precisely 66h.
+> This presentation has been created from a solo man 3 days of work, or more precisely 66 hours.
 
 ---
 
