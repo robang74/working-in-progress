@@ -12,11 +12,11 @@ The result compiles and apparently does what is supposed to do but...
 
 The result compiles and apparently does what is supposed to do but...
 
-4. TODO
+4. deciding for which standard buffer max size go with
 
 Is that more efficient than writing the code from scratch? I have my serious doubts but it is more enjoyable and also more interesting because it resembles extreme programming (programming in alternance with a peer). I like the exchange of opinions because in the rush of writing code, sometimes we implicitly give something for granted which is not so much in the most general case.
 
-5. TODO
+5. asking to add a feature, the reverse buffer output.
 
 Once I get in touch with the AI, the real work is starting: adding functionality on the basic schema built. Two main fundanting pillar have been set by  now:
 
