@@ -5,9 +5,6 @@
 
 #define MAX_BLOCK_SIZE 512
 
-/**
- * Reverses a buffer of a given size in-place.
- */
 static inline void reverse_buffer(unsigned char *buf, size_t size) {
     size_t i, j;
     for (i = 0, j = size - 1; i < j; i++, j--) {
@@ -19,36 +16,42 @@ static inline void reverse_buffer(unsigned char *buf, size_t size) {
 
 int main(int argc, char *argv[]) {
     int opt;
-    long o_size = 0; 
-    size_t w_size = 0;
+    long o_arg = 0; 
+    long w_arg = 0;
 
     while ((opt = getopt(argc, argv, "o:w:")) != -1) {
         switch (opt) {
-            case 'o': o_size = strtol(optarg, NULL, 10); break;
-            case 'w': w_size = strtoul(optarg, NULL, 10); break;
+            case 'o': o_arg = strtol(optarg, NULL, 10); break;
+            case 'w': w_arg = strtol(optarg, NULL, 10); break;
             default: exit(EXIT_FAILURE);
         }
     }
 
+    size_t w_size = (size_t)(w_arg < 0 ? -w_arg : w_arg);
+    size_t o_abs = (size_t)(o_arg < 0 ? -o_arg : o_arg);
+
+    // 1. STOP Condition: If absolute values are equal and w was negative
+    if (w_arg < 0 && w_size == o_abs) {
+        return 0; 
+    }
+
     if (w_size == 0 || w_size > MAX_BLOCK_SIZE) {
-        fprintf(stderr, "Error: Window (-w) must be between 1 and %d\n", MAX_BLOCK_SIZE);
+        fprintf(stderr, "Error: Window size invalid.\n");
         exit(EXIT_FAILURE);
     }
 
-    size_t abs_o_size = (o_size < 0) ? -o_size : o_size;
-    if (abs_o_size > w_size) {
-        fprintf(stderr, "Error: Absolute offset |%ld| cannot exceed window %zu\n", o_size, w_size);
+    if (o_abs > w_size) {
+        fprintf(stderr, "Error: Offset exceeds window.\n");
         exit(EXIT_FAILURE);
     }
 
     unsigned char buffer[MAX_BLOCK_SIZE];
-    
+
     while (1) {
         size_t bytes_read = 0;
-
         while (bytes_read < w_size) {
             ssize_t n = read(STDIN_FILENO, buffer + bytes_read, w_size - bytes_read);
-            if (n == 0) return 0; 
+            if (n == 0) return 0;
             if (n < 0) {
                 if (errno == EINTR) continue;
                 perror("read");
@@ -57,33 +60,22 @@ int main(int argc, char *argv[]) {
             bytes_read += n;
         }
 
-        // --- New Logic: Reverse vs Slice ---
-        if (abs_o_size == w_size) {
-            // Case: Full window reverse
+        // 2. Processing Logic
+        if (o_abs == w_size) {
+            // Reversal logic (triggered by equal abs values, but not the STOP case)
             reverse_buffer(buffer, w_size);
-            if (write(STDOUT_FILENO, buffer, w_size) < 0) {
-                perror("write");
-                exit(EXIT_FAILURE);
-            }
-        } else {
-            // Case: Standard slicing (head or tail)
-            unsigned char *output_ptr;
-            size_t bytes_to_write;
-
-            if (o_size >= 0) {
-                output_ptr = buffer;
-                bytes_to_write = (size_t)o_size;
-            } else {
-                output_ptr = buffer + (w_size - abs_o_size);
-                bytes_to_write = abs_o_size;
-            }
-
-            if (bytes_to_write > 0) {
-                if (write(STDOUT_FILENO, output_ptr, bytes_to_write) < 0) {
-                    perror("write");
-                    exit(EXIT_FAILURE);
-                }
-            }
+            write(STDOUT_FILENO, buffer, w_size);
+        } 
+        else if (w_arg < 0) {
+            // Centered Mode: Logic (w-o)/2
+            // Note: This implementation assumes we print o_abs chars starting at 'start'
+            size_t start = (w_size - o_abs) / 2;
+            write(STDOUT_FILENO, buffer + start, o_abs);
+        } 
+        else {
+            // Standard Slice Mode (Head/Tail)
+            unsigned char *ptr = (o_arg >= 0) ? buffer : (buffer + (w_size - o_abs));
+            write(STDOUT_FILENO, ptr, o_abs);
         }
     }
     return 0;
