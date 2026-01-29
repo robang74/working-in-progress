@@ -34,8 +34,8 @@ int main(int argc, char *argv[]) {
     size_t w_size = (size_t)ABS(w_arg);
     size_t o_abs = (size_t)ABS(o_arg);
 
-    // 1. Symmetric STOP Condition
-    if (w_size == o_abs) return 0;
+    // 1. STOP Conditions
+    //if (w_size == o_abs) return 0;
 
     if (w_size == 0 || w_size > MAX_BLOCK_SIZE) {
         fprintf(stderr, "Error: Window size invalid.\n");
@@ -50,9 +50,12 @@ int main(int argc, char *argv[]) {
     unsigned char buffer[MAX_BLOCK_SIZE];
 
     while (1) {
-        size_t bytes_read = 0;
+        size_t bytes_read = 0, nr = 0, nw = 0;
+        unsigned char *output_ptr = buffer;
+        size_t bytes_to_write = 0;
+
         while (bytes_read < w_size) {
-            ssize_t nr = read(STDIN_FILENO, buffer + bytes_read, w_size - bytes_read);
+            nr = read(STDIN_FILENO, buffer + bytes_read, w_size - bytes_read);
             if (nr == 0) return 0;
             if (nr < 0) {
                 if (errno == EINTR) continue;
@@ -62,39 +65,30 @@ int main(int argc, char *argv[]) {
             bytes_read += (size_t)nr;
         }
 
-        unsigned char *output_ptr = buffer;
-        size_t bytes_to_write = 0;
-
         // 2. Processing Logic
         if (w_arg < 0) {
-            /* * Centered Mode (Removal): Overwrite the middle portion.
-             * Logic: Keep first 'n' bytes, skip 'o_abs' bytes, keep the rest.
-             */
-            size_t n_head = (w_size - o_abs) / 2;
-            size_t n_tail = w_size - (n_head + o_abs);
-            
+            // Centered Mode (Removal): Overwrite the middle portion.
+            // Logic: Keep first 'n' bytes, skip 'o_abs' bytes, keep the rest.
+            size_t n = w_size - o_abs; n += (n % 2) ? (o_arg < 0) : 0; n/=2;
+            size_t n_tail = w_size - (n + o_abs);
             if (n_tail > 0) {
                 // Move tail forward to overwrite the 'o_abs' hole
                 // memmove is used because the source and dest might overlap
-                memmove(buffer + n_head, buffer + n_head + o_abs, n_tail);
+                memmove(buffer + n, buffer + n + o_abs, n_tail);
             }
-            
             output_ptr = buffer;
-            bytes_to_write = n_head + n_tail;
-        } 
-        else {
+            bytes_to_write = n + n_tail;
+        } else {
             /* Standard Slice Mode (Head/Tail) */
             output_ptr = (o_arg >= 0) ? buffer : (buffer + (w_size - o_abs));
             bytes_to_write = o_abs;
         }
 
         // 3. Single Write Execution
-        if (bytes_to_write > 0) {
-            ssize_t nw = write(STDOUT_FILENO, output_ptr, bytes_to_write);
-            if (nw < 0) {
-                perror("write");
-                exit(EXIT_FAILURE);
-            }
+        if (bytes_to_write < 1) return 0;
+        if (write(STDOUT_FILENO, output_ptr, bytes_to_write) < 0) {
+            perror("write");
+            exit(EXIT_FAILURE);
         }
     }
     return 0;
