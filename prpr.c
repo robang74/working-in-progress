@@ -41,20 +41,22 @@ int main(int argc, char *argv[]) {
     size_t r_size = (size_t)ABS(r_arg);
     size_t o_abs = (size_t)ABS(o_arg);
 
-    // 1. STOP Conditions
-    //if (r_size == o_abs) return 0;
+    // 1. STOP Conditions    
+    if (!o_abs) return 0;
 
-    if (r_size == 0 || r_size > MAX_BLOCK_SIZE) {
+    if (r_size > MAX_BLOCK_SIZE) {
         fprintf(stderr, "Error: Window size invalid.\n");
         exit(EXIT_FAILURE);
     }
 
-    if (o_abs > r_size) {
+    if (r_size && o_abs > r_size) {
         fprintf(stderr, "Error: Offset exceeds window.\n");
         exit(EXIT_FAILURE);
     }
 
     unsigned char buffer[MAX_BLOCK_SIZE];
+    
+    if (!r_arg) r_size = o_abs;
 
     while (1) {
         size_t bytes_read = 0, nr = 0, nw = 0;
@@ -71,8 +73,15 @@ int main(int argc, char *argv[]) {
             }
             bytes_read += (size_t)nr;
         }
-
+        
         // 2. Processing Logic
+        output_ptr = buffer;
+        bytes_to_write = o_abs;
+
+        if (!r_arg && o_arg < 0) { // reverse the buffer
+            reverse_buffer(buffer, r_size);
+        }
+        else
         if (r_arg < 0) {
             // Centered Mode (Removal): Overwrite the middle portion.
             // Logic: Keep first 'n' bytes, skip 'o_abs' bytes, keep the rest.
@@ -83,12 +92,11 @@ int main(int argc, char *argv[]) {
                 // memmove is used because the source and dest might overlap
                 memmove(buffer + n, buffer + n + o_abs, n_tail);
             }
-            output_ptr = buffer;
             bytes_to_write = n + n_tail;
-        } else {
+        }
+        else {
             /* Standard Slice Mode (Head/Tail) */
             output_ptr = (o_arg >= 0) ? buffer : (buffer + (r_size - o_abs));
-            bytes_to_write = o_abs;
         }
 
         // 3. Single Write Execution
