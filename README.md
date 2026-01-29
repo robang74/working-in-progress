@@ -4,7 +4,7 @@ Working in progress and other stuff that I prefer to share here to give them a c
 
 ### Index
 
-* **Chaos Shell Engine**: 1. [presentation](chaos-shell-engine.md), &nbsp; 2. [lab notes](random.txt)
+* **Chaos Shell Engine**: 1. [presentation](chaos-shell-engine.md), &nbsp; 2. [lab notes](random.txt) &nbsp; from which the presentation has been made
 
 ### Copyright
 
