@@ -1,5 +1,9 @@
 ## Chaos Shell Engine
 
+- (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, CC ND-BY-NC 4.0
+
+### Abstract
+
 The [Chaos Shell Engine](random.txt) is the laboratory note about a Proof-of-Concept to introduce a novel perspective in terms of crypthocraphic security underlining the difference between unceranty and unpredicatability, between entropy and information but not in the most general terms, specifically declined for information tecnology.
 
 - [Structural Synthetic Analysis prompt](https://robang74.github.io/chatbots-for-fun/html/collection-of-useful-prompts-by-raf.html#1-structural-synthetic-analysis-prompt)
@@ -8,9 +12,9 @@ The [Chaos Shell Engine](random.txt) is the laboratory note about a Proof-of-Con
 
 - [The ChatGPT session providing the essay](https://chatgpt.com/share/697aacca-dafc-8012-a331-48e94e4e1cd5)
 
-### Informative Note
-
-This presentation has been created from a solo man 3 days of work, or more precisely 66h.
+> [!INFO]
+> 
+> This presentation has been created from a solo man 3 days of work, or more precisely 66h.
 
 ```text
 commit 50b4845e
@@ -21,6 +25,8 @@ commit 7d59a912
 Date:  Thu Jan 29 00:04:23 2026 +0100
 random.txt: dieharder, all test passed
 ```
+
+### Introduction
 
 My way of taking notes is peculiar and somehow personal because I consider my own lab note. Therefore here below the "translation" by ChatGPT supported by "a useful prompt" of mine that instructs AI about how to create an index and a summary of the document.
 
