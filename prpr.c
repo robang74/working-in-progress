@@ -8,7 +8,7 @@
 /**
  * Reverses a buffer of a given size in-place.
  */
-void reverse_buffer(unsigned char *buf, size_t size) {
+static inline void reverse_buffer(unsigned char *buf, size_t size) {
     size_t i, j;
     for (i = 0, j = size - 1; i < j; i++, j--) {
         unsigned char temp = buf[i];
