@@ -268,7 +268,9 @@ the author shows that a deterministic OS can be driven into a **self-sustaining 
 
 The extensive use of `ent` and `dieharder` is not presented as absolute proof of randomness, but as **diagnostic instrumentation**. Failures are analyzed, not dismissed. The document repeatedly ties observed weaknesses back to structural causes: block alignment, hash finalization artifacts, interpreter dominance, scheduling imbalance.
 
-This retrospective discipline culminates not in blind aggregation, but in a selective integration strategy: individual generator variants are discarded as soon as a statistical watermark is detected, regardless of sample size, and only watermark-free implementations were allowed to **further** contribute. Aggregation therefore does not mask defects; it compounds independently validated stochastic behaviors. The improved results of aggregated runs are not accidental nor magical, but a consequence of integrating only those pipelines whose interaction with system jitter has already proven structurally sound under early, adversarial scrutiny.
+This retrospective discipline initially employed selective aggregation as a development tool: individual generator variants were discarded as soon as a statistical watermark was detected, regardless of sample size, and only watermark-free implementations were allowed to **further** contribute. While early aggregated runs demonstrated that independently validated stochastic behaviors could be compounded without introducing defects, later results — most notably **run.82** — show that aggregation is not essential.
+
+The **run.82** proves that a single, structurally sound implementation, operating at full production volume, is sufficient to pass the entire test suite. Aggregation therefore served to identify and eliminate circularity during design, not as a requirement for final statistical validity.
 
 #### Watermarks repetition is sampling-induced, not process-induced.
 
