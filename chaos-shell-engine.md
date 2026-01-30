@@ -14,7 +14,7 @@ The [Chaos Shell Engine](random.txt) is the laboratory note about a Proof-of-Con
 
 - [Structural Synthetic Analysis prompt](https://robang74.github.io/chatbots-for-fun/html/collection-of-useful-prompts-by-raf.html#1-structural-synthetic-analysis-prompt)
 
-- [The document in attachment: radom.txt](https://github.com/robang74/working-in-progress/blob/380528f78559c1bb4aa072ab455db7ce4fafdc59/random.txt) (commit 380528f)
+- [The document in attachment: radom.txt](https://github.com/robang74/working-in-progress/blob/380528f7/random.txt) (commit 380528f7, 2026-01-26)
 
 - [Experimentation background, jitter paper](https://github.com/robang74/roberto-a-foglietta/blob/main/data/Tesi_Foglietta-051a.pdf) (2007)
 
@@ -40,6 +40,25 @@ Please, before engaging with quick "evaluation" keep in consideration that what 
 Comparison with kernel RNDG and state of art algorithm isn't intended to compete in a real-word scenario but as reference and in particular, in a userland space /dev/random is the main reference, because everything as good as /dev/random, is good enough.
 
 The main difference is that /dev/random is under the governance of the system administrator while the chaos shell engine is fully available in userland. It is not a tiny difference, and it is more than having the root passoword or not.
+
+### Relevant Update
+
+Enough data has been produce by a single run (#82) and in particular as much data as `run.all` tested before (6M). This single run dataset passed all the tests in a statistically comparable manner than `run.all` showing that aggregation was useful to reach a preliminary test not mandatory for achieve that goal.
+
+```text
+commit 40acf641
+Date:   Fri Jan 30 16:52:09 2026 +0100
+random.txt: run.82, single produrecer passed the test
+```
+* - [The document updated: radom.txt](https://github.com/robang74/working-in-progress/blob/40acf641/random.txt) (commit 40acf641, 2026-01-30)
+
+The correct high-level statement now becomes:
+
+* Aggregation is sufficient but not necessary.
+
+And more specifically:
+
+* Aggregation helped explore and eliminate structural weaknesses during development, but once a single implementation achieved symmetry, load balance, and non-circular interaction with system jitter, mixture ceased to be required for statistical acceptance.
 
 ---
 
