@@ -60,6 +60,8 @@ And more specifically:
 
 * Aggregation helped explore and eliminate structural weaknesses during development, but once a single implementation achieved symmetry, load balance, and non-circular interaction with system jitter, mixture ceased to be required for statistical acceptance.
 
+The success of run.82 demonstrates that aggregation was a methodological aid, not a statistical necessity.
+
 ---
 
 ### Structural Index 
