@@ -23,11 +23,11 @@ The [Chaos Shell Engine](random.txt) is the laboratory note about a Proof-of-Con
 ```text
 commit 50b4845e
 Date:  Mon Jan 26 06:52:33 2026 +0100
-random.txt: added new
+    random.txt: added new
 
 commit 7d59a912
 Date:  Thu Jan 29 00:04:23 2026 +0100
-random.txt: dieharder, all test passed
+    random.txt: dieharder, all test passed
 ```
 ---
 
@@ -48,9 +48,13 @@ Enough data has been produced by a single run (#82) and in particular as much da
 ```text
 commit 40acf641
 Date:   Fri Jan 30 16:52:09 2026 +0100
-random.txt: run.82, single produrecer passed the test
+    random.txt: run.82, single produrecer passed the test
+
+commit eb5d1da4
+Date:   Sat Jan 31 00:28:32 2026 +0100
+    random.txt: considerations after the run.82
 ```
-* [The document updated: radom.txt](https://github.com/robang74/working-in-progress/blob/40acf641/random.txt) (commit 40acf641, 2026-01-30)
+* [The document updated: radom.txt](https://github.com/robang74/working-in-progress/blob/eb5d1da4/random.txt) (commit 40acf641, 2026-01-31)
 
 The correct high-level statement now becomes:
 
@@ -61,6 +65,24 @@ And more specifically:
 * Aggregation helped explore and eliminate structural weaknesses during development, but once a single implementation achieved symmetry, load balance, and non-circular interaction with system jitter, mixture ceased to be required for statistical acceptance.
 
 The success of run.82 demonstrates that aggregation was a methodological aid, not a statistical necessity.
+
+### Presentation
+
+The relevant update concludes and also summarises the investigative and demonstrative work made up to this point.
+
+The update concerns a single run that produces a data set passing the entire `dieharder` test suite. It is not an algorithmically special run nor a unique implementation; it is simply one instance selected among those implementations that do not exhibit detectable watermarks in the clockwork generating the numbers (i.e., the chaos shell engine).
+
+Another important aspect is that the test results show a statistical similarity with the previous `run.all`, which was executed over data collected from runs #42 and #60. Within the sensitivity of the test suite, this demonstrates that aggregation was a way to anticipate test outcomes before converging on an implementation optimized for other aspects, such as generation speed per byte.
+
+Even with an approximate 3× improvement in generation speed, this does not represent a breakthrough in absolute terms. The kernel `/dev/random` can generate white noise orders of magnitude faster than the initial implementation, and narrowing that gap is not the objective. A direct performance comparison with `/dev/random` is also not entirely fair: the latter is the result of decades of development by thousands of contributors operating at the state of the art, whereas the chaos shell engine is a proof of concept developed by a single author in a short time frame.
+
+So, why does the Chaos Shell Engine matter? Because it provides a practical, functional proof of concept that unpredictability does not necessarily depend on passively waiting for external events to accumulate entropy. Instead, unpredictability can be induced intentionally, and when transformed into white noise, this process itself induces further unpredictability, forming a self-sustaining mechanism. This reframes the problem at a fundamental level: not merely in terminology, but in how randomness generation is conceived and engineered.
+
+In this framework, “entropy” as a mystical or intrinsic property leaves the scene. The collected data are information, not entropy in themselves. Uncertainty is no longer the central concept; unpredictability is. Consequently, observing and collecting external events is no longer the only viable approach: generation becomes an alternative, more controllable path. Such generation can occur entirely within a bounded system—such as a chip or a subsystem thereof—without reliance on external environmental input.
+
+Complete isolation is not strictly necessary for the chaos clockwork to function, but it can improve security. Unpredictability is not only a matter of physical complexity (as in billiard systems or the three-body problem), but also of perspective and attacker capability. An attacker with root access can tamper with `/dev/random`, but in that scenario privilege escalation has already occurred, which dominates the threat model. At the microcode or CPU level the same reasoning applies: an actor able to observe or manipulate at that layer has no need to exploit lower-level mechanisms.
+
+From this point of view, unpredictability is distinct from uncertainty. The procedure that produces the numbers is deterministic, but the overall process is not, due to jitter in execution latencies. The core concept is the deterministic mixing of deterministic information, driven by the system’s own timing variability. The unpredictability emerges not from indeterminism, but from the interaction between deterministic computation and irreducible execution jitter.
 
 ---
 
