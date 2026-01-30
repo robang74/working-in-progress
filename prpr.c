@@ -40,9 +40,13 @@ int main(int argc, char *argv[]) {
 
     size_t r_size = (size_t)ABS(r_arg);
     size_t o_abs = (size_t)ABS(o_arg);
+    if (!r_size) r_size = o_abs;
+    if (r_arg < 0)
+      o_abs = r_size - o_abs;
 
-    // 1. STOP Conditions    
-    if (!o_abs) return 0;
+    // 1. STOP Conditions
+    if (!r_size && !o_abs) return 0;
+    if (r_arg > 0 && !o_abs) return 0;
 
     if (r_size > MAX_BLOCK_SIZE) {
         fprintf(stderr, "Error: Window size invalid.\n");
@@ -55,8 +59,6 @@ int main(int argc, char *argv[]) {
     }
 
     unsigned char buffer[MAX_BLOCK_SIZE];
-    
-    if (!r_arg) r_size = o_abs;
 
     while (1) {
         size_t bytes_read = 0, nr = 0, nw = 0;
@@ -85,7 +87,7 @@ int main(int argc, char *argv[]) {
         if (r_arg < 0) {
             // Centered Mode (Removal): Overwrite the middle portion.
             // Logic: Keep first 'n' bytes, skip 'o_abs' bytes, keep the rest.
-            size_t n = r_size - o_abs; n += (n % 2) ? (o_arg < 0) : 0; n/=2;
+            size_t n = r_size - o_abs; n += (n % 2) ? (o_arg > 0) : 0; n/=2;
             size_t n_tail = r_size - (n + o_abs);
             if (n_tail > 0) {
                 // Move tail forward to overwrite the 'o_abs' hole
