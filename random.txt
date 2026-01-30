@@ -2061,3 +2061,22 @@ Preparing to run test 208.  ntuple = 0
 Preparing to run test 209.  ntuple = 0
         dab_monobit2|  12|  65000000|       1|0.86679048|  PASSED  
 
+=== a single run but relevant ==================================================
+
+CHAOS SHELL ENGINE, SINGLE RUN
+
+The relevant update is about a single run that produces a data set that passes all the tests from the `diehardner` suite. It is not a special run, it is not a special implementation, it is by design. A run that has been chosen among those implementations that do not show watermarks for the clockwork which generated the numbers (aka the chaos shell engine).
+
+Another important aspect is that the test results show a statistical similarity with the previous run.all test that was run over collected data from run #42 and #60. This proves that mixture was a way to anticipate test results before providing an implementation optimised under other aspects like speed per byte generated.
+
+Even an improvement of 3x in generation, it is not a breakthrough because the kernel /dev/random can generate white noise at 10^5 times faster than the initial implementation and dividing by 3 does not fill the gap. However, a direct and full confrontation with /dev/random isn't fair because the last is a product of decades, thousands of people and companies behind them working at the state of art level while the chaos shell engine is a PoC by a solo man made in a few days.
+
+So, why does the Chaos Shell Engine matter? Because it shows with a practical and functional proof of concept that randomness is not necessarily depending on waiting events for collecting unpredictability but such unpredictability can be generated on purpose and in transforming it in white noise, more unpredictability is also generated thus is a self-sustaining process. This reframes completely the scenario at its fundamentals, not just the wording.
+
+The "magic" entropy gets out of the scene. Every data collected is information not entropy, anymore. The uncertainty isn't the key, but unpredictability. Therefore waiting to observe and collect data isn't anymore the only way to go but generating is another way and it is more controllable, it can be done within a bounded system (like a chip or part of it) that has no connection with the external environment.
+
+This isolation isn't even necessary for the chaos clockwork functioning but it improves security. Because the concept of unpredictability isn't just a matter of physics (like the biliard 7-cushion or the 3-body problem) but also a perspective.
+
+An attacker that should have root access can tamper /dev/random but in the local system the privilege escalation already took place and this matters more than tampering /dev/random. At the chip level or CPU micro firmware, the same: who can operate or observe at that level, hasn't the need to exploit lower levels.
+
+From this point of view unpredictability is not uncertainty anymore. The procedure to provide numbers is deterministic but the overall process is not because of jitters on the latencies. The main concept is mixing deterministic information in a deterministic way but driven by jittering of the process itself.
