@@ -43,14 +43,14 @@ The main difference is that /dev/random is under the governance of the system ad
 
 ### Relevant Update
 
-Enough data has been produce by a single run (#82) and in particular as much data as `run.all` tested before (6M). This single run dataset passed all the tests in a statistically comparable manner than `run.all` showing that aggregation was useful to reach a preliminary test not mandatory for achieve that goal.
+Enough data has been produced by a single run (#82) and in particular as much data as `run.all` tested before (6M). This single run dataset passed all the tests in a statistically comparable manner than `run.all` showing that aggregation was useful to reach a preliminary test not mandatory for achieve that goal.
 
 ```text
 commit 40acf641
 Date:   Fri Jan 30 16:52:09 2026 +0100
 random.txt: run.82, single produrecer passed the test
 ```
-* - [The document updated: radom.txt](https://github.com/robang74/working-in-progress/blob/40acf641/random.txt) (commit 40acf641, 2026-01-30)
+* [The document updated: radom.txt](https://github.com/robang74/working-in-progress/blob/40acf641/random.txt) (commit 40acf641, 2026-01-30)
 
 The correct high-level statement now becomes:
 
