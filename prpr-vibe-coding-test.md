@@ -29,6 +29,7 @@ Once I get in touch with the AI, the real work is starting: adding functionality
 In order to have an idea of the overall process, this is the commits history
 
 - rprp.c commits [history](https://github.com/robang74/working-in-progress/commits/main/prpr.c)
+- prpr folder on [github](https://github.com/robang74/working-in-progress/tree/main/prpr)
 
 ### CONCLUSION
 
