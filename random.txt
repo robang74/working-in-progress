@@ -1258,6 +1258,10 @@ Preparing to run test 209.  ntuple = 0
 
 --------------------------------------------------------------------------------  # run.62
 
+The custom "prpr" command replace the equivalent scripts in "perl" used before:
+
+  https://github.com/robang74/working-in-progress/tree/main/prpr
+
   ph() { ionice -c2 -n7 nice -n19 stdbuf -o0 -e0 -i0 "$@"; }
 
   pl() { h9 | ud | ph ./prpr "$@"; }
