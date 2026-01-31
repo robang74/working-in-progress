@@ -24,12 +24,12 @@ Once I get in touch with the AI, the real work is starting: adding functionality
 
 - Starting with a simple skeleton on which add functionalities helps the AI to work on as short as possible CoT and avoid mistakes that will waste time and disrupt confidence of both parties in being able to work as Extreme Programming peers. In the meantime unit test suite is growing.
 
-- Gemini chat sharing [link](https://gemini.google.com/share/1a68ccb34779)
+- [Gemini chat sharing link](https://gemini.google.com/share/1a68ccb34779)
 
 In order to have an idea of the overall process, this is the commits history
 
-- rprp.c commits [history](https://github.com/robang74/working-in-progress/commits/main/prpr.c)
-- prpr folder on [github](https://github.com/robang74/working-in-progress/tree/main/prpr)
+- [rprp.c commits history](https://github.com/robang74/working-in-progress/commits/main/prpr.c)
+- [prpr folder on github](https://github.com/robang74/working-in-progress/tree/main/prpr)
 
 ### CONCLUSION
 
