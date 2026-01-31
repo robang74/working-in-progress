@@ -2063,20 +2063,207 @@ Preparing to run test 209.  ntuple = 0
 
 === a single run but relevant ==================================================
 
-CHAOS SHELL ENGINE, SINGLE RUN
+The relevant update concludes and also summarises the investigative and
+demonstrative work made up to this point.
 
-The relevant update is about a single run that produces a data set that passes all the tests from the `diehardner` suite. It is not a special run, it is not a special implementation, it is by design. A run that has been chosen among those implementations that do not show watermarks for the clockwork which generated the numbers (aka the chaos shell engine).
+The update is about a single run that produces a data set that passes all the
+tests from the `diehardner` suite. It is not a special run, it is not a special
+implementation, it is by design. A run that has been chosen among those
+implementations that do not show watermarks for the clockwork which generated
+the numbers (aka the chaos shell engine).
 
-Another important aspect is that the test results show a statistical similarity with the previous run.all test that was run over collected data from run #42 and #60. This proves that mixture was a way to anticipate test results before providing an implementation optimised under other aspects like speed per byte generated.
+Another important aspect is that the test results show a statistical similarity
+with the previous run.all test that was run over collected data from run #42 and
+#60. This proves that mixture was a way to anticipate test results before
+providing an implementation optimised under other aspects like speed per byte
+generated.
 
-Even an improvement of 3x in generation, it is not a breakthrough because the kernel /dev/random can generate white noise at 10^5 times faster than the initial implementation and dividing by 3 does not fill the gap. However, a direct and full confrontation with /dev/random isn't fair because the last is a product of decades, thousands of people and companies behind them working at the state of art level while the chaos shell engine is a PoC by a solo man made in a few days.
+Even an improvement of 3x in generation, it is not a breakthrough because the
+kernel /dev/random can generate white noise at 10^5 times faster than the
+initial implementation and dividing by 3 does not fill the gap. However, a
+direct and full confrontation with /dev/random isn't fair because the last is a
+product of decades, thousands of people and companies behind them working at the
+state of art level while the chaos shell engine is a PoC by a solo man made in a
+few days.
 
-So, why does the Chaos Shell Engine matter? Because it shows with a practical and functional proof of concept that randomness is not necessarily depending on waiting events for collecting unpredictability but such unpredictability can be generated on purpose and in transforming it in white noise, more unpredictability is also generated thus is a self-sustaining process. This reframes completely the scenario at its fundamentals, not just the wording.
+So, why does the Chaos Shell Engine matter? Because it shows with a practical
+and functional proof of concept that randomness is not necessarily depending on
+waiting events for collecting unpredictability but such unpredictability can be
+generated on purpose and in transforming it in white noise, more
+unpredictability is also generated thus is a self-sustaining process. This
+reframes completely the scenario at its fundamentals, not just the wording.
 
-The "magic" entropy gets out of the scene. Every data collected is information not entropy, anymore. The uncertainty isn't the key, but unpredictability. Therefore waiting to observe and collect data isn't anymore the only way to go but generating is another way and it is more controllable, it can be done within a bounded system (like a chip or part of it) that has no connection with the external environment.
+The "magic" entropy gets out of the scene. Every data collected is information
+not entropy, anymore. The uncertainty isn't the key, but unpredictability.
+Therefore waiting to observe and collect data isn't anymore the only way to go
+but generating is another way and it is more controllable, it can be done within
+a bounded system (like a chip or part of it) that has no connection with the
+external environment.
 
-This isolation isn't even necessary for the chaos clockwork functioning but it improves security. Because the concept of unpredictability isn't just a matter of physics (like the biliard 7-cushion or the 3-body problem) but also a perspective.
+This isolation isn't even necessary for the chaos clockwork functioning but it
+improves security. Because the concept of unpredictability isn't just a matter
+of physics (like the biliard 7-cushion or the 3-body problem) but also a
+perspective.
 
-An attacker that should have root access can tamper /dev/random but in the local system the privilege escalation already took place and this matters more than tampering /dev/random. At the chip level or CPU micro firmware, the same: who can operate or observe at that level, hasn't the need to exploit lower levels.
+An attacker that should have root access can tamper /dev/random but in the local
+system the privilege escalation already took place and this matters more than
+tampering /dev/random. At the chip level or CPU micro firmware, the same: who
+can operate or observe at that level, hasn't the need to exploit lower levels.
 
-From this point of view unpredictability is not uncertainty anymore. The procedure to provide numbers is deterministic but the overall process is not because of jitters on the latencies. The main concept is mixing deterministic information in a deterministic way but driven by jittering of the process itself.
+From this point of view unpredictability is not uncertainty anymore. The
+procedure to provide numbers is deterministic but the overall process is not
+because of jitters on the latencies. The main concept is mixing deterministic
+information in a deterministic way but driven by jittering of the process itself.
+
+=== testing the previous =======================================================
+
+By the way, I have tested the collection of the runs from #61 and #81, those left
+behind and created during developing a faster implementation that culminates into #82.
+
+Testing the previous runs from #61 to #81 wasn't essential but reinforces the main
+point: even those implementations that in the aim of achieving a faster production
+breaks simmetries and produced biased samples set, and stop as soon as the evidence
+emerged of their unability to qualify, even when merged in larger set, creates some
+WEAK attention flags into the test all-PASSED. Showing a relative strong resilience
+in terms of design even when its fundamental rules are broken and they has been
+broken by pourpose becuase a constraint is essential to keep only if it is needed.
+
+The chaos shell engine does not rely on fragile parameter tuning; even when its
+design constraints are deliberately violated during development, the resulting
+output degrades gracefully rather than catastrophically. The presence of isolated
+WEAK results in run.681.all confirms that the imposed symmetry constraints are not
+cosmetic, but functional: when relaxed, residual structure becomes detectable,
+yet the system as a whole remains statistically stable.
+
+  for i in $(seq 61 81); do cat run.$i >> run.681.all; done
+  echo >> run.681.all
+  du -ks run.681.all
+    5264	run.681.all
+  dieharder -a -f run.681.all
+
+#=============================================================================#
+#            dieharder version 3.31.1 Copyright 2003 Robert G. Brown          #
+#=============================================================================#
+   rng_name    |           filename             |rands/second|
+        mt19937|                     run.681.all|  9.82e+07  |
+#=============================================================================#
+        test_name   |ntup| tsamples |psamples|  p-value |Assessment
+#=============================================================================#
+   diehard_birthdays|   0|       100|     100|0.99851167|   WEAK   
+      diehard_operm5|   0|   1000000|     100|0.66212393|  PASSED  
+  diehard_rank_32x32|   0|     40000|     100|0.81137351|  PASSED  
+    diehard_rank_6x8|   0|    100000|     100|0.98633442|  PASSED  
+   diehard_bitstream|   0|   2097152|     100|0.13531121|  PASSED  
+        diehard_opso|   0|   2097152|     100|0.77540186|  PASSED  
+        diehard_oqso|   0|   2097152|     100|0.96182275|  PASSED  
+         diehard_dna|   0|   2097152|     100|0.78775283|  PASSED  
+diehard_count_1s_str|   0|    256000|     100|0.86995033|  PASSED  
+diehard_count_1s_byt|   0|    256000|     100|0.96720674|  PASSED  
+ diehard_parking_lot|   0|     12000|     100|0.87150767|  PASSED  
+    diehard_2dsphere|   2|      8000|     100|0.74799072|  PASSED  
+    diehard_3dsphere|   3|      4000|     100|0.06156903|  PASSED  
+     diehard_squeeze|   0|    100000|     100|0.92431567|  PASSED  
+        diehard_sums|   0|       100|     100|0.00016198|   WEAK   
+        diehard_runs|   0|    100000|     100|0.11429580|  PASSED  
+        diehard_runs|   0|    100000|     100|0.23704715|  PASSED  
+       diehard_craps|   0|    200000|     100|0.93187786|  PASSED  
+       diehard_craps|   0|    200000|     100|0.75595561|  PASSED  
+ marsaglia_tsang_gcd|   0|  10000000|     100|0.96066686|  PASSED  
+ marsaglia_tsang_gcd|   0|  10000000|     100|0.57553618|  PASSED  
+         sts_monobit|   1|    100000|     100|0.99649071|   WEAK   
+            sts_runs|   2|    100000|     100|0.77963632|  PASSED  
+          sts_serial|   1|    100000|     100|0.96939413|  PASSED  
+          sts_serial|   2|    100000|     100|0.49818396|  PASSED  
+          sts_serial|   3|    100000|     100|0.30576225|  PASSED  
+          sts_serial|   3|    100000|     100|0.41740924|  PASSED  
+          sts_serial|   4|    100000|     100|0.03904883|  PASSED  
+          sts_serial|   4|    100000|     100|0.11286123|  PASSED  
+          sts_serial|   5|    100000|     100|0.07917344|  PASSED  
+          sts_serial|   5|    100000|     100|0.35949753|  PASSED  
+          sts_serial|   6|    100000|     100|0.00038837|   WEAK   
+          sts_serial|   6|    100000|     100|0.02177808|  PASSED  
+          sts_serial|   7|    100000|     100|0.00721382|  PASSED  
+          sts_serial|   7|    100000|     100|0.59941207|  PASSED  
+          sts_serial|   8|    100000|     100|0.15432859|  PASSED  
+          sts_serial|   8|    100000|     100|0.78549314|  PASSED  
+          sts_serial|   9|    100000|     100|0.54409161|  PASSED  
+          sts_serial|   9|    100000|     100|0.66477347|  PASSED  
+          sts_serial|  10|    100000|     100|0.76245455|  PASSED  
+          sts_serial|  10|    100000|     100|0.81514013|  PASSED  
+          sts_serial|  11|    100000|     100|0.41126269|  PASSED  
+          sts_serial|  11|    100000|     100|0.94817689|  PASSED  
+          sts_serial|  12|    100000|     100|0.70809600|  PASSED  
+          sts_serial|  12|    100000|     100|0.92460492|  PASSED  
+          sts_serial|  13|    100000|     100|0.59337641|  PASSED  
+          sts_serial|  13|    100000|     100|0.98273854|  PASSED  
+          sts_serial|  14|    100000|     100|0.31922453|  PASSED  
+          sts_serial|  14|    100000|     100|0.17518502|  PASSED  
+          sts_serial|  15|    100000|     100|0.56578050|  PASSED  
+          sts_serial|  15|    100000|     100|0.74774961|  PASSED  
+          sts_serial|  16|    100000|     100|0.65521770|  PASSED  
+          sts_serial|  16|    100000|     100|0.24736579|  PASSED  
+         rgb_bitdist|   1|    100000|     100|0.10067237|  PASSED  
+         rgb_bitdist|   2|    100000|     100|0.84827179|  PASSED  
+         rgb_bitdist|   3|    100000|     100|0.89765402|  PASSED  
+         rgb_bitdist|   4|    100000|     100|0.12231053|  PASSED  
+         rgb_bitdist|   5|    100000|     100|0.86119744|  PASSED  
+         rgb_bitdist|   6|    100000|     100|0.83685830|  PASSED  
+         rgb_bitdist|   7|    100000|     100|0.76707486|  PASSED  
+         rgb_bitdist|   8|    100000|     100|0.05946863|  PASSED  
+         rgb_bitdist|   9|    100000|     100|0.79973113|  PASSED  
+         rgb_bitdist|  10|    100000|     100|0.36060582|  PASSED  
+         rgb_bitdist|  11|    100000|     100|0.69871109|  PASSED  
+         rgb_bitdist|  12|    100000|     100|0.72063908|  PASSED  
+rgb_minimum_distance|   2|     10000|    1000|0.41454923|  PASSED  
+rgb_minimum_distance|   3|     10000|    1000|0.53301102|  PASSED  
+rgb_minimum_distance|   4|     10000|    1000|0.21278934|  PASSED  
+rgb_minimum_distance|   5|     10000|    1000|0.89993809|  PASSED  
+    rgb_permutations|   2|    100000|     100|0.44265162|  PASSED  
+    rgb_permutations|   3|    100000|     100|0.11003359|  PASSED  
+    rgb_permutations|   4|    100000|     100|0.14656091|  PASSED  
+    rgb_permutations|   5|    100000|     100|0.96441458|  PASSED  
+      rgb_lagged_sum|   0|   1000000|     100|0.98223291|  PASSED  
+      rgb_lagged_sum|   1|   1000000|     100|0.93457708|  PASSED  
+      rgb_lagged_sum|   2|   1000000|     100|0.59731913|  PASSED  
+      rgb_lagged_sum|   3|   1000000|     100|0.65356100|  PASSED  
+      rgb_lagged_sum|   4|   1000000|     100|0.13538407|  PASSED  
+      rgb_lagged_sum|   5|   1000000|     100|0.82167932|  PASSED  
+      rgb_lagged_sum|   6|   1000000|     100|0.08046151|  PASSED  
+      rgb_lagged_sum|   7|   1000000|     100|0.70760182|  PASSED  
+      rgb_lagged_sum|   8|   1000000|     100|0.80177199|  PASSED  
+      rgb_lagged_sum|   9|   1000000|     100|0.46696203|  PASSED  
+      rgb_lagged_sum|  10|   1000000|     100|0.21564463|  PASSED  
+      rgb_lagged_sum|  11|   1000000|     100|0.18274143|  PASSED  
+      rgb_lagged_sum|  12|   1000000|     100|0.19508902|  PASSED  
+      rgb_lagged_sum|  13|   1000000|     100|0.19018835|  PASSED  
+      rgb_lagged_sum|  14|   1000000|     100|0.95433505|  PASSED  
+      rgb_lagged_sum|  15|   1000000|     100|0.66026452|  PASSED  
+      rgb_lagged_sum|  16|   1000000|     100|0.37258551|  PASSED  
+      rgb_lagged_sum|  17|   1000000|     100|0.63345528|  PASSED  
+      rgb_lagged_sum|  18|   1000000|     100|0.03814203|  PASSED  
+      rgb_lagged_sum|  19|   1000000|     100|0.71392751|  PASSED  
+      rgb_lagged_sum|  20|   1000000|     100|0.93504408|  PASSED  
+      rgb_lagged_sum|  21|   1000000|     100|0.85808730|  PASSED  
+      rgb_lagged_sum|  22|   1000000|     100|0.54828993|  PASSED  
+      rgb_lagged_sum|  23|   1000000|     100|0.60222963|  PASSED  
+      rgb_lagged_sum|  24|   1000000|     100|0.20412135|  PASSED  
+      rgb_lagged_sum|  25|   1000000|     100|0.76910368|  PASSED  
+      rgb_lagged_sum|  26|   1000000|     100|0.97752266|  PASSED  
+      rgb_lagged_sum|  27|   1000000|     100|0.62487242|  PASSED  
+      rgb_lagged_sum|  28|   1000000|     100|0.87709501|  PASSED  
+      rgb_lagged_sum|  29|   1000000|     100|0.90928319|  PASSED  
+      rgb_lagged_sum|  30|   1000000|     100|0.30058101|  PASSED  
+      rgb_lagged_sum|  31|   1000000|     100|0.50116172|  PASSED  
+      rgb_lagged_sum|  32|   1000000|     100|0.88078996|  PASSED  
+     rgb_kstest_test|   0|     10000|    1000|0.40123902|  PASSED  
+     dab_bytedistrib|   0|  51200000|       1|0.42086984|  PASSED  
+             dab_dct| 256|     50000|       1|0.63596292|  PASSED  
+Preparing to run test 207.  ntuple = 0
+        dab_filltree|  32|  15000000|       1|0.79644680|  PASSED  
+        dab_filltree|  32|  15000000|       1|0.10791348|  PASSED  
+Preparing to run test 208.  ntuple = 0
+       dab_filltree2|   0|   5000000|       1|0.78036462|  PASSED  
+       dab_filltree2|   1|   5000000|       1|0.55793909|  PASSED  
+Preparing to run test 209.  ntuple = 0
+        dab_monobit2|  12|  65000000|       1|0.91125430|  PASSED  
+
