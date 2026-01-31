@@ -24,7 +24,7 @@ The [Chaos Shell Engine](random.txt) is the laboratory note about a Proof-of-Con
 commit 50b4845e
 Date:  Mon Jan 26 06:52:33 2026 +0100
     random.txt: added new
-
+    ...
 commit 7d59a912
 Date:  Thu Jan 29 00:04:23 2026 +0100
     random.txt: dieharder, all test passed
@@ -49,12 +49,13 @@ Enough data has been produced by a single run (#82) and in particular as much da
 commit 40acf641
 Date:   Fri Jan 30 16:52:09 2026 +0100
     random.txt: run.82, single produrecer passed the test
+    ...
+commit f3ea61e4
+Date:   Sat Jan 31 01:04:24 2026 +0100
+    random.txt: test results over previous runs #61-#81
 
-commit eb5d1da4
-Date:   Sat Jan 31 00:28:32 2026 +0100
-    random.txt: considerations after the run.82
 ```
-* [The document updated: radom.txt](https://github.com/robang74/working-in-progress/blob/eb5d1da4/random.txt) (commit 40acf641, 2026-01-31)
+* [The document updated: radom.txt](https://github.com/robang74/working-in-progress/blob/f3ea61e4/random.txt) (commit f3ea61e4, 2026-01-31)
 
 The correct high-level statement now becomes:
 
@@ -64,7 +65,23 @@ And more specifically:
 
 * Aggregation helped explore and eliminate structural weaknesses during development, but once a single implementation achieved symmetry, load balance, and non-circular interaction with system jitter, mixture ceased to be required for statistical acceptance.
 
-The success of run.82 demonstrates that aggregation was a methodological aid, not a statistical necessity.
+The success of run.82 demonstrates that aggregation was a methodological aid, not a statistical necessity. The runs from #61 and #81, those left behind and created during developing a faster implementation that culminates into #82, have also been tested as an aggregate `run.681.all`.
+
+Testing the previous runs from #61 to #81 wasn't essential but reinforces the main
+point: even those implementations that in the aim of achieving a faster production
+breaks simmetries and produced biased samples set, and stop as soon as the evidence
+emerged of their unability to qualify, even when merged in larger set, creates some
+WEAK attention flags into the test all-PASSED. Showing a relative strong resilience
+in terms of design even when its fundamental rules are broken and they has been
+broken by pourpose becuase a constraint is essential to keep only if it is needed.
+
+The chaos shell engine does not rely on fragile parameter tuning; even when its
+design constraints are deliberately violated during development, the resulting
+output degrades gracefully rather than catastrophically. The presence of isolated
+WEAK results in run.681.all confirms that the imposed symmetry constraints are not
+cosmetic, but functional: when relaxed, residual structure becomes detectable,
+yet the system as a whole remains statistically stable.
+
 
 ### Presentation
 
