@@ -53,9 +53,9 @@ Date:   Fri Jan 30 16:52:09 2026 +0100
 commit f3ea61e4
 Date:   Sat Jan 31 01:04:24 2026 +0100
     random.txt: test results over previous runs #61-#81
-
 ```
 * [The document updated: radom.txt](https://github.com/robang74/working-in-progress/blob/f3ea61e4/random.txt) (commit f3ea61e4, 2026-01-31)
+* [`prpr` folder, the custom command](https://github.com/robang74/working-in-progress/tree/main/prpr) (logic re-evaluation, 2026-01-30)
 
 The correct high-level statement now becomes:
 
