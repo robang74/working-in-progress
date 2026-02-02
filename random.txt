@@ -418,7 +418,7 @@ Statistics from 'ent' clearly indicate that functions set below are better.
   h4() { { hg & hg & hg & hg; } | hs | ud; }
 
   h3() { { h4 & h4 & h4; } | hc -1 | hs | ud; }  # h3(i:192-->hc(-c+24)-->o:192)
-  
+
   cg() { { h3 & h3; } | hc -9; }
 
 "The Chaos Engine is independent of specific cryptographic primitives. While
@@ -617,7 +617,7 @@ The last operation he() can be improved in terms of execution speed using perl.
   hc() { pigz -cp$(nproc) "$@" | tail -c+16 | head -c-8; }
 
   hs() { sha512sum | xxd -r -p; }
-  
+
   hx() { { cat -; date +%N; } | ud; }
 
   hg() { { time echo | ud status=progress count=1k; } 2>&1 | hx; }
@@ -625,7 +625,7 @@ The last operation he() can be improved in terms of execution speed using perl.
   h1() { { hg & hg & hg; } | hc -1 | ud; }
 
   h9() { { h1 & h1 & h1; } | hc -9 | hs | ud; }
-  
+
   he() { for i in $(seq 64); do dd status=none bs=1 skip=1 count=2; done; }
 
   cg() { { h9 & h9 & h9; } | he; }
@@ -926,7 +926,7 @@ Aligned the I/O waiting schedule policy into the #42 without other changes.     
   hc() { pigz -cp$(nproc) "$@" | tail -c+16 | head -c-8; }
 
   hs() { sha512sum | xxd -r -p; }
-  
+
   hx() { { cat -; date +%N; } | ud; }
 
   hg() { { time echo | ud status=progress count=1k; } 2>&1 | hx; }
@@ -934,7 +934,7 @@ Aligned the I/O waiting schedule policy into the #42 without other changes.     
   h1() { { hg & hg & hg; } | hc -1 | ud; }
 
   h9() { { h1 & h1 & h1; } | hc -9 | hs | ud; }
-  
+
   he() { for i in $(seq 64); do dd status=none bs=1 skip=1 count=2; done; }
 
   cg() { { h9 & h9 & h9; } | he; }
@@ -1068,7 +1068,7 @@ The same #42 but without the nice -n19 in the ud-dd function:
   would exceed this value 72.57 percent of the times.
   Arithmetic mean value of data bytes is 127.5677 (127.5 = random).
   Monte Carlo value for Pi is 3.134672619 (error 0.22 percent).
-  
+
   Entropy = 7.999440 bits per byte.
   Chi square distribution for 361484 samples is 281.06, and randomly
   would exceed this value 12.58 percent of the times.
@@ -1104,123 +1104,123 @@ Both were essential to establish how the "clockwork" is resilient and reliable.
 #=============================================================================#
         test_name   |ntup| tsamples |psamples|  p-value |Assessment
 #=============================================================================#
-   diehard_birthdays|   0|       100|     100|0.03641208|  PASSED  
-      diehard_operm5|   0|   1000000|     100|0.07541389|  PASSED  
-  diehard_rank_32x32|   0|     40000|     100|0.58548746|  PASSED  
-    diehard_rank_6x8|   0|    100000|     100|0.76391437|  PASSED  
-   diehard_bitstream|   0|   2097152|     100|0.79109933|  PASSED  
-        diehard_opso|   0|   2097152|     100|0.58268424|  PASSED  
-        diehard_oqso|   0|   2097152|     100|0.57240383|  PASSED  
-         diehard_dna|   0|   2097152|     100|0.77761391|  PASSED  
-diehard_count_1s_str|   0|    256000|     100|0.02121344|  PASSED  
-diehard_count_1s_byt|   0|    256000|     100|0.55294204|  PASSED  
- diehard_parking_lot|   0|     12000|     100|0.19536922|  PASSED  
-    diehard_2dsphere|   2|      8000|     100|0.25010320|  PASSED  
-    diehard_3dsphere|   3|      4000|     100|0.48828522|  PASSED  
-     diehard_squeeze|   0|    100000|     100|0.22496051|  PASSED  
-        diehard_sums|   0|       100|     100|0.25081516|  PASSED  
-        diehard_runs|   0|    100000|     100|0.11195859|  PASSED  
-        diehard_runs|   0|    100000|     100|0.72451058|  PASSED  
-       diehard_craps|   0|    200000|     100|0.75657484|  PASSED  
-       diehard_craps|   0|    200000|     100|0.69991716|  PASSED  
- marsaglia_tsang_gcd|   0|  10000000|     100|0.35366608|  PASSED  
- marsaglia_tsang_gcd|   0|  10000000|     100|0.49730104|  PASSED  
-         sts_monobit|   1|    100000|     100|0.17934607|  PASSED  
-            sts_runs|   2|    100000|     100|0.12271631|  PASSED  
-          sts_serial|   1|    100000|     100|0.47265566|  PASSED  
-          sts_serial|   2|    100000|     100|0.44899500|  PASSED  
-          sts_serial|   3|    100000|     100|0.30208524|  PASSED  
-          sts_serial|   3|    100000|     100|0.33365487|  PASSED  
-          sts_serial|   4|    100000|     100|0.31276400|  PASSED  
-          sts_serial|   4|    100000|     100|0.39483800|  PASSED  
-          sts_serial|   5|    100000|     100|0.79632737|  PASSED  
-          sts_serial|   5|    100000|     100|0.91273095|  PASSED  
-          sts_serial|   6|    100000|     100|0.98321159|  PASSED  
-          sts_serial|   6|    100000|     100|0.74252464|  PASSED  
-          sts_serial|   7|    100000|     100|0.80357047|  PASSED  
-          sts_serial|   7|    100000|     100|0.68096563|  PASSED  
-          sts_serial|   8|    100000|     100|0.57482535|  PASSED  
-          sts_serial|   8|    100000|     100|0.43322830|  PASSED  
-          sts_serial|   9|    100000|     100|0.60564880|  PASSED  
-          sts_serial|   9|    100000|     100|0.77760478|  PASSED  
-          sts_serial|  10|    100000|     100|0.40345293|  PASSED  
-          sts_serial|  10|    100000|     100|0.84797819|  PASSED  
-          sts_serial|  11|    100000|     100|0.96306234|  PASSED  
-          sts_serial|  11|    100000|     100|0.41781615|  PASSED  
-          sts_serial|  12|    100000|     100|0.99022533|  PASSED  
-          sts_serial|  12|    100000|     100|0.88586876|  PASSED  
-          sts_serial|  13|    100000|     100|0.09931011|  PASSED  
-          sts_serial|  13|    100000|     100|0.06113278|  PASSED  
-          sts_serial|  14|    100000|     100|0.35490381|  PASSED  
-          sts_serial|  14|    100000|     100|0.96509875|  PASSED  
-          sts_serial|  15|    100000|     100|0.20132546|  PASSED  
-          sts_serial|  15|    100000|     100|0.67841577|  PASSED  
-          sts_serial|  16|    100000|     100|0.88190174|  PASSED  
-          sts_serial|  16|    100000|     100|0.44063038|  PASSED  
-         rgb_bitdist|   1|    100000|     100|0.04888472|  PASSED  
-         rgb_bitdist|   2|    100000|     100|0.98183110|  PASSED  
-         rgb_bitdist|   3|    100000|     100|0.75638519|  PASSED  
-         rgb_bitdist|   4|    100000|     100|0.08362236|  PASSED  
-         rgb_bitdist|   5|    100000|     100|0.72637480|  PASSED  
-         rgb_bitdist|   6|    100000|     100|0.23909631|  PASSED  
-         rgb_bitdist|   7|    100000|     100|0.59757228|  PASSED  
-         rgb_bitdist|   8|    100000|     100|0.30322541|  PASSED  
-         rgb_bitdist|   9|    100000|     100|0.46453856|  PASSED  
-         rgb_bitdist|  10|    100000|     100|0.28734470|  PASSED  
-         rgb_bitdist|  11|    100000|     100|0.17575246|  PASSED  
-         rgb_bitdist|  12|    100000|     100|0.39138690|  PASSED  
-rgb_minimum_distance|   2|     10000|    1000|0.92758471|  PASSED  
-rgb_minimum_distance|   3|     10000|    1000|0.18048291|  PASSED  
-rgb_minimum_distance|   4|     10000|    1000|0.54123563|  PASSED  
-rgb_minimum_distance|   5|     10000|    1000|0.83739886|  PASSED  
-    rgb_permutations|   2|    100000|     100|0.90566701|  PASSED  
-    rgb_permutations|   3|    100000|     100|0.42531076|  PASSED  
-    rgb_permutations|   4|    100000|     100|0.85600382|  PASSED  
-    rgb_permutations|   5|    100000|     100|0.98238654|  PASSED  
-      rgb_lagged_sum|   0|   1000000|     100|0.80110616|  PASSED  
-      rgb_lagged_sum|   1|   1000000|     100|0.87726417|  PASSED  
-      rgb_lagged_sum|   2|   1000000|     100|0.76229461|  PASSED  
-      rgb_lagged_sum|   3|   1000000|     100|0.39697235|  PASSED  
-      rgb_lagged_sum|   4|   1000000|     100|0.55630985|  PASSED  
-      rgb_lagged_sum|   5|   1000000|     100|0.41204561|  PASSED  
-      rgb_lagged_sum|   6|   1000000|     100|0.16811575|  PASSED  
-      rgb_lagged_sum|   7|   1000000|     100|0.38863610|  PASSED  
-      rgb_lagged_sum|   8|   1000000|     100|0.10192600|  PASSED  
-      rgb_lagged_sum|   9|   1000000|     100|0.96936129|  PASSED  
-      rgb_lagged_sum|  10|   1000000|     100|0.63165107|  PASSED  
-      rgb_lagged_sum|  11|   1000000|     100|0.18413929|  PASSED  
-      rgb_lagged_sum|  12|   1000000|     100|0.45008215|  PASSED  
-      rgb_lagged_sum|  13|   1000000|     100|0.52259112|  PASSED  
-      rgb_lagged_sum|  14|   1000000|     100|0.23939839|  PASSED  
-      rgb_lagged_sum|  15|   1000000|     100|0.46559267|  PASSED  
-      rgb_lagged_sum|  16|   1000000|     100|0.86193601|  PASSED  
-      rgb_lagged_sum|  17|   1000000|     100|0.98383304|  PASSED  
-      rgb_lagged_sum|  18|   1000000|     100|0.80903829|  PASSED  
-      rgb_lagged_sum|  19|   1000000|     100|0.62545788|  PASSED  
-      rgb_lagged_sum|  20|   1000000|     100|0.91031756|  PASSED  
-      rgb_lagged_sum|  21|   1000000|     100|0.74695393|  PASSED  
-      rgb_lagged_sum|  22|   1000000|     100|0.89685575|  PASSED  
-      rgb_lagged_sum|  23|   1000000|     100|0.30518916|  PASSED  
-      rgb_lagged_sum|  24|   1000000|     100|0.68648182|  PASSED  
-      rgb_lagged_sum|  25|   1000000|     100|0.29811632|  PASSED  
-      rgb_lagged_sum|  26|   1000000|     100|0.02939841|  PASSED  
-      rgb_lagged_sum|  27|   1000000|     100|0.27859097|  PASSED  
-      rgb_lagged_sum|  28|   1000000|     100|0.61193995|  PASSED  
-      rgb_lagged_sum|  29|   1000000|     100|0.40361452|  PASSED  
-      rgb_lagged_sum|  30|   1000000|     100|0.27254238|  PASSED  
-      rgb_lagged_sum|  31|   1000000|     100|0.46073198|  PASSED  
-      rgb_lagged_sum|  32|   1000000|     100|0.63546725|  PASSED  
-     rgb_kstest_test|   0|     10000|    1000|0.87240657|  PASSED  
-     dab_bytedistrib|   0|  51200000|       1|0.40002040|  PASSED  
-             dab_dct| 256|     50000|       1|0.70791691|  PASSED  
+   diehard_birthdays|   0|       100|     100|0.03641208|  PASSED
+      diehard_operm5|   0|   1000000|     100|0.07541389|  PASSED
+  diehard_rank_32x32|   0|     40000|     100|0.58548746|  PASSED
+    diehard_rank_6x8|   0|    100000|     100|0.76391437|  PASSED
+   diehard_bitstream|   0|   2097152|     100|0.79109933|  PASSED
+        diehard_opso|   0|   2097152|     100|0.58268424|  PASSED
+        diehard_oqso|   0|   2097152|     100|0.57240383|  PASSED
+         diehard_dna|   0|   2097152|     100|0.77761391|  PASSED
+diehard_count_1s_str|   0|    256000|     100|0.02121344|  PASSED
+diehard_count_1s_byt|   0|    256000|     100|0.55294204|  PASSED
+ diehard_parking_lot|   0|     12000|     100|0.19536922|  PASSED
+    diehard_2dsphere|   2|      8000|     100|0.25010320|  PASSED
+    diehard_3dsphere|   3|      4000|     100|0.48828522|  PASSED
+     diehard_squeeze|   0|    100000|     100|0.22496051|  PASSED
+        diehard_sums|   0|       100|     100|0.25081516|  PASSED
+        diehard_runs|   0|    100000|     100|0.11195859|  PASSED
+        diehard_runs|   0|    100000|     100|0.72451058|  PASSED
+       diehard_craps|   0|    200000|     100|0.75657484|  PASSED
+       diehard_craps|   0|    200000|     100|0.69991716|  PASSED
+ marsaglia_tsang_gcd|   0|  10000000|     100|0.35366608|  PASSED
+ marsaglia_tsang_gcd|   0|  10000000|     100|0.49730104|  PASSED
+         sts_monobit|   1|    100000|     100|0.17934607|  PASSED
+            sts_runs|   2|    100000|     100|0.12271631|  PASSED
+          sts_serial|   1|    100000|     100|0.47265566|  PASSED
+          sts_serial|   2|    100000|     100|0.44899500|  PASSED
+          sts_serial|   3|    100000|     100|0.30208524|  PASSED
+          sts_serial|   3|    100000|     100|0.33365487|  PASSED
+          sts_serial|   4|    100000|     100|0.31276400|  PASSED
+          sts_serial|   4|    100000|     100|0.39483800|  PASSED
+          sts_serial|   5|    100000|     100|0.79632737|  PASSED
+          sts_serial|   5|    100000|     100|0.91273095|  PASSED
+          sts_serial|   6|    100000|     100|0.98321159|  PASSED
+          sts_serial|   6|    100000|     100|0.74252464|  PASSED
+          sts_serial|   7|    100000|     100|0.80357047|  PASSED
+          sts_serial|   7|    100000|     100|0.68096563|  PASSED
+          sts_serial|   8|    100000|     100|0.57482535|  PASSED
+          sts_serial|   8|    100000|     100|0.43322830|  PASSED
+          sts_serial|   9|    100000|     100|0.60564880|  PASSED
+          sts_serial|   9|    100000|     100|0.77760478|  PASSED
+          sts_serial|  10|    100000|     100|0.40345293|  PASSED
+          sts_serial|  10|    100000|     100|0.84797819|  PASSED
+          sts_serial|  11|    100000|     100|0.96306234|  PASSED
+          sts_serial|  11|    100000|     100|0.41781615|  PASSED
+          sts_serial|  12|    100000|     100|0.99022533|  PASSED
+          sts_serial|  12|    100000|     100|0.88586876|  PASSED
+          sts_serial|  13|    100000|     100|0.09931011|  PASSED
+          sts_serial|  13|    100000|     100|0.06113278|  PASSED
+          sts_serial|  14|    100000|     100|0.35490381|  PASSED
+          sts_serial|  14|    100000|     100|0.96509875|  PASSED
+          sts_serial|  15|    100000|     100|0.20132546|  PASSED
+          sts_serial|  15|    100000|     100|0.67841577|  PASSED
+          sts_serial|  16|    100000|     100|0.88190174|  PASSED
+          sts_serial|  16|    100000|     100|0.44063038|  PASSED
+         rgb_bitdist|   1|    100000|     100|0.04888472|  PASSED
+         rgb_bitdist|   2|    100000|     100|0.98183110|  PASSED
+         rgb_bitdist|   3|    100000|     100|0.75638519|  PASSED
+         rgb_bitdist|   4|    100000|     100|0.08362236|  PASSED
+         rgb_bitdist|   5|    100000|     100|0.72637480|  PASSED
+         rgb_bitdist|   6|    100000|     100|0.23909631|  PASSED
+         rgb_bitdist|   7|    100000|     100|0.59757228|  PASSED
+         rgb_bitdist|   8|    100000|     100|0.30322541|  PASSED
+         rgb_bitdist|   9|    100000|     100|0.46453856|  PASSED
+         rgb_bitdist|  10|    100000|     100|0.28734470|  PASSED
+         rgb_bitdist|  11|    100000|     100|0.17575246|  PASSED
+         rgb_bitdist|  12|    100000|     100|0.39138690|  PASSED
+rgb_minimum_distance|   2|     10000|    1000|0.92758471|  PASSED
+rgb_minimum_distance|   3|     10000|    1000|0.18048291|  PASSED
+rgb_minimum_distance|   4|     10000|    1000|0.54123563|  PASSED
+rgb_minimum_distance|   5|     10000|    1000|0.83739886|  PASSED
+    rgb_permutations|   2|    100000|     100|0.90566701|  PASSED
+    rgb_permutations|   3|    100000|     100|0.42531076|  PASSED
+    rgb_permutations|   4|    100000|     100|0.85600382|  PASSED
+    rgb_permutations|   5|    100000|     100|0.98238654|  PASSED
+      rgb_lagged_sum|   0|   1000000|     100|0.80110616|  PASSED
+      rgb_lagged_sum|   1|   1000000|     100|0.87726417|  PASSED
+      rgb_lagged_sum|   2|   1000000|     100|0.76229461|  PASSED
+      rgb_lagged_sum|   3|   1000000|     100|0.39697235|  PASSED
+      rgb_lagged_sum|   4|   1000000|     100|0.55630985|  PASSED
+      rgb_lagged_sum|   5|   1000000|     100|0.41204561|  PASSED
+      rgb_lagged_sum|   6|   1000000|     100|0.16811575|  PASSED
+      rgb_lagged_sum|   7|   1000000|     100|0.38863610|  PASSED
+      rgb_lagged_sum|   8|   1000000|     100|0.10192600|  PASSED
+      rgb_lagged_sum|   9|   1000000|     100|0.96936129|  PASSED
+      rgb_lagged_sum|  10|   1000000|     100|0.63165107|  PASSED
+      rgb_lagged_sum|  11|   1000000|     100|0.18413929|  PASSED
+      rgb_lagged_sum|  12|   1000000|     100|0.45008215|  PASSED
+      rgb_lagged_sum|  13|   1000000|     100|0.52259112|  PASSED
+      rgb_lagged_sum|  14|   1000000|     100|0.23939839|  PASSED
+      rgb_lagged_sum|  15|   1000000|     100|0.46559267|  PASSED
+      rgb_lagged_sum|  16|   1000000|     100|0.86193601|  PASSED
+      rgb_lagged_sum|  17|   1000000|     100|0.98383304|  PASSED
+      rgb_lagged_sum|  18|   1000000|     100|0.80903829|  PASSED
+      rgb_lagged_sum|  19|   1000000|     100|0.62545788|  PASSED
+      rgb_lagged_sum|  20|   1000000|     100|0.91031756|  PASSED
+      rgb_lagged_sum|  21|   1000000|     100|0.74695393|  PASSED
+      rgb_lagged_sum|  22|   1000000|     100|0.89685575|  PASSED
+      rgb_lagged_sum|  23|   1000000|     100|0.30518916|  PASSED
+      rgb_lagged_sum|  24|   1000000|     100|0.68648182|  PASSED
+      rgb_lagged_sum|  25|   1000000|     100|0.29811632|  PASSED
+      rgb_lagged_sum|  26|   1000000|     100|0.02939841|  PASSED
+      rgb_lagged_sum|  27|   1000000|     100|0.27859097|  PASSED
+      rgb_lagged_sum|  28|   1000000|     100|0.61193995|  PASSED
+      rgb_lagged_sum|  29|   1000000|     100|0.40361452|  PASSED
+      rgb_lagged_sum|  30|   1000000|     100|0.27254238|  PASSED
+      rgb_lagged_sum|  31|   1000000|     100|0.46073198|  PASSED
+      rgb_lagged_sum|  32|   1000000|     100|0.63546725|  PASSED
+     rgb_kstest_test|   0|     10000|    1000|0.87240657|  PASSED
+     dab_bytedistrib|   0|  51200000|       1|0.40002040|  PASSED
+             dab_dct| 256|     50000|       1|0.70791691|  PASSED
 Preparing to run test 207.  ntuple = 0
-        dab_filltree|  32|  15000000|       1|0.33168953|  PASSED  
-        dab_filltree|  32|  15000000|       1|0.52339206|  PASSED  
+        dab_filltree|  32|  15000000|       1|0.33168953|  PASSED
+        dab_filltree|  32|  15000000|       1|0.52339206|  PASSED
 Preparing to run test 208.  ntuple = 0
-       dab_filltree2|   0|   5000000|       1|0.17713515|  PASSED  
-       dab_filltree2|   1|   5000000|       1|0.99092681|  PASSED  
+       dab_filltree2|   0|   5000000|       1|0.17713515|  PASSED
+       dab_filltree2|   1|   5000000|       1|0.99092681|  PASSED
 Preparing to run test 209.  ntuple = 0
-        dab_monobit2|  12|  65000000|       1|0.48313795|  PASSED  
+        dab_monobit2|  12|  65000000|       1|0.48313795|  PASSED
 
 --------------------------------------------------------------------------------  # run.61
 
@@ -1373,9 +1373,9 @@ Monte Carlo value for Pi is 3.142912675 (error 0.04 percent).
   hg() { { time date +%N | dd; } 2>&1 | ph dd bs=1 2>&1; }
 
   h1() { { hg & hg & hg & hg; } | hc -1 | hs; }
-  
+
   h9() { { h1 & h1 & h1 & h1; } | hc -9 | ph ./prpr "$@"; }
-  
+
   cg() { ( h9 -r3 -o2 & h9 -r-3 -o-2 & h9 -r3 -o-2; ) }
 
   Entropy = 7.997007 bits per byte.
@@ -1411,7 +1411,7 @@ Monte Carlo value for Pi is 3.142912675 (error 0.04 percent).
   hc() { nice -n19 pigz -cp$(nproc) "$@" | tail -c+16 | head -c-8; }
 
   ph() { ionice -c3 stdbuf -o0 -e0 -i0 "$@"; }
-  
+
   hs() { nice -n19 sha512sum | ph xxd -r -p; }
 
   Entropy = 7.997329 bits per byte.
@@ -1431,7 +1431,7 @@ Monte Carlo value for Pi is 3.142912675 (error 0.04 percent).
   hc() { nice -n19 pigz -cp$(nproc) "$@" | tail -c+16 | head -c-8; }
 
   ph() { nice -n19 ionice -c3 stdbuf -o0 -e0 -i0 "$@"; }
-  
+
   hs() { nice -n19 sha512sum | ph xxd -r -p; }
 
   Entropy = 7.997331 bits per byte.
@@ -1481,9 +1481,9 @@ The run #70 teaches a lesson: schedluing policiy uniformity in mixing is fundame
   hg() { { time date +%N | dd; } 2>&1 | dd bs=1 2>&1 | ud; }
 
   h1() { { hg & hg & hg & hg; } | pc -1 | bh | ud; }
-  
+
   h9() { { h1 & h1 & h1 & h1; } | pc -9 | ./prpr "$@" | ud; }
-  
+
   cg() { ( h9 -r3 -o2 & h9 -r-3 -o-2 & h9 -r3 -o-2; ) }
 
   Entropy = 7.997058 bits per byte.
@@ -1511,9 +1511,9 @@ The run #70 teaches a lesson: schedluing policiy uniformity in mixing is fundame
   hg() { { time date +%N | dd; } 2>&1 | pi dd bs=1 2>&1; }
 
   h1() { { hg & hg & hg & hg; } | pc -1 | bh; }
-  
+
   h9() { { h1 & h1 & h1 & h1; } | pc -9 | pi ./prpr "$@"; }
-  
+
   cg() { ( h9 -r3 -o2 & h9 -r-3 -o-2 & h9 -r3 -o-2; ) }
 
   Entropy = 7.997181 bits per byte.
@@ -1541,9 +1541,9 @@ The run #70 teaches a lesson: schedluing policiy uniformity in mixing is fundame
   hg() { { time date +%N | dd; } 2>&1 | pi dd bs=1 2>&1; }
 
   h1() { { hg & hg & hg & hg; } | pc -1 | bh; }
-  
+
   h9() { { h1 & h1 & h1 & h1; } | pc -9 | ud; }
-  
+
   cg() { { h9 & h9 & h9; } | ./prpr -r-3 -o-2; }
 
 Entropy = 7.997318 bits per byte.
@@ -1577,9 +1577,9 @@ Monte Carlo value for Pi is 3.143700757 (error 0.07 percent).
   hg() { { time date +%N | dd; } 2>&1 | pi dd bs=1 2>&1; }
 
   h1() { { hg & hg & hg & hg; } | ud | pc -1 | bh; }
-  
+
   h9() { { h1 & h1 & h1 & h1; } | ud | pc -9 | ud; }
-  
+
   cg() { { h9 & h9 & h9; } | ud | ./prpr -r-3 -o-2; }
 
   Entropy = 7.997142 bits per byte.
@@ -1609,15 +1609,15 @@ Monte Carlo value for Pi is 3.143700757 (error 0.07 percent).
   ud() { pi dd status=none bs=1 "$@"; }
 
   bh() { sha512sum | xxd -r -p; }
-  
+
   dg() { pi dd bs=1 2>&1; }
 
-  hg() { { { time date +%N | dg; } 2>&1 | dg; } | ud; } 
+  hg() { { { time date +%N | dg; } 2>&1 | dg; } | ud; }
 
   h1() { { hg & hg & hg; } | ud | pc -1 | bh | ud; }
-  
+
   h9() { { h1 & h1 & h1; } | ud | pc -9 | ud; }
-  
+
   cg() { { h9 & h9 & h9; } | ud | ./prpr -r-9 -o-8; }
 
   Entropy = 7.996889 bits per byte.
@@ -1659,15 +1659,15 @@ Monte Carlo value for Pi is 3.143700757 (error 0.07 percent).
   ud() { pi dd status=none bs=1 "$@"; }
 
   bh() { sha512sum | xxd -r -p; }
-  
+
   dg() { pi dd bs=1 2>&1; }
 
-  hg() { { time date +%N | dg; } 2>&1 | dg; } 
+  hg() { { time date +%N | dg; } 2>&1 | dg; }
 
   h1() { { hg & hg & hg; } | ud | pc -1 | bh; }
-  
+
   h9() { { h1 & h1 & h1 & h1; } | ud | pc -9; }
-  
+
   cg() { { h9 & h9 & h9 & h9 & h9; } | ud | ./prpr -r-5 -o-4; }
 
   Entropy = 7.997466 bits per byte.
@@ -1709,13 +1709,13 @@ Monte Carlo value for Pi is 3.143700757 (error 0.07 percent).
   ud() { pi dd status=none bs=1 "$@"; }
 
   bh() { sha512sum | xxd -r -p; }
-  
+
   dg() { pi dd bs=1 2>&1; }
 
-  hg() { { time date +%N | dg; } 2>&1 | dg; } 
+  hg() { { time date +%N | dg; } 2>&1 | dg; }
 
   h1() { { hg & hg; } | ud | pc -1 | bh; }
-  
+
   h9() { { h1 & h1 & h1; } | ud | pc -9; }
 
   cg() { { h9 & h9 & h9 & h9; } | ud obs=32 | ./prpr -r-32 -o-31; }
@@ -1747,13 +1747,13 @@ Monte Carlo value for Pi is 3.143700757 (error 0.07 percent).
   ud() { pi dd status=none bs=1 "$@"; }
 
   bh() { sha512sum | xxd -r -p; }
-  
+
   dg() { pi dd bs=1 2>&1; }
 
-  hg() { { time date +%N | dg; } 2>&1 | dg; } 
+  hg() { { time date +%N | dg; } 2>&1 | dg; }
 
   h1() { { hg & hg & hg; } | ud | pc -1 | bh; }
-  
+
   h9() { { h1 & h1 & h1; } | ud | pc -9; }
 
   cg() { { h9 & h9 & h9 & h9; } | ud obs=32 | ./prpr -r-32 -o-31; }
@@ -1785,13 +1785,13 @@ Monte Carlo value for Pi is 3.139410365 (error 0.07 percent).
   ud() { pi dd status=none bs=1 "$@"; }
 
   bh() { sha512sum | xxd -r -p; }
-  
+
   dg() { pi dd bs=1 2>&1; }
 
-  hg() { { time date +%N | dg; } 2>&1 | dg; } 
+  hg() { { time date +%N | dg; } 2>&1 | dg; }
 
   h1() { { hg & hg; } | ud | pc -1 | bh; }
-  
+
   h9() { { h1 & h1 & h1; } | ud | pc -9; }
 
   cg() { { h9 & h9 & h9 & h9; } | ud obs=16 | ./prpr -r-16 -o-15; }
@@ -1823,13 +1823,13 @@ Monte Carlo value for Pi is 3.139410365 (error 0.07 percent).
   ud() { pi dd status=none bs=1 "$@"; }
 
   bh() { sha512sum | xxd -r -p; }
-  
+
   dg() { pi dd bs=1 2>&1; }
 
-  hg() { { time date +%N | dg; } 2>&1 | dg; } 
+  hg() { { time date +%N | dg; } 2>&1 | dg; }
 
   h1() { { hg & hg; } | ud | pc -1 | bh; }
-  
+
   h9() { { h1 & h1 & h1; } | ud | pc -9; }
 
   cg() { { h9 & h9 & h9 & h9; } | ud obs=8 | ./prpr -r-8 -o-7; }
@@ -1873,13 +1873,13 @@ Monte Carlo value for Pi is 3.139410365 (error 0.07 percent).
   ud() { pi dd status=none bs=1 "$@"; }
 
   bh() { sha512sum | xxd -r -p; }
-  
+
   dg() { pi dd bs=1 2>&1; }
 
-  hg() { { time date +%N | dg; } 2>&1 | dg; } 
+  hg() { { time date +%N | dg; } 2>&1 | dg; }
 
   h1() { { hg & hg; } | ud | pc -1 | bh; }
-  
+
   h9() { { h1 & h1 & h1; } | ud obs=8 | ./prpr -r-8 -o-7 | pc -9; }
 
   cg() { { h9 & h9 & h9 & h9; } | ud obs=512; }
@@ -1931,13 +1931,13 @@ enough or a mixture of several engines are needed to pass all the tests. Morover
 these runs from the #60 to the #82 allowed to get deeper in understanding what's
 matter for designing this clockwork in a reliable manner.
 
-  du -ks run.all 
+  du -ks run.all
     6104	run.all
   du -ks run.82
     6108	run.82
   cp run.82 run.82.test
   echo >> run.82.test
-  dieharder -a -f run.82.test 
+  dieharder -a -f run.82.test
 
 #=============================================================================#
 #            dieharder version 3.31.1 Copyright 2003 Robert G. Brown          #
@@ -1947,123 +1947,123 @@ matter for designing this clockwork in a reliable manner.
 #=============================================================================#
         test_name   |ntup| tsamples |psamples|  p-value |Assessment
 #=============================================================================#
-   diehard_birthdays|   0|       100|     100|0.79402831|  PASSED  
-      diehard_operm5|   0|   1000000|     100|0.71445214|  PASSED  
-  diehard_rank_32x32|   0|     40000|     100|0.61095101|  PASSED  
-    diehard_rank_6x8|   0|    100000|     100|0.60132060|  PASSED  
-   diehard_bitstream|   0|   2097152|     100|0.89715629|  PASSED  
-        diehard_opso|   0|   2097152|     100|0.94215120|  PASSED  
-        diehard_oqso|   0|   2097152|     100|0.29602779|  PASSED  
-         diehard_dna|   0|   2097152|     100|0.48190839|  PASSED  
-diehard_count_1s_str|   0|    256000|     100|0.82721780|  PASSED  
-diehard_count_1s_byt|   0|    256000|     100|0.98395217|  PASSED  
- diehard_parking_lot|   0|     12000|     100|0.53133973|  PASSED  
-    diehard_2dsphere|   2|      8000|     100|0.49171492|  PASSED  
-    diehard_3dsphere|   3|      4000|     100|0.73732116|  PASSED  
-     diehard_squeeze|   0|    100000|     100|0.83266652|  PASSED  
-        diehard_sums|   0|       100|     100|0.01357142|  PASSED  
-        diehard_runs|   0|    100000|     100|0.18874586|  PASSED  
-        diehard_runs|   0|    100000|     100|0.65852623|  PASSED  
-       diehard_craps|   0|    200000|     100|0.08233515|  PASSED  
-       diehard_craps|   0|    200000|     100|0.24599509|  PASSED  
- marsaglia_tsang_gcd|   0|  10000000|     100|0.69352848|  PASSED  
- marsaglia_tsang_gcd|   0|  10000000|     100|0.29179918|  PASSED  
-         sts_monobit|   1|    100000|     100|0.61131607|  PASSED  
-            sts_runs|   2|    100000|     100|0.27245985|  PASSED  
-          sts_serial|   1|    100000|     100|0.69066679|  PASSED  
-          sts_serial|   2|    100000|     100|0.92955129|  PASSED  
-          sts_serial|   3|    100000|     100|0.63620788|  PASSED  
-          sts_serial|   3|    100000|     100|0.53112268|  PASSED  
-          sts_serial|   4|    100000|     100|0.73465401|  PASSED  
-          sts_serial|   4|    100000|     100|0.41876151|  PASSED  
-          sts_serial|   5|    100000|     100|0.41861265|  PASSED  
-          sts_serial|   5|    100000|     100|0.47999525|  PASSED  
-          sts_serial|   6|    100000|     100|0.98446498|  PASSED  
-          sts_serial|   6|    100000|     100|0.89586149|  PASSED  
-          sts_serial|   7|    100000|     100|0.77490631|  PASSED  
-          sts_serial|   7|    100000|     100|0.31548242|  PASSED  
-          sts_serial|   8|    100000|     100|0.85857239|  PASSED  
-          sts_serial|   8|    100000|     100|0.25260445|  PASSED  
-          sts_serial|   9|    100000|     100|0.93752091|  PASSED  
-          sts_serial|   9|    100000|     100|0.70800854|  PASSED  
-          sts_serial|  10|    100000|     100|0.36454088|  PASSED  
-          sts_serial|  10|    100000|     100|0.03953376|  PASSED  
-          sts_serial|  11|    100000|     100|0.55823431|  PASSED  
-          sts_serial|  11|    100000|     100|0.87654193|  PASSED  
-          sts_serial|  12|    100000|     100|0.39840287|  PASSED  
-          sts_serial|  12|    100000|     100|0.02277808|  PASSED  
-          sts_serial|  13|    100000|     100|0.84689792|  PASSED  
-          sts_serial|  13|    100000|     100|0.94515275|  PASSED  
-          sts_serial|  14|    100000|     100|0.04820059|  PASSED  
-          sts_serial|  14|    100000|     100|0.67007095|  PASSED  
-          sts_serial|  15|    100000|     100|0.09711746|  PASSED  
-          sts_serial|  15|    100000|     100|0.23107080|  PASSED  
-          sts_serial|  16|    100000|     100|0.43015267|  PASSED  
-          sts_serial|  16|    100000|     100|0.82673110|  PASSED  
-         rgb_bitdist|   1|    100000|     100|0.67425615|  PASSED  
-         rgb_bitdist|   2|    100000|     100|0.11604944|  PASSED  
-         rgb_bitdist|   3|    100000|     100|0.89621067|  PASSED  
-         rgb_bitdist|   4|    100000|     100|0.84747709|  PASSED  
-         rgb_bitdist|   5|    100000|     100|0.62285474|  PASSED  
-         rgb_bitdist|   6|    100000|     100|0.45260658|  PASSED  
-         rgb_bitdist|   7|    100000|     100|0.95633476|  PASSED  
-         rgb_bitdist|   8|    100000|     100|0.80004092|  PASSED  
-         rgb_bitdist|   9|    100000|     100|0.80496350|  PASSED  
-         rgb_bitdist|  10|    100000|     100|0.83384598|  PASSED  
-         rgb_bitdist|  11|    100000|     100|0.25788647|  PASSED  
-         rgb_bitdist|  12|    100000|     100|0.62681258|  PASSED  
-rgb_minimum_distance|   2|     10000|    1000|0.33282727|  PASSED  
-rgb_minimum_distance|   3|     10000|    1000|0.30946444|  PASSED  
-rgb_minimum_distance|   4|     10000|    1000|0.71385380|  PASSED  
-rgb_minimum_distance|   5|     10000|    1000|0.38482735|  PASSED  
-    rgb_permutations|   2|    100000|     100|0.48648080|  PASSED  
-    rgb_permutations|   3|    100000|     100|0.58517388|  PASSED  
-    rgb_permutations|   4|    100000|     100|0.42293489|  PASSED  
-    rgb_permutations|   5|    100000|     100|0.01771197|  PASSED  
-      rgb_lagged_sum|   0|   1000000|     100|0.32684422|  PASSED  
-      rgb_lagged_sum|   1|   1000000|     100|0.97672881|  PASSED  
-      rgb_lagged_sum|   2|   1000000|     100|0.95760546|  PASSED  
-      rgb_lagged_sum|   3|   1000000|     100|0.94235441|  PASSED  
-      rgb_lagged_sum|   4|   1000000|     100|0.01273451|  PASSED  
-      rgb_lagged_sum|   5|   1000000|     100|0.99421437|  PASSED  
-      rgb_lagged_sum|   6|   1000000|     100|0.44014833|  PASSED  
-      rgb_lagged_sum|   7|   1000000|     100|0.31992919|  PASSED  
-      rgb_lagged_sum|   8|   1000000|     100|0.24917417|  PASSED  
-      rgb_lagged_sum|   9|   1000000|     100|0.54816381|  PASSED  
-      rgb_lagged_sum|  10|   1000000|     100|0.74219703|  PASSED  
-      rgb_lagged_sum|  11|   1000000|     100|0.29489454|  PASSED  
-      rgb_lagged_sum|  12|   1000000|     100|0.57157240|  PASSED  
-      rgb_lagged_sum|  13|   1000000|     100|0.64287488|  PASSED  
-      rgb_lagged_sum|  14|   1000000|     100|0.21561089|  PASSED  
-      rgb_lagged_sum|  15|   1000000|     100|0.30751482|  PASSED  
-      rgb_lagged_sum|  16|   1000000|     100|0.69532651|  PASSED  
-      rgb_lagged_sum|  17|   1000000|     100|0.96164676|  PASSED  
-      rgb_lagged_sum|  18|   1000000|     100|0.71544882|  PASSED  
-      rgb_lagged_sum|  19|   1000000|     100|0.96991998|  PASSED  
-      rgb_lagged_sum|  20|   1000000|     100|0.17106228|  PASSED  
-      rgb_lagged_sum|  21|   1000000|     100|0.85848341|  PASSED  
-      rgb_lagged_sum|  22|   1000000|     100|0.66455716|  PASSED  
-      rgb_lagged_sum|  23|   1000000|     100|0.31630262|  PASSED  
-      rgb_lagged_sum|  24|   1000000|     100|0.92085926|  PASSED  
-      rgb_lagged_sum|  25|   1000000|     100|0.71872106|  PASSED  
-      rgb_lagged_sum|  26|   1000000|     100|0.99338759|  PASSED  
-      rgb_lagged_sum|  27|   1000000|     100|0.28460591|  PASSED  
-      rgb_lagged_sum|  28|   1000000|     100|0.84311690|  PASSED  
-      rgb_lagged_sum|  29|   1000000|     100|0.74704588|  PASSED  
-      rgb_lagged_sum|  30|   1000000|     100|0.57720865|  PASSED  
-      rgb_lagged_sum|  31|   1000000|     100|0.08206929|  PASSED  
-      rgb_lagged_sum|  32|   1000000|     100|0.15908385|  PASSED  
-     rgb_kstest_test|   0|     10000|    1000|0.59953360|  PASSED  
-     dab_bytedistrib|   0|  51200000|       1|0.89320618|  PASSED  
-             dab_dct| 256|     50000|       1|0.35361675|  PASSED  
+   diehard_birthdays|   0|       100|     100|0.79402831|  PASSED
+      diehard_operm5|   0|   1000000|     100|0.71445214|  PASSED
+  diehard_rank_32x32|   0|     40000|     100|0.61095101|  PASSED
+    diehard_rank_6x8|   0|    100000|     100|0.60132060|  PASSED
+   diehard_bitstream|   0|   2097152|     100|0.89715629|  PASSED
+        diehard_opso|   0|   2097152|     100|0.94215120|  PASSED
+        diehard_oqso|   0|   2097152|     100|0.29602779|  PASSED
+         diehard_dna|   0|   2097152|     100|0.48190839|  PASSED
+diehard_count_1s_str|   0|    256000|     100|0.82721780|  PASSED
+diehard_count_1s_byt|   0|    256000|     100|0.98395217|  PASSED
+ diehard_parking_lot|   0|     12000|     100|0.53133973|  PASSED
+    diehard_2dsphere|   2|      8000|     100|0.49171492|  PASSED
+    diehard_3dsphere|   3|      4000|     100|0.73732116|  PASSED
+     diehard_squeeze|   0|    100000|     100|0.83266652|  PASSED
+        diehard_sums|   0|       100|     100|0.01357142|  PASSED
+        diehard_runs|   0|    100000|     100|0.18874586|  PASSED
+        diehard_runs|   0|    100000|     100|0.65852623|  PASSED
+       diehard_craps|   0|    200000|     100|0.08233515|  PASSED
+       diehard_craps|   0|    200000|     100|0.24599509|  PASSED
+ marsaglia_tsang_gcd|   0|  10000000|     100|0.69352848|  PASSED
+ marsaglia_tsang_gcd|   0|  10000000|     100|0.29179918|  PASSED
+         sts_monobit|   1|    100000|     100|0.61131607|  PASSED
+            sts_runs|   2|    100000|     100|0.27245985|  PASSED
+          sts_serial|   1|    100000|     100|0.69066679|  PASSED
+          sts_serial|   2|    100000|     100|0.92955129|  PASSED
+          sts_serial|   3|    100000|     100|0.63620788|  PASSED
+          sts_serial|   3|    100000|     100|0.53112268|  PASSED
+          sts_serial|   4|    100000|     100|0.73465401|  PASSED
+          sts_serial|   4|    100000|     100|0.41876151|  PASSED
+          sts_serial|   5|    100000|     100|0.41861265|  PASSED
+          sts_serial|   5|    100000|     100|0.47999525|  PASSED
+          sts_serial|   6|    100000|     100|0.98446498|  PASSED
+          sts_serial|   6|    100000|     100|0.89586149|  PASSED
+          sts_serial|   7|    100000|     100|0.77490631|  PASSED
+          sts_serial|   7|    100000|     100|0.31548242|  PASSED
+          sts_serial|   8|    100000|     100|0.85857239|  PASSED
+          sts_serial|   8|    100000|     100|0.25260445|  PASSED
+          sts_serial|   9|    100000|     100|0.93752091|  PASSED
+          sts_serial|   9|    100000|     100|0.70800854|  PASSED
+          sts_serial|  10|    100000|     100|0.36454088|  PASSED
+          sts_serial|  10|    100000|     100|0.03953376|  PASSED
+          sts_serial|  11|    100000|     100|0.55823431|  PASSED
+          sts_serial|  11|    100000|     100|0.87654193|  PASSED
+          sts_serial|  12|    100000|     100|0.39840287|  PASSED
+          sts_serial|  12|    100000|     100|0.02277808|  PASSED
+          sts_serial|  13|    100000|     100|0.84689792|  PASSED
+          sts_serial|  13|    100000|     100|0.94515275|  PASSED
+          sts_serial|  14|    100000|     100|0.04820059|  PASSED
+          sts_serial|  14|    100000|     100|0.67007095|  PASSED
+          sts_serial|  15|    100000|     100|0.09711746|  PASSED
+          sts_serial|  15|    100000|     100|0.23107080|  PASSED
+          sts_serial|  16|    100000|     100|0.43015267|  PASSED
+          sts_serial|  16|    100000|     100|0.82673110|  PASSED
+         rgb_bitdist|   1|    100000|     100|0.67425615|  PASSED
+         rgb_bitdist|   2|    100000|     100|0.11604944|  PASSED
+         rgb_bitdist|   3|    100000|     100|0.89621067|  PASSED
+         rgb_bitdist|   4|    100000|     100|0.84747709|  PASSED
+         rgb_bitdist|   5|    100000|     100|0.62285474|  PASSED
+         rgb_bitdist|   6|    100000|     100|0.45260658|  PASSED
+         rgb_bitdist|   7|    100000|     100|0.95633476|  PASSED
+         rgb_bitdist|   8|    100000|     100|0.80004092|  PASSED
+         rgb_bitdist|   9|    100000|     100|0.80496350|  PASSED
+         rgb_bitdist|  10|    100000|     100|0.83384598|  PASSED
+         rgb_bitdist|  11|    100000|     100|0.25788647|  PASSED
+         rgb_bitdist|  12|    100000|     100|0.62681258|  PASSED
+rgb_minimum_distance|   2|     10000|    1000|0.33282727|  PASSED
+rgb_minimum_distance|   3|     10000|    1000|0.30946444|  PASSED
+rgb_minimum_distance|   4|     10000|    1000|0.71385380|  PASSED
+rgb_minimum_distance|   5|     10000|    1000|0.38482735|  PASSED
+    rgb_permutations|   2|    100000|     100|0.48648080|  PASSED
+    rgb_permutations|   3|    100000|     100|0.58517388|  PASSED
+    rgb_permutations|   4|    100000|     100|0.42293489|  PASSED
+    rgb_permutations|   5|    100000|     100|0.01771197|  PASSED
+      rgb_lagged_sum|   0|   1000000|     100|0.32684422|  PASSED
+      rgb_lagged_sum|   1|   1000000|     100|0.97672881|  PASSED
+      rgb_lagged_sum|   2|   1000000|     100|0.95760546|  PASSED
+      rgb_lagged_sum|   3|   1000000|     100|0.94235441|  PASSED
+      rgb_lagged_sum|   4|   1000000|     100|0.01273451|  PASSED
+      rgb_lagged_sum|   5|   1000000|     100|0.99421437|  PASSED
+      rgb_lagged_sum|   6|   1000000|     100|0.44014833|  PASSED
+      rgb_lagged_sum|   7|   1000000|     100|0.31992919|  PASSED
+      rgb_lagged_sum|   8|   1000000|     100|0.24917417|  PASSED
+      rgb_lagged_sum|   9|   1000000|     100|0.54816381|  PASSED
+      rgb_lagged_sum|  10|   1000000|     100|0.74219703|  PASSED
+      rgb_lagged_sum|  11|   1000000|     100|0.29489454|  PASSED
+      rgb_lagged_sum|  12|   1000000|     100|0.57157240|  PASSED
+      rgb_lagged_sum|  13|   1000000|     100|0.64287488|  PASSED
+      rgb_lagged_sum|  14|   1000000|     100|0.21561089|  PASSED
+      rgb_lagged_sum|  15|   1000000|     100|0.30751482|  PASSED
+      rgb_lagged_sum|  16|   1000000|     100|0.69532651|  PASSED
+      rgb_lagged_sum|  17|   1000000|     100|0.96164676|  PASSED
+      rgb_lagged_sum|  18|   1000000|     100|0.71544882|  PASSED
+      rgb_lagged_sum|  19|   1000000|     100|0.96991998|  PASSED
+      rgb_lagged_sum|  20|   1000000|     100|0.17106228|  PASSED
+      rgb_lagged_sum|  21|   1000000|     100|0.85848341|  PASSED
+      rgb_lagged_sum|  22|   1000000|     100|0.66455716|  PASSED
+      rgb_lagged_sum|  23|   1000000|     100|0.31630262|  PASSED
+      rgb_lagged_sum|  24|   1000000|     100|0.92085926|  PASSED
+      rgb_lagged_sum|  25|   1000000|     100|0.71872106|  PASSED
+      rgb_lagged_sum|  26|   1000000|     100|0.99338759|  PASSED
+      rgb_lagged_sum|  27|   1000000|     100|0.28460591|  PASSED
+      rgb_lagged_sum|  28|   1000000|     100|0.84311690|  PASSED
+      rgb_lagged_sum|  29|   1000000|     100|0.74704588|  PASSED
+      rgb_lagged_sum|  30|   1000000|     100|0.57720865|  PASSED
+      rgb_lagged_sum|  31|   1000000|     100|0.08206929|  PASSED
+      rgb_lagged_sum|  32|   1000000|     100|0.15908385|  PASSED
+     rgb_kstest_test|   0|     10000|    1000|0.59953360|  PASSED
+     dab_bytedistrib|   0|  51200000|       1|0.89320618|  PASSED
+             dab_dct| 256|     50000|       1|0.35361675|  PASSED
 Preparing to run test 207.  ntuple = 0
-        dab_filltree|  32|  15000000|       1|0.43990407|  PASSED  
-        dab_filltree|  32|  15000000|       1|0.28307474|  PASSED  
+        dab_filltree|  32|  15000000|       1|0.43990407|  PASSED
+        dab_filltree|  32|  15000000|       1|0.28307474|  PASSED
 Preparing to run test 208.  ntuple = 0
-       dab_filltree2|   0|   5000000|       1|0.22850674|  PASSED  
-       dab_filltree2|   1|   5000000|       1|0.09073751|  PASSED  
+       dab_filltree2|   0|   5000000|       1|0.22850674|  PASSED
+       dab_filltree2|   1|   5000000|       1|0.09073751|  PASSED
 Preparing to run test 209.  ntuple = 0
-        dab_monobit2|  12|  65000000|       1|0.86679048|  PASSED  
+        dab_monobit2|  12|  65000000|       1|0.86679048|  PASSED
 
 === a single run but relevant ==================================================
 
@@ -2153,121 +2153,796 @@ yet the system as a whole remains statistically stable.
 #=============================================================================#
         test_name   |ntup| tsamples |psamples|  p-value |Assessment
 #=============================================================================#
-   diehard_birthdays|   0|       100|     100|0.99851167|   WEAK   
-      diehard_operm5|   0|   1000000|     100|0.66212393|  PASSED  
-  diehard_rank_32x32|   0|     40000|     100|0.81137351|  PASSED  
-    diehard_rank_6x8|   0|    100000|     100|0.98633442|  PASSED  
-   diehard_bitstream|   0|   2097152|     100|0.13531121|  PASSED  
-        diehard_opso|   0|   2097152|     100|0.77540186|  PASSED  
-        diehard_oqso|   0|   2097152|     100|0.96182275|  PASSED  
-         diehard_dna|   0|   2097152|     100|0.78775283|  PASSED  
-diehard_count_1s_str|   0|    256000|     100|0.86995033|  PASSED  
-diehard_count_1s_byt|   0|    256000|     100|0.96720674|  PASSED  
- diehard_parking_lot|   0|     12000|     100|0.87150767|  PASSED  
-    diehard_2dsphere|   2|      8000|     100|0.74799072|  PASSED  
-    diehard_3dsphere|   3|      4000|     100|0.06156903|  PASSED  
-     diehard_squeeze|   0|    100000|     100|0.92431567|  PASSED  
-        diehard_sums|   0|       100|     100|0.00016198|   WEAK   
-        diehard_runs|   0|    100000|     100|0.11429580|  PASSED  
-        diehard_runs|   0|    100000|     100|0.23704715|  PASSED  
-       diehard_craps|   0|    200000|     100|0.93187786|  PASSED  
-       diehard_craps|   0|    200000|     100|0.75595561|  PASSED  
- marsaglia_tsang_gcd|   0|  10000000|     100|0.96066686|  PASSED  
- marsaglia_tsang_gcd|   0|  10000000|     100|0.57553618|  PASSED  
-         sts_monobit|   1|    100000|     100|0.99649071|   WEAK   
-            sts_runs|   2|    100000|     100|0.77963632|  PASSED  
-          sts_serial|   1|    100000|     100|0.96939413|  PASSED  
-          sts_serial|   2|    100000|     100|0.49818396|  PASSED  
-          sts_serial|   3|    100000|     100|0.30576225|  PASSED  
-          sts_serial|   3|    100000|     100|0.41740924|  PASSED  
-          sts_serial|   4|    100000|     100|0.03904883|  PASSED  
-          sts_serial|   4|    100000|     100|0.11286123|  PASSED  
-          sts_serial|   5|    100000|     100|0.07917344|  PASSED  
-          sts_serial|   5|    100000|     100|0.35949753|  PASSED  
-          sts_serial|   6|    100000|     100|0.00038837|   WEAK   
-          sts_serial|   6|    100000|     100|0.02177808|  PASSED  
-          sts_serial|   7|    100000|     100|0.00721382|  PASSED  
-          sts_serial|   7|    100000|     100|0.59941207|  PASSED  
-          sts_serial|   8|    100000|     100|0.15432859|  PASSED  
-          sts_serial|   8|    100000|     100|0.78549314|  PASSED  
-          sts_serial|   9|    100000|     100|0.54409161|  PASSED  
-          sts_serial|   9|    100000|     100|0.66477347|  PASSED  
-          sts_serial|  10|    100000|     100|0.76245455|  PASSED  
-          sts_serial|  10|    100000|     100|0.81514013|  PASSED  
-          sts_serial|  11|    100000|     100|0.41126269|  PASSED  
-          sts_serial|  11|    100000|     100|0.94817689|  PASSED  
-          sts_serial|  12|    100000|     100|0.70809600|  PASSED  
-          sts_serial|  12|    100000|     100|0.92460492|  PASSED  
-          sts_serial|  13|    100000|     100|0.59337641|  PASSED  
-          sts_serial|  13|    100000|     100|0.98273854|  PASSED  
-          sts_serial|  14|    100000|     100|0.31922453|  PASSED  
-          sts_serial|  14|    100000|     100|0.17518502|  PASSED  
-          sts_serial|  15|    100000|     100|0.56578050|  PASSED  
-          sts_serial|  15|    100000|     100|0.74774961|  PASSED  
-          sts_serial|  16|    100000|     100|0.65521770|  PASSED  
-          sts_serial|  16|    100000|     100|0.24736579|  PASSED  
-         rgb_bitdist|   1|    100000|     100|0.10067237|  PASSED  
-         rgb_bitdist|   2|    100000|     100|0.84827179|  PASSED  
-         rgb_bitdist|   3|    100000|     100|0.89765402|  PASSED  
-         rgb_bitdist|   4|    100000|     100|0.12231053|  PASSED  
-         rgb_bitdist|   5|    100000|     100|0.86119744|  PASSED  
-         rgb_bitdist|   6|    100000|     100|0.83685830|  PASSED  
-         rgb_bitdist|   7|    100000|     100|0.76707486|  PASSED  
-         rgb_bitdist|   8|    100000|     100|0.05946863|  PASSED  
-         rgb_bitdist|   9|    100000|     100|0.79973113|  PASSED  
-         rgb_bitdist|  10|    100000|     100|0.36060582|  PASSED  
-         rgb_bitdist|  11|    100000|     100|0.69871109|  PASSED  
-         rgb_bitdist|  12|    100000|     100|0.72063908|  PASSED  
-rgb_minimum_distance|   2|     10000|    1000|0.41454923|  PASSED  
-rgb_minimum_distance|   3|     10000|    1000|0.53301102|  PASSED  
-rgb_minimum_distance|   4|     10000|    1000|0.21278934|  PASSED  
-rgb_minimum_distance|   5|     10000|    1000|0.89993809|  PASSED  
-    rgb_permutations|   2|    100000|     100|0.44265162|  PASSED  
-    rgb_permutations|   3|    100000|     100|0.11003359|  PASSED  
-    rgb_permutations|   4|    100000|     100|0.14656091|  PASSED  
-    rgb_permutations|   5|    100000|     100|0.96441458|  PASSED  
-      rgb_lagged_sum|   0|   1000000|     100|0.98223291|  PASSED  
-      rgb_lagged_sum|   1|   1000000|     100|0.93457708|  PASSED  
-      rgb_lagged_sum|   2|   1000000|     100|0.59731913|  PASSED  
-      rgb_lagged_sum|   3|   1000000|     100|0.65356100|  PASSED  
-      rgb_lagged_sum|   4|   1000000|     100|0.13538407|  PASSED  
-      rgb_lagged_sum|   5|   1000000|     100|0.82167932|  PASSED  
-      rgb_lagged_sum|   6|   1000000|     100|0.08046151|  PASSED  
-      rgb_lagged_sum|   7|   1000000|     100|0.70760182|  PASSED  
-      rgb_lagged_sum|   8|   1000000|     100|0.80177199|  PASSED  
-      rgb_lagged_sum|   9|   1000000|     100|0.46696203|  PASSED  
-      rgb_lagged_sum|  10|   1000000|     100|0.21564463|  PASSED  
-      rgb_lagged_sum|  11|   1000000|     100|0.18274143|  PASSED  
-      rgb_lagged_sum|  12|   1000000|     100|0.19508902|  PASSED  
-      rgb_lagged_sum|  13|   1000000|     100|0.19018835|  PASSED  
-      rgb_lagged_sum|  14|   1000000|     100|0.95433505|  PASSED  
-      rgb_lagged_sum|  15|   1000000|     100|0.66026452|  PASSED  
-      rgb_lagged_sum|  16|   1000000|     100|0.37258551|  PASSED  
-      rgb_lagged_sum|  17|   1000000|     100|0.63345528|  PASSED  
-      rgb_lagged_sum|  18|   1000000|     100|0.03814203|  PASSED  
-      rgb_lagged_sum|  19|   1000000|     100|0.71392751|  PASSED  
-      rgb_lagged_sum|  20|   1000000|     100|0.93504408|  PASSED  
-      rgb_lagged_sum|  21|   1000000|     100|0.85808730|  PASSED  
-      rgb_lagged_sum|  22|   1000000|     100|0.54828993|  PASSED  
-      rgb_lagged_sum|  23|   1000000|     100|0.60222963|  PASSED  
-      rgb_lagged_sum|  24|   1000000|     100|0.20412135|  PASSED  
-      rgb_lagged_sum|  25|   1000000|     100|0.76910368|  PASSED  
-      rgb_lagged_sum|  26|   1000000|     100|0.97752266|  PASSED  
-      rgb_lagged_sum|  27|   1000000|     100|0.62487242|  PASSED  
-      rgb_lagged_sum|  28|   1000000|     100|0.87709501|  PASSED  
-      rgb_lagged_sum|  29|   1000000|     100|0.90928319|  PASSED  
-      rgb_lagged_sum|  30|   1000000|     100|0.30058101|  PASSED  
-      rgb_lagged_sum|  31|   1000000|     100|0.50116172|  PASSED  
-      rgb_lagged_sum|  32|   1000000|     100|0.88078996|  PASSED  
-     rgb_kstest_test|   0|     10000|    1000|0.40123902|  PASSED  
-     dab_bytedistrib|   0|  51200000|       1|0.42086984|  PASSED  
-             dab_dct| 256|     50000|       1|0.63596292|  PASSED  
+   diehard_birthdays|   0|       100|     100|0.99851167|   WEAK
+      diehard_operm5|   0|   1000000|     100|0.66212393|  PASSED
+  diehard_rank_32x32|   0|     40000|     100|0.81137351|  PASSED
+    diehard_rank_6x8|   0|    100000|     100|0.98633442|  PASSED
+   diehard_bitstream|   0|   2097152|     100|0.13531121|  PASSED
+        diehard_opso|   0|   2097152|     100|0.77540186|  PASSED
+        diehard_oqso|   0|   2097152|     100|0.96182275|  PASSED
+         diehard_dna|   0|   2097152|     100|0.78775283|  PASSED
+diehard_count_1s_str|   0|    256000|     100|0.86995033|  PASSED
+diehard_count_1s_byt|   0|    256000|     100|0.96720674|  PASSED
+ diehard_parking_lot|   0|     12000|     100|0.87150767|  PASSED
+    diehard_2dsphere|   2|      8000|     100|0.74799072|  PASSED
+    diehard_3dsphere|   3|      4000|     100|0.06156903|  PASSED
+     diehard_squeeze|   0|    100000|     100|0.92431567|  PASSED
+        diehard_sums|   0|       100|     100|0.00016198|   WEAK
+        diehard_runs|   0|    100000|     100|0.11429580|  PASSED
+        diehard_runs|   0|    100000|     100|0.23704715|  PASSED
+       diehard_craps|   0|    200000|     100|0.93187786|  PASSED
+       diehard_craps|   0|    200000|     100|0.75595561|  PASSED
+ marsaglia_tsang_gcd|   0|  10000000|     100|0.96066686|  PASSED
+ marsaglia_tsang_gcd|   0|  10000000|     100|0.57553618|  PASSED
+         sts_monobit|   1|    100000|     100|0.99649071|   WEAK
+            sts_runs|   2|    100000|     100|0.77963632|  PASSED
+          sts_serial|   1|    100000|     100|0.96939413|  PASSED
+          sts_serial|   2|    100000|     100|0.49818396|  PASSED
+          sts_serial|   3|    100000|     100|0.30576225|  PASSED
+          sts_serial|   3|    100000|     100|0.41740924|  PASSED
+          sts_serial|   4|    100000|     100|0.03904883|  PASSED
+          sts_serial|   4|    100000|     100|0.11286123|  PASSED
+          sts_serial|   5|    100000|     100|0.07917344|  PASSED
+          sts_serial|   5|    100000|     100|0.35949753|  PASSED
+          sts_serial|   6|    100000|     100|0.00038837|   WEAK
+          sts_serial|   6|    100000|     100|0.02177808|  PASSED
+          sts_serial|   7|    100000|     100|0.00721382|  PASSED
+          sts_serial|   7|    100000|     100|0.59941207|  PASSED
+          sts_serial|   8|    100000|     100|0.15432859|  PASSED
+          sts_serial|   8|    100000|     100|0.78549314|  PASSED
+          sts_serial|   9|    100000|     100|0.54409161|  PASSED
+          sts_serial|   9|    100000|     100|0.66477347|  PASSED
+          sts_serial|  10|    100000|     100|0.76245455|  PASSED
+          sts_serial|  10|    100000|     100|0.81514013|  PASSED
+          sts_serial|  11|    100000|     100|0.41126269|  PASSED
+          sts_serial|  11|    100000|     100|0.94817689|  PASSED
+          sts_serial|  12|    100000|     100|0.70809600|  PASSED
+          sts_serial|  12|    100000|     100|0.92460492|  PASSED
+          sts_serial|  13|    100000|     100|0.59337641|  PASSED
+          sts_serial|  13|    100000|     100|0.98273854|  PASSED
+          sts_serial|  14|    100000|     100|0.31922453|  PASSED
+          sts_serial|  14|    100000|     100|0.17518502|  PASSED
+          sts_serial|  15|    100000|     100|0.56578050|  PASSED
+          sts_serial|  15|    100000|     100|0.74774961|  PASSED
+          sts_serial|  16|    100000|     100|0.65521770|  PASSED
+          sts_serial|  16|    100000|     100|0.24736579|  PASSED
+         rgb_bitdist|   1|    100000|     100|0.10067237|  PASSED
+         rgb_bitdist|   2|    100000|     100|0.84827179|  PASSED
+         rgb_bitdist|   3|    100000|     100|0.89765402|  PASSED
+         rgb_bitdist|   4|    100000|     100|0.12231053|  PASSED
+         rgb_bitdist|   5|    100000|     100|0.86119744|  PASSED
+         rgb_bitdist|   6|    100000|     100|0.83685830|  PASSED
+         rgb_bitdist|   7|    100000|     100|0.76707486|  PASSED
+         rgb_bitdist|   8|    100000|     100|0.05946863|  PASSED
+         rgb_bitdist|   9|    100000|     100|0.79973113|  PASSED
+         rgb_bitdist|  10|    100000|     100|0.36060582|  PASSED
+         rgb_bitdist|  11|    100000|     100|0.69871109|  PASSED
+         rgb_bitdist|  12|    100000|     100|0.72063908|  PASSED
+rgb_minimum_distance|   2|     10000|    1000|0.41454923|  PASSED
+rgb_minimum_distance|   3|     10000|    1000|0.53301102|  PASSED
+rgb_minimum_distance|   4|     10000|    1000|0.21278934|  PASSED
+rgb_minimum_distance|   5|     10000|    1000|0.89993809|  PASSED
+    rgb_permutations|   2|    100000|     100|0.44265162|  PASSED
+    rgb_permutations|   3|    100000|     100|0.11003359|  PASSED
+    rgb_permutations|   4|    100000|     100|0.14656091|  PASSED
+    rgb_permutations|   5|    100000|     100|0.96441458|  PASSED
+      rgb_lagged_sum|   0|   1000000|     100|0.98223291|  PASSED
+      rgb_lagged_sum|   1|   1000000|     100|0.93457708|  PASSED
+      rgb_lagged_sum|   2|   1000000|     100|0.59731913|  PASSED
+      rgb_lagged_sum|   3|   1000000|     100|0.65356100|  PASSED
+      rgb_lagged_sum|   4|   1000000|     100|0.13538407|  PASSED
+      rgb_lagged_sum|   5|   1000000|     100|0.82167932|  PASSED
+      rgb_lagged_sum|   6|   1000000|     100|0.08046151|  PASSED
+      rgb_lagged_sum|   7|   1000000|     100|0.70760182|  PASSED
+      rgb_lagged_sum|   8|   1000000|     100|0.80177199|  PASSED
+      rgb_lagged_sum|   9|   1000000|     100|0.46696203|  PASSED
+      rgb_lagged_sum|  10|   1000000|     100|0.21564463|  PASSED
+      rgb_lagged_sum|  11|   1000000|     100|0.18274143|  PASSED
+      rgb_lagged_sum|  12|   1000000|     100|0.19508902|  PASSED
+      rgb_lagged_sum|  13|   1000000|     100|0.19018835|  PASSED
+      rgb_lagged_sum|  14|   1000000|     100|0.95433505|  PASSED
+      rgb_lagged_sum|  15|   1000000|     100|0.66026452|  PASSED
+      rgb_lagged_sum|  16|   1000000|     100|0.37258551|  PASSED
+      rgb_lagged_sum|  17|   1000000|     100|0.63345528|  PASSED
+      rgb_lagged_sum|  18|   1000000|     100|0.03814203|  PASSED
+      rgb_lagged_sum|  19|   1000000|     100|0.71392751|  PASSED
+      rgb_lagged_sum|  20|   1000000|     100|0.93504408|  PASSED
+      rgb_lagged_sum|  21|   1000000|     100|0.85808730|  PASSED
+      rgb_lagged_sum|  22|   1000000|     100|0.54828993|  PASSED
+      rgb_lagged_sum|  23|   1000000|     100|0.60222963|  PASSED
+      rgb_lagged_sum|  24|   1000000|     100|0.20412135|  PASSED
+      rgb_lagged_sum|  25|   1000000|     100|0.76910368|  PASSED
+      rgb_lagged_sum|  26|   1000000|     100|0.97752266|  PASSED
+      rgb_lagged_sum|  27|   1000000|     100|0.62487242|  PASSED
+      rgb_lagged_sum|  28|   1000000|     100|0.87709501|  PASSED
+      rgb_lagged_sum|  29|   1000000|     100|0.90928319|  PASSED
+      rgb_lagged_sum|  30|   1000000|     100|0.30058101|  PASSED
+      rgb_lagged_sum|  31|   1000000|     100|0.50116172|  PASSED
+      rgb_lagged_sum|  32|   1000000|     100|0.88078996|  PASSED
+     rgb_kstest_test|   0|     10000|    1000|0.40123902|  PASSED
+     dab_bytedistrib|   0|  51200000|       1|0.42086984|  PASSED
+             dab_dct| 256|     50000|       1|0.63596292|  PASSED
 Preparing to run test 207.  ntuple = 0
-        dab_filltree|  32|  15000000|       1|0.79644680|  PASSED  
-        dab_filltree|  32|  15000000|       1|0.10791348|  PASSED  
+        dab_filltree|  32|  15000000|       1|0.79644680|  PASSED
+        dab_filltree|  32|  15000000|       1|0.10791348|  PASSED
 Preparing to run test 208.  ntuple = 0
-       dab_filltree2|   0|   5000000|       1|0.78036462|  PASSED  
-       dab_filltree2|   1|   5000000|       1|0.55793909|  PASSED  
+       dab_filltree2|   0|   5000000|       1|0.78036462|  PASSED
+       dab_filltree2|   1|   5000000|       1|0.55793909|  PASSED
 Preparing to run test 209.  ntuple = 0
-        dab_monobit2|  12|  65000000|       1|0.91125430|  PASSED  
+        dab_monobit2|  12|  65000000|       1|0.91125430|  PASSED
+
+--------------------------------------------------------------------------------  # run.83
+
+entgr() { ent "$@" | grep -E "error|samples|127.5 |Entropy|exceed|uncorrelated"; }
+
+Equivalent functionality but more conventional order of settings application
+plus use of output-only limiting ud for mixing the streams into a single one.
+
+  pc() { pigz -cp$(nproc) "$@" | tail -c+16 | head -c-8; }
+
+  pi() { nice -n19 ionice -c3 stdbuf -o0 -e0 -i0 "$@"; }
+
+  h1() { { hg & hg; } | ud | pc -1 | ./prpr -r-16 -o-15 | bh | ud ibs=512; }
+
+  h9() { { h1 & h1 & h1; } | ud obs=16 | pc -9 | tail -c 192 | ud ibs=512; }
+
+  Entropy = 7.997404 bits per byte.
+  Chi square distribution for 62208 samples is 223.23, and randomly
+  would exceed this value 92.50 percent of the times.
+  Arithmetic mean value of data bytes is 127.6617 (127.5 = random).
+  Monte Carlo value for Pi is 3.154706790 (error 0.42 percent).
+
+  Entropy = 7.999224 bits per byte.
+  Chi square distribution for 261120 samples is 281.06, and randomly
+  would exceed this value 12.58 percent of the times.
+  Arithmetic mean value of data bytes is 127.5401 (127.5 = random).
+  Monte Carlo value for Pi is 3.147150735 (error 0.18 percent).
+
+  Entropy = 7.999484 bits per byte.
+  Chi square distribution for 362688 samples is 259.02, and randomly
+  would exceed this value 41.81 percent of the times.
+  Arithmetic mean value of data bytes is 127.6501 (127.5 = random).
+  Monte Carlo value for Pi is 3.143197459 (error 0.05 percent).
+
+  Entropy = 7.999918 bits per byte.
+  Chi square distribution for 2198016 samples is 250.83, and randomly
+  would exceed this value 56.20 percent of the times.
+  Arithmetic mean value of data bytes is 127.5135 (127.5 = random).
+  Monte Carlo value for Pi is 3.141924354 (error 0.01 percent).
+  Serial correlation coefficient is 0.000734 (totally uncorrelated = 0.0).
+
+--------------------------------------------------------------------------------  # run.83 (2nd part)
+
+  Entropy = 7.999885 bits per byte.
+  Chi square distribution for 1605696 samples is 256.23, and randomly
+  would exceed this value 46.65 percent of the times.
+  Arithmetic mean value of data bytes is 127.5190 (127.5 = random).
+  Monte Carlo value for Pi is 3.147584599 (error 0.19 percent).
+  Serial correlation coefficient is 0.000504 (totally uncorrelated = 0.0).
+
+  Entropy = 7.999935 bits per byte.
+  Chi square distribution for 2603904 samples is 233.65, and randomly
+  would exceed this value 82.73 percent of the times.
+  Arithmetic mean value of data bytes is 127.4993 (127.5 = random).
+  Monte Carlo value for Pi is 3.146871774 (error 0.17 percent).
+  Serial correlation coefficient is 0.000216 (totally uncorrelated = 0.0).
+
+  Entropy = 7.999953 bits per byte.
+  Chi square distribution for 3608448 samples is 237.53, and randomly
+  would exceed this value 77.70 percent of the times.
+  Arithmetic mean value of data bytes is 127.5161 (127.5 = random).
+  Monte Carlo value for Pi is 3.145744653 (error 0.13 percent).
+  Serial correlation coefficient is -0.000119 (totally uncorrelated = 0.0).
+
+  Entropy = 7.999966 bits per byte.
+  Chi square distribution for 4925568 samples is 235.45, and randomly
+  would exceed this value 80.49 percent of the times.
+  Arithmetic mean value of data bytes is 127.5021 (127.5 = random).
+  Monte Carlo value for Pi is 3.145259998 (error 0.12 percent).
+  Serial correlation coefficient is -0.000421 (totally uncorrelated = 0.0).
+
+dieharder -a -f run.83                                      # 1st + 2nd parts #
+#=============================================================================#
+#            dieharder version 3.31.1 Copyright 2003 Robert G. Brown          #
+#=============================================================================#
+   rng_name    |           filename             |rands/second|
+        mt19937|                          run.83|  1.19e+08  |
+#=============================================================================#
+        test_name   |ntup| tsamples |psamples|  p-value |Assessment
+#=============================================================================#
+          sts_serial|   8|    100000|     100|0.99928914|   WEAK
+      rgb_lagged_sum|   6|   1000000|     100|0.99827572|   WEAK
+      rgb_lagged_sum|  16|   1000000|     100|0.99622625|   WEAK
+      rgb_lagged_sum|  23|   1000000|     100|0.00306467|   WEAK
+      rgb_lagged_sum|  31|   1000000|     100|0.99952363|   WEAK
+
+echo >> run.83; dieharder -a -f run.83                      # 1st + 2nd parts #
+#=============================================================================#
+#            dieharder version 3.31.1 Copyright 2003 Robert G. Brown          #
+#=============================================================================#
+   rng_name    |           filename             |rands/second|
+        mt19937|                     run.83.test|  1.07e+08  |
+#=============================================================================#
+        test_name   |ntup| tsamples |psamples|  p-value |Assessment
+#=============================================================================#
+diehard_count_1s_byt|   0|    256000|     100|0.99746005|   WEAK
+     diehard_squeeze|   0|    100000|     100|0.99517582|   WEAK
+
+echo >> run.83; dieharder -a -f run.83           # 1st + 2nd parts (test n.2) #
+#=============================================================================#
+#            dieharder version 3.31.1 Copyright 2003 Robert G. Brown          #
+#=============================================================================#
+   rng_name    |           filename             |rands/second|
+        mt19937|                     run.83.test|  1.02e+08  |
+#=============================================================================#
+        test_name   |ntup| tsamples |psamples|  p-value |Assessment
+#=============================================================================#
+    rgb_permutations|   5|    100000|     100|0.00408576|   WEAK
+
+# run #83, only 2nd part, no ending echo
+#=============================================================================#
+#            dieharder version 3.31.1 Copyright 2003 Robert G. Brown          #
+#=============================================================================#
+   rng_name    |           filename             |rands/second|
+        mt19937|                      run.83.2nd|  1.31e+08  |
+#=============================================================================#
+        test_name   |ntup| tsamples |psamples|  p-value |Assessment
+#=============================================================================#
+          sts_serial|  13|    100000|     100|0.99527623|   WEAK
+
+================================================================================
+--------------------------------------------------------------------------------  # run.84
+
+  dg() { pi dd bs=1 2>&1; }
+
+  hg() { { time date +%N | dg; } 2>&1 | dg; }
+
+  pc() { pigz -cp$(nproc) "$@" | tail -c+16 | head -c-8; }
+
+  pi() { nice -n19 ionice -c3 stdbuf -o0 -e0 -i0 "$@"; }
+
+  h1() { { hg & hg; } | ud | pc -1 | bh | ud ibs=64 "$@"; }
+
+  h9() { { h1 & h1 conv=swab & h1; } | ud obs=192 | pc -9; }
+
+  hx() { h9 | ./prpr -r 16 -o $1 | ud ibs=180 $2; }
+
+  hy() { h9 | ./prpr -r-16 -o-15 | ud ibs=180 $2; }
+
+  cg() { { hx 15 conv=swab & hy & hx -15 & hy conv=swab; } | ud obs=720; }
+
+  Entropy = 7.998753 bits per byte.
+  Chi square distribution for 141120 samples is 243.36, and randomly
+  would exceed this value 68.92 percent of the times.
+  Arithmetic mean value of data bytes is 127.6472 (127.5 = random).
+  Monte Carlo value for Pi is 3.130782313 (error 0.34 percent).
+  Serial correlation coefficient is 0.004273 (totally uncorrelated = 0.0).
+
+--------------------------------------------------------------------------------  # run.85
+
+  h1() { hg | pc -1 | bh | ud ibs=64 "$@"; }
+
+  h9() { { h1 & h1 conv=swab & h1 & h1 conv=swab; } | ud obs=256 | pc -9; }
+
+  hx() { h9 | ./prpr -r 16 -o $1 | ud ibs=240 $2; }
+
+  hy() { h9 | ./prpr -r-16 -o-15 | ud ibs=240 $2; }
+
+  cg() { { hx 15 conv=swab & hy & hx -15 & hy conv=swab; } | ud obs=720; }
+
+  Entropy = 7.999727 bits per byte.
+  Chi square distribution for 621120 samples is 234.65, and randomly
+  would exceed this value 81.50 percent of the times.
+  Arithmetic mean value of data bytes is 127.4872 (127.5 = random).
+  Monte Carlo value for Pi is 3.144204019 (error 0.08 percent).
+  Serial correlation coefficient is -0.000597 (totally uncorrelated = 0.0).
+
+--------------------------------------------------------------------------------  # run.86
+
+  h9() { { h1 conv=swab & h1 & h1 & h1 conv=swab; } | ud obs=256 | pc -9; }
+
+  hx() { h9 | ./prpr -r 16 -o $1 | ud ibs=240 $2; }
+
+  hy() { h9 | ./prpr -r-16 -o-15 | ud ibs=240 $2; }
+
+  cg() { { hx 15 conv=swab & hy & hx -15 & hy conv=swab; } | ud obs=720; }
+
+  Entropy = 7.999518 bits per byte.
+  Chi square distribution for 402240 samples is 268.03, and randomly
+  would exceed this value 27.53 percent of the times.
+  Arithmetic mean value of data bytes is 127.5538 (127.5 = random).
+  Monte Carlo value for Pi is 3.141527446 (error 0.00 percent).
+  Serial correlation coefficient is -0.001817 (totally uncorrelated = 0.0).
+
+--------------------------------------------------------------------------------  # run.87
+
+  h9() { { h1 conv=swab & h1 & h1 & h1 conv=swab; } | ud obs=256 | pc -9; }
+
+  hx() { h9 | ./prpr -r 16 -o $1 | ud ibs=240 $2; }
+
+  hy() { h9 | ./prpr -r-16 -o-15 | ud ibs=240 $2; }
+
+  cg() { { hx 15 conv=swab & hy & hx -15 & hy conv=swab; } | ud obs=720; }
+
+  Entropy = 7.999518 bits per byte.
+  Chi square distribution for 402240 samples is 268.03, and randomly
+  would exceed this value 27.53 percent of the times.
+  Arithmetic mean value of data bytes is 127.5538 (127.5 = random).
+  Monte Carlo value for Pi is 3.141527446 (error 0.00 percent).
+  Serial correlation coefficient is -0.001817 (totally uncorrelated = 0.0).
+
+--------------------------------------------------------------------------------  # run.88
+
+  h9() { { h1 & h1 & h1 & h1; }  | ud obs=256 | pc -9; }
+
+  hx() { h9 | ./prpr -r 16 -o $1 | ud ibs=240 $2; }
+
+  hy() { h9 | ./prpr -r-16 -o-15 | ud ibs=240 $2; }
+
+  cg() { { hy & hx 15 conv=swab & hx -15 & hy conv=swab; } | ud obs=960; }
+
+  Entropy = 7.999576 bits per byte.
+  Chi square distribution for 391680 samples is 230.36, and randomly
+  would exceed this value 86.40 percent of the times.
+  Arithmetic mean value of data bytes is 127.4096 (127.5 = random).
+  Monte Carlo value for Pi is 3.145894608 (error 0.14 percent).
+  Serial correlation coefficient is -0.001390 (totally uncorrelated = 0.0).
+
+dieharder -a -f ../tmp/run.last                                  # runs 84-88 #
+#=============================================================================#
+#            dieharder version 3.31.1 Copyright 2003 Robert G. Brown          #
+#=============================================================================#
+   rng_name    |           filename             |rands/second|
+        mt19937|                 ../tmp/run.last|  1.21e+08  |
+#=============================================================================#
+        test_name   |ntup| tsamples |psamples|  p-value |Assessment
+#=============================================================================#
+      rgb_lagged_sum|  15|   1000000|     100|0.99684604|   WEAK
+      rgb_lagged_sum|  18|   1000000|     100|0.99957358|   WEAK
+
+dieharder -a -f ../tmp/run.last                          # echo >> runs 84-88 #
+#=============================================================================#
+#            dieharder version 3.31.1 Copyright 2003 Robert G. Brown          #
+#=============================================================================#
+   rng_name    |           filename             |rands/second|
+        mt19937|                 ../tmp/run.last|  1.20e+08  |
+#=============================================================================#
+        test_name   |ntup| tsamples |psamples|  p-value |Assessment
+#=============================================================================#
+         sts_monobit|   1|    100000|     100|0.99870841|   WEAK
+         rgb_bitdist|   1|    100000|     100|0.99993470|   WEAK
+    rgb_permutations|   5|    100000|     100|0.99511756|   WEAK
+      rgb_lagged_sum|  28|   1000000|     100|0.00370196|   WEAK
+
+
+--------------------------------------------------------------------------------  # run.89
+
+  h1() { hg | pc -1 | bh | ./prpx -r1 -x1 | ud ibs=64; }
+
+  h9() { { h1 & h1 & h1 & h1; } | ud obs=256 | pc -9; }
+
+  hx() { h9 | ./prpx -r$1 -x$2  | ud ibs=256; }
+
+  cg() { { hx 1 1  & hx -1 1 & hx 1 -1 & hx -1 -1; } | ud obs=1024; }
+
+  Entropy = 7.999646 bits per byte.
+  Chi square distribution for 506880 samples is 248.61, and randomly
+  would exceed this value 60.10 percent of the times.
+  Arithmetic mean value of data bytes is 127.4891 (127.5 = random).
+  Monte Carlo value for Pi is 3.131865530 (error 0.31 percent).
+  Serial correlation coefficient is -0.000099 (totally uncorrelated = 0.0).
+
+--------------------------------------------------------------------------------  # run.90
+
+  h1() { hg | pc -1 | bh | ./prpx -r$1 -x$2 | ud ibs=64; }
+
+  h9() { { h1 1 1 & h1 -1 1 & h1 1 -1 & h1 -1 -1; } | ud obs=256; }
+
+  hx() { h9 | pc -9 |      ./prpx -r$1 -x$2 | ud ibs=256; }
+
+  cg() { { hx 1 1 & hx -1 1 & hx 1 -1 & hx -1 -1; } | ud obs=1k; }
+
+  Entropy = 7.999592 bits per byte.
+  Chi square distribution for 368640 samples is 208.12, and randomly
+  would exceed this value 98.57 percent of the times.
+  Arithmetic mean value of data bytes is 127.6366 (127.5 = random).
+  Monte Carlo value for Pi is 3.141861979 (error 0.01 percent).
+  Serial correlation coefficient is -0.002369 (totally uncorrelated = 0.0).
+
+--------------------------------------------------------------------------------  # run.91
+
+  h1() { hg | pc -1 | bh | ./prpx -r$1 -x$2; }
+
+  h9() { { h1 1 1 & h1 -1 1 & h1 1 -1 & h1 -1 -1; } | ud ibs=2 obs=256; }
+
+  hx() { h9 | pc -9 |      ./prpx -r$1 -x$2; }
+
+  cg() { { hx 1 1 & hx -1 1 & hx 1 -1 & hx -1 -1; } | ud ibs=2 obs=1k; }
+
+  Entropy = 7.999810 bits per byte.
+  Chi square distribution for 1169408 samples is 307.33, and randomly
+  would exceed this value 1.37 percent of the times.
+  Arithmetic mean value of data bytes is 127.5309 (127.5 = random).
+  Monte Carlo value for Pi is 3.139501593 (error 0.07 percent).
+  Serial correlation coefficient is -0.000449 (totally uncorrelated = 0.0).
+
+================================================================================
+--------------------------------------------------------------------------------  # run.92
+
+  pn() { nice -n19 ionice -c3 stdbuf -o0 -e0 -i0 "$@"; }
+
+  pc() { pigz -cp$(nproc) "$@" | tail -c+16 | head -c-8; }
+
+  dg() { pn dd bs=2 "$@" 2>&1; }
+
+  ud() { dg status=none "$@"; }
+
+  bh() { sha512sum | xxd -r -p; }
+
+  hg() { { time date +%N | dg; } 2>&1 | dg; }
+
+  h1() { hg |  bh   | ./prpx -r$1 -x$2; }
+
+  h9() { { h1 1 1 & h1 -1 1 & h1 1 -1 & h1 -1 -1; } | ud; }
+
+  hx() { h9 | pc -9 | ./prpx -r$1 -x$2; }
+
+  cg() { { hx 1 1 & hx -1 1 & hx 1 -1 & hx -1 -1; } | ud obs=1k; }
+
+  Entropy = 7.999694 bits per byte.
+  Chi square distribution for 598016 samples is 253.75, and randomly
+  would exceed this value 51.03 percent of the times.
+  Arithmetic mean value of data bytes is 127.4858 (127.5 = random).
+  Monte Carlo value for Pi is 3.136180758 (error 0.17 percent).
+  Serial correlation coefficient is -0.000089 (totally uncorrelated = 0.0).
+
+--------------------------------------------------------------------------------  # run.93
+
+  hx() { h9 | pc -1 | ./prpx -r$1 -x$2; }
+
+  Entropy = 7.999336 bits per byte.
+  Chi square distribution for 259072 samples is 238.63, and randomly
+  would exceed this value 76.15 percent of the times.
+  Arithmetic mean value of data bytes is 127.4833 (127.5 = random).
+  Monte Carlo value for Pi is 3.137523739 (error 0.13 percent).
+  Serial correlation coefficient is 0.000207 (totally uncorrelated = 0.0).
+
+  Entropy = 7.999683 bits per byte.
+  Chi square distribution for 607232 samples is 266.91, and randomly
+  would exceed this value 29.16 percent of the times.
+  Arithmetic mean value of data bytes is 127.5180 (127.5 = random).
+  Monte Carlo value for Pi is 3.137275826 (error 0.14 percent).
+  Serial correlation coefficient is 0.001493 (totally uncorrelated = 0.0).
+
+--------------------------------------------------------------------------------  # run.94
+
+  hx() { h9 | pc -9 -J4 | ./prpx -r$1 -x$2; }
+
+  Entropy = 7.999463 bits per byte.
+  Chi square distribution for 391168 samples is 291.42, and randomly
+  would exceed this value 5.81 percent of the times.
+  Arithmetic mean value of data bytes is 127.5399 (127.5 = random).
+  Monte Carlo value for Pi is 3.142620487 (error 0.03 percent).
+  Serial correlation coefficient is -0.002493 (totally uncorrelated = 0.0).
+
+--------------------------------------------------------------------------------  # run.95
+
+  hx() { h9 | pc -J4 | ./prpx -r$1 -x$2; }
+
+Entropy = 7.998970 bits per byte.
+Chi square distribution for 159744 samples is 228.06, and randomly
+would exceed this value 88.65 percent of the times.
+Arithmetic mean value of data bytes is 127.5147 (127.5 = random).
+Monte Carlo value for Pi is 3.131460337 (error 0.32 percent).
+Serial correlation coefficient is -0.000363 (totally uncorrelated = 0.0).
+
+Entropy = 7.999430 bits per byte.
+Chi square distribution for 306176 samples is 242.16, and randomly
+would exceed this value 70.83 percent of the times.
+Arithmetic mean value of data bytes is 127.3991 (127.5 = random).
+Monte Carlo value for Pi is 3.139548100 (error 0.07 percent).
+Serial correlation coefficient is 0.000406 (totally uncorrelated = 0.0).
+
+--------------------------------------------------------------------------------  # run.96
+
+  pc() { pigz -cp4 -J4 "$@" | tail -c+16 | head -c-8; }
+
+  hx() { h9 | pc | ./prpx -r$1 -x$2; }
+
+  Entropy = 7.999799 bits per byte.
+  Chi square distribution for 1015808 samples is 283.72, and randomly
+  would exceed this value 10.45 percent of the times.
+  Arithmetic mean value of data bytes is 127.5984 (127.5 = random).
+  Monte Carlo value for Pi is 3.140347665 (error 0.04 percent).
+  Serial correlation coefficient is 0.000677 (totally uncorrelated = 0.0).
+
+--------------------------------------------------------------------------------  # run.97
+
+  hx() { h9 | pc -9 | ./prpx -r$1 -x$2; }
+
+  Entropy = 7.999799 bits per byte.
+  Chi square distribution for 1015808 samples is 283.72, and randomly
+  would exceed this value 10.45 percent of the times.
+  Arithmetic mean value of data bytes is 127.5984 (127.5 = random).
+  Monte Carlo value for Pi is 3.140347665 (error 0.04 percent).
+  Serial correlation coefficient is 0.000677 (totally uncorrelated = 0.0).
+
+--------------------------------------------------------------------------------  # run.98
+
+  pc() { pigz -qOcp4 "$@" | tail -c+16 | head -c-8; }
+
+  hx() { h9 | pc -9 | ./prpx -r$1 -x$2; }
+
+  Entropy = 7.999006 bits per byte.
+  Chi square distribution for 205824 samples is 283.30, and randomly
+  would exceed this value 10.77 percent of the times.
+  Arithmetic mean value of data bytes is 127.6369 (127.5 = random).
+  Monte Carlo value for Pi is 3.140741604 (error 0.03 percent).
+  Serial correlation coefficient is 0.000223 (totally uncorrelated = 0.0).
+
+--------------------------------------------------------------------------------  # run.99
+
+  pc() { pigz -qcp4 -J4 -FI4 "$@" | tail -c+16 | head -c-8; }
+
+  hx() { h9 | pc -9 | ./prpx -r$1 -x$2; }
+
+  Entropy = 7.999136 bits per byte.
+  Chi square distribution for 256000 samples is 306.50, and randomly
+  would exceed this value 1.49 percent of the times.
+  Arithmetic mean value of data bytes is 127.2226 (127.5 = random).
+  Monte Carlo value for Pi is 3.153893030 (error 0.39 percent).
+  Serial correlation coefficient is 0.001572 (totally uncorrelated = 0.0).
+
+--------------------------------------------------------------------------------  # run.100
+
+  pc() { pigz -qcp4 -J4 -I8 "$@" | tail -c+16 | head -c-8; }
+
+  Entropy = 7.999387 bits per byte.
+  Chi square distribution for 262144 samples is 222.81, and randomly
+  would exceed this value 92.79 percent of the times.
+  Arithmetic mean value of data bytes is 127.6152 (127.5 = random).
+  Monte Carlo value for Pi is 3.148180362 (error 0.21 percent).
+  Serial correlation coefficient is 0.002801 (totally uncorrelated = 0.0).
+
+  Entropy = 7.999614 bits per byte.
+  Chi square distribution for 414720 samples is 221.90, and randomly
+  would exceed this value 93.38 percent of the times.
+  Arithmetic mean value of data bytes is 127.6295 (127.5 = random).
+  Monte Carlo value for Pi is 3.143923611 (error 0.07 percent).
+  Serial correlation coefficient is 0.001241 (totally uncorrelated = 0.0).
+
+--------------------------------------------------------------------------------  # run.101
+
+  pc() { pigz -9qcp4 -J4 -I16 "$@" | tail -c+16 | head -c-8; }
+
+  hx() { h9 | pc | ./prpx -r$1 -x$2; }
+
+  Entropy = 7.997428 bits per byte.
+  Chi square distribution for 60416 samples is 215.33, and randomly
+  would exceed this value 96.62 percent of the times.
+  Arithmetic mean value of data bytes is 127.5730 (127.5 = random).
+  Monte Carlo value for Pi is 3.121660542 (error 0.63 percent).
+  Serial correlation coefficient is -0.002250 (totally uncorrelated = 0.0).
+
+  Entropy = 7.999086 bits per byte.
+  Chi square distribution for 187392 samples is 237.77, and randomly
+  would exceed this value 77.38 percent of the times.
+  Arithmetic mean value of data bytes is 127.2651 (127.5 = random).
+  Monte Carlo value for Pi is 3.135117828 (error 0.21 percent).
+  Serial correlation coefficient is -0.001563 (totally uncorrelated = 0.0).
+
+--------------------------------------------------------------------------------  # run.102
+
+  pc() { pigz -9qcp8 -J4 -I16 "$@" | tail -c+16 | head -c-8; }
+
+  hx() { h9 | pc | ./prpx -r$1 -x$2; }
+
+  Entropy = 7.998967 bits per byte.
+  Chi square distribution for 159744 samples is 228.72, and randomly
+  would exceed this value 88.03 percent of the times.
+  Arithmetic mean value of data bytes is 127.3838 (127.5 = random).
+  Monte Carlo value for Pi is 3.140775240 (error 0.03 percent).
+  Serial correlation coefficient is 0.000615 (totally uncorrelated = 0.0).
+
+  Entropy = 7.999475 bits per byte.
+  Chi square distribution for 362496 samples is 263.40, and randomly
+  would exceed this value 34.55 percent of the times.
+  Arithmetic mean value of data bytes is 127.5703 (127.5 = random).
+  Monte Carlo value for Pi is 3.133474576 (error 0.26 percent).
+  Serial correlation coefficient is -0.000974 (totally uncorrelated = 0.0).
+
+  Entropy = 7.999936 bits per byte.
+  Chi square distribution for 2772992 samples is 244.81, and randomly
+  would exceed this value 66.56 percent of the times.
+  Arithmetic mean value of data bytes is 127.5184 (127.5 = random).
+  Monte Carlo value for Pi is 3.136767172 (error 0.15 percent).
+  Serial correlation coefficient is -0.000312 (totally uncorrelated = 0.0).
+
+# no ending echo                                                              #
+#=============================================================================#
+#            dieharder version 3.31.1 Copyright 2003 Robert G. Brown          #
+#=============================================================================#
+   rng_name    |           filename             |rands/second|
+        mt19937|                    run.131.test|  9.29e+07  |
+#=============================================================================#
+        test_name   |ntup| tsamples |psamples|  p-value |Assessment
+#=============================================================================#
+       diehard_craps|   0|    200000|     100|0.99715571|   WEAK
+          sts_serial|  16|    100000|     100|0.99977128|   WEAK
+         rgb_bitdist|   3|    100000|     100|0.99902435|   WEAK
+      rgb_lagged_sum|  14|   1000000|     100|0.99682434|   WEAK
+      rgb_lagged_sum|  16|   1000000|     100|0.99657115|   WEAK
+      rgb_lagged_sum|  17|   1000000|     100|0.99860941|   WEAK
+
+--------------------------------------------------------------------------------  # run.103
+
+  pn() { nice -n19 ionice -c3 stdbuf -o0 -e0 -i0 "$@"; }
+
+  pc() { pigz -9cp$(nproc) "$@" | tail -c+16 | head -c-8; }
+
+  dg() { pn dd bs=2 "$@" 2>&1; }
+
+  ud() { dg status=none "$@"; }
+
+  bh() { sha512sum | xxd -r -p; }
+
+  hg() { { time date +%N | dg; } 2>&1 | dg; }
+
+  h1() { hg | bh | ./prpx -r ${1} -x ${2}; }
+
+  h9() { { h1 -1 -1 & h1 1 -1 & h1 -1 -1 & h1 1 -1; } | ud; }
+
+  hx() { h9 | pc | ./prpr -r${1}6 -o${2}5; }
+
+  cg() { { hx -1 -1 & hx 1 -1 & hx -1 -1 & hx 1 -1; } | ud obs=1k; }
+
+  Entropy = 7.999546 bits per byte.
+  Chi square distribution for 360960 samples is 227.57, and randomly
+  would exceed this value 89.09 percent of the times.
+  Arithmetic mean value of data bytes is 127.4896 (127.5 = random).
+  Monte Carlo value for Pi is 3.148736702 (error 0.23 percent).
+  Serial correlation coefficient is 0.001691 (totally uncorrelated = 0.0).
+
+  Entropy = 7.999899 bits per byte.
+  Chi square distribution for 2004480 samples is 280.17, and randomly
+  would exceed this value 13.36 percent of the times.
+  Arithmetic mean value of data bytes is 127.4942 (127.5 = random).
+  Monte Carlo value for Pi is 3.140241858 (error 0.04 percent).
+  Serial correlation coefficient is 0.000167 (totally uncorrelated = 0.0).
+
+--------------------------------------------------------------------------------
+
+# runs: 83-102 (no ending echo)
+#=============================================================================#
+#            dieharder version 3.31.1 Copyright 2003 Robert G. Brown          #
+#=============================================================================#
+   rng_name    |           filename             |rands/second|
+        mt19937|                         run.all|  1.19e+08  |
+#=============================================================================#
+        test_name   |ntup| tsamples |psamples|  p-value |Assessment
+#=============================================================================#
+     diehard_squeeze|   0|    100000|     100|0.00203685|   WEAK
+      rgb_lagged_sum|  18|   1000000|     100|0.99885342|   WEAK
+
+================================================================================
+--------------------------------------------------------------------------------  # run.104
+
+  pn() { nice -n19 ionice -c3 stdbuf -o0 -e0 -i0 "$@"; }
+
+  pc() { pigz -9cp$(nproc) "$@" | tail -c+16 | head -c-8; }
+
+  dg() { ( pn time dd bs=2 "$@" ) 2>&1; }
+
+  ud() { dg status=none "$@"; }
+
+  bh() { sha512sum | xxd -r -p; }
+
+  hg() { { time date +%N | dg; } 2>&1 | dg; }
+
+  h1() { { hg & hg; } | bh | ./prpx -r ${1} -x ${2}; }
+
+  h9() { { h1 -1 -1 & h1 1 -1 & h1 -1 -1 & h1 1 -1; } | ud; }
+
+  hx() { h9 | pc | ./prpr -r${1}6 -o${2}5 | ./prpx -r-15 -x0; }
+
+  cg() { { hx -1 -1 & hx 1 -1 & hx -1 -1 & hx 1 -1; } | ud obs=1k; }
+
+  Entropy = 7.999574 bits per byte.
+  Chi square distribution for 397440 samples is 234.72, and randomly
+  would exceed this value 81.41 percent of the times.
+  Arithmetic mean value of data bytes is 127.4860 (127.5 = random).
+  Monte Carlo value for Pi is 3.134480676 (error 0.23 percent).
+  Serial correlation coefficient is -0.000241 (totally uncorrelated = 0.0).
+
+--------------------------------------------------------------------------------  # run.105
+
+  dg() { pn dd bs=2 "$@"; }
+
+  hg() { { time date +%N | dg; } 2>&1; }
+
+  h1() { { hg & hg; } | bh | ./prpx -r ${1} -x ${2}; }
+
+  Entropy = 7.999503 bits per byte.
+  Chi square distribution for 338880 samples is 233.48, and randomly
+  would exceed this value 82.93 percent of the times.
+  Arithmetic mean value of data bytes is 127.6434 (127.5 = random).
+  Monte Carlo value for Pi is 3.138526912 (error 0.10 percent).
+  Serial correlation coefficient is 0.001239 (totally uncorrelated = 0.0).
+
+  Entropy = 7.999852 bits per byte.
+  Chi square distribution for 1225920 samples is 251.89, and randomly
+  would exceed this value 54.32 percent of the times.
+  Arithmetic mean value of data bytes is 127.5348 (127.5 = random).
+  Monte Carlo value for Pi is 3.140759593 (error 0.03 percent).
+  Serial correlation coefficient is -0.001990 (totally uncorrelated = 0.0).
+
+--------------------------------------------------------------------------------  # run.106
+
+  h1() { { hg & hg & hg & hg; } | bh | ./prpx -r ${1} -x ${2}; }
+
+  pc() { pigz -1cp$(nproc) "$@" | tail -c+16 | head -c-8; }
+
+  Entropy = 7.999495 bits per byte.
+  Chi square distribution for 372480 samples is 260.61, and randomly
+  would exceed this value 39.12 percent of the times.
+  Arithmetic mean value of data bytes is 127.6209 (127.5 = random).
+  Monte Carlo value for Pi is 3.144909794 (error 0.11 percent).
+  Serial correlation coefficient is 0.000050 (totally uncorrelated = 0.0).
+
+================================================================================
+--------------------------------------------------------------------------------  # run.107
+
+  pn() { nice -n19 ionice -c3 stdbuf -o0 -e0 -i0 "$@"; }
+
+  pc() { pigz -1cp$(nproc) "$@" | tail -c+16 | head -c-8; }                         # workload -1
+
+  sl() {  sleep 0.001; }
+
+  dg() { pn dd bs=2 "$@"; }                                                         # semplificato
+
+  ud() { dg status=none "$@"; }
+
+  bh() { sha512sum | xxd -r -p; }
+
+  hg() { { time date +%N | dg; } 2>&1; }                                            # semplificato
+
+  h1() { { hg & hg & sl; } | bh | ./prpx -r ${1:-1} -x ${2:-1}; }                   # sleep 0.01
+
+  h9() { { h1 -1 -1 & h1 1 -1 & h1 -1 -1 & h1 1 -1 & sl; } | ud; }                  # sleep 0.01
+
+  hx() { h9 | pc | ./prpr -r${1:-1}6 -o${2:-1}5 | ./prpx -r-3 -x0; }
+
+  cg() { { hx -1 -1 & hx 1 -1 & hx -1 -1 & hx 1 -1 & sl; } | ud obs=1k; }           # sleep 0.01
+
+  # sleep 0.001
+  Entropy = 7.999655 bits per byte.
+  Chi square distribution for 521280 samples is 249.10, and randomly
+  would exceed this value 59.25 percent of the times.
+  Arithmetic mean value of data bytes is 127.6753 (127.5 = random).
+  Monte Carlo value for Pi is 3.139364641 (error 0.07 percent).
+  Serial correlation coefficient is -0.000840 (totally uncorrelated = 0.0).
+
+  # sleep 0.01
+  Entropy = 7.999661 bits per byte.
+  Chi square distribution for 523200 samples is 245.54, and randomly
+  would exceed this value 65.34 percent of the times.
+  Arithmetic mean value of data bytes is 127.3580 (127.5 = random).
+  Monte Carlo value for Pi is 3.145642202 (error 0.13 percent).
+  Serial correlation coefficient is 0.001609 (totally uncorrelated = 0.0).
+
+--------------------------------------------------------------------------------
+
+rm -f run.all;
+cat run.2 run.4 run.3 run.4 run.5 >> run.all;
+echo >> run.all; du -ks run.all
+dieharder -a -f run.all
+#=============================================================================#
+#            dieharder version 3.31.1 Copyright 2003 Robert G. Brown          #
+#=============================================================================#
+   rng_name    |           filename             |rands/second|
+        mt19937|                         run.all|  9.89e+07  |
+#=============================================================================#
+        test_name   |ntup| tsamples |psamples|  p-value |Assessment
+#=============================================================================#
+        diehard_sums|   0|       100|     100|0.00016367|   WEAK
 
