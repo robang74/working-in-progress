@@ -80,7 +80,7 @@ int main(int argc, char *argv[]) {
         }
 
         // 2. Processing Logic
-        if(x_arg * r_arg < 0)
+        if(x_arg * r_arg < 1)
           reverse_buffer(buffer, r_size);
         xorskip_buffer(buffer, x_abs);
         if(x_arg < 0)
