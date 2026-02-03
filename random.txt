@@ -2517,7 +2517,7 @@ dieharder -a -f ../tmp/run.last                          # echo >> runs 84-88 #
 
 --------------------------------------------------------------------------------  # run.89
 
-  h1() { hg | pc -1 | bh | ./prpx -r1 -x1 | ud ibs=64; }
+  h1() { hg | pc -1 | bh | ./prpx -r1 -x1 | ud ibs=64; }                          # prpx commit 35cacb9
 
   h9() { { h1 & h1 & h1 & h1; } | ud obs=256 | pc -9; }
 
@@ -2843,7 +2843,7 @@ Serial correlation coefficient is 0.000406 (totally uncorrelated = 0.0).
 
   h9() { { h1 -1 -1 & h1 1 -1 & h1 -1 -1 & h1 1 -1; } | ud; }
 
-  hx() { h9 | pc | ./prpr -r${1}6 -o${2}5 | ./prpx -r-15 -x0; }
+  hx() { h9 | pc | ./prpr -r${1}6 -o${2}5 | ./prpx -r-15 -x0; }                   # prpx commit 35cacb9 (do nothing -x0)
 
   cg() { { hx -1 -1 & hx 1 -1 & hx -1 -1 & hx 1 -1; } | ud obs=1k; }
 
@@ -2906,13 +2906,13 @@ Serial correlation coefficient is 0.000406 (totally uncorrelated = 0.0).
 
   hg() { { time date +%N | dg; } 2>&1; }                                            # semplificato
 
-  h1() { { hg & hg & sl; } | bh | ./prpx -r ${1:-1} -x ${2:-1}; }                   # sleep 0.01
+  h1() { { hg & hg & sl; } | bh | ./prpx -r ${1:-1} -x ${2:-1}; }                   # sleep 0.001
 
-  h9() { { h1 -1 -1 & h1 1 -1 & h1 -1 -1 & h1 1 -1 & sl; } | ud; }                  # sleep 0.01
+  h9() { { h1 -1 -1 & h1 1 -1 & h1 -1 -1 & h1 1 -1 & sl; } | ud; }                  # sleep 0.001
 
-  hx() { h9 | pc | ./prpr -r${1:-1}6 -o${2:-1}5 | ./prpx -r-3 -x0; }
+  hx() { h9 | pc | ./prpr -r${1:-1}6 -o${2:-1}5 | ./prpx -r-3 -x0; }                # prpx commit 35cacb9 (do nothing -x0)
 
-  cg() { { hx -1 -1 & hx 1 -1 & hx -1 -1 & hx 1 -1 & sl; } | ud obs=1k; }           # sleep 0.01
+  cg() { { hx -1 -1 & hx 1 -1 & hx -1 -1 & hx 1 -1 & sl; } | ud obs=1k; }           # sleep 0.001
 
   # sleep 0.001
   Entropy = 7.999655 bits per byte.
