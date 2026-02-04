@@ -41,29 +41,53 @@ int main(int argc, char *argv[]) {
 
   for (entropy = 0, s = 0, k = 0, i = 0; i < 256; i++) {
       if(counts[i]) n++;
-      double ex = ((double)bytes_read) / 256.0;
+      double ex = ((double)bytes_read) / 256.0, epx = 1.0 / 256.0;
       x = ((double)counts[i] - ex);
       s += x * x  / ex;
       px = ((double)counts[i]) / bytes_read;
-      x = px - (1.0 / 256.0);
+      x = px - epx;
       k += x * x; // TODO
       if(!counts[i]) continue;
       entropy -= px * log2(px);
 
   }
-  printf("bytes: %4ld, Eñ: %12.6lf / 8, X²: %12.6lf, k²: %12.6lf\n", bytes_read, entropy, s, k * 256);
+  printf("bytes: %4ld, Eñ: %.6lf / 8.00 = %.6lf, X²: %5.3lf, k²: %2.6lf\n",
+      bytes_read, entropy, entropy/8, s, k * 256);
 
-  for (entropy = 0, s = 0, k = 0, i = 0; i < 256; i++) {
-      if(!counts[i]) continue;
-      double ex = ((double)bytes_read) / n;
-      x = ((double)counts[i] - ex);
-      s += x * x  / ex;
-      px = ((double)counts[i]) / n;
-      x = px - (1.0 / n);
-      k += x * x; // TODO
-      entropy -= px * log2(px);
+  double lg2s = log2(n);
+  unsigned nbits = ceil(lg2s), nmax = 1 << nbits;
+
+  if (nbits < 8) {
+      for (entropy = 0, s = 0, k = 0, i = 0; i < 256; i++) {
+          double ex = ((double)bytes_read) / nmax, epx = 1.0 / nmax;
+          x = ((double)counts[i] - ex);
+          s += x * x  / ex;
+          px = ((double)counts[i]) / nmax;
+          x = px - epx;
+          k += x * x; // TODO
+          if(!counts[i]) continue;
+          entropy -= px * log2(px);
+      }
+      printf("encdg: %4u, Eñ: %.6lf / %u.00 = %.6lf, X²: %5.3lf, k²: %2.6lf\n",
+          (unsigned) nmax, entropy, nbits, entropy/nbits, s, k * n);
   }
-  printf("symbl: %4u, Eñ: %12.6lf / %u, X²: %12.6lf, k²: %12.6lf\n", (unsigned) n, entropy, (unsigned) ceil(log2(n)), s, k * n);
+
+  if(n < nmax) {
+      for (entropy = 0, s = 0, k = 0, i = 0; i < 256; i++) {
+          double ex = ((double)bytes_read) / n, epx = 1.0 / n;
+          x = ((double)counts[i] - ex);
+          s += x * x  / ex;
+          px = ((double)counts[i]) / n;
+          x = px - epx;
+          k += x * x; // TODO
+          if(!counts[i]) continue;
+          entropy -= px * log2(px);
+      }
+      entropy = (entropy * n)/nmax;
+      printf("symbl: %4u, Eñ: %.6lf / %.2f = %.6lf, X²: %5.3lf, k²: %2.6lf\n",
+          (unsigned) n, entropy, lg2s, entropy/lg2s, s, k * n);
+  }
+
 /* 
    for (i = 0; i < 256; i++) {
       if(counts[i])
