@@ -39,21 +39,29 @@ int main(int argc, char *argv[]) {
 
   double x, s = 0;
   unsigned int n = 0;
-  for (i = 0; i < 256; i++) {
+  double entropy;;
+
+  for (entropy = 0, i = 0; i < 256; i++) {
       if(counts[i]) n++;
-      double ex = ((double)bytes_read)/256;
+      double ex = ((double)bytes_read) / 256.0;
       x = ((double)counts[i] -  ex);
       s += x * x  / ex;
-      //printf("i: %3ld, c: %3ld / %ld, x: %lf, s: %lf\n", i, counts[i], bytes_read, x, s);
+      if(!counts[i]) continue;
+      double px = ((double)counts[i]) / bytes_read;
+      entropy -= px * log2(px);
   }
-  printf("bytes: %4ld, E: %16lf, E²: %16lf\n", bytes_read, sqrt(s), s);
-  for (i = 0; i < 256; i++) {
-      double ex = ((double)bytes_read)/n;
+  printf("bytes: %4ld, E: %12lf, X²: %12lf\n", bytes_read, entropy, s);
+
+  for (entropy = 0, i = 0; i < 256; i++) {
+      if(!counts[i]) continue;
+      double ex = ((double)bytes_read) / n;
       x = ((double)counts[i] -  ex);
       s += x * x  / ex;
-      //printf("i: %3ld, c: %3ld / %ld, x: %lf, s: %lf\n", i, counts[i], bytes_read, x, s);
+      double px = ((double)counts[i]) / n;
+      entropy -= px * log2(px);
+
   }
-  printf("symbl: %4u, E: %16lf, E²: %16lf\n", n, sqrt(s), s);
+  printf("symbl: %4u, E: %12lf, X²: %12lf\n", n, entropy, s);
 /* 
    for (i = 0; i < 256; i++) {
       if(counts[i])
