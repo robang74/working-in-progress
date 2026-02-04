@@ -14,6 +14,8 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <time.h>
+#include <spawn.h>
+#include <sys/wait.h>
 
 // Struttura per passare i dati ai thread
 typedef struct {
@@ -58,33 +60,54 @@ static inline void prt_nanos(unsigned char a, unsigned char b) {
     return;
 }
 
-void* spawn_and_mix(void* arg) {
-    thread_data_t *data = (thread_data_t *)arg;
-    char final_cmd[2048];
+extern char **environ;
 
-    // Usiamo stdbuf su tutto il comando e uniamo gli stream.
-    // L'aggiunta di 'stdbuf -i0 -o0 -e0' è fondamentale.
-    snprintf(final_cmd, sizeof(final_cmd),
-             "stdbuf -i0 -o0 -e0 bash -c '%s'", data->cmd);
-    // Apriamo un canale di lettura dal comando bash
-    FILE *fp = popen(final_cmd, "r");
-    if (!fp) return NULL;
+void *spawn_and_mix(void* arg) {
+    thread_data_t *t = (thread_data_t *)arg;
+    int pipefd[2];
 
     prt_nanos('[','>');
-
-    int ch;
-    // Leggiamo un carattere alla volta e lo spariamo su stdout
-    // Il kernel scheduler deciderà quando interrompere questo thread
-    while ((ch = fgetc(fp)) != EOF) {
-        // Formato: [NANOSECONDI] BYTE
-        // Usiamo un printf atomico per evitare che il timestamp stesso venga spezzato
-        putchar((unsigned char)ch);
-        fflush(stdout); // Forza l'uscita immediata del singolo byte
+    if(pipe(pipefd) < 0) {
+        perror("pipe");
+        return NULL;
     }
 
-    prt_nanos('<',']');
+    // Prepariamo l'azione per duplicare i descrittori di file nel figlio
+    posix_spawn_file_actions_t actions;
+    posix_spawn_file_actions_init(&actions);
+    posix_spawn_file_actions_adddup2(&actions, pipefd[1], STDOUT_FILENO);
+    posix_spawn_file_actions_adddup2(&actions, pipefd[1], STDERR_FILENO);
+    posix_spawn_file_actions_addclose(&actions, pipefd[0]);
 
-    pclose(fp);
+    char *argv[] = {"stdbuf", "-i0", "-o0", "-e0", "bash", "-c", t->cmd, NULL};
+
+    pid_t pid;
+    // posix_spawn è molto più efficiente di fork() per lanciare processi
+    if (posix_spawn(&pid, "/usr/bin/stdbuf", &actions, NULL, argv, environ) != 0) {
+        perror("posix_spawn");
+        return NULL;
+    }
+
+    close(pipefd[1]);
+    unsigned char ch;
+    char buffer[128];
+    struct timespec ts;
+
+    // Lettura a basso livello
+    while (read(pipefd[0], &ch, 1) > 0) {
+        // write() è atomica se la stringa è corta, ma il mixing avviene
+        // tra i vari thread che chiamano read()
+        if(write(STDOUT_FILENO, &ch, 1) < 0) {
+            perror("write");
+            break;
+        }
+    }
+
+    close(pipefd[0]);
+    waitpid(pid, NULL, 0);
+    posix_spawn_file_actions_destroy(&actions);
+
+    prt_nanos('<',']');
     return NULL;
 }
 
@@ -92,7 +115,7 @@ int main(int argc, char *argv[]) {
     (void)get_nanos(); // Inizializzazione di start
 
     if (argc < 3) {
-        fprintf(stderr, "Uso: %s -n4 \"comando\"\n", argv[0]);
+        fprintf(stderr, "Usage: %s -n4 \"commands\"\n", argv[0]);
         return 1;
     }
 
