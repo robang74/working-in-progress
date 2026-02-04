@@ -8,12 +8,14 @@
  */
 
 #include <stdio.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <errno.h>
 #include <string.h>
 #include <math.h>
 
+#define AVG 125.5
 #define MAX_READ_SIZE 4096
 #define MIN(a,b) ((a<b)?(a):(b))
 
@@ -39,7 +41,7 @@ unsigned printstats(const char *str, size_t nread, unsigned nsymb, size_t *count
   if(!entdone) {
     entdone = 1;
     avg = avg / nread;
-    pavg = ((avg-127.5)/125.5)*100;
+    pavg = (avg/AVG - 1)*100;
   }
   printf("%s: %4ld, Eñ: %.6lf / %.2f = %.6lf, X²: %5.3lf, k²: %3.5lf, avg: %.4lf %+.4lf %%\n",
       str, MIN(nread,nsymb), entropy, lg2s, entropy/lg2s, s, k * nsymb, avg, pavg);
@@ -48,11 +50,12 @@ unsigned printstats(const char *str, size_t nread, unsigned nsymb, size_t *count
 }
 
 int main(int argc, char *argv[]) {
-    size_t bytes_read = 0, nr = 0, i, counts[256];  
-    unsigned char buffer[MAX_READ_SIZE];
-    
-    for (i = 0; i < 256; i++)
-        counts[i] = 0;
+    size_t bytes_read = 0, nr = 0, i, counts[256] = {0};
+    unsigned char *buffer, buf[MAX_READ_SIZE+64];
+  
+    // Memory alignment at 64 bit
+    uintptr_t p = (uintptr_t)buf + 64;
+    buffer = (unsigned char *)((p >> 6) << 6);
 
     while (1) {
         nr = read(STDIN_FILENO, buffer, MAX_READ_SIZE);
