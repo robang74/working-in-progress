@@ -15,24 +15,30 @@
 #include <math.h>
 
 #define MAX_READ_SIZE 4096
+#define MIN(a,b) ((a<b)?(a):(b))
 
 unsigned printstats(const char *str, size_t nread, unsigned nsymb, size_t *counts) {
+  static char entdone = 0;
+  static double entropy = 0, n = 0;
+  double x, px, k = 0, s = 0, lg2s = log2(nsymb);
   size_t i;
-  double x, px, k = 0, s = 0, entropy = 0, n = 0, lg2s = log2(nsymb);
 
   for (i = 0; i < 256; i++) {
       double ex = ((double)nread) / nsymb, epx = 1.0 / nsymb;
       x = ((double)counts[i] - ex);
-      s += x * x  / ex;
+      s += x * x / ex;
       px = ((double)counts[i]) / nread;
       x = px - epx;
       k += x * x;
-      if(counts[i]) n++; else continue;
+
+      if(!counts[i] || entdone) continue;
       entropy -= px * log2(px);
+      n++; 
   }
   printf("%s: %4ld, Eñ: %.6lf / %.2f = %.6lf, X²: %5.3lf, k²: %3.5lf\n",
-      str, nread, entropy, lg2s, entropy/lg2s, s, k * nsymb);
-
+      str, MIN(nread,nsymb), entropy, lg2s, entropy/lg2s, s, k * nsymb);
+  
+  entdone = 1;
   return n;
 }
 
@@ -56,44 +62,15 @@ int main(int argc, char *argv[]) {
         bytes_read += nr;
     }
 
-  unsigned n = printstats("bytes", bytes_read, 256, counts);
+    unsigned nsymb = printstats("bytes", bytes_read, 256, counts);
+    double lg2s = log2(nsymb);
+    unsigned nbits = ceil(lg2s), nmax = 1 << nbits;
 
-  double lg2s = log2(n);
-  unsigned nbits = ceil(lg2s), nmax = 1 << nbits;
+    if (nbits < 8)
+        (void)printstats("encdg", bytes_read, nmax, counts);
 
-  if (nbits < 8) {
-      (void)printstats("encdg", nmax, nmax, counts);
-/*
-      for (entropy = 0, s = 0, k = 0, i = 0; i < 256; i++) {
-          double ex = ((double)bytes_read) / nmax, epx = 1.0 / nmax;
-          x = ((double)counts[i] - ex);
-          s += x * x  / ex;
-          px = ((double)counts[i]) / nmax;
-          x = px - epx;
-          k += x * x;
-          if(!counts[i]) continue;
-          entropy -= px * log2(px);
-      }
-      printf("encdg: %4u, Eñ: %.6lf / %u.00 = %.6lf, X²: %5.3lf, k²: %2.6lf\n",
-          (unsigned) nmax, entropy, nbits, entropy/nbits, s, k * n);
-*/
-  }
-/*
-  if(n < nmax) {
-      for (entropy = 0, s = 0, k = 0, i = 0; i < 256; i++) {
-          double ex = ((double)bytes_read) / n, epx = 1.0 / n;
-          x = ((double)counts[i] - ex);
-          s += x * x  / ex;
-          px = ((double)counts[i]) / n;
-          x = px - epx;
-          k += x * x; // TODO
-          if(!counts[i]) continue;
-          entropy -= px * log2(px);
-      }
-      entropy = (entropy * n)/nmax;
-      printf("symbl: %4u, Eñ: %.6lf / %.2f = %.6lf, X²: %5.3lf, k²: %2.6lf\n",
-          (unsigned) n, entropy, lg2s, entropy/lg2s, s, k * n);
-  }
-*/
+    if(nsymb < nmax)
+        (void)printstats("symbl", bytes_read, nsymb, counts);
+
     return 0;
 }
