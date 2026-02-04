@@ -20,10 +20,23 @@ typedef struct {
 
 // Funzione per ottenere il tempo in nanosecondi
 long get_nanos() {
+    static long start = 0;
     struct timespec ts;
     clock_gettime(CLOCK_MONOTONIC, &ts);
-    return (long)ts.tv_sec * 1000000000L + ts.tv_nsec;
+    if (!start) {
+      start = (long)ts.tv_sec * 1000000000L + ts.tv_nsec;
+      return 0;
+    }
+    return ((long)ts.tv_sec * 1000000000L + ts.tv_nsec) - start;
 }
+
+#define NS 1000000000L
+void prt_nanos(unsigned char a, unsigned char b) {
+    long nanos = get_nanos();
+    fprintf(stdout, "%c%ld.%09ld%c\n", a, nanos / NS, nanos % NS, b);
+    fflush(stdout);
+}
+
 
 void* spawn_and_mix(void* arg) {
     thread_data_t *data = (thread_data_t *)arg;
@@ -37,8 +50,7 @@ void* spawn_and_mix(void* arg) {
     FILE *fp = popen(final_cmd, "r");
     if (!fp) return NULL;
 
-    fprintf(stdout, "[%ld>\n", get_nanos());
-    fflush(stdout);
+    prt_nanos('[','>');
 
     int ch;
     // Leggiamo un carattere alla volta e lo spariamo su stdout
@@ -49,15 +61,16 @@ void* spawn_and_mix(void* arg) {
         putchar((unsigned char)ch);
         fflush(stdout); // Forza l'uscita immediata del singolo byte
     }
-
-    fprintf(stdout, "<%ld]\n", get_nanos());
-    fflush(stdout);
+    
+    prt_nanos('<',']');
 
     pclose(fp);
     return NULL;
 }
 
 int main(int argc, char *argv[]) {
+    (void)get_nanos(); // Inizializzazione di start
+
     if (argc < 3) {
         fprintf(stderr, "Uso: %s -n4 \"comando\"\n", argv[0]);
         return 1;
@@ -84,5 +97,6 @@ int main(int argc, char *argv[]) {
     }
 
     pthread_barrier_destroy(&barrier);
+    prt_nanos('[',']');
     return 0;
 }
