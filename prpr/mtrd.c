@@ -1,7 +1,9 @@
 /*
  * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, MIT license
  *
- * Usage: mtrd -nN "command or binary to execute"
+ * Usage: mtrd -nN "command or binary to execute"; or -tN for timestamps also
+ *
+ * Compile with lib pthread: gcc mtrd.c -O3 -o mtrd -lpthread
  *
  */
 
@@ -22,21 +24,39 @@ typedef struct {
 long get_nanos() {
     static long start = 0;
     struct timespec ts;
+
     clock_gettime(CLOCK_MONOTONIC, &ts);
     if (!start) {
       start = (long)ts.tv_sec * 1000000000L + ts.tv_nsec;
-      return 0;
+      return start;
     }
     return ((long)ts.tv_sec * 1000000000L + ts.tv_nsec) - start;
 }
 
 #define NS 1000000000L
-void prt_nanos(unsigned char a, unsigned char b) {
-    long nanos = get_nanos();
-    fprintf(stdout, "%c%ld.%09ld%c\n", a, nanos / NS, nanos % NS, b);
-    fflush(stdout);
-}
+unsigned char prtnano = 0;
+static inline void prt_nanos(unsigned char a, unsigned char b) {
+    const int BFLN = 32;
+    static char first = 1;
+    unsigned char buf[BFLN];
+    long nanos;
 
+    if(!prtnano) return;
+
+    nanos = get_nanos();
+    if(first) {
+        first = 0;
+        snprintf(buf, BFLN, "%cs.%09ld%c\n", a, nanos % NS, b);
+    } else {
+        snprintf(buf, BFLN, "\n%c%ld.%09ld%c\n", a, nanos / NS, nanos % NS, b);
+    }
+
+    buf[BFLN-1] = 0;
+    fprintf(stdout, "%s", buf);
+    fflush(stdout);
+
+    return;
+}
 
 void* spawn_and_mix(void* arg) {
     thread_data_t *data = (thread_data_t *)arg;
@@ -44,8 +64,8 @@ void* spawn_and_mix(void* arg) {
 
     // Usiamo stdbuf su tutto il comando e uniamo gli stream.
     // L'aggiunta di 'stdbuf -i0 -o0 -e0' è fondamentale.
-    snprintf(final_cmd, sizeof(final_cmd), 
-             "stdbuf -i0 -o0 -e0 bash -c '%s' 2>&1", data->cmd);
+    snprintf(final_cmd, sizeof(final_cmd),
+             "stdbuf -i0 -o0 -e0 bash -c '%s'", data->cmd);
     // Apriamo un canale di lettura dal comando bash
     FILE *fp = popen(final_cmd, "r");
     if (!fp) return NULL;
@@ -61,7 +81,7 @@ void* spawn_and_mix(void* arg) {
         putchar((unsigned char)ch);
         fflush(stdout); // Forza l'uscita immediata del singolo byte
     }
-    
+
     prt_nanos('<',']');
 
     pclose(fp);
@@ -76,9 +96,11 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
+    prtnano = (argv[1][1] == 't');
     int num_threads = atoi(argv[1] + 2); // Gestisce -n4
     char *cmd = argv[2];
 
+    prt_nanos('<','>');
     pthread_t threads[num_threads];
     thread_data_t t_data = {cmd};
 
