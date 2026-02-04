@@ -2946,3 +2946,486 @@ dieharder -a -f run.all
 #=============================================================================#
         diehard_sums|   0|       100|     100|0.00016367|   WEAK
 
+================================================================================
+--------------------------------------------------------------------------------  # run.108
+
+  pn() { nice -n19 ionice -c3 stdbuf -o0 -e0 -i0 strace -o slow-1 "$@"; }
+
+Entropy = 7.999474 bits per byte.
+Chi square distribution for 384000 samples is 280.78, and randomly
+would exceed this value 12.83 percent of the times.
+Arithmetic mean value of data bytes is 127.4398 (127.5 = random).
+Monte Carlo value for Pi is 3.138062500 (error 0.11 percent).
+Serial correlation coefficient is -0.001011 (totally uncorrelated = 0.0).
+
+--------------------------------------------------------------------------------  # run.109
+# Testing h1() output only not cg()
+
+  h1() { { hg & hg & sl; } | dg 2>&1 | bh; }
+
+Entropy = 7.998139 bits per byte.
+Chi square distribution for 100992 samples is 260.96, and randomly
+would exceed this value 38.54 percent of the times.
+Arithmetic mean value of data bytes is 127.5564 (127.5 = random).
+Monte Carlo value for Pi is 3.135693916 (error 0.19 percent).
+Serial correlation coefficient is 0.000107 (totally uncorrelated = 0.0).
+
+  h1() { { hg & hg & hg & hg & sl; } | dg 2>&1 | bh; }
+
+Entropy = 7.998057 bits per byte.
+Chi square distribution for 101824 samples is 275.04, and randomly
+would exceed this value 18.56 percent of the times.
+Arithmetic mean value of data bytes is 127.3306 (127.5 = random).
+Monte Carlo value for Pi is 3.138243960 (error 0.11 percent).
+Serial correlation coefficient is -0.005720 (totally uncorrelated = 0.0).
+
+  h1() { { hg & hg & hg & hg & sl; } | dg 2>&1 | bh | ./prpx -r1 -x1; }
+
+Entropy = 7.998177 bits per byte.
+Chi square distribution for 100288 samples is 253.20, and randomly
+would exceed this value 52.00 percent of the times.
+Arithmetic mean value of data bytes is 127.6866 (127.5 = random).
+Monte Carlo value for Pi is 3.130788560 (error 0.34 percent).
+Serial correlation coefficient is 0.003156 (totally uncorrelated = 0.0).
+
+  h1() { { hg & hg & hg & hg & sl; } | dg 2>&1 | ./prpx -r1 -x1 | bh; }
+
+Entropy = 7.998394 bits per byte.
+Chi square distribution for 100160 samples is 222.71, and randomly
+would exceed this value 92.86 percent of the times.
+Arithmetic mean value of data bytes is 127.6494 (127.5 = random).
+Monte Carlo value for Pi is 3.120589469 (error 0.67 percent).
+Serial correlation coefficient is -0.002471 (totally uncorrelated = 0.0).
+
+--------------------------------------------------------------------------------  # run.110
+
+  h1() { { hg & hg & sl; } | bh | ./prpx -r ${1:-1} -x ${2:-1}; }
+
+  hx() { h9 | pc | ./prpr -r${1:-1}6 -o${2:-1}5 | ./prpx -r-7 -x0; }              # prpx commit 35cacb9 (do nothing -x0)
+
+Entropy = 7.999484 bits per byte.
+Chi square distribution for 384608 samples is 274.66, and randomly
+would exceed this value 18.98 percent of the times.
+Arithmetic mean value of data bytes is 127.4394 (127.5 = random).
+Monte Carlo value for Pi is 3.139545405 (error 0.07 percent).
+Serial correlation coefficient is -0.002990 (totally uncorrelated = 0.0).
+
+  hx() { h9 | pc | ./prpr -r${1:-1}6 -o${2:-1}5 | ./prpx -r-7 -x0; }              # prpx commit 23a06e2 bug fixed
+
+Entropy = 7.999653 bits per byte.
+Chi square distribution for 476952 samples is 229.17, and randomly
+would exceed this value 87.60 percent of the times.
+Arithmetic mean value of data bytes is 127.5310 (127.5 = random).
+Monte Carlo value for Pi is 3.143813214 (error 0.07 percent).
+Serial correlation coefficient is 0.000262 (totally uncorrelated = 0.0).
+
+  hx() { h9 | pc | ./prpr -r${1:-1}6 -o${2:-1}5 | ./prpx -r-7 -x3; }              # prpx commit 23a06e2 bug fixed
+
+Entropy = 7.999717 bits per byte.
+Chi square distribution for 668160 samples is 262.52, and randomly
+would exceed this value 35.97 percent of the times.
+Arithmetic mean value of data bytes is 127.6502 (127.5 = random).
+Monte Carlo value for Pi is 3.135344828 (error 0.20 percent).
+Serial correlation coefficient is 0.000119 (totally uncorrelated = 0.0).
+
+--------------------------------------------------------------------------------  # run.111
+# Testing h9() output only not cg()
+
+  h1() { { hg & hg & hg & hg & sl; } | dg 2>&1 | bh; }
+
+  h9() { { h1 & h1 & h1 & h1 & sl; } | ud; }
+
+Entropy = 7.998201 bits per byte.
+Chi square distribution for 101120 samples is 252.38, and randomly
+would exceed this value 53.45 percent of the times.
+Arithmetic mean value of data bytes is 127.5775 (127.5 = random).
+Monte Carlo value for Pi is 3.147688839 (error 0.19 percent).
+Serial correlation coefficient is -0.000085 (totally uncorrelated = 0.0).
+
+Entropy = 7.999196 bits per byte.
+Chi square distribution for 202496 samples is 225.89, and randomly
+would exceed this value 90.52 percent of the times.
+Arithmetic mean value of data bytes is 127.5512 (127.5 = random).
+Monte Carlo value for Pi is 3.146996948 (error 0.17 percent).
+Serial correlation coefficient is -0.001831 (totally uncorrelated = 0.0).
+
+  h1() { { hg & hg & hg & hg & sl; } | dg 2>&1 | bh | ./prpx -r$1 -x$2; }
+
+  h9() { { h1 -1 -1 & h1 1 -1 & h1 -1 1 & h1 1 1 & sl; } | ud obs=1k; }
+
+Entropy = 7.982796 bits per byte.
+Chi square distribution for 12800 samples is 308.36, and randomly
+would exceed this value 1.24 percent of the times.
+Arithmetic mean value of data bytes is 126.2452 (127.5 = random).
+Monte Carlo value for Pi is 3.221753399 (error 2.55 percent).
+Serial correlation coefficient is 0.002437 (totally uncorrelated = 0.0).
+
+Entropy = 7.998057 bits per byte.
+Chi square distribution for 101824 samples is 275.04, and randomly
+would exceed this value 18.56 percent of the times.
+Arithmetic mean value of data bytes is 127.3306 (127.5 = random).
+Monte Carlo value for Pi is 3.138243960 (error 0.11 percent).
+Serial correlation coefficient is -0.005720 (totally uncorrelated = 0.0).
+
+  h9() { { h1 -1 -1 & h1 1 -1 & h1 -1 -1 & h1 1 -1 & sl; } | ud obs=1k; }
+
+Entropy = 7.998244 bits per byte.
+Chi square distribution for 101632 samples is 246.76, and randomly
+would exceed this value 63.29 percent of the times.
+Arithmetic mean value of data bytes is 127.4721 (127.5 = random).
+Monte Carlo value for Pi is 3.150076751 (error 0.27 percent).
+Serial correlation coefficient is -0.002852 (totally uncorrelated = 0.0).
+
+  h1() { { hg & hg & hg & hg & sl; } | dg 2>&1 | bh; }
+
+  h9() { { h1 & h1 & h1 & h1 & sl; } | ud | ./prpx -r1 -x1; }
+
+Entropy = 7.998073 bits per byte.
+Chi square distribution for 100608 samples is 267.67, and randomly
+would exceed this value 28.04 percent of the times.
+Arithmetic mean value of data bytes is 127.6969 (127.5 = random).
+Monte Carlo value for Pi is 3.139790076 (error 0.06 percent).
+Serial correlation coefficient is -0.000751 (totally uncorrelated = 0.0).
+
+--------------------------------------------------------------------------------  # run.112
+
+  h1() { { hg & hg & hg & hg & sl; } | dg 2>&1 | bh; }
+
+  h9() { { h1 & h1 & h1 & h1 & sl; } | ud; }
+
+# testing h9()
+Entropy = 7.998300 bits per byte.
+Chi square distribution for 101120 samples is 238.50, and randomly
+would exceed this value 76.35 percent of the times.
+Arithmetic mean value of data bytes is 127.4632 (127.5 = random).
+Monte Carlo value for Pi is 3.158369430 (error 0.53 percent).
+Serial correlation coefficient is -0.001193 (totally uncorrelated = 0.0).
+
+  cg() { { h9 & h9 & h9 & h9 & sl; } | ud obs=1k; }
+
+Entropy = 7.998233 bits per byte.
+Chi square distribution for 100352 samples is 244.77, and randomly
+would exceed this value 66.63 percent of the times.
+Arithmetic mean value of data bytes is 127.4111 (127.5 = random).
+Monte Carlo value for Pi is 3.140687593 (error 0.03 percent).
+Serial correlation coefficient is 0.000796 (totally uncorrelated = 0.0).
+
+  dd if=/dev/random bs=1k count=100 | entgr
+
+Entropy = 7.998096 bits per byte.
+Chi square distribution for 102400 samples is 269.94, and randomly
+would exceed this value 24.87 percent of the times.
+Arithmetic mean value of data bytes is 127.6198 (127.5 = random).
+Monte Carlo value for Pi is 3.139575765 (error 0.06 percent).
+Serial correlation coefficient is -0.002615 (totally uncorrelated = 0.0).
+
+  dd if=/dev/random bs=1000 count=1000 | entgr
+
+Entropy = 7.999839 bits per byte.
+Chi square distribution for 1000000 samples is 222.59, and randomly
+would exceed this value 92.94 percent of the times.
+Arithmetic mean value of data bytes is 127.4970 (127.5 = random).
+Monte Carlo value for Pi is 3.140604562 (error 0.03 percent).
+Serial correlation coefficient is -0.000883 (totally uncorrelated = 0.0).
+
+  dd if=/dev/random bs=10000 count=10000 | entgr
+
+Entropy = 7.999998 bits per byte.
+Chi square distribution for 100000000 samples is 235.86, and randomly
+would exceed this value 79.95 percent of the times.
+Arithmetic mean value of data bytes is 127.4824 (127.5 = random).
+Monte Carlo value for Pi is 3.142780686 (error 0.04 percent).
+Serial correlation coefficient is 0.000027 (totally uncorrelated = 0.0).
+
+================================================================================
+--------------------------------------------------------------------------------  # run 113
+
+  pn() { nice -n19 ionice -c3 stdbuf -o0 -e0 -i0 strace -o slow-1 "$@"; }
+
+  sl() { sleep 0.001; }
+
+  dg() { pn dd bs=2 "$@"; }
+
+  ud() { dg status=none "$@"; }
+
+  bh() { sha512sum | xxd -r -p; }
+
+  hg() { { time date +%N | dg; } 2>&1; }
+
+  h1() { { hg & hg & hg & hg & sl; } | dg 2>&1 | bh; }
+
+  h9() { { h1 & h1 & h1 & h1 & sl; } | ud; }
+
+  cg() { { h9 & h9 & h9 & h9 & sl; } | ud obs=1k; }
+
+Testing h1() output only generates random number that does not fail the tests
+while the WEAK flags are more associated to the seed used by dieharder and by
+the relatively small data set (6.7Mb) than a flaw into the dataset itself.
+
+  Entropy = 7.999973 bits per byte.
+  Chi square distribution for 6678848 samples is 249.92, and randomly
+  would exceed this value 57.80 percent of the times.
+  Arithmetic mean value of data bytes is 127.5061 (127.5 = random).
+  Monte Carlo value for Pi is 3.140514993 (error 0.03 percent).
+  Serial correlation coefficient is 0.000441 (totally uncorrelated = 0.0).
+
+echo >> run.113.test
+dieharder -a -f run.113.test
+#=============================================================================#
+#            dieharder version 3.31.1 Copyright 2003 Robert G. Brown          #
+#=============================================================================#
+   rng_name    |           filename             |rands/second|
+        mt19937|                    run.113.test|  9.75e+07  |
+#=============================================================================#
+        test_name   |ntup| tsamples |psamples|  p-value |Assessment
+#=============================================================================#
+         sts_monobit|   1|    100000|     100|0.00122362|   WEAK
+rgb_minimum_distance|   5|     10000|    1000|0.00227110|   WEAK
+
+Notable the fact that h1() is just the first level of generation and mixing and
+more extra passages can be added with at certain computational cost (or time).
+
+$ time for i in $(seq 100); do h1; done | wc -c
+  6400 / real	0m02.865s = 2234 bytes/s (sys/real: 71.9%)
+
+$ time for i in $(seq 100); do h9; done | wc -c
+ 25600 / real	0m16.345s = 1566 bytes/s (sys/real: 15.5%)
+
+$ time for i in $(seq 100); do cg; done | wc -c
+102400 / real	1m16.792s = 1333 bytes/s (sys/real:  7.8%)
+
+Testing h9() output only (8.2MB) doesn't change sensitively the panorama but the
+very low Chi² with 97.99% of random chance reveals the syntetic origin of data.
+Paradoxaly, a further level of processing can masq this peculiarity rather than
+accentuate it. In a different class of implementations "pigz" was doing so.
+
+  Entropy = 7.999981 bits per byte.
+  Chi square distribution for 8190720 samples is 210.84, and randomly
+  would exceed this value 97.99 percent of the times.
+  Arithmetic mean value of data bytes is 127.4776 (127.5 = random).
+  Monte Carlo value for Pi is 3.143415963 (error 0.06 percent).
+  Serial correlation coefficient is 0.000486 (totally uncorrelated = 0.0).
+
+$ echo >> run.25.113
+$ dieharder -a -f run.25.113
+#=============================================================================#
+#            dieharder version 3.31.1 Copyright 2003 Robert G. Brown          #
+#=============================================================================#
+   rng_name    |           filename             |rands/second|
+        mt19937|                      run.25.113|  9.81e+07  |
+#=============================================================================#
+        test_name   |ntup| tsamples |psamples|  p-value |Assessment
+#=============================================================================#
+          sts_serial|   5|    100000|     100|0.99636774|   WEAK
+
+Here, the best option to leverage for the first is to use prpr/prpx to break the
+serial five bytes structure which is a watermark that affect the data and probably
+caused the Chi² to drop under an acceptable value (WEAK flag above).
+
+Testing cg() output
+
+  Entropy = 7.999979 bits per byte.
+  Chi square distribution for 8612864 samples is 244.85, and randomly
+  would exceed this value 66.49 percent of the times.
+  Arithmetic mean value of data bytes is 127.4750 (127.5 = random).
+  Monte Carlo value for Pi is 3.141291710 (error 0.01 percent).
+  Serial correlation coefficient is -0.000134 (totally uncorrelated = 0.0).
+
+$ dieharder -a -f run.26.113
+#=============================================================================#
+#            dieharder version 3.31.1 Copyright 2003 Robert G. Brown          #
+#=============================================================================#
+   rng_name    |           filename             |rands/second|
+        mt19937|                      run.26.113|  8.49e+07  |
+#=============================================================================#
+        test_name   |ntup| tsamples |psamples|  p-value |Assessment
+#=============================================================================#
+rgb_minimum_distance|   5|     10000|    1000|0.00211192|   WEAK
+     dab_bytedistrib|   0|  51200000|       1|0.99946362|   WEAK
+
+$ echo >> run.26.113.test
+$ dieharder -a -f run.26.113.test
+#=============================================================================#
+#            dieharder version 3.31.1 Copyright 2003 Robert G. Brown          #
+#=============================================================================#
+   rng_name    |           filename             |rands/second|
+        mt19937|                 run.26.113.test|  1.34e+08  |
+#=============================================================================#
+        test_name   |ntup| tsamples |psamples|  p-value |Assessment
+#=============================================================================#
+     diehard_squeeze|   0|    100000|     100|0.00440070|   WEAK
+         rgb_bitdist|   3|    100000|     100|0.00162818|   WEAK
+
+================================================================================
+--------------------------------------------------------------------------------  # run 114
+
+  pn() { nice -n19 ionice -c3 stdbuf -o0 -e0 -i0 "$@"; }
+
+  sl() { sleep 0.01; }
+
+  dg() { pn dd bs=2 "$@"; }
+
+  ud() { dg status=none "$@"; }
+
+  bh() { sha512sum | xxd -r -p | ud ibs=64; }
+
+  hg() { { time date +%N | dg; } 2>&1 | bh; }
+
+  h1() { { hg & hg & hg & hg & sl; } | pn ./prpx -r2 -x1; }
+
+  cg() { for i in $(seq 16); do h1 & done | ud obs=1k; }
+
+Entropy = 7.999982 bits per byte.
+Chi square distribution for 8702272 samples is 218.17, and randomly
+would exceed this value 95.42 percent of the times.
+Arithmetic mean value of data bytes is 127.5146 (127.5 = random).
+Monte Carlo value for Pi is 3.140990831 (error 0.02 percent).
+Serial correlation coefficient is -0.000047 (totally uncorrelated = 0.0).
+
+$ dieharder -a -f run.35.test
+#=============================================================================#
+#            dieharder version 3.31.1 Copyright 2003 Robert G. Brown          #
+#=============================================================================#
+   rng_name    |           filename             |rands/second|
+        mt19937|                     run.35.test|  1.37e+08  |
+#=============================================================================#
+        test_name   |ntup| tsamples |psamples|  p-value |Assessment
+#=============================================================================#
+         rgb_bitdist|   8|    100000|     100|0.99998350|   WEAK
+
+$ echo >> run.26.113.test
+$ dieharder -a -f run.26.113.test
+#=============================================================================#
+#            dieharder version 3.31.1 Copyright 2003 Robert G. Brown          #
+#=============================================================================#
+   rng_name    |           filename             |rands/second|
+        mt19937|                 run.26.113.test|  1.34e+08  |
+#=============================================================================#
+        test_name   |ntup| tsamples |psamples|  p-value |Assessment
+#=============================================================================#
+     diehard_squeeze|   0|    100000|     100|0.00440070|   WEAK
+         rgb_bitdist|   3|    100000|     100|0.00162818|   WEAK
+
+$ dd if=run.26 obs=3 | ./prpx -r3 -x0 >run.26.113.r3x0
+$ dieharder -a -f run.26.113.r3x0
+#=============================================================================#
+#            dieharder version 3.31.1 Copyright 2003 Robert G. Brown          #
+#=============================================================================#
+   rng_name    |           filename             |rands/second|
+        mt19937|                 run.26.113.r3x0|  9.76e+07  |
+#=============================================================================#
+        test_name   |ntup| tsamples |psamples|  p-value |Assessment
+#=============================================================================#
+          sts_serial|  14|    100000|     100|0.99909619|   WEAK
+      rgb_lagged_sum|  12|   1000000|     100|0.00477055|   WEAK
+      rgb_lagged_sum|  21|   1000000|     100|0.00290828|   WEAK
+
+$ echo >> run.26.113.r3x0
+$ dieharder -a -f run.26.113.r3x0
+#=============================================================================#
+#            dieharder version 3.31.1 Copyright 2003 Robert G. Brown          #
+#=============================================================================#
+   rng_name    |           filename             |rands/second|
+        mt19937|                 run.26.113.r3x0|  1.04e+08  |
+#=============================================================================#
+        test_name   |ntup| tsamples |psamples|  p-value |Assessment
+#=============================================================================#
+        diehard_oqso|   0|   2097152|     100|0.99661139|   WEAK
+          sts_serial|   3|    100000|     100|0.99691239|   WEAK
+          sts_serial|   4|    100000|     100|0.99534613|   WEAK
+
+================================================================================
+--------------------------------------------------------------------------------  # run 114
+
+  stdbuf -o0 -e0 -i0 bash
+
+  pn() { nice -n19 ionice -c3 "$@"; }
+
+  sl() { exec -a tslp sleep 1; }
+
+  dg() { pn dd bs=2 "$@"; }
+
+  ud() { dg status=none "$@"; }
+
+  bh() { pigz -1cOp1 -J1 | sha512sum | xxd -r -p | ./prpx -r2 -x1; }
+
+  hg() { { time date +%N | dg; sl; } 2>&1 | bh; }
+
+  h1() { { hg & hg & hg & hg; } | ud; }
+
+  cg() { { for i in $(seq 16); do h1 & done; killall tslp; } | ud obs=1k; }
+
+Entropy = 7.998145 bits per byte.
+Chi square distribution for 107136 samples is 276.09, and randomly
+would exceed this value 17.39 percent of the times.
+Arithmetic mean value of data bytes is 127.2682 (127.5 = random).
+Monte Carlo value for Pi is 3.141353047 (error 0.01 percent).
+Serial correlation coefficient is 0.000415 (totally uncorrelated = 0.0).
+
+--------------------------------------------------------------------------------  # run 115
+
+  st() { killall tslp 2>/dev/null; }
+
+  bh() { sha512sum | xxd -r -p; }
+
+  sl() { exec -a tslp sleep 1 2>/dev/null; }
+
+  hg() { { sl; time date +%N | dg; } 2>&1 | bh; }
+
+  cg() { { for i in $(seq 16); do h1 & done; st; } | ud obs=1k; }
+
+Entropy = 5.769455 bits per byte.
+Chi square distribution for 65536 samples is 262144.00, and randomly
+would exceed this value less than 0.01 percent of the times.
+Arithmetic mean value of data bytes is 134.9375 (127.5 = random).
+Monte Carlo value for Pi is 3.115180370 (error 0.84 percent).
+Serial correlation coefficient is -0.187279 (totally uncorrelated = 0.0).
+
+--------------------------------------------------------------------------------  # run 116
+
+The important results from these additional runs is: 1) pigz cannot be replaced
+as flattener by tricks on data after or before the hashing function; 2) the mtrd
+binary command shows that it is possible to mix various stream by stocastics.
+
+  hgstr="{ time date +%N 2>&1 | dd bs=1; } 2>&1"
+
+  pn() { nice -n19 ionice -c3 stdbuf -o0 -e0 -i0 "$@"; }
+
+  ud() { pn dd bs=1 status=none "$@"; }
+
+  dp() { ./mtrd -t4 "$hgstr" | tee /dev/stderr; }
+
+  pp() { { dp | ./prpx -r4 -x2; } 2>&1 | ./prpx -r4 -x-2; }
+
+  hp() { pp | tail -c1280 | sha512sum | xxd -r -p | ud; }
+
+  cg() { { for i in $(seq 16); do hp & done; } | ud obs=1k; }
+
+Entropy = 7.997277 bits per byte.
+Chi square distribution for 60416 samples is 228.20, and randomly
+would exceed this value 88.51 percent of the times.
+Arithmetic mean value of data bytes is 127.3819 (127.5 = random).
+Monte Carlo value for Pi is 3.153043996 (error 0.36 percent).
+Serial correlation coefficient is 0.004665 (totally uncorrelated = 0.0).
+
+Entropy = 7.998913 bits per byte.
+Chi square distribution for 161792 samples is 243.17, and randomly
+would exceed this value 69.24 percent of the times.
+Arithmetic mean value of data bytes is 127.4613 (127.5 = random).
+Monte Carlo value for Pi is 3.152679399 (error 0.35 percent).
+Serial correlation coefficient is -0.000287 (totally uncorrelated = 0.0).
+
+Entropy = 7.999335 bits per byte.
+Chi square distribution for 260416 samples is 239.38, and randomly
+would exceed this value 75.06 percent of the times.
+Arithmetic mean value of data bytes is 127.4332 (127.5 = random).
+Monte Carlo value for Pi is 3.144647712 (error 0.10 percent).
+Serial correlation coefficient is -0.000766 (totally uncorrelated = 0.0).
+
+Entropy = 7.999451 bits per byte.
+Chi square distribution for 354304 samples is 269.06, and randomly
+would exceed this value 26.08 percent of the times.
+Arithmetic mean value of data bytes is 127.3744 (127.5 = random).
+Monte Carlo value for Pi is 3.144047417 (error 0.08 percent).
+Serial correlation coefficient is -0.000739 (totally uncorrelated = 0.0).
+
