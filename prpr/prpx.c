@@ -1,7 +1,7 @@
 /*
  * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, MIT license
  *
- * Usage: binary stream | prpr -r [-]N -o [-]n
+ * Usage: binary stream | prpr -r [-]N -x [-]n
  *
  */
 
