@@ -1,5 +1,5 @@
 /*
- * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, MIT license
+ * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2 license
  *
  * Usage: mtrd -nN "command or binary to execute"; or -tN for timestamps also
  *
@@ -16,6 +16,13 @@
 #include <time.h>
 #include <spawn.h>
 #include <sys/wait.h>
+
+#define AVGV 127.5
+#define NS 1000000000L
+#define MAX_READ_SIZE 16384
+#define ABS(a) ((a<0)?-(a):(a))
+#define MIN(a,b) ((a<b)?(a):(b))
+#define MAX(a,b) ((a>b)?(a):(b))
 
 // Struttura per passare i dati ai thread
 typedef struct {
@@ -35,7 +42,6 @@ long get_nanos() {
     return ((long)ts.tv_sec * 1000000000L + ts.tv_nsec) - start;
 }
 
-#define NS 1000000000L
 unsigned char prtnano = 0;
 static inline void prt_nanos(unsigned char a, unsigned char b) {
     const int BFLN = 32;
