@@ -12,12 +12,11 @@
 #include <unistd.h>
 #include <errno.h>
 #include <string.h>
-#include <string.h>
 #include <math.h>
 
 #define MAX_READ_SIZE 4096
 
-void main(void) {
+int main(int argc, char *argv[]) {
     size_t bytes_read = 0, nr = 0, i;  
     unsigned char buffer[MAX_READ_SIZE];
     size_t counts[256];
@@ -42,14 +41,16 @@ void main(void) {
   unsigned int n = 0;
   for (i = 0; i < 256; i++) {
       if(counts[i]) n++;
-      x = (double)counts[i] - (double)bytes_read / 256;
-      s += x * x;
+      double ex = ((double)bytes_read)/256;
+      x = ((double)counts[i] -  ex);
+      s += x * x  / ex;
       //printf("i: %3ld, c: %3ld / %ld, x: %lf, s: %lf\n", i, counts[i], bytes_read, x, s);
   }
   printf("bytes: %4ld, E: %16lf, E²: %16lf\n", bytes_read, sqrt(s), s);
   for (i = 0; i < 256; i++) {
-      x = (double)counts[i] - (double)bytes_read / n;
-      s += x * x;
+      double ex = ((double)bytes_read)/n;
+      x = ((double)counts[i] -  ex);
+      s += x * x  / ex;
       //printf("i: %3ld, c: %3ld / %ld, x: %lf, s: %lf\n", i, counts[i], bytes_read, x, s);
   }
   printf("symbl: %4u, E: %16lf, E²: %16lf\n", n, sqrt(s), s);
