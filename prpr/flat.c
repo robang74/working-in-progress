@@ -19,7 +19,7 @@
 
 unsigned printstats(const char *str, size_t nread, unsigned nsymb, size_t *counts) {
   static char entdone = 0;
-  static double entropy = 0, n = 0;
+  static double pavg, entropy = 0, avg = 0, n = 0;
   double x, px, k = 0, s = 0, lg2s = log2(nsymb);
   size_t i;
 
@@ -33,12 +33,17 @@ unsigned printstats(const char *str, size_t nread, unsigned nsymb, size_t *count
 
       if(!counts[i] || entdone) continue;
       entropy -= px * log2(px);
+      avg += i*counts[i];
       n++; 
   }
-  printf("%s: %4ld, Eñ: %.6lf / %.2f = %.6lf, X²: %5.3lf, k²: %3.5lf\n",
-      str, MIN(nread,nsymb), entropy, lg2s, entropy/lg2s, s, k * nsymb);
-  
-  entdone = 1;
+  if(!entdone) {
+    entdone = 1;
+    avg = avg / nread;
+    pavg = ((avg-127.5)/125.5)*100;
+  }
+  printf("%s: %4ld, Eñ: %.6lf / %.2f = %.6lf, X²: %5.3lf, k²: %3.5lf, avg: %.4lf %+.4lf %%\n",
+      str, MIN(nread,nsymb), entropy, lg2s, entropy/lg2s, s, k * nsymb, avg, pavg);
+
   return n;
 }
 
@@ -62,10 +67,14 @@ int main(int argc, char *argv[]) {
         bytes_read += nr;
     }
 
+    if (bytes_read > 256)
+        printf("size : %ld bytes, %.1lf Kb, %.3lf Mb\n",
+            bytes_read, (double)bytes_read/(1<<10), (double)bytes_read/(1<<20));
+
     unsigned nsymb = printstats("bytes", bytes_read, 256, counts);
     double lg2s = log2(nsymb);
     unsigned nbits = ceil(lg2s), nmax = 1 << nbits;
-
+     
     if (nbits < 8)
         (void)printstats("encdg", bytes_read, nmax, counts);
 
