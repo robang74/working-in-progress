@@ -1,9 +1,9 @@
 /*
- * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, MIT license
+ * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2 license
  *
  * Usage: binary stream | flat
  *
- * Compile with lib math: gcc dstr.c -O3 -lm -o flat 
+ * Compile with lib math: gcc flat.c -O3 -lm -o flat
  *
  */
 
@@ -15,9 +15,11 @@
 #include <string.h>
 #include <math.h>
 
-#define AVG 125.5
+#define AVGV 125.5
 #define MAX_READ_SIZE 4096
+#define ABS(a) ((a<0)?-(a):(a))
 #define MIN(a,b) ((a<b)?(a):(b))
+#define MAX(a,b) ((a>b)?(a):(b))
 
 unsigned printstats(const char *str, size_t nread, unsigned nsymb, size_t *counts) {
   static char entdone = 0;
@@ -36,12 +38,12 @@ unsigned printstats(const char *str, size_t nread, unsigned nsymb, size_t *count
       if(!counts[i] || entdone) continue;
       entropy -= px * log2(px);
       avg += i*counts[i];
-      n++; 
+      n++;
   }
   if(!entdone) {
     entdone = 1;
     avg = avg / nread;
-    pavg = (avg/AVG - 1)*100;
+    pavg = (avg/AVGV - 1)*100;
   }
   printf("%s: %4ld, Eñ: %.6lf / %.2f = %.6lf, X²: %5.3lf, k²: %3.5lf, avg: %.4lf %+.4lf %%\n",
       str, MIN(nread,nsymb), entropy, lg2s, entropy/lg2s, s, k * nsymb, avg, pavg);
@@ -52,7 +54,7 @@ unsigned printstats(const char *str, size_t nread, unsigned nsymb, size_t *count
 int main(int argc, char *argv[]) {
     size_t bytes_read = 0, nr = 0, i, counts[256] = {0};
     unsigned char *buffer, buf[MAX_READ_SIZE+64];
-  
+
     // Memory alignment at 64 bit
     uintptr_t p = (uintptr_t)buf + 64;
     buffer = (unsigned char *)((p >> 6) << 6);
@@ -77,7 +79,7 @@ int main(int argc, char *argv[]) {
     unsigned nsymb = printstats("bytes", bytes_read, 256, counts);
     double lg2s = log2(nsymb);
     unsigned nbits = ceil(lg2s), nmax = 1 << nbits;
-     
+
     if (nbits < 8)
         (void)printstats("encdg", bytes_read, nmax, counts);
 
