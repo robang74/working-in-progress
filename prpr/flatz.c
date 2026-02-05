@@ -1,7 +1,7 @@
 /*
  * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2 license
  *
- * Usage: binary stream | flat [-p]
+ * Usage: binary stream | flat [-p] [-q] [-zN]
  *
  * Compile with lib math: gcc flat.c -O3 -lm -o flat
  *
@@ -95,7 +95,7 @@ static inline void *memalign(void *buf) {
 
 int main(int argc, char *argv[]) {
     z_stream strm = {0};
-    int opt, pass = 0, zipl = -1;
+    int opt, pass = 0, zipl = -1, quiet = 0;
     size_t i, rsizetot = 0, nr = 0, zsizetot = 0;
     size_t rcounts[256] = {0}, zcounts[256] = {0};
     unsigned char *rbuffer, rbuf[MAX_READ_SIZE+64];
@@ -105,8 +105,9 @@ int main(int argc, char *argv[]) {
     rbuffer = (unsigned char *)memalign(rbuf);
     zbuffer = (unsigned char *)memalign(zbuf);
 
-    while ((opt = getopt(argc, argv, "pz:")) != -1) {
+    while ((opt = getopt(argc, argv, "pqz:")) != -1) {
         switch (opt) {
+            case 'q': quiet =1; break;
             case 'p': pass = 1; break;
             case 'z': zipl = atoi(optarg); break;
         }
@@ -162,6 +163,7 @@ int main(int argc, char *argv[]) {
     }
     fflush(stdout);
 
+    if(quiet) return 0;
     printallstats(rsizetot, "rdata", rcounts, (zipl >= 0), 0.0);
     printallstats(zsizetot, "zdata", zcounts, (zipl >= 0), (double)zsizetot/rsizetot);
 
