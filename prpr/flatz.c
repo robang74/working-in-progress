@@ -14,9 +14,11 @@
 #include <errno.h>
 #include <string.h>
 #include <math.h>
+#include <zlib.h>
 
 #define AVGV 125.5
 #define MAX_READ_SIZE 4096
+#define MAX_COMP_SIZE (MAX_READ_SIZE<<1)
 #define ABS(a) ((a<0)?-(a):(a))
 #define MIN(a,b) ((a<b)?(a):(b))
 #define MAX(a,b) ((a>b)?(a):(b))
@@ -66,51 +68,96 @@ static inline ssize_t writebuf(int fd, const char *buffer, size_t ntwr) {
    return tot;
 }
 
+static inline void *memalign(void *buf) {
+  uintptr_t p = (uintptr_t)buf + 64;
+  buf = (void *)((p >> 6) << 6);
+  return buf;
+}
+
 int main(int argc, char *argv[]) {
-    int opt, pass = 0;
-    size_t bytes_read = 0, nr = 0, i, counts[256] = {0};
-    unsigned char *buffer, buf[MAX_READ_SIZE+64];
+    z_stream strm = {0};
+    int opt, pass = 0, zipl = -1;
+    size_t i, bytes_read = 0, nr = 0, zsizetot = 0;
+    size_t counts[256] = {0}, zcounts[256] = {0};
+    unsigned char *rbuffer, rbuf[MAX_READ_SIZE+64];
+    unsigned char *zbuffer, zbuf[MAX_COMP_SIZE+64];
 
     // Memory alignment at 64 bit
-    uintptr_t p = (uintptr_t)buf + 64;
-    buffer = (unsigned char *)((p >> 6) << 6);
+    rbuffer = (unsigned char *)memalign(rbuf);
+    zbuffer = (unsigned char *)memalign(zbuf);
 
-    while ((opt = getopt(argc, argv, "p")) != -1) {
+    while ((opt = getopt(argc, argv, "pz:")) != -1) {
         switch (opt) {
             case 'p': pass = 1; break;
+            case 'z': zipl = atoi(optarg); break;
         }
+    }
+    if (zipl >= 0) {
+        strm.next_out = zbuf;
+        strm.avail_out = MAX_COMP_SIZE;
+        if (deflateInit(&strm, zipl) != Z_OK) {
+            perror("deflateInit");
+            exit(EXIT_FAILURE);
+        }
+        //writebuf(STDOUT_FILENO, strm.next_out, MAX_COMP_SIZE - strm.avail_out);
     }
 
     while (1) {
-        nr = read(STDIN_FILENO, buffer, MAX_READ_SIZE);
+        nr = read(STDIN_FILENO, rbuffer, MAX_READ_SIZE);
         if (nr == 0) break;
         if (nr < 0) {
             if (errno == EINTR) continue;
             perror("read");
             exit(EXIT_FAILURE);
         }
-        if(pass) {
-          writebuf(STDOUT_FILENO, buffer, nr);
+        if(pass && zipl < 0) {
+          writebuf(STDOUT_FILENO, rbuffer, nr);
         }
         for (i = 0; i < nr; i++) {
-            counts[ buffer[i] ]++;
+            counts[ rbuffer[i] ]++;
         }
         bytes_read += nr;
+        if (zipl < 0) continue;
+
+        strm.avail_in = nr;
+        strm.next_in = rbuffer;
+        do {
+            strm.next_out = zbuffer;
+            strm.avail_out = MAX_COMP_SIZE;
+            deflate(&strm, Z_NO_FLUSH);
+            size_t zsize = MAX_COMP_SIZE - strm.avail_out;
+            if(zsize > 0)
+                writebuf(STDOUT_FILENO, (const char *)zbuffer, zsize);
+            for (i = 0; i < zsize; i++) zcounts[zbuf[i]]++;
+            zsizetot += zsize;
+        } while (strm.avail_out == 0);
     }
 
     if (bytes_read > 256)
         fprintf(stderr, "size : %ld bytes, %.1lf Kb, %.3lf Mb\n",
             bytes_read, (double)bytes_read/(1<<10), (double)bytes_read/(1<<20));
-
     unsigned nsymb = printstats("bytes", bytes_read, 256, counts);
     double lg2s = log2(nsymb);
     unsigned nbits = ceil(lg2s), nmax = 1 << nbits;
-
     if (nbits < 8)
         (void)printstats("encdg", bytes_read, nmax, counts);
-
     if(nsymb < nmax)
         (void)printstats("symbl", bytes_read, nsymb, counts);
+
+    if (zipl >= 0) {
+        int ret;
+        do {
+            strm.next_out = zbuffer;
+            strm.avail_out = MAX_COMP_SIZE;
+            ret = deflate(&strm, Z_FINISH);
+            size_t zsize = MAX_COMP_SIZE - strm.avail_out;
+            if(zsize > 0)
+                writebuf(STDOUT_FILENO, (const char *)zbuffer, zsize);
+            for (i = 0; i < zsize; i++) zcounts[ zbuf[i] ]++;
+            zsizetot += zsize;
+        } while (ret != Z_STREAM_END);
+        deflateEnd(&strm);
+    }
 
     return 0;
 }
