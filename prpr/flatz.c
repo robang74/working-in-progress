@@ -23,7 +23,7 @@
 #define MIN(a,b) ((a<b)?(a):(b))
 #define MAX(a,b) ((a>b)?(a):(b))
 
-unsigned printstats(const char *str, size_t nread, unsigned nsymb, size_t *counts) {
+unsigned printstats(const char *str, size_t nread, unsigned nsymb, size_t *counts, char idnt) {
   static char entdone = 0;
   static double pavg, entropy = 0, avg = 0, n = 0;
   double x, px, k = 0, s = 0, lg2s = log2(nsymb);
@@ -47,10 +47,29 @@ unsigned printstats(const char *str, size_t nread, unsigned nsymb, size_t *count
     avg = avg / nread;
     pavg = (avg/AVGV - 1)*100;
   }
-  fprintf(stderr, "%s: %4ld, Eñ: %.6lf / %.2f = %.6lf, X²: %5.3lf, k²: %3.5lf, avg: %.4lf %+.4lf %%\n",
-      str, MIN(nread,nsymb), entropy, lg2s, entropy/lg2s, s, k * nsymb, avg, pavg);
+  fprintf(stderr, "%s%s: %4ld, Eñ: %.6lf / %.2f = %.6lf, X²: %5.3lf, k²: %3.5lf, avg: %.4lf %+.4lf %%\n",
+      idnt?"  ":"", str, MIN(nread,nsymb), entropy, lg2s, entropy/lg2s, s, k * nsymb, avg, pavg);
 
   return n;
+}
+
+void printallstats(size_t size, const char *dstr, size_t *counts, char prnt, double zratio) {
+    fprintf(stderr, "\n");
+    if (size > 256 || prnt) {
+        fprintf(stderr, "%s: %ld bytes, %.1lf Kb, %.3lf Mb", dstr,
+            size, (double)size / (1<<10), (double)size / (1<<20));
+        if(zratio > 0)
+          fprintf(stderr, ", zr: %lf %% (1:%.3lf)\n", zratio * 100, 1.0/zratio);
+        else
+          fprintf(stderr, "\n");
+    }
+    unsigned nsymb = printstats("bytes", size, 256, counts, prnt);
+    double lg2s = log2(nsymb);
+    unsigned nbits = ceil(lg2s), nmax = 1 << nbits;
+    if (nbits < 8)
+        (void)printstats("encdg", size, nmax, counts, prnt);
+    if(nsymb < nmax)
+        (void)printstats("symbl", size, nsymb, counts, prnt);
 }
 
 static inline ssize_t writebuf(int fd, const char *buffer, size_t ntwr) {
@@ -77,8 +96,8 @@ static inline void *memalign(void *buf) {
 int main(int argc, char *argv[]) {
     z_stream strm = {0};
     int opt, pass = 0, zipl = -1;
-    size_t i, bytes_read = 0, nr = 0, zsizetot = 0;
-    size_t counts[256] = {0}, zcounts[256] = {0};
+    size_t i, rsizetot = 0, nr = 0, zsizetot = 0;
+    size_t rcounts[256] = {0}, zcounts[256] = {0};
     unsigned char *rbuffer, rbuf[MAX_READ_SIZE+64];
     unsigned char *zbuffer, zbuf[MAX_COMP_SIZE+64];
 
@@ -110,13 +129,9 @@ int main(int argc, char *argv[]) {
             perror("read");
             exit(EXIT_FAILURE);
         }
-        if(pass && zipl < 0) {
-          writebuf(STDOUT_FILENO, rbuffer, nr);
-        }
-        for (i = 0; i < nr; i++) {
-            counts[ rbuffer[i] ]++;
-        }
-        bytes_read += nr;
+        if(pass && zipl < 0) writebuf(STDOUT_FILENO, rbuffer, nr);
+        for (i = 0; i < nr; i++) rcounts[ rbuffer[i] ]++;
+        rsizetot += nr;
         if (zipl < 0) continue;
 
         strm.avail_in = nr;
@@ -126,23 +141,11 @@ int main(int argc, char *argv[]) {
             strm.avail_out = MAX_COMP_SIZE;
             deflate(&strm, Z_NO_FLUSH);
             size_t zsize = MAX_COMP_SIZE - strm.avail_out;
-            if(zsize > 0)
-                writebuf(STDOUT_FILENO, (const char *)zbuffer, zsize);
+            if(zsize > 0) writebuf(STDOUT_FILENO, (const char *)zbuffer, zsize);
             for (i = 0; i < zsize; i++) zcounts[zbuf[i]]++;
             zsizetot += zsize;
         } while (strm.avail_out == 0);
     }
-
-    if (bytes_read > 256)
-        fprintf(stderr, "size : %ld bytes, %.1lf Kb, %.3lf Mb\n",
-            bytes_read, (double)bytes_read/(1<<10), (double)bytes_read/(1<<20));
-    unsigned nsymb = printstats("bytes", bytes_read, 256, counts);
-    double lg2s = log2(nsymb);
-    unsigned nbits = ceil(lg2s), nmax = 1 << nbits;
-    if (nbits < 8)
-        (void)printstats("encdg", bytes_read, nmax, counts);
-    if(nsymb < nmax)
-        (void)printstats("symbl", bytes_read, nsymb, counts);
 
     if (zipl >= 0) {
         int ret;
@@ -151,13 +154,17 @@ int main(int argc, char *argv[]) {
             strm.avail_out = MAX_COMP_SIZE;
             ret = deflate(&strm, Z_FINISH);
             size_t zsize = MAX_COMP_SIZE - strm.avail_out;
-            if(zsize > 0)
-                writebuf(STDOUT_FILENO, (const char *)zbuffer, zsize);
+            if(zsize > 0) writebuf(STDOUT_FILENO, (const char *)zbuffer, zsize);
             for (i = 0; i < zsize; i++) zcounts[ zbuf[i] ]++;
             zsizetot += zsize;
         } while (ret != Z_STREAM_END);
         deflateEnd(&strm);
     }
+    fflush(stdout);
 
+    printallstats(rsizetot, "rdata", rcounts, (zipl >= 0), 0.0);
+    printallstats(zsizetot, "zdata", zcounts, (zipl >= 0), (double)zsizetot/rsizetot);
+
+    fflush(stderr);
     return 0;
 }
