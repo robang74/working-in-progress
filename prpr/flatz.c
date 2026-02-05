@@ -159,47 +159,82 @@ long get_nanos() {
     return ((long)ts.tv_sec * 1000000000L + ts.tv_nsec) - start;
 }
 
+/*
+ * TODO: fare una stats_t as sharing struct
+ */
 unsigned printstats(const char *str, size_t nread, unsigned nsymb,
-  size_t *counts, char idnt, char rset)
+    size_t *counts, bool idnt, bool rset)
 {
-  static char entdone = 0;
-  static double pavg, entropy = 0, avg = 0, n = 0;
-  double x, px, k = 0, s = 0, lg2s = log2(nsymb);
-  size_t i;
+    static char entdone = 0;
+    static double entropy = 0, pavg = 0, avg = 0;
+    double x = 0, px = 0, k = 0, s = 0, n = 0;
+    size_t i;
 
-  if(rset) { entdone = 0; entropy = 0; avg = 0; n = 0; pavg = 0; }
-  if(rset < 0) return 0;
+    if(rset) { entdone = 0; entropy = 0; pavg = 0; avg = 0; n = 0; return 0; }
 
-  for (i = 0; i < 256; i++) {
-      double ex = ((double)nread) / nsymb, epx = 1.0 / nsymb;
-      x = ((double)counts[i] - ex);
-      s += x * x / ex;
-      px = ((double)counts[i]) / nread;
-      x = px - epx;
-      k += x * x;
+    double ex = ((double)nread) / nsymb, epx = 1.0 / nsymb;
+    for (i = 0; i < 256; i++) {
+        x = ((double)counts[i] - ex);
+        s += x * x / ex;
+        px = ((double)counts[i]) / nread;
+        x = px - epx;
+        k += x * x;
 
-      if(!counts[i] || entdone) continue;
-      entropy -= px * log2(px);
-      avg += i*counts[i];
-      n++;
-  }
-  if(!entdone) {
-    entdone = 1;
-    avg = avg / nread;
-    pavg = (avg/AVGV - 1)*100;
-  }
-  fprintf(stderr,
-      "%s%s: %3ld, Eñ: %8.6lf / %4.2f = %8.6lf, X²: %10.3lf, k²: %9.5lf, avg: %9.5lf %+.4lf %%\n",
-      idnt?"  ":"", str, MIN(nread,nsymb), entropy, lg2s, entropy/lg2s, s, k * nsymb, avg, pavg);
+        if(!counts[i] || entdone) continue;
+        entropy -= px * log2(px);
+        avg += i * counts[i];
+        n++;
+    }
+    if(!entdone) {
+      entdone = 1;
+      avg = avg / nread;
+      pavg = (avg/AVGV - 1)*100;
+    }
 
-  return n;
+    double lg2s = log2(nsymb);
+    fprintf(stderr,
+        "%s%s: %3ld, Eñ: %8.6lf / %4.2f = %8.6lf, X²: %10.3lf, k²: %9.5lf, avg: %9.5lf %+.4lf %%\n",
+        idnt?"  ":"", str, MIN(nread,nsymb), entropy, lg2s, entropy/lg2s, s, k * nsymb, avg, pavg);
+
+    return n;
 }
 
-void printallstats(size_t size, const char *dstr, size_t *counts, char prnt,
-  double ratio)
+typedef struct {
+    /* --- 8-Byte Aligned Group --- */
+    void *p;                        // for future use
+    double avg;                     // average as 'ent' provides
+    double avg_exp;                 // expected average (by type)
+    double avg_pdv;                 // = %(avg - avg_exp)/avg_exp
+    double nbits;                   // = log2(nsybl)
+    double entropy;                 // entropy 8-bit based
+    double ent1bit;                 // 1-bit entropy density
+    double x2;                      // Chi-square as 'ent' provides
+    double k2;                      // Squared mean freq. deviations
+    double ratio;                   // sizes ratio compared to original dataset
+    size_t nsize;                   // size in bytes of the original dataset
+
+    /* --- 4-Byte Aligned Group --- */
+    uint32_t counts[256];           // array of frequencies (by counters)
+    unsigned nsybl;                 // n. of symbols found in the dataset
+    unsigned nmax;                  // = 1 << nencg, max n. of encodable symbols
+
+    /* --- 1-Byte Aligned Group (The Tail) --- */
+    char name[15];                  // a string for the name of dataset
+    uint8_t nencg;                  // n. bits needed for encoding nsybl
+} stats_t;
+
+void printallstats(const char *dstr, const unsigned char *buf, size_t size,
+    size_t *counts, double ratio, bool rset)
 {
+    if(rset) {
+        printstats(0, 0, 0, 0, 0, 1);
+        memset(counts, 0, sizeof(size_t) << 8);
+        for (size_t i = 0; i < size; i++)
+            counts[ buf[i] ]++;
+    }
+
     fprintf(stderr, "\n");
-    if (size > 256 || prnt) {
+    if (size > 256) {
         fprintf(stderr, "%s: %ld bytes, %.1lf Kb, %.3lf Mb", dstr,
             size, (double)size / (1<<10), (double)size / (1<<20));
         if(ratio > 0) {
@@ -210,13 +245,13 @@ void printallstats(size_t size, const char *dstr, size_t *counts, char prnt,
               getpid(), (double)nsrun / E6, (double)size * (E9 >> 10) / nsrun);
         }
     }
-    unsigned nsymb = printstats("bytes", size, 256, counts, prnt, (ratio != 0));
+    unsigned nsymb = printstats("bytes", size, 256, counts, 1, 0);
     double lg2s = log2(nsymb);
     unsigned nbits = ceil(lg2s), nmax = 1 << nbits;
     if (nbits < 8)
-        (void)printstats("encdg", size, nmax, counts, prnt, 0);
+        (void)printstats("encdg", size, nmax, counts, 1, 0);
     if(nsymb < nmax)
-        (void)printstats("symbl", size, nsymb, counts, prnt, 0);
+        (void)printstats("symbl", size, nsymb, counts, 1, 0);
 }
 
 static inline ssize_t writebuf(int fd, const char *buffer, size_t ntwr) {
@@ -436,8 +471,6 @@ int main(int argc, char *argv[]) {
         rsizetot += nr;
         // write stdin stream on stdout
         if(pass && !Z_ON) writebuf(STDOUT_FILENO, rbuffer, nr);
-        // do statistics on stdin
-        for (i = 0; i < nr; i++) rcounts[ rbuf[i] ]++;
         // check for zip
         if (!Z_ON) continue;
         // z-compressing
@@ -451,18 +484,18 @@ int main(int argc, char *argv[]) {
     zbuffer = zbuf;
 
     if(!quiet) {
-        printallstats(rsizetot, "rdata", rcounts, 1, 0.0);
-        if(jsizetot > 0) {
-            for (i = 0; i < jsizetot; i++) jcounts[ jbuf[i] ]++;
-            printallstats(jsizetot, "jdata", jcounts, 1, (double)jsizetot/rsizetot);
-        }
+        printallstats("rdata", rbuf, rsizetot, rcounts, 0, 1);
+        if(jsizetot > 0)
+            printallstats("jdata", jbuf, jsizetot, jcounts,
+                (double)jsizetot / rsizetot, 1);
     }
 
     if (Z_ON) {
         zsizetot = zdeflating(Z_FINISH, zbuf, &strm, hsize, tsize, zcounts, pass);
         deflateEnd(&strm);
         if(!quiet)
-        printallstats(zsizetot, "zdata", zcounts, 1, (double)zsizetot/rsizetot);
+            printallstats("zdata", zbuf, zsizetot, zcounts,
+                (double)zsizetot / rsizetot, 1);
     }
 
     if(!quiet) {
