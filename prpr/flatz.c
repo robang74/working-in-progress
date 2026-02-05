@@ -168,6 +168,7 @@ unsigned printstats(const char *str, size_t nread, unsigned nsymb,
   size_t i;
 
   if(rset) { entdone = 0; entropy = 0; avg = 0; n = 0; pavg = 0; }
+  if(rset < 0) return 0;
 
   for (i = 0; i < 256; i++) {
       double ex = ((double)nread) / nsymb, epx = 1.0 / nsymb;
@@ -188,28 +189,28 @@ unsigned printstats(const char *str, size_t nread, unsigned nsymb,
     pavg = (avg/AVGV - 1)*100;
   }
   fprintf(stderr,
-      "%s%s: %3ld, Eñ: %8.6lf / %4.2f = %8.6lf, X²: %8.3lf, k²: %8.5lf, avg: %8.4lf %+.4lf %%\n",
+      "%s%s: %3ld, Eñ: %8.6lf / %4.2f = %8.6lf, X²: %10.3lf, k²: %9.5lf, avg: %9.5lf %+.4lf %%\n",
       idnt?"  ":"", str, MIN(nread,nsymb), entropy, lg2s, entropy/lg2s, s, k * nsymb, avg, pavg);
 
   return n;
 }
 
 void printallstats(size_t size, const char *dstr, size_t *counts, char prnt,
-  double zratio)
+  double ratio)
 {
     fprintf(stderr, "\n");
     if (size > 256 || prnt) {
         fprintf(stderr, "%s: %ld bytes, %.1lf Kb, %.3lf Mb", dstr,
             size, (double)size / (1<<10), (double)size / (1<<20));
-        if(zratio > 0) {
-          fprintf(stderr, ", zr: %lf %% (1:%.3lf)\n", zratio * 100, 1.0 / zratio);
+        if(ratio > 0) {
+          fprintf(stderr, ", rtio: %lf %% (1 : %.3lf)\n", ratio * 100, 1.0 / ratio);
         } else {
           long nsrun = get_nanos();
           fprintf(stderr, ", pid: %d, elab: %.1lf ms (%.1lf Kb/s)\n",
               getpid(), (double)nsrun / E6, (double)size * (E9 >> 10) / nsrun);
         }
     }
-    unsigned nsymb = printstats("bytes", size, 256, counts, prnt, (zratio != 0));
+    unsigned nsymb = printstats("bytes", size, 256, counts, prnt, (ratio != 0));
     double lg2s = log2(nsymb);
     unsigned nbits = ceil(lg2s), nmax = 1 << nbits;
     if (nbits < 8)
@@ -266,14 +267,15 @@ size_t zdeflating(const int action, uint8_t const *zbuf, z_stream *pstrm,
     if(action != Z_NO_FLUSH && action != Z_FINISH)
         return 0;
 
-    unsigned char *tbuffer = NULL;
+    unsigned char *tbuf, *tbuffer = NULL;
     if (tsize > 0) {
-        tbuffer = malloc(tsize+64);
-        if (!tbuffer) {
+        tbuf = malloc(tsize+64);
+        if (!tbuf) {
           perror("malloc");
           exit(EXIT_FAILURE);
         }
-        tbuffer = (unsigned char *)memalign(tbuffer);
+        tbuf = (unsigned char *)memalign(tbuf);
+        tbuffer = tbuf;
     }
 
     do {
@@ -296,7 +298,7 @@ size_t zdeflating(const int action, uint8_t const *zbuf, z_stream *pstrm,
             if(zsize >= tsize) {
                 if(tsved > 0) {
                     writebuf(STDOUT_FILENO, (const uint8_t *)tbuffer, tsved);
-                    for (i = 0; i < tsved; i++) zcounts[ tbuffer[i] ]++;
+                    for (i = 0; i < tsved; i++) zcounts[ tbuf[i] ]++;
                     zsizetot += tsved;
                     tsved = 0;
                  }
@@ -309,7 +311,7 @@ size_t zdeflating(const int action, uint8_t const *zbuf, z_stream *pstrm,
                 size_t nz = tsved-zsize;
                 if(nz > 0) {
                     writebuf(STDOUT_FILENO, (const uint8_t *)tbuffer, nz);
-                    for (i = 0; i < nz; i++) zcounts[ tbuffer[i] ]++;
+                    for (i = 0; i < nz; i++) zcounts[ tbuf[i] ]++;
                     zsizetot += nz;
                     tsved -= nz;
                     memmove(tbuffer, &tbuffer[nz], tsved);
@@ -322,11 +324,13 @@ size_t zdeflating(const int action, uint8_t const *zbuf, z_stream *pstrm,
         if(zsize > 0) {
             if(pass)
                 writebuf(STDOUT_FILENO, (const uint8_t *)zbuffer, zsize);
-            for (i = 0; i < zsize; i++) zcounts[ zbuffer[i] ]++;
+            for (i = 0; i < zsize; i++) zcounts[ zbuf[i] ]++;
             zsizetot += zsize;
         }
     } while( (action == Z_NO_FLUSH && pstrm->avail_out == 0)
           || (action == Z_FINISH   && ret != Z_STREAM_END) );
+
+    free(tbuf); // TODO: use a fixed allocated buffer
     return zsizetot;
 }
 
@@ -351,8 +355,9 @@ int main(int argc, char *argv[]) {
     z_stream strm = {0};
     int pass = 0, zipl = -1, quiet = 0;
     size_t hsize = 0, tsize = 0, jsize = 0;
-    size_t i, rsizetot = 0, nr = 0, zsizetot = 0;
-    size_t nsved = 0, rcounts[256] = {0}, zcounts[256] = {0};
+    size_t rsizetot = 0, zsizetot = 0, jsizetot = 0;
+    size_t rcounts[256] = {0}, zcounts[256] = {0}, jcounts[256] = {0};
+    size_t i, nr = 0, nsved = 0;
     unsigned char *rbuffer, rbuf[MAX_READ_SIZE+64];
     unsigned char *jbuffer, jbuf[MAX_READ_SIZE+64];
     unsigned char *zbuffer, zbuf[MAX_COMP_SIZE+64];
@@ -390,15 +395,6 @@ int main(int argc, char *argv[]) {
     tsize = MIN(tsize, 256);
     jsize = MIN(jsize, 256);
 
-    if(0 && jsize > 0) {
-        size_t i, n, w, len;
-        w = jsize << 3;
-        n = readbuf(STDIN_FILENO, (uint8_t *)jbuffer, MIN(w, MAX_READ_SIZE));
-        if(n < 1) exit(EXIT_FAILURE);
-        if(n < w) memset(jbuffer + n, 0, w-n);
-        n += 3; n >>= 5; n <<= 5;
-    }
-
     if (Z_ON) {
         strm.next_out = zbuf;
         strm.avail_out = MAX_COMP_SIZE;
@@ -408,19 +404,40 @@ int main(int argc, char *argv[]) {
         }
     }
 
+    if(jsize > 0) perr("\n");
+
+    int k = 0;
     while (1) {
+        k++;
         // read input stream
-        nr = read(STDIN_FILENO, rbuffer, MAX_READ_SIZE);
-        if (nr == 0) break;
-        if (nr < 0) {
-            if (errno == EINTR) continue;
-            perror("read");
-            exit(EXIT_FAILURE);
+        if(jsize > 0) {
+            nr = readbuf(STDIN_FILENO, rbuffer, jsize << 3);
+            if (nr == 0) break;
+            rbuffer[nr] = 0; // String termination
+            uint64_t hj = djb2sum(rbuffer, 0);
+            if(!quiet) {
+                perr("%03d: djb2sum(%03ld): ", k, nr);
+                for (size_t i = 0; i < 8; i++, hj >>= 8) {
+                    perr("%01x%01x", (uint8_t)hj & 0x0F, ((uint8_t)hj & 0xF0) >> 4);
+                }
+                perr("\n");
+            }
+            *(uint64_t *)jbuffer = hj; jbuffer += 8; jsizetot += 8;
+        } else {
+            nr = read(STDIN_FILENO, rbuffer, MAX_READ_SIZE);
+            if (nr == 0) break;
+            if (nr < 0) {
+                if (errno == EINTR) continue;
+                perror("read");
+                exit(EXIT_FAILURE);
+            }
         }
+        // increase the read sise
+        rsizetot += nr;
         // write stdin stream on stdout
         if(pass && !Z_ON) writebuf(STDOUT_FILENO, rbuffer, nr);
         // do statistics on stdin
-        for (i = 0; i < nr; i++) rcounts[ rbuffer[i] ]++; rsizetot += nr;
+        for (i = 0; i < nr; i++) rcounts[ rbuf[i] ]++;
         // check for zip
         if (!Z_ON) continue;
         // z-compressing
@@ -428,9 +445,18 @@ int main(int argc, char *argv[]) {
         strm.next_in = rbuffer;
         zdeflating(Z_NO_FLUSH, zbuf, &strm, hsize, tsize, zcounts, pass);
     }
+    // pointers reset
+    rbuffer = rbuf;
+    jbuffer = jbuf;
+    zbuffer = zbuf;
 
-    if(!quiet)
+    if(!quiet) {
         printallstats(rsizetot, "rdata", rcounts, 1, 0.0);
+        if(jsizetot > 0) {
+            for (i = 0; i < jsizetot; i++) jcounts[ jbuf[i] ]++;
+            printallstats(jsizetot, "jdata", jcounts, 1, (double)jsizetot/rsizetot);
+        }
+    }
 
     if (Z_ON) {
         zsizetot = zdeflating(Z_FINISH, zbuf, &strm, hsize, tsize, zcounts, pass);
