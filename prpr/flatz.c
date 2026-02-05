@@ -314,10 +314,24 @@ size_t zdeflating(const int action, uint8_t const *zbuf, z_stream *pstrm,
 }
 
 #define Z_ON (zipl >= 0)
+#define perr(x...) fprintf(stderr, x)
+
+static inline void usage(const char *name) {
+    perr("\n"\
+"%s read on stdin, stats on stderr, and data on stdout\n"\
+"\n"\
+"Usage: %s [-p] [-q] [-zN [-hN] [-tN]]\n"\
+"   -q: no stats (quiet)\n"\
+"   -p: data pass-through\n"\
+"   -z: data compression (N:level)\n"\
+"   -h: skip header (N:bytes)\n"\
+"   -t: skip tail (N:bytes)\n"\
+"\n", name, name);
+}
 
 int main(int argc, char *argv[]) {
     z_stream strm = {0};
-    int opt, pass = 0, zipl = -1, quiet = 0;
+    int pass = 0, zipl = -1, quiet = 0;
     size_t i, rsizetot = 0, nr = 0, zsizetot = 0, hsize = 0, tsize = 0;
     size_t nsved = 0, rcounts[256] = {0}, zcounts[256] = {0};
     unsigned char *rbuffer, rbuf[MAX_READ_SIZE+64];
@@ -329,7 +343,13 @@ int main(int argc, char *argv[]) {
     rbuffer = (unsigned char *)memalign(rbuf);
     zbuffer = (unsigned char *)memalign(zbuf);
 
-    while ((opt = getopt(argc, argv, "pqz:h:t:")) != -1) {
+    while (1) {
+        int opt = getopt(argc, argv, "pqz:h:t:");
+        //printf("opt: %d (%c), optarg: %s\n", opt, opt, optarg);
+        if(opt == '?' && !optarg) {
+          usage("flatz"); exit(0);
+        } else if(opt == -1) break;
+
         switch (opt) {
             case 'p': pass = 1; break;
             case 'q': quiet = 1; break;
