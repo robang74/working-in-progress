@@ -25,10 +25,10 @@
 #define E6 1000000L
 #define E9 1000000000L
 #define MAX_READ_SIZE 4096
-#define MAX_COMP_SIZE (MAX_READ_SIZE<<1)
-#define ABS(a) ((a<0)?-(a):(a))
-#define MIN(a,b) ((a<b)?(a):(b))
-#define MAX(a,b) ((a>b)?(a):(b))
+#define MAX_COMP_SIZE (MAX_READ_SIZE << 1)
+#define ABS(a)   ( ( (a) < 0 )  ? -(a) : (a) )
+#define MIN(a,b) ( ( (a) < (b) ) ? (a) : (b) )
+#define MAX(a,b) ( ( (a) > (b) ) ? (a) : (b) )
 
 /* *** HASHING  ************************************************************* */
 
@@ -233,10 +233,27 @@ static inline ssize_t writebuf(int fd, const char *buffer, size_t ntwr) {
    return tot;
 }
 
+static inline ssize_t readbuf(int fd, char *buffer, size_t ntrd) {
+    ssize_t tot = 0;
+    while (ntrd > tot) {
+        errno = 0;
+        ssize_t nr = read(fd, buffer + tot, ntrd - tot);
+        if (nr == 0) break;
+        if (nr < 0) {
+            if (errno == EINTR) continue;
+            perror("read");
+            exit(EXIT_FAILURE);
+        }
+        tot += nr;
+    }
+    return tot;
+}
+
+#define ALGN64(n) ( ( ( (n) + 63) >> 6 ) << 6 )
+
 static inline void *memalign(void *buf) {
-  uintptr_t p = (uintptr_t)buf + 64;
-  buf = (void *)((p >> 6) << 6);
-  return buf;
+    uintptr_t p = (uintptr_t)buf;
+    return (void *)ALGN64(p);
 }
 
 size_t zdeflating(const int action, uint8_t const *zbuf, z_stream *pstrm,
@@ -323,28 +340,32 @@ static inline void usage(const char *name) {
 "Usage: %s [-p] [-q] [-zN [-hN] [-tN]]\n"\
 "   -q: no stats (quiet)\n"\
 "   -p: data pass-through\n"\
-"   -z: data compression (N:level)\n"\
-"   -h: skip header (N:bytes)\n"\
-"   -t: skip tail (N:bytes)\n"\
+"   -j: text hash (block N x 64bit, max:256)\n"\
+"   -z: data compression (N:level, 0-9)\n"\
+"   -h: skip header (N:bytes, max:256)\n"\
+"   -t: skip tail (N:bytes, max:256)\n"\
 "\n", name, name);
 }
 
 int main(int argc, char *argv[]) {
     z_stream strm = {0};
     int pass = 0, zipl = -1, quiet = 0;
-    size_t i, rsizetot = 0, nr = 0, zsizetot = 0, hsize = 0, tsize = 0;
+    size_t hsize = 0, tsize = 0, jsize = 0;
+    size_t i, rsizetot = 0, nr = 0, zsizetot = 0;
     size_t nsved = 0, rcounts[256] = {0}, zcounts[256] = {0};
     unsigned char *rbuffer, rbuf[MAX_READ_SIZE+64];
+    unsigned char *jbuffer, jbuf[MAX_READ_SIZE+64];
     unsigned char *zbuffer, zbuf[MAX_COMP_SIZE+64];
 
     (void) get_nanos(); //----------------------------------------------------//
 
     // Memory alignment at 64 bit
     rbuffer = (unsigned char *)memalign(rbuf);
+    jbuffer = (unsigned char *)memalign(jbuf);
     zbuffer = (unsigned char *)memalign(zbuf);
 
     while (1) {
-        int opt = getopt(argc, argv, "pqz:h:t:");
+        int opt = getopt(argc, argv, "pqz:h:t:j:");
         //printf("opt: %d (%c), optarg: %s\n", opt, opt, optarg);
         if(opt == '?' && !optarg) {
           usage("flatz"); exit(0);
@@ -356,12 +377,27 @@ int main(int argc, char *argv[]) {
             case 'z': zipl = atoi(optarg); break;
             case 'h': hsize = atoi(optarg); break;
             case 't': tsize = atoi(optarg); break;
+            case 'j': jsize = atoi(optarg); break;
         }
     }
-    // Sanitise the values
+
+    // Sanitise the optional argument
     zipl = MAX(-1, zipl);
     hsize = MAX(0, hsize);
     tsize = MAX(0, tsize);
+    jsize = MAX(0, jsize);
+    hsize = MIN(hsize, 256);
+    tsize = MIN(tsize, 256);
+    jsize = MIN(jsize, 256);
+
+    if(0 && jsize > 0) {
+        size_t i, n, w, len;
+        w = jsize << 3;
+        n = readbuf(STDIN_FILENO, (uint8_t *)jbuffer, MIN(w, MAX_READ_SIZE));
+        if(n < 1) exit(EXIT_FAILURE);
+        if(n < w) memset(jbuffer + n, 0, w-n);
+        n += 3; n >>= 5; n <<= 5;
+    }
 
     if (Z_ON) {
         strm.next_out = zbuf;
@@ -381,9 +417,9 @@ int main(int argc, char *argv[]) {
             perror("read");
             exit(EXIT_FAILURE);
         }
-        // write input stream
+        // write stdin stream on stdout
         if(pass && !Z_ON) writebuf(STDOUT_FILENO, rbuffer, nr);
-        // do statistics
+        // do statistics on stdin
         for (i = 0; i < nr; i++) rcounts[ rbuffer[i] ]++; rsizetot += nr;
         // check for zip
         if (!Z_ON) continue;
@@ -403,7 +439,7 @@ int main(int argc, char *argv[]) {
         printallstats(zsizetot, "zdata", zcounts, 1, (double)zsizetot/rsizetot);
     }
 
-    if(!quiet) { 
+    if(!quiet) {
       fprintf(stderr, "\n");
       fflush(stderr);
     }
