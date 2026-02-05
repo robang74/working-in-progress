@@ -23,11 +23,13 @@
 #define MIN(a,b) ((a<b)?(a):(b))
 #define MAX(a,b) ((a>b)?(a):(b))
 
-unsigned printstats(const char *str, size_t nread, unsigned nsymb, size_t *counts, char idnt) {
+unsigned printstats(const char *str, size_t nread, unsigned nsymb, size_t *counts, char idnt, char rset) {
   static char entdone = 0;
   static double pavg, entropy = 0, avg = 0, n = 0;
   double x, px, k = 0, s = 0, lg2s = log2(nsymb);
   size_t i;
+  
+  if(rset) { entdone = 0; entropy = 0; avg = 0; n = 0; pavg = 0; }
 
   for (i = 0; i < 256; i++) {
       double ex = ((double)nread) / nsymb, epx = 1.0 / nsymb;
@@ -63,13 +65,13 @@ void printallstats(size_t size, const char *dstr, size_t *counts, char prnt, dou
         else
           fprintf(stderr, "\n");
     }
-    unsigned nsymb = printstats("bytes", size, 256, counts, prnt);
+    unsigned nsymb = printstats("bytes", size, 256, counts, prnt, (zratio != 0));
     double lg2s = log2(nsymb);
     unsigned nbits = ceil(lg2s), nmax = 1 << nbits;
     if (nbits < 8)
-        (void)printstats("encdg", size, nmax, counts, prnt);
+        (void)printstats("encdg", size, nmax, counts, prnt, 0);
     if(nsymb < nmax)
-        (void)printstats("symbl", size, nsymb, counts, prnt);
+        (void)printstats("symbl", size, nsymb, counts, prnt, 0);
 }
 
 static inline ssize_t writebuf(int fd, const char *buffer, size_t ntwr) {
@@ -96,7 +98,7 @@ static inline void *memalign(void *buf) {
 int main(int argc, char *argv[]) {
     z_stream strm = {0};
     int opt, pass = 0, zipl = -1, quiet = 0;
-    size_t i, rsizetot = 0, nr = 0, zsizetot = 0;
+    size_t i, rsizetot = 0, nr = 0, zsizetot = 0, hsize = 0;
     size_t rcounts[256] = {0}, zcounts[256] = {0};
     unsigned char *rbuffer, rbuf[MAX_READ_SIZE+64];
     unsigned char *zbuffer, zbuf[MAX_COMP_SIZE+64];
@@ -105,21 +107,26 @@ int main(int argc, char *argv[]) {
     rbuffer = (unsigned char *)memalign(rbuf);
     zbuffer = (unsigned char *)memalign(zbuf);
 
-    while ((opt = getopt(argc, argv, "pqz:")) != -1) {
+    while ((opt = getopt(argc, argv, "pqz:h:")) != -1) {
         switch (opt) {
             case 'q': quiet =1; break;
             case 'p': pass = 1; break;
             case 'z': zipl = atoi(optarg); break;
+            case 'h': hsize = atoi(optarg); break;
         }
     }
+    zipl = MAX(0, zipl);
+    hsize = MAX(0, hsize);
+
     if (zipl >= 0) {
+        //if(hsize > 0)
+        //   fprintf(stderr,"hsize: %ld\n", hsize);
         strm.next_out = zbuf;
         strm.avail_out = MAX_COMP_SIZE;
         if (deflateInit(&strm, zipl) != Z_OK) {
             perror("deflateInit");
             exit(EXIT_FAILURE);
         }
-        //writebuf(STDOUT_FILENO, strm.next_out, MAX_COMP_SIZE - strm.avail_out);
     }
 
     while (1) {
@@ -142,9 +149,23 @@ int main(int argc, char *argv[]) {
             strm.avail_out = MAX_COMP_SIZE;
             deflate(&strm, Z_NO_FLUSH);
             size_t zsize = MAX_COMP_SIZE - strm.avail_out;
-            if(zsize > 0) writebuf(STDOUT_FILENO, (const char *)zbuffer, zsize);
-            for (i = 0; i < zsize; i++) zcounts[zbuf[i]]++;
-            zsizetot += zsize;
+            if(hsize && zsize > 0) {
+                //fprintf(stderr,"hsize: %ld, zsize: %ld --> ", hsize, zsize);
+                if(zsize >= hsize) {
+                    zsize -= hsize;
+                    zbuffer += hsize;
+                    hsize = 0;
+                } else {
+                    hsize -= zsize;
+                    zsize = 0;
+                }
+                //fprintf(stderr,"hsize: %ld, zsize: %ld\n", hsize, zsize);
+            }
+            if(zsize > 0) {
+                writebuf(STDOUT_FILENO, (const char *)zbuffer, zsize);
+                for (i = 0; i < zsize; i++) zcounts[ zbuffer[i] ]++;
+                zsizetot += zsize;
+            }
         } while (strm.avail_out == 0);
     }
 
@@ -155,9 +176,23 @@ int main(int argc, char *argv[]) {
             strm.avail_out = MAX_COMP_SIZE;
             ret = deflate(&strm, Z_FINISH);
             size_t zsize = MAX_COMP_SIZE - strm.avail_out;
-            if(zsize > 0) writebuf(STDOUT_FILENO, (const char *)zbuffer, zsize);
-            for (i = 0; i < zsize; i++) zcounts[ zbuf[i] ]++;
-            zsizetot += zsize;
+            if(hsize && zsize > 0) {
+                //fprintf(stderr,"hsize: %ld, zsize: %ld --> ", hsize, zsize);
+                if(zsize >= hsize) {
+                    zsize -= hsize;
+                    zbuffer += hsize;
+                    hsize = 0;
+                } else {
+                    hsize -= zsize;
+                    zsize = 0;
+                }
+                //fprintf(stderr,"hsize: %ld, zsize: %ld\n", hsize, zsize);
+            }
+            if(zsize > 0) {
+                writebuf(STDOUT_FILENO, (const char *)zbuffer, zsize);
+                for (i = 0; i < zsize; i++) zcounts[ zbuffer[i] ]++;
+                zsizetot += zsize;
+            }
         } while (ret != Z_STREAM_END);
         deflateEnd(&strm);
     }
