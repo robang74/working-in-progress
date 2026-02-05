@@ -98,8 +98,8 @@ static inline void *memalign(void *buf) {
 int main(int argc, char *argv[]) {
     z_stream strm = {0};
     int opt, pass = 0, zipl = -1, quiet = 0;
-    size_t i, rsizetot = 0, nr = 0, zsizetot = 0, hsize = 0;
-    size_t rcounts[256] = {0}, zcounts[256] = {0};
+    size_t i, rsizetot = 0, nr = 0, zsizetot = 0, hsize = 0, tsize = 0;
+    size_t nsved = 0, rcounts[256] = {0}, zcounts[256] = {0};
     unsigned char *rbuffer, rbuf[MAX_READ_SIZE+64];
     unsigned char *zbuffer, zbuf[MAX_COMP_SIZE+64];
 
@@ -107,17 +107,31 @@ int main(int argc, char *argv[]) {
     rbuffer = (unsigned char *)memalign(rbuf);
     zbuffer = (unsigned char *)memalign(zbuf);
 
-    while ((opt = getopt(argc, argv, "pqz:h:")) != -1) {
+    while ((opt = getopt(argc, argv, "pqz:h:t:")) != -1) {
         switch (opt) {
             case 'q': quiet =1; break;
             case 'p': pass = 1; break;
             case 'z': zipl = atoi(optarg); break;
             case 'h': hsize = atoi(optarg); break;
+            case 't': tsize = atoi(optarg); break;
         }
     }
+    // Sanitise the values
     zipl = MAX(0, zipl);
     hsize = MAX(0, hsize);
+    tsize = MAX(0, tsize);
 
+    unsigned char *tbuffer = NULL;
+    size_t tsved = 0;
+    if (tsize > 0) {
+        tbuffer = malloc(tsize+64);
+        if (!tbuffer) {
+          perror("malloc");
+          exit(EXIT_FAILURE);
+        }
+        tbuffer = (unsigned char *)memalign(tbuffer);
+    }
+    
     if (zipl >= 0) {
         //if(hsize > 0)
         //   fprintf(stderr,"hsize: %ld\n", hsize);
@@ -145,6 +159,7 @@ int main(int argc, char *argv[]) {
         strm.avail_in = nr;
         strm.next_in = rbuffer;
         do {
+            zbuffer = zbuf;
             strm.next_out = zbuffer;
             strm.avail_out = MAX_COMP_SIZE;
             deflate(&strm, Z_NO_FLUSH);
@@ -161,6 +176,33 @@ int main(int argc, char *argv[]) {
                 }
                 //fprintf(stderr,"hsize: %ld, zsize: %ld\n", hsize, zsize);
             }
+            if(tsize > 0 && zsize > 0) {
+                if(zsize >= tsize) {
+                    if(tsved > 0) {
+                        writebuf(STDOUT_FILENO, (const char *)tbuffer, tsved);
+                        for (i = 0; i < tsved; i++) zcounts[ tbuffer[i] ]++;
+                        zsizetot += tsved;
+                        tsved = 0;
+                     }
+                     memcpy(tbuffer, zbuffer, tsize);
+                     memmove(zbuffer, &zbuffer[tsize], tsize);
+                     zsize -= tsize;
+                     tsved = tsize;
+                } else
+                if(tsved >= zsize) {
+                    size_t nz = tsved-zsize;
+                    if(nz > 0) {
+                        writebuf(STDOUT_FILENO, (const char *)tbuffer, nz);
+                        for (i = 0; i < nz; i++) zcounts[ tbuffer[i] ]++;
+                        zsizetot += nz;
+                        tsved -= nz;
+                        memmove(tbuffer, &tbuffer[nz], tsved);
+                        memcpy(&tbuffer[tsved], zbuffer, nz);
+                        memmove(zbuffer, &zbuffer[nz], nz);
+                        zsize -= nz;
+                    }
+                }
+            }
             if(zsize > 0) {
                 writebuf(STDOUT_FILENO, (const char *)zbuffer, zsize);
                 for (i = 0; i < zsize; i++) zcounts[ zbuffer[i] ]++;
@@ -170,6 +212,7 @@ int main(int argc, char *argv[]) {
     }
 
     if (zipl >= 0) {
+        zbuffer = zbuf;
         int ret;
         do {
             strm.next_out = zbuffer;
@@ -188,6 +231,33 @@ int main(int argc, char *argv[]) {
                 }
                 //fprintf(stderr,"hsize: %ld, zsize: %ld\n", hsize, zsize);
             }
+            if(tsize > 0 && zsize > 0) {
+                if(zsize >= tsize) {
+                    if(tsved > 0) {
+                        writebuf(STDOUT_FILENO, (const char *)tbuffer, tsved);
+                        for (i = 0; i < tsved; i++) zcounts[ tbuffer[i] ]++;
+                        zsizetot += tsved;
+                        tsved = 0;
+                     }
+                     memcpy(tbuffer, zbuffer, tsize);
+                     memmove(zbuffer, &zbuffer[tsize], tsize);
+                     zsize -= tsize;
+                     tsved = tsize;
+                } else
+                if(tsved >= zsize) {
+                    size_t nz = tsved-zsize;
+                    if(nz > 0) {
+                        writebuf(STDOUT_FILENO, (const char *)tbuffer, nz);
+                        for (i = 0; i < nz; i++) zcounts[ tbuffer[i] ]++;
+                        zsizetot += nz;
+                        tsved -= nz;
+                        memmove(tbuffer, &tbuffer[nz], tsved);
+                        memcpy(&tbuffer[tsved], zbuffer, nz);
+                        memmove(zbuffer, &zbuffer[nz], nz);
+                        zsize -= nz;
+                    }
+                }
+            }
             if(zsize > 0) {
                 writebuf(STDOUT_FILENO, (const char *)zbuffer, zsize);
                 for (i = 0; i < zsize; i++) zcounts[ zbuffer[i] ]++;
@@ -201,6 +271,7 @@ int main(int argc, char *argv[]) {
     if(quiet) return 0;
     printallstats(rsizetot, "rdata", rcounts, (zipl >= 0), 0.0);
     printallstats(zsizetot, "zdata", zcounts, (zipl >= 0), (double)zsizetot/rsizetot);
+    //fprintf(stderr, "nsved: %ld\n", nsved);
 
     fflush(stderr);
     return 0;
