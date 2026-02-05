@@ -28,7 +28,7 @@ unsigned printstats(const char *str, size_t nread, unsigned nsymb, size_t *count
   static double pavg, entropy = 0, avg = 0, n = 0;
   double x, px, k = 0, s = 0, lg2s = log2(nsymb);
   size_t i;
-  
+
   if(rset) { entdone = 0; entropy = 0; avg = 0; n = 0; pavg = 0; }
 
   for (i = 0; i < 256; i++) {
@@ -109,15 +109,15 @@ int main(int argc, char *argv[]) {
 
     while ((opt = getopt(argc, argv, "pqz:h:t:")) != -1) {
         switch (opt) {
-            case 'q': quiet =1; break;
             case 'p': pass = 1; break;
+            case 'q': quiet = 1; break;
             case 'z': zipl = atoi(optarg); break;
             case 'h': hsize = atoi(optarg); break;
             case 't': tsize = atoi(optarg); break;
         }
     }
     // Sanitise the values
-    zipl = MAX(0, zipl);
+    zipl = MAX(-1, zipl);
     hsize = MAX(0, hsize);
     tsize = MAX(0, tsize);
 
@@ -131,7 +131,7 @@ int main(int argc, char *argv[]) {
         }
         tbuffer = (unsigned char *)memalign(tbuffer);
     }
-    
+
     if (zipl >= 0) {
         //if(hsize > 0)
         //   fprintf(stderr,"hsize: %ld\n", hsize);
@@ -204,7 +204,8 @@ int main(int argc, char *argv[]) {
                 }
             }
             if(zsize > 0) {
-                writebuf(STDOUT_FILENO, (const char *)zbuffer, zsize);
+                if(pass)
+                    writebuf(STDOUT_FILENO, (const char *)zbuffer, zsize);
                 for (i = 0; i < zsize; i++) zcounts[ zbuffer[i] ]++;
                 zsizetot += zsize;
             }
@@ -259,7 +260,8 @@ int main(int argc, char *argv[]) {
                 }
             }
             if(zsize > 0) {
-                writebuf(STDOUT_FILENO, (const char *)zbuffer, zsize);
+                if(pass)
+                    writebuf(STDOUT_FILENO, (const char *)zbuffer, zsize);
                 for (i = 0; i < zsize; i++) zcounts[ zbuffer[i] ]++;
                 zsizetot += zsize;
             }
@@ -269,10 +271,12 @@ int main(int argc, char *argv[]) {
     fflush(stdout);
 
     if(quiet) return 0;
-    printallstats(rsizetot, "rdata", rcounts, (zipl >= 0), 0.0);
-    printallstats(zsizetot, "zdata", zcounts, (zipl >= 0), (double)zsizetot/rsizetot);
-    //fprintf(stderr, "nsved: %ld\n", nsved);
-
+    printallstats(rsizetot, "rdata", rcounts, 1, 0.0);
     fflush(stderr);
+    if(zipl < 0) return 0;
+    printallstats(zsizetot, "zdata", zcounts, 1, (double)zsizetot/rsizetot);
+    fflush(stderr);
+
+    //fprintf(stderr, "\nnsved: %ld, zipl: %d\n", nsved, zipl);
     return 0;
 }
