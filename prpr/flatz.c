@@ -163,7 +163,7 @@ long get_nanos() {
  * TODO: fare una stats_t as sharing struct
  */
 unsigned printstats(const char *str, size_t nread, unsigned nsymb,
-    size_t *counts, bool idnt, bool rset)
+    uint32_t *counts, bool idnt, bool rset)
 {
     static char entdone = 0;
     static double entropy = 0, pavg = 0, avg = 0;
@@ -201,17 +201,18 @@ unsigned printstats(const char *str, size_t nread, unsigned nsymb,
 
 typedef struct {
     /* --- 8-Byte Aligned Group --- */
-    void *p;                        // for future use
-    double avg;                     // average as 'ent' provides
-    double avg_exp;                 // expected average (by type)
-    double avg_pdv;                 // = %(avg - avg_exp)/avg_exp
-    double nbits;                   // = log2(nsybl)
-    double entropy;                 // entropy 8-bit based
-    double ent1bit;                 // 1-bit entropy density
-    double x2;                      // Chi-square as 'ent' provides
-    double k2;                      // Squared mean freq. deviations
-    double ratio;                   // sizes ratio compared to original dataset
-    size_t nsize;                   // size in bytes of the original dataset
+    void    *pbuf;                  // keep tract of the buffer address
+    uint8_t *data;                  // buffer pointer for data elaboration
+    double   avg;                   // average as 'ent' provides
+    double   avg_exp;               // expected average (by type)
+    double   avg_pdv;               // = %(avg - avg_exp)/avg_exp
+    double   nbits;                 // = log2(nsybl)
+    double   entropy;               // entropy 8-bit based
+    double   ent1bit;               // 1-bit entropy density
+    double   x2;                    // Chi-square as 'ent' provides
+    double   k2;                    // Squared mean freq. deviations
+    double   ratio;                 // sizes ratio compared to original dataset
+    size_t   bsize;                 // size in bytes of the original dataset
 
     /* --- 4-Byte Aligned Group --- */
     uint32_t counts[256];           // array of frequencies (by counters)
@@ -219,12 +220,12 @@ typedef struct {
     unsigned nmax;                  // = 1 << nencg, max n. of encodable symbols
 
     /* --- 1-Byte Aligned Group (The Tail) --- */
-    char name[15];                  // a string for the name of dataset
-    uint8_t nencg;                  // n. bits needed for encoding nsybl
+    char     name[7];               // a string for the name of dataset
+    uint8_t  nencg;                 // n. bits needed for encoding nsybl
 } stats_t;
 
 void printallstats(const char *dstr, const unsigned char *buf, size_t size,
-    size_t *counts, double ratio, bool rset)
+    uint32_t *counts, double ratio, bool rset)
 {
     if(rset) {
         printstats(0, 0, 0, 0, 0, 1);
@@ -293,7 +294,7 @@ static inline void *memalign(void *buf) {
 }
 
 size_t zdeflating(const int action, uint8_t const *zbuf, z_stream *pstrm,
-    size_t hsize, size_t tsize, size_t *zcounts, bool pass)
+    uint32_t hsize, uint32_t tsize, uint32_t *zcounts, bool pass)
 {
     static size_t tsved = 0, zsizetot = 0;
     uint8_t *zbuffer;
@@ -389,24 +390,46 @@ static inline void usage(const char *name) {
 int main(int argc, char *argv[]) {
     z_stream strm = {0};
     int pass = 0, zipl = -1, quiet = 0;
-    size_t hsize = 0, tsize = 0, jsize = 0;
+    size_t i, hsize = 0, tsize = 0, jsize = 0;
+    stats_t rs = {0}, js = {0}, zs = {0};
+
+/*
     size_t rsizetot = 0, zsizetot = 0, jsizetot = 0;
     size_t rcounts[256] = {0}, zcounts[256] = {0}, jcounts[256] = {0};
     size_t i, nr = 0, nsved = 0;
+*/
+
+    (void) get_nanos(); //----------------------------------------------------//
+
+    // Static memory allocation: it fails immediately or it runs forever
     unsigned char *rbuffer, rbuf[MAX_READ_SIZE+64];
     unsigned char *jbuffer, jbuf[MAX_READ_SIZE+64];
     unsigned char *zbuffer, zbuf[MAX_COMP_SIZE+64];
 
-    (void) get_nanos(); //----------------------------------------------------//
+    // Memory alignment at 64 bit: more an attitude than an optimisation
+    rs.pbuf = (void *)memalign(rbuf);
+    js.pbuf = (void *)memalign(jbuf);
+    zs.pbuf = (void *)memalign(zbuf);
 
-    // Memory alignment at 64 bit
-    rbuffer = (unsigned char *)memalign(rbuf);
-    jbuffer = (unsigned char *)memalign(jbuf);
-    zbuffer = (unsigned char *)memalign(zbuf);
+    // Stats structure initialisation
+    rs.data = (uint8_t *)rs.pbuf;
+    js.data = (uint8_t *)js.pbuf;
+    zs.data = (uint8_t *)zs.pbuf;
+    snprintf(rs.name, 7, "rdata");
+    snprintf(js.name, 7, "jdata");
+    snprintf(zs.name, 7, "zdata");
 
+    // TODO: temporary trick to make it compile
+    #define rsizetot rs.bsize
+    #define jsizetot js.bsize
+    #define zsizetot zs.bsize
+    #define rcounts  rs.counts
+    #define jcounts  js.counts
+    #define zcounts  zs.counts
+    
+    // Collect arguments from optional command line parameters
     while (1) {
         int opt = getopt(argc, argv, "pqz:h:t:j:");
-        //printf("opt: %d (%c), optarg: %s\n", opt, opt, optarg);
         if(opt == '?' && !optarg) {
           usage("flatz"); exit(0);
         } else if(opt == -1) break;
@@ -430,6 +453,7 @@ int main(int argc, char *argv[]) {
     tsize = MIN(tsize, 256);
     jsize = MIN(jsize, 256);
 
+    // libz initialisation
     if (Z_ON) {
         strm.next_out = zbuf;
         strm.avail_out = MAX_COMP_SIZE;
@@ -439,8 +463,16 @@ int main(int argc, char *argv[]) {
         }
     }
 
+    // Aesthetic blankline
     if(jsize > 0) perr("\n");
 
+//-- ---------------------------------------------------------------------- --//
+
+
+
+
+//-- ---------------------------------------------------------------------- --//
+#if 0
     int k = 0;
     while (1) {
         k++;
@@ -489,7 +521,7 @@ int main(int argc, char *argv[]) {
             printallstats("jdata", jbuf, jsizetot, jcounts,
                 (double)jsizetot / rsizetot, 1);
     }
-
+#endif
     if (Z_ON) {
         zsizetot = zdeflating(Z_FINISH, zbuf, &strm, hsize, tsize, zcounts, pass);
         deflateEnd(&strm);
