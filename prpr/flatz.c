@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <stddef.h>
 #include <time.h>
 #include <math.h>
 #include <zlib.h>
@@ -27,6 +28,122 @@
 #define ABS(a) ((a<0)?-(a):(a))
 #define MIN(a,b) ((a<b)?(a):(b))
 #define MAX(a,b) ((a>b)?(a):(b))
+
+/* *** HASHING  ************************************************************* */
+
+uint64_t djb2sum(const char *str, uint64_t seed) {
+/*
+ * One of the most popular and efficient hash functions for strings in C is
+ * the djb2 algorithm created by Dan Bernstein. It strikes a great balance
+ * between speed and low collision rates. Great for text.
+ */
+    uint64_t hash;
+    int c;
+
+    if(!seed) hash = 5381;
+    /*
+     * 5381              Prime number choosen by Dan Bernstein, as 1010100000101
+     *                   empirically is one of the best for English words text.
+     * Alternatives:
+     *
+     * 16777619               The FNV-1 offset basis (32-bit).
+     * 14695981039346656037	  The FNV-1 offset basis (64-bit).
+     */
+    while ((c = *str++)) {
+        // A slightly more aggressive mixing constant (31 or 33 are common)
+        hash = ((hash << 5) + hash) ^ (uint64_t)c;
+    }
+
+    return hash;
+}
+
+#ifdef __APPLE__
+    #include <libkern/OSByteOrder.h>
+    #define htole64(x) OSSwapHostToLittleInt64(x)
+#elif defined(__linux__)
+    #include <endian.h>
+#else
+    // Manual fallback for portability if not on Linux/macOS
+    #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+        #define htole64(x) __builtin_bswap64(x)
+    #else
+        #define htole64(x) (x)
+    #endif
+#endif
+
+uint64_t fnv1sum(const void *data, size_t len) {
+/*
+ * While djb2 (5381) is legendary for strings, it was designed for ASCII text.
+ * Compressed binary data contains many 0x00 (null) bytes and high-bit values
+ * that djb2 can sometimes struggle to distribute evenly. Instead, FNV-1a was
+ * specifically engineered for mapping byte sequences (like binary blobs) to
+ * indices with minimal collisions.
+ */
+    const uint64_t *ptr = (const uint64_t *)__builtin_assume_aligned(data, 8);
+    uint64_t hash = 14695981039346656037ULL; // The FNV-1 offset basis (64-bit).
+    const uint64_t prime = 1099511628211ULL; // The 64-bit FNV prime
+
+    for (size_t i = 0; i < len; i++) {
+        hash ^= htole64(ptr[i]);
+        hash *= prime;
+    }
+
+    return hash;
+}
+
+/**
+ * @param data  Must be 8-byte aligned
+ * @param n_64  Number of 64-bit blocks (len_bytes / 8)
+ */
+uint64_t fnv8sum(const uint64_t *data, size_t n_64) {
+/*
+ * This assumes data is 64bit memory aligned in address and size (0-padding).
+ */
+    // Hint to compiler: pointer is aligned to 8-byte boundary
+    const uint64_t *ptr = (const uint64_t *)__builtin_assume_aligned(data, 8);
+    uint64_t hash = 14695981039346656037ULL; // The FNV-1 offset basis (64-bit).
+    const uint64_t prime = 1099511628211ULL; // The 64-bit FNV prime
+
+    for (size_t i = 0; i < n_64; i++) {
+        // Direct access is safe because of your alignment guarantee
+        hash ^= htole64(ptr[i]);
+        hash *= prime;
+    }
+
+    return hash;
+}
+
+/**
+ * @param data  Must be 8-byte aligned and 0-padded to 64-bit boundaries.
+ * @param n_64  Number of 64-bit blocks.
+ */
+uint64_t fnv64sum(const uint64_t *data, size_t n_64) {
+    // Hint to compiler: pointer is aligned to 8-byte boundary
+    const uint64_t *ptr = (const uint64_t *)__builtin_assume_aligned(data, 8);
+    uint64_t hash = 14695981039346656037ULL; // The FNV-1 offset basis (64-bit).
+    const uint64_t prime = 1099511628211ULL; // The 64-bit FNV prime
+
+    size_t i = 0;
+
+    // 1. Unrolled Hot Loop (Process 4 blocks at a time)
+    for (; i < (n_64 & ~3); i += 4) {
+        hash ^= htole64(ptr[i]);     hash *= prime;
+        hash ^= htole64(ptr[i + 1]); hash *= prime;
+        hash ^= htole64(ptr[i + 2]); hash *= prime;
+        hash ^= htole64(ptr[i + 3]); hash *= prime;
+    }
+
+    // 2. Cleanup Loop (Process remaining 0-3 blocks)
+    // Even with 0-padding, n_64 might not be a multiple of 4.
+    for (; i < n_64; i++) {
+        hash ^= htole64(ptr[i]);
+        hash *= prime;
+    }
+
+    return hash;
+}
+
+/* ************************************************************************** */
 
 // Funzione per ottenere il tempo in nanosecondi
 long get_nanos() {
@@ -82,7 +199,8 @@ void printallstats(size_t size, const char *dstr, size_t *counts, char prnt, dou
           fprintf(stderr, ", zr: %lf %% (1:%.3lf)\n", zratio * 100, 1.0 / zratio);
         } else {
           long nsrun = get_nanos();
-          fprintf(stderr, ", elab: %.1lf ms (%.1lf Kb/s)\n", (double)nsrun / E6, (double)size * (E9 >> 10) / nsrun);
+          fprintf(stderr, ", pid: %d, elab: %.1lf ms (%.1lf Kb/s)\n",
+              getpid(), (double)nsrun / E6, (double)size * (E9 >> 10) / nsrun);
         }
     }
     unsigned nsymb = printstats("bytes", size, 256, counts, prnt, (zratio != 0));
@@ -234,6 +352,9 @@ int main(int argc, char *argv[]) {
         } while (strm.avail_out == 0);
     }
 
+    if(!quiet)
+      printallstats(rsizetot, "rdata", rcounts, 1, 0.0);
+
     if (zipl >= 0) {
         zbuffer = zbuf;
         int ret;
@@ -293,7 +414,6 @@ int main(int argc, char *argv[]) {
     fflush(stdout);
 
     if(!quiet) {
-      printallstats(rsizetot, "rdata", rcounts, 1, 0.0);
       if(zipl >= 0)
       printallstats(zsizetot, "zdata", zcounts, 1, (double)zsizetot/rsizetot);
       fprintf(stderr, "\n");
