@@ -3,25 +3,43 @@
  *
  * Usage: binary stream | flat [-p] [-q] [-zN]
  *
- * Compile with lib math: gcc flat.c -O3 -lm -o flat
+ * Compile with lib math: gcc flatz.c -O3 -lm -lz -o flatz
  *
  */
 
+#define _GNU_SOURCE
 #include <stdio.h>
+#include <errno.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <errno.h>
 #include <string.h>
+#include <time.h>
 #include <math.h>
 #include <zlib.h>
 
 #define AVGV 125.5
+#define E3 1000L
+#define E6 1000000L
+#define E9 1000000000L
 #define MAX_READ_SIZE 4096
 #define MAX_COMP_SIZE (MAX_READ_SIZE<<1)
 #define ABS(a) ((a<0)?-(a):(a))
 #define MIN(a,b) ((a<b)?(a):(b))
 #define MAX(a,b) ((a>b)?(a):(b))
+
+// Funzione per ottenere il tempo in nanosecondi
+long get_nanos() {
+    static long start = 0;
+    struct timespec ts;
+
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    if (!start) {
+      start = (long)ts.tv_sec * 1000000000L + ts.tv_nsec;
+      return start;
+    }
+    return ((long)ts.tv_sec * 1000000000L + ts.tv_nsec) - start;
+}
 
 unsigned printstats(const char *str, size_t nread, unsigned nsymb, size_t *counts, char idnt, char rset) {
   static char entdone = 0;
@@ -49,7 +67,7 @@ unsigned printstats(const char *str, size_t nread, unsigned nsymb, size_t *count
     avg = avg / nread;
     pavg = (avg/AVGV - 1)*100;
   }
-  fprintf(stderr, "%s%s: %4ld, Eñ: %.6lf / %.2f = %.6lf, X²: %5.3lf, k²: %3.5lf, avg: %.4lf %+.4lf %%\n",
+  fprintf(stderr, "%s%s: %3ld, Eñ: %8.6lf / %4.2f = %8.6lf, X²: %8.3lf, k²: %8.5lf, avg: %8.4lf %+.4lf %%\n",
       idnt?"  ":"", str, MIN(nread,nsymb), entropy, lg2s, entropy/lg2s, s, k * nsymb, avg, pavg);
 
   return n;
@@ -60,10 +78,12 @@ void printallstats(size_t size, const char *dstr, size_t *counts, char prnt, dou
     if (size > 256 || prnt) {
         fprintf(stderr, "%s: %ld bytes, %.1lf Kb, %.3lf Mb", dstr,
             size, (double)size / (1<<10), (double)size / (1<<20));
-        if(zratio > 0)
-          fprintf(stderr, ", zr: %lf %% (1:%.3lf)\n", zratio * 100, 1.0/zratio);
-        else
-          fprintf(stderr, "\n");
+        if(zratio > 0) {
+          fprintf(stderr, ", zr: %lf %% (1:%.3lf)\n", zratio * 100, 1.0 / zratio);
+        } else {
+          long nsrun = get_nanos();
+          fprintf(stderr, ", elab: %.1lf ms (%.1lf Kb/s)\n", (double)nsrun / E6, (double)size * (E9 >> 10) / nsrun);
+        }
     }
     unsigned nsymb = printstats("bytes", size, 256, counts, prnt, (zratio != 0));
     double lg2s = log2(nsymb);
@@ -102,6 +122,8 @@ int main(int argc, char *argv[]) {
     size_t nsved = 0, rcounts[256] = {0}, zcounts[256] = {0};
     unsigned char *rbuffer, rbuf[MAX_READ_SIZE+64];
     unsigned char *zbuffer, zbuf[MAX_COMP_SIZE+64];
+
+    (void) get_nanos(); //----------------------------------------------------//
 
     // Memory alignment at 64 bit
     rbuffer = (unsigned char *)memalign(rbuf);
@@ -270,13 +292,13 @@ int main(int argc, char *argv[]) {
     }
     fflush(stdout);
 
-    if(quiet) return 0;
-    printallstats(rsizetot, "rdata", rcounts, 1, 0.0);
-    fflush(stderr);
-    if(zipl < 0) return 0;
-    printallstats(zsizetot, "zdata", zcounts, 1, (double)zsizetot/rsizetot);
+    if(!quiet) {
+      printallstats(rsizetot, "rdata", rcounts, 1, 0.0);
+      if(zipl >= 0)
+      printallstats(zsizetot, "zdata", zcounts, 1, (double)zsizetot/rsizetot);
+      fprintf(stderr, "\n");
+    }
     fflush(stderr);
 
-    //fprintf(stderr, "\nnsved: %ld, zipl: %d\n", nsved, zipl);
     return 0;
 }
