@@ -200,28 +200,30 @@ unsigned printstats(const char *str, size_t nread, unsigned nsymb,
 }
 
 typedef struct {
-    /* --- 8-Byte Aligned Group --- */
-    void    *pbuf;                  // keep tract of the buffer address
-    uint8_t *data;                  // buffer pointer for data elaboration
-    double   avg;                   // average as 'ent' provides
-    double   avg_exp;               // expected average (by type)
-    double   avg_pdv;               // = %(avg - avg_exp)/avg_exp
-    double   nbits;                 // = log2(nsybl)
-    double   entropy;               // entropy 8-bit based
-    double   ent1bit;               // 1-bit entropy density
-    double   x2;                    // Chi-square as 'ent' provides
-    double   k2;                    // Squared mean freq. deviations
-    double   ratio;                 // sizes ratio compared to original dataset
-    size_t   bsize;                 // size in bytes of the original dataset
+    /* -- 8-Byte Aligned Group -- */
+    void    *pbuf;                // keep tract of the buffer address
+    uint8_t *data;                // buffer pointer for data elaboration
+    double   avg;                 // average as 'ent' provides
+    double   avg_sum;             // for progressive sum of data elements
+    double   avg_exp;             // expected average (by type)
+    double   avg_pdv;             // = %(avg - avg_exp)/avg_exp
+    double   nbits;               // = log2(nsybl)
+    double   entropy;             // entropy 8-bit based
+    double   ent1bit;             // 1-bit entropy density
+    double   x2;                  // Chi-square as 'ent' provides
+    double   k2;                  // Squared mean freq. deviations
+    double   ratio;               // sizes ratio compared to original dataset
+    size_t   bsize;               // size in bytes of the elaboration block
+    size_t   ntot;                // total size in bytes of the original dataset
 
-    /* --- 4-Byte Aligned Group --- */
-    uint32_t counts[256];           // array of frequencies (by counters)
-    unsigned nsybl;                 // n. of symbols found in the dataset
-    unsigned nmax;                  // = 1 << nencg, max n. of encodable symbols
+    /* -- 4-Byte Aligned Group -- */
+    uint32_t counts[256];         // array of frequencies (by counters)
+    unsigned nsybl;               // n. of symbols found in the dataset
+    unsigned nmax;                // = 1 << nencg, max n. of encodable symbols
 
-    /* --- 1-Byte Aligned Group (The Tail) --- */
-    char     name[7];               // a string for the name of dataset
-    uint8_t  nencg;                 // n. bits needed for encoding nsybl
+    /* -- 1-Byte Aligned Group -- */
+    char     name[7];             // a string for the name of dataset
+    uint8_t  nencg;               // n. bits needed for encoding nsybl
 } stats_t;
 
 void printallstats(const char *dstr, const unsigned char *buf, size_t size,
@@ -270,14 +272,17 @@ static inline ssize_t writebuf(int fd, const char *buffer, size_t ntwr) {
    return tot;
 }
 
-static inline ssize_t readbuf(int fd, char *buffer, size_t ntrd) {
+static inline ssize_t readbuf(int fd, char *buffer, size_t size, bool intr) {
     ssize_t tot = 0;
-    while (ntrd > tot) {
+    while (size > tot) {
         errno = 0;
-        ssize_t nr = read(fd, buffer + tot, ntrd - tot);
+        ssize_t nr = read(fd, buffer + tot, size - tot);
         if (nr == 0) break;
         if (nr < 0) {
-            if (errno == EINTR) continue;
+            if (errno == EINTR) {
+              if(intr) return tot;
+              else continue;
+            }
             perror("read");
             exit(EXIT_FAILURE);
         }
@@ -371,6 +376,8 @@ size_t zdeflating(const int action, uint8_t const *zbuf, z_stream *pstrm,
 }
 
 #define Z_ON (zipl >= 0)
+#define J_ON (jsize > 0)
+#define P_ON (pass && !Z_ON && !J_ON)
 #define perr(x...) fprintf(stderr, x)
 
 static inline void usage(const char *name) {
@@ -420,9 +427,9 @@ int main(int argc, char *argv[]) {
     snprintf(zs.name, 7, "zdata");
 
     // TODO: temporary trick to make it compile
-    #define rsizetot rs.bsize
-    #define jsizetot js.bsize
-    #define zsizetot zs.bsize
+    #define rsizetot rs.ntot
+    #define jsizetot js.ntot
+    #define zsizetot zs.ntot
     #define rcounts  rs.counts
     #define jcounts  js.counts
     #define zcounts  zs.counts
@@ -445,7 +452,7 @@ int main(int argc, char *argv[]) {
     }
 
     // Sanitise the optional argument
-    zipl = MAX(-1, zipl);
+    zipl  = MAX(-1, zipl);
     hsize = MAX(0, hsize);
     tsize = MAX(0, tsize);
     jsize = MAX(0, jsize);
@@ -467,9 +474,33 @@ int main(int argc, char *argv[]) {
     if(jsize > 0) perr("\n");
 
 //-- ---------------------------------------------------------------------- --//
+#if 0
+#define BLOCK_SIZE MAX_READ_SIZE
+#else
+#define BLOCK_SIZE 64
+#endif
 
-
-
+    // read data from input stream
+    rs.bsize = readbuf(STDIN_FILENO, rs.data, BLOCK_SIZE, 0);
+    // write stdin stream on stdout, if requested
+    if(P_ON) { (void)writebuf(STDOUT_FILENO, rs.data, rs.bsize); }
+    else
+    if(J_ON) {}
+    else // TODO: J_ON doesn't exclude Z_ON, simplification to remove later
+    if(Z_ON) {}
+    
+unsigned stats_block_elab(stats_t *st) {
+    //memset(st->counts, 0, sizeof(st->counts[0]) << 8);
+    for (size_t i = 0; i < st->bsize; i++) {
+        st->counts[ st->data[i] ]++;
+        st->avg_sum += st->data[i];
+    }
+    st->ntot += st->bsize;
+    st->avg = st->avg_sum / st->ntot;
+    return 0;
+}
+    stats_block_elab(&rs);
+    perr("DGB, rs.stats> avg: %lf, ntot: %ld, bsize: %ld\n", rs.avg, rs.ntot, rs.bsize);
 
 //-- ---------------------------------------------------------------------- --//
 #if 0
