@@ -199,10 +199,12 @@ unsigned printstats(const char *str, size_t nread, unsigned nsymb,
     return n;
 }
 
-typedef struct {
+#define st_t struct stats
+typedef struct stats {
     /* -- 8-Byte Aligned Group -- */
     void    *pbuf;                // keep tract of the buffer address
     uint8_t *data;                // buffer pointer for data elaboration
+    unsigned (*elab)(st_t *st);   // function pointer for block elaboration
     double   avg;                 // average as 'ent' provides
     double   avg_sum;             // for progressive sum of data elements
     double   avg_exp;             // expected average (by type)
@@ -225,6 +227,35 @@ typedef struct {
     char     name[7];             // a string for the name of dataset
     uint8_t  nencg;               // n. bits needed for encoding nsybl
 } stats_t;
+
+unsigned stats_block_elab(stats_t *st) {
+    //this is mandatory only for the initialisation or a reset:
+    //memset(st->counts, 0, sizeof(st->counts[0]) << 8);
+    if (!st || !st->data || !st->bsize) return 0;
+
+    // Localized variables for compiler optimisation
+    // register keywords and while uusage for speed.
+    register size_t   len = st->bsize;
+    register uint8_t *d   = st->data;
+    uint32_t         *c   = st->counts;
+    double            sum = 0;
+    
+    // Updated before decrementing the value in len:
+    st->ntot += len;
+
+    while(len--) {
+        uint8_t v = *d++;
+        sum += v;
+        c[v]++;
+    }
+
+    // Updates struct values
+    st->avg_sum += sum;
+    st->avg = st->avg_sum / st->ntot;
+
+    return st->ntot;
+}
+#define ELAB(s) ( (s)->elab(s) )
 
 void printallstats(const char *dstr, const unsigned char *buf, size_t size,
     uint32_t *counts, double ratio, bool rset)
@@ -425,6 +456,9 @@ int main(int argc, char *argv[]) {
     snprintf(rs.name, 7, "rdata");
     snprintf(js.name, 7, "jdata");
     snprintf(zs.name, 7, "zdata");
+    rs.elab = stats_block_elab;
+    js.elab = stats_block_elab;
+    zs.elab = stats_block_elab;
 
     // TODO: temporary trick to make it compile
     #define rsizetot rs.ntot
@@ -488,18 +522,8 @@ int main(int argc, char *argv[]) {
     if(J_ON) {}
     else // TODO: J_ON doesn't exclude Z_ON, simplification to remove later
     if(Z_ON) {}
-    
-unsigned stats_block_elab(stats_t *st) {
-    //memset(st->counts, 0, sizeof(st->counts[0]) << 8);
-    for (size_t i = 0; i < st->bsize; i++) {
-        st->counts[ st->data[i] ]++;
-        st->avg_sum += st->data[i];
-    }
-    st->ntot += st->bsize;
-    st->avg = st->avg_sum / st->ntot;
-    return 0;
-}
-    stats_block_elab(&rs);
+
+    ELAB(&rs);
     perr("DGB, rs.stats> avg: %lf, ntot: %ld, bsize: %ld\n", rs.avg, rs.ntot, rs.bsize);
 
 //-- ---------------------------------------------------------------------- --//
