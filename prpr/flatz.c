@@ -505,17 +505,18 @@ int main(int argc, char *argv[]) {
     }
 
     // Aesthetic blankline
-    if(jsize > 0) perr("\n");
+    /*if(jsize > 0)*/ perr("\n");
 
-//-- ---------------------------------------------------------------------- --//
+//== ====================================================================== ==//
 #if 0
 #define BLOCK_SIZE MAX_READ_SIZE
 #else
 #define BLOCK_SIZE 64
 #endif
-
+    while (1) { //-- service while start ---------------------------------- --//
     // read data from input stream
     rs.bsize = readbuf(STDIN_FILENO, rs.data, BLOCK_SIZE, 0);
+    if(!rs.bsize) break;
     // write stdin stream on stdout, if requested
     if(P_ON) { (void)writebuf(STDOUT_FILENO, rs.data, rs.bsize); }
     else
@@ -524,9 +525,11 @@ int main(int argc, char *argv[]) {
     if(Z_ON) {}
 
     ELAB(&rs);
-    perr("DGB, rs.stats> avg: %lf, ntot: %ld, bsize: %ld\n", rs.avg, rs.ntot, rs.bsize);
+    perr("DGB, rs.stats> avg: %7.3lf, ntot: %4ld, bsize: %4ld\n",
+        rs.avg, rs.ntot, rs.bsize);
+    } //-- service while end ---------------------------------------------- --//
 
-//-- ---------------------------------------------------------------------- --//
+//== ====================================================================== ==//
 #if 0
     int k = 0;
     while (1) {
