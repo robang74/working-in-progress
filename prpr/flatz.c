@@ -26,9 +26,11 @@
 #define E9 1000000000L
 #define MAX_READ_SIZE 4096
 #define MAX_COMP_SIZE (MAX_READ_SIZE << 1)
-#define ABS(a)   ( ( (a) < 0 )  ? -(a) : (a) )
-#define MIN(a,b) ( ( (a) < (b) ) ? (a) : (b) )
-#define MAX(a,b) ( ( (a) > (b) ) ? (a) : (b) )
+#define ABS(a)    ( ( (a) < 0 )  ? -(a) : (a) )
+#define MIN(a,b)  ( ( (a) < (b) ) ? (a) : (b) )
+#define MAX(a,b)  ( ( (a) > (b) ) ? (a) : (b) )
+#define ALGN64(n) ( ( ( (n) + 63) >> 6 ) << 6 )
+#define perr(x...) fprintf(stderr, x)
 
 /* *** HASHING  ************************************************************* */
 
@@ -38,10 +40,7 @@ uint64_t djb2sum(const char *str, uint64_t seed) {
  * the djb2 algorithm created by Dan Bernstein. It strikes a great balance
  * between speed and low collision rates. Great for text.
  */
-    uint64_t hash;
-    int c;
-
-    if(!seed) hash = 5381;
+    uint64_t c, hash = 5381;
     /*
      * 5381              Prime number choosen by Dan Bernstein, as 1010100000101
      *                   empirically is one of the best for English words text.
@@ -50,10 +49,12 @@ uint64_t djb2sum(const char *str, uint64_t seed) {
      * 16777619               The FNV-1 offset basis (32-bit).
      * 14695981039346656037	  The FNV-1 offset basis (64-bit).
      */
-    while ((c = *str++)) {
+    if(seed) hash = seed;
+    if(!*str) return 0;
+    while((c = *str++)) {
         // A slightly more aggressive mixing constant (31 or 33 are common)
-        hash = ((hash << 5) + hash) ^ (uint64_t)c;
-    }
+        hash = ((hash << 5) + hash) ^ c;
+    } 
 
     return hash;
 }
@@ -144,6 +145,11 @@ uint64_t fnv64sum(const uint64_t *data, size_t n_64) {
     return hash;
 }
 
+static inline void print_hash(uint64_t hj, uint16_t hl) {
+    for (uint16_t i = 0; i < hl; i++, hj >>= 8)
+        perr("%01x%01x", ((uint8_t)hj) & 0x0F, ((uint8_t)hj) >> 4);
+}
+
 /* ************************************************************************** */
 
 // Funzione per ottenere il tempo in nanosecondi
@@ -200,6 +206,7 @@ unsigned printstats(const char *str, size_t nread, unsigned nsymb,
 }
 
 #define st_t struct stats
+
 typedef struct stats {
     /* -- 8-Byte Aligned Group -- */
     void    *pbuf;                // keep tract of the buffer address
@@ -255,6 +262,7 @@ unsigned stats_block_elab(stats_t *st) {
 
     return st->ntot;
 }
+
 #define ELAB(s) ( (s)->elab(s) )
 
 void printallstats(const char *dstr, const unsigned char *buf, size_t size,
@@ -321,8 +329,6 @@ static inline ssize_t readbuf(int fd, char *buffer, size_t size, bool intr) {
     }
     return tot;
 }
-
-#define ALGN64(n) ( ( ( (n) + 63) >> 6 ) << 6 )
 
 static inline void *memalign(void *buf) {
     uintptr_t p = (uintptr_t)buf;
@@ -409,7 +415,6 @@ size_t zdeflating(const int action, uint8_t const *zbuf, z_stream *pstrm,
 #define Z_ON (zipl >= 0)
 #define J_ON (jsize > 0)
 #define P_ON (pass && !Z_ON && !J_ON)
-#define perr(x...) fprintf(stderr, x)
 
 static inline void usage(const char *name) {
     perr("\n"\
@@ -505,7 +510,7 @@ int main(int argc, char *argv[]) {
     }
 
     // Aesthetic blankline
-    /*if(jsize > 0)*/ perr("\n");
+    if(!quiet) perr("\n");
 
 //== ====================================================================== ==//
 #if 0
@@ -513,21 +518,27 @@ int main(int argc, char *argv[]) {
 #else
 #define BLOCK_SIZE 64
 #endif
-    while (1) { //-- service while start ---------------------------------- --//
-    // read data from input stream
-    rs.bsize = readbuf(STDIN_FILENO, rs.data, BLOCK_SIZE, 0);
-    if(!rs.bsize) break;
-    // write stdin stream on stdout, if requested
-    if(P_ON) { (void)writebuf(STDOUT_FILENO, rs.data, rs.bsize); }
-    else
-    if(J_ON) {}
-    else // TODO: J_ON doesn't exclude Z_ON, simplification to remove later
-    if(Z_ON) {}
 
-    ELAB(&rs);
-    perr("DGB, rs.stats> avg: %7.3lf, ntot: %4ld, bsize: %4ld\n",
-        rs.avg, rs.ntot, rs.bsize);
-    } //-- service while end ---------------------------------------------- --//
+    uint64_t hash = 0;
+    unsigned k = 0;
+    do { //-- service while start ----------------------------------------- --//
+        // read data from input stream
+        rs.bsize = readbuf(STDIN_FILENO, rs.data, (J_ON)?jsize:BLOCK_SIZE, 0);
+        if(!rs.bsize) break;
+        // write stdin stream on stdout, if requested
+        if(P_ON) { (void)writebuf(STDOUT_FILENO, rs.data, rs.bsize); }
+        else
+        if(J_ON) { hash = djb2sum(rs.data, 0); }
+        else // TODO: J_ON doesn't exclude Z_ON, simplification to remove later
+        if(Z_ON) {}
+
+        ELAB(&rs);
+        if(quiet) continue;
+        perr("DGB, rs(%03d)> avg: %7.3lf, ntot: %4ld, bsize: %4ld",
+            ++k, rs.avg, rs.ntot, rs.bsize);
+        if (J_ON) { perr(", djb2: "); print_hash(hash, 8); }
+        perr("\n");
+    } while (1);//-- service while end ------------------------------------ --//
 
 //== ====================================================================== ==//
 #if 0
