@@ -54,7 +54,7 @@ uint64_t djb2sum(const char *str, uint64_t seed) {
     while((c = *str++)) {
         // A slightly more aggressive mixing constant (31 or 33 are common)
         hash = ((hash << 5) + hash) ^ c;
-    } 
+    }
 
     return hash;
 }
@@ -246,7 +246,7 @@ unsigned stats_block_elab(stats_t *st) {
     register uint8_t *d   = st->data;
     uint32_t         *c   = st->counts;
     double            sum = 0;
-    
+
     // Updated before decrementing the value in len:
     st->ntot += len;
 
@@ -296,7 +296,7 @@ void printallstats(const char *dstr, const unsigned char *buf, size_t size,
         (void)printstats("symbl", size, nsymb, counts, 1, 0);
 }
 
-static inline ssize_t writebuf(int fd, const char *buffer, size_t ntwr) {
+static inline ssize_t writebuf(int fd, const uint8_t *buffer, size_t ntwr) {
     ssize_t tot = 0;
     while (ntwr > tot) {
         errno = 0;
@@ -414,7 +414,7 @@ size_t zdeflating(const int action, uint8_t const *zbuf, z_stream *pstrm,
 
 #define Z_ON (zipl >= 0)
 #define J_ON (jsize > 0)
-#define P_ON (pass && !Z_ON && !J_ON)
+#define P_ON (pass && !Z_ON)
 
 static inline void usage(const char *name) {
     perr("\n"\
@@ -472,7 +472,7 @@ int main(int argc, char *argv[]) {
     #define rcounts  rs.counts
     #define jcounts  js.counts
     #define zcounts  zs.counts
-    
+
     // Collect arguments from optional command line parameters
     while (1) {
         int opt = getopt(argc, argv, "pqz:h:t:j:");
@@ -523,14 +523,15 @@ int main(int argc, char *argv[]) {
     unsigned k = 0;
     do { //-- service while start ----------------------------------------- --//
         // read data from input stream
-        rs.bsize = readbuf(STDIN_FILENO, rs.data, (J_ON)?jsize:BLOCK_SIZE, 0);
+        rs.bsize = readbuf(STDIN_FILENO, rs.data, (J_ON) ? jsize : BLOCK_SIZE, 0);
         if(!rs.bsize) break;
         // write stdin stream on stdout, if requested
-        if(P_ON) { (void)writebuf(STDOUT_FILENO, rs.data, rs.bsize); }
-        else
-        if(J_ON) { hash = djb2sum(rs.data, 0); }
-        else // TODO: J_ON doesn't exclude Z_ON, simplification to remove later
-        if(Z_ON) {}
+        if (J_ON) { hash = djb2sum(rs.data, 0); }
+        if (Z_ON) {}
+        if (P_ON) {
+            if (J_ON) { (void)writebuf(STDOUT_FILENO, (uint8_t *)&hash, 8); }
+            else { (void)writebuf(STDOUT_FILENO, rs.data, rs.bsize); }
+         }
 
         ELAB(&rs);
         if(quiet) continue;
