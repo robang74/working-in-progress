@@ -335,6 +335,8 @@ static inline void *memalign(void *buf) {
     return (void *)ALGN64(p);
 }
 
+#define writeout(b,s) { if(pass) { writebuf(STDOUT_FILENO, (const uint8_t *)(b), (size_t)(s)); } }
+
 size_t zdeflating(const int action, uint8_t const *zbuf, z_stream *pstrm,
     uint32_t hsize, uint32_t tsize, uint32_t *zcounts, bool pass)
 {
@@ -345,7 +347,7 @@ size_t zdeflating(const int action, uint8_t const *zbuf, z_stream *pstrm,
     if(action != Z_NO_FLUSH && action != Z_FINISH)
         return 0;
 
-    unsigned char *tbuf, *tbuffer = NULL;
+    unsigned char *tbuf = NULL, *tbuffer = NULL;
     if (tsize > 0) {
         tbuf = malloc(tsize+64);
         if (!tbuf) {
@@ -353,7 +355,6 @@ size_t zdeflating(const int action, uint8_t const *zbuf, z_stream *pstrm,
           exit(EXIT_FAILURE);
         }
         tbuf = (unsigned char *)memalign(tbuf);
-        tbuffer = tbuf;
     }
 
     do {
@@ -375,8 +376,8 @@ size_t zdeflating(const int action, uint8_t const *zbuf, z_stream *pstrm,
         if(tsize > 0 && zsize > 0) {
             if(zsize >= tsize) {
                 if(tsved > 0) {
-                    writebuf(STDOUT_FILENO, (const uint8_t *)tbuffer, tsved);
-                    for (i = 0; i < tsved; i++) zcounts[ tbuf[i] ]++;
+                    writeout(tbuffer, tsved);
+                    for (i = 0; i < tsved; i++) zcounts[ tbuffer[i] ]++;
                     zsizetot += tsved;
                     tsved = 0;
                  }
@@ -388,8 +389,8 @@ size_t zdeflating(const int action, uint8_t const *zbuf, z_stream *pstrm,
             if(tsved >= zsize) {
                 size_t nz = tsved-zsize;
                 if(nz > 0) {
-                    writebuf(STDOUT_FILENO, (const uint8_t *)tbuffer, nz);
-                    for (i = 0; i < nz; i++) zcounts[ tbuf[i] ]++;
+                    writeout(tbuffer, nz);
+                    for (i = 0; i < nz; i++) zcounts[ tbuffer[i] ]++;
                     zsizetot += nz;
                     tsved -= nz;
                     memmove(tbuffer, &tbuffer[nz], tsved);
@@ -400,15 +401,14 @@ size_t zdeflating(const int action, uint8_t const *zbuf, z_stream *pstrm,
             }
         }
         if(zsize > 0) {
-            if(pass)
-                writebuf(STDOUT_FILENO, (const uint8_t *)zbuffer, zsize);
-            for (i = 0; i < zsize; i++) zcounts[ zbuf[i] ]++;
+            writeout(zbuffer, zsize);
+            for (i = 0; i < zsize; i++) zcounts[ zbuffer[i] ]++;
             zsizetot += zsize;
         }
     } while( (action == Z_NO_FLUSH && pstrm->avail_out == 0)
           || (action == Z_FINISH   && ret != Z_STREAM_END) );
 
-    free(tbuf); // TODO: use a fixed allocated buffer
+    if(tbuf) free(tbuf); // TODO: use a fixed allocated buffer
     return zsizetot;
 }
 
@@ -520,7 +520,7 @@ int main(int argc, char *argv[]) {
 #endif
 
     for (unsigned k = 0; true; k) { //-- service loop start --------------- --//
-        uint64_t hash;
+        static uint64_t hash;
 
         // decoupling output from storage, uniforming API output
         size_t outsz;
@@ -528,7 +528,8 @@ int main(int argc, char *argv[]) {
         #define setout(b,s) { outbuf = (uint8_t *)(b); outsz = (size_t)(s); }
 
         // read data from input stream
-        rs.bsize = readbuf(STDIN_FILENO, rs.data, (J_ON) ? jsize : BLOCK_SIZE, 0);
+        outsz = (J_ON) ? jsize : BLOCK_SIZE;
+        rs.bsize = readbuf(STDIN_FILENO, rs.data, outsz, 0);
         if(!rs.bsize) break; else setout(rs.data, rs.bsize);
 
         // write stdin stream on stdout, if requested
@@ -536,7 +537,11 @@ int main(int argc, char *argv[]) {
             hash = djb2sum(outbuf, 0);
             setout(&hash, sizeof(hash));
         }
-        if (Z_ON) {}
+        if (Z_ON) {
+          strm.avail_in = outsz;
+          strm.next_in = outbuf;
+          outsz = zdeflating(Z_NO_FLUSH, zbuf, &strm, hsize, tsize, rs.counts, pass);
+        } else // zdeflating already provides pass-through when requested
         if (P_ON) (void)writebuf(STDOUT_FILENO, outbuf, outsz);
 
         ELAB(&rs);
