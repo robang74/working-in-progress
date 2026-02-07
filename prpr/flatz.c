@@ -20,7 +20,7 @@
 #include <math.h>
 #include <zlib.h>
 
-#define AVGV 125.5
+#define AVGV 127.5
 #define E3 1000L
 #define E6 1000000L
 #define E9 1000000000L
@@ -199,7 +199,7 @@ unsigned printstats(const char *str, size_t nread, unsigned nsymb,
 
     double lg2s = log2(nsymb);
     fprintf(stderr,
-        "%s%s: %3ld, Eñ: %8.6lf / %4.2f = %8.6lf, X²: %10.3lf, k²: %9.5lf, avg: %9.5lf %+.4lf %%\n",
+        "%s%s: %3ld, Eñ: %8.6lf / %4.2f = %8.6lf, X²: %10.3lf, k²: %9.5lf, avg: %9.5lf %+4g %%\n",
         idnt?"  ":"", str, MIN(nread,nsymb), entropy, lg2s, entropy/lg2s, s, k * nsymb, avg, pavg);
 
     return n;
@@ -213,6 +213,7 @@ typedef struct stats {
     uint8_t *data;                // buffer pointer for data elaboration
     unsigned (*elab)(st_t *st);   // function pointer for block elaboration
     size_t   (*calc)(st_t *st);   // function pointer for total elaboration
+    void     (*show)(st_t *st);   // function pointer for print stats' show
     double   avg;                 // average as 'ent' provides
     double   avg_sum;             // for progressive sum of data elements
     double   avg_exp;             // expected average (by type)
@@ -230,11 +231,12 @@ typedef struct stats {
     /* -- 4-Byte Aligned Group -- */
     uint32_t counts[256];         // array of frequencies (by counters)
     unsigned nsybl;               // n. of symbols found in the dataset
-    unsigned nmax;                // = 1 << nencg, max n. of encodable symbols
+    unsigned nmax;                // = 1U << nencg, max n. of encodable symbols
 
     /* -- 1-Byte Aligned Group -- */
-    char     name[7];             // a string for the name of dataset
-    uint8_t  nencg;               // n. bits needed for encoding nsybl
+    char     name[6];             // a string for the name of dataset
+    uint8_t  nenc;                // n. bits needed for encoding nsybl
+    uint8_t  base;                // the standard base of counts (2^8 = 256)
 } stats_t;
 
 unsigned stats_block_elab(stats_t *st) {
@@ -265,35 +267,26 @@ unsigned stats_block_elab(stats_t *st) {
     return st->ntot;
 }
 
-void printallstats(const char *dstr, const unsigned char *buf, size_t size,
-    uint32_t *counts, double ratio, bool rset)
-{
-    if(rset && false) {
-        printstats(0, 0, 0, 0, 0, 1);
-        memset(counts, 0, sizeof(size_t) << 8);
-        for (size_t i = 0; i < size; i++)
-            counts[ buf[i] ]++;
+void stats_print_line(stats_t *st) {
+    perr("\n%s: %ld bytes, %.1lf Kb, %.3lf Mb", st->name,
+        st->ntot, (double)st->ntot / (1<<10), (double)st->ntot / (1<<20));
+    if(st->ratio > 0) {
+      perr(", rtio: %lf %% (1 : %.3lf)\n", st->ratio * 100, 1.0 / st->ratio);
+    } else {
+      long nsrun = get_nanos();
+      perr(", pid: %d, elab: %.1lf ms (%.1lf Kb/s)\n",
+          getpid(), (double)nsrun / E6, (double)st->ntot * (E9 >> 10) / nsrun);
     }
 
-    fprintf(stderr, "\n");
-    if (size > 256 || true) {
-        fprintf(stderr, "%s: %ld bytes, %.1lf Kb, %.3lf Mb", dstr,
-            size, (double)size / (1<<10), (double)size / (1<<20));
-        if(ratio > 0) {
-          fprintf(stderr, ", rtio: %lf %% (1 : %.3lf)\n", ratio * 100, 1.0 / ratio);
-        } else {
-          long nsrun = get_nanos();
-          fprintf(stderr, ", pid: %d, elab: %.1lf ms (%.1lf Kb/s)\n",
-              getpid(), (double)nsrun / E6, (double)size * (E9 >> 10) / nsrun);
-        }
-    }
-    unsigned nsymb = printstats("bytes", size, 256, counts, 1, 0);
-    double lg2s = log2(nsymb);
-    unsigned nbits = ceil(lg2s), nmax = 1 << nbits;
-    if (nbits < 8)
-        (void)printstats("encdg", size, nmax, counts, 1, 0);
-    if(nsymb < nmax)
-        (void)printstats("symbl", size, nsymb, counts, 1, 0);
+    perr("%s: %3ld symbl, Eñ: %5.3lf / %4.2f = %6.4lf, X²: %8.2lf, k²: %7.4lf, avg: %8.7g %+.4g %%\n",
+        st->name, MIN(st->ntot, st->nsybl), st->entropy, st->log2s, st->ent1bit,
+        st->x2, st->k2 * st->nsybl, st->avg, st->avg_pdv);
+    /*
+        if (st->nenc < 8)
+            (void)printstats("encdg", size, st->nmax, st->counts, 1, 0);
+        if(st->nsybl < nmax)
+            (void)printstats("symbl", size, st->nsybl, st->counts, 1, 0);
+    */
 }
 
 static inline ssize_t writebuf(int fd, const uint8_t *buffer, size_t ntwr) {
@@ -416,11 +409,11 @@ size_t zdeflating(const int action, uint8_t const *zbuf, z_stream *pstrm,
 #define J_ON (jsize > 0)
 #define P_ON (pass && !Z_ON)
 
+#define SHOW(s) { if(!quiet) { (void)stats_total_calc(s); stats_print_line(s); } }
 #define ZDEF(f) zs.bsize = zdeflating(f, zs.data, &strm, hsize, tsize, zs.counts, pass)
 #define PASS(x) { if(x) (void)writebuf(STDOUT_FILENO, outbuf, outsz); }
 #define ELAB(s) { if(!quiet) (void)stats_block_elab(s); }
 #define CALC(s) { if(!quiet) (void)stats_total_calc(s); }
-//#define ELAB(s) { if(!quiet) (void)(s)->elab(s); }
 
 static inline void usage(const char *name) {
     perr("\n"\
@@ -467,26 +460,30 @@ size_t stats_total_calc(stats_t *st) {
         st->log2s = log2(nsybl); // run once per dataset, precision vs speed
     }
 
-    if(!st->avg_pdv) st->avg_pdv = (st->avg/st->avg_exp - 1)*100;
+    if(!st->avg_pdv) st->avg_pdv = (st->avg/st->avg_exp - 1) * 100;
 
-    const double ex = ((double)nread) / st->nsybl;
-    const double epx = 1.0 / st->nsybl;
-    register double px, x, s, k, e;
+    double s = 0, k = 0, e = 0;
+    const double epx = 1.0 / (1U << st->base);             //st->nsybl;
+    const double ex = (double)nread / (1U << st->base);    //st->nsybl;
+
     for (register int i = 0; i < 256; i++) {
-        x = ((double)c[i] - ex);
-        s += x * x / ex;
-        px = ((double)c[i]) / nread;
+        register double x  = (double)c[i] - ex;
+        const double px = (double)c[i] / nread;
+        s += (x * x) / ex;
         x = px - epx;
-        k += x * x;
+        k += (x * x);
 
         if(entdone || !c[i])
             continue;
         e -= px * LOG2(px);
     }
+
     st->x2 = s;
     st->k2 = k;
     st->entropy = e;
     st->ent1bit = e / st->log2s;
+    st->nenc = ceil(st->log2s);
+    st->nmax = 1U << st->nenc;
 
     return st->ntot;
 }
@@ -498,13 +495,15 @@ int main(int argc, char *argv[]) {
     stats_t rs = {0}, js = {0}, zs = {0};
 
     (void) get_nanos(); //----------------------------------------------------//
-
+    /*
+     * TODO: write a function that create and initialise such a structure
+     */
     // Static memory allocation: it fails immediately or it runs forever
     unsigned char rbuf[MAX_READ_SIZE+64];
     unsigned char jbuf[MAX_READ_SIZE+64];
     unsigned char zbuf[MAX_COMP_SIZE+64];
 
-    // Zeroing the structures
+    // Zeroing the structures, best practice only: given zeroed for security
     memset(&rs, 0, sizeof(rs));
     memset(&js, 0, sizeof(js));
     memset(&zs, 0, sizeof(zs));
@@ -515,29 +514,27 @@ int main(int argc, char *argv[]) {
     zs.pbuf = (void *)ptralign(zbuf);
 
     // Stats structure initialisation
+    snprintf(rs.name, sizeof(rs.name), "rdata");
+    snprintf(js.name, sizeof(js.name), "jdata");
+    snprintf(zs.name, sizeof(zs.name), "zdata");
     rs.data = (uint8_t *)rs.pbuf;
     js.data = (uint8_t *)js.pbuf;
     zs.data = (uint8_t *)zs.pbuf;
-    snprintf(rs.name, 7, "rdata");
-    snprintf(js.name, 7, "jdata");
-    snprintf(zs.name, 7, "zdata");
     rs.elab = stats_block_elab;
     js.elab = stats_block_elab;
     zs.elab = stats_block_elab;
     rs.calc = stats_total_calc;
     js.calc = stats_total_calc;
     zs.calc = stats_total_calc;
+    rs.show = stats_print_line;
+    js.show = stats_print_line;
+    zs.show = stats_print_line;
     rs.avg_exp = AVGV;
     js.avg_exp = AVGV;
     zs.avg_exp = AVGV;
-
-    // TODO: temporary trick to make it compile
-    #define rsizetot rs.ntot
-    #define jsizetot js.ntot
-    #define zsizetot zs.ntot
-    #define rcounts  rs.counts
-    #define jcounts  js.counts
-    #define zcounts  zs.counts
+    rs.base = 8;
+    js.base = 8;
+    zs.base = 8;
 
     // Collect arguments from optional command line parameters
     while (1) {
@@ -623,26 +620,14 @@ int main(int argc, char *argv[]) {
         perr("\n");
     } //-- service while end ---------------------------------------------- --//
 
-/*
-    fprintf(stderr,
-        "%s%s: %3ld, Eñ: %8.6lf / %4.2f = %8.6lf, X²: %10.3lf, k²: %9.5lf, avg: %9.5lf %+.4lf %%\n",
-        idnt?"  ":"", str, MIN(nread,nsymb), entropy, log2s, entropy/log2s, s, k * nsymb, avg, pavg);
-
-*/
-
-    // Show input data statistics, if not inhibited
-    if(!quiet) printallstats("rdata", rbuf, rsizetot, rs.counts, 1, 1);
+    SHOW(&rs); // Show read data statistics, if not inhibited
 
     // Finalise the zlib compression process
     if (Z_ON) { // zdeflating already provides pass-through when requested
         ZDEF(Z_FINISH);
         deflateEnd(&strm);
         ELAB(&zs);
-
-        if(!quiet) {
-            printallstats("zdata", zs.data, zsizetot, zs.counts,
-                (double)zsizetot / rsizetot, 1);
-        }
+        SHOW(&zs); // Show libz data statistics, if not inhibited
     }
 
     if(!quiet) perr("\n");
