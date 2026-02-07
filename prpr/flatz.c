@@ -330,7 +330,7 @@ static inline ssize_t readbuf(int fd, char *buffer, size_t size, bool intr) {
     return tot;
 }
 
-static inline void *memalign(void *buf) {
+static inline void *ptralign(void *buf) {
     uintptr_t p = (uintptr_t)buf;
     return (void *)ALGN64(p);
 }
@@ -464,7 +464,7 @@ size_t stats_total_calc(stats_t *st) {
         for (register int i = 0; i < 256; i++)
             if(c[i]) nsybl++;
         st->nsybl = nsybl;
-        st->log2s = LOG2(nsybl);
+        st->log2s = log2(nsybl); // run once per dataset, precision vs speed
     }
 
     if(!st->avg_pdv) st->avg_pdv = (st->avg/st->avg_exp - 1)*100;
@@ -483,7 +483,10 @@ size_t stats_total_calc(stats_t *st) {
             continue;
         e -= px * LOG2(px);
     }
+    st->x2 = s;
+    st->k2 = k;
     st->entropy = e;
+    st->ent1bit = e / st->log2s;
 
     return st->ntot;
 }
@@ -493,12 +496,6 @@ int main(int argc, char *argv[]) {
     int pass = 0, zipl = -1, quiet = 0;
     size_t i, hsize = 0, tsize = 0, jsize = 0;
     stats_t rs = {0}, js = {0}, zs = {0};
-
-/*
-    size_t rsizetot = 0, zsizetot = 0, jsizetot = 0;
-    size_t rcounts[256] = {0}, zcounts[256] = {0}, jcounts[256] = {0};
-    size_t i, nr = 0, nsved = 0;
-*/
 
     (void) get_nanos(); //----------------------------------------------------//
 
@@ -513,9 +510,9 @@ int main(int argc, char *argv[]) {
     memset(&zs, 0, sizeof(zs));
 
     // Memory alignment at 64 bit: more an attitude than an optimisation
-    rs.pbuf = (void *)memalign(rbuf);
-    js.pbuf = (void *)memalign(jbuf);
-    zs.pbuf = (void *)memalign(zbuf);
+    rs.pbuf = (void *)ptralign(rbuf);
+    js.pbuf = (void *)ptralign(jbuf);
+    zs.pbuf = (void *)ptralign(zbuf);
 
     // Stats structure initialisation
     rs.data = (uint8_t *)rs.pbuf;
@@ -629,7 +626,7 @@ int main(int argc, char *argv[]) {
 /*
     fprintf(stderr,
         "%s%s: %3ld, Eñ: %8.6lf / %4.2f = %8.6lf, X²: %10.3lf, k²: %9.5lf, avg: %9.5lf %+.4lf %%\n",
-        idnt?"  ":"", str, MIN(nread,nsymb), entropy, lg2s, entropy/lg2s, s, k * nsymb, avg, pavg);
+        idnt?"  ":"", str, MIN(nread,nsymb), entropy, log2s, entropy/log2s, s, k * nsymb, avg, pavg);
 
 */
 
