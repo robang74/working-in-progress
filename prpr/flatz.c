@@ -236,9 +236,7 @@ typedef struct stats {
 } stats_t;
 
 unsigned stats_block_elab(stats_t *st) {
-    //this is mandatory only for the initialisation or a reset:
-    //memset(st->counts, 0, sizeof(st->counts[0]) << 8);
-    if (!st || !st->data || !st->bsize) return 0;
+    if (!st) return 0;
 
     // Localized variables for compiler optimisation
     // register keywords and while uusage for speed.
@@ -246,6 +244,8 @@ unsigned stats_block_elab(stats_t *st) {
     register uint8_t *d   = st->data;
     uint32_t         *c   = st->counts;
     double            sum = 0;
+
+    if(!len || !d) return 0;
 
     // Updated before decrementing the value in len:
     st->ntot += len;
@@ -338,7 +338,7 @@ static inline void *memalign(void *buf) {
 size_t zdeflating(const int action, uint8_t const *zbuf, z_stream *pstrm,
     uint32_t hsize, uint32_t tsize, uint32_t *zcounts, bool pass)
 {
-    static size_t tsved = 0, zsizetot = 0;
+    static size_t tsved = 0, zsizetot = 0, zsize = 0;
     uint8_t *zbuffer;
     int i, ret;
 
@@ -360,7 +360,7 @@ size_t zdeflating(const int action, uint8_t const *zbuf, z_stream *pstrm,
         pstrm->next_out = zbuffer;
         pstrm->avail_out = MAX_COMP_SIZE;
         ret = deflate(pstrm, action);
-        size_t zsize = MAX_COMP_SIZE - pstrm->avail_out;
+        zsize = MAX_COMP_SIZE - pstrm->avail_out;
         if(hsize && zsize > 0) {
             if(zsize >= hsize) {
                 zsize -= hsize;
@@ -407,12 +407,17 @@ size_t zdeflating(const int action, uint8_t const *zbuf, z_stream *pstrm,
           || (action == Z_FINISH   && ret != Z_STREAM_END) );
 
     if(tbuf) free(tbuf); // TODO: use a fixed allocated buffer
-    return zsizetot;
+    return zsize;
 }
 
 #define Z_ON (zipl >= 0)
 #define J_ON (jsize > 0)
 #define P_ON (pass && !Z_ON)
+
+#define ZDEF(f) zs.bsize = zdeflating(f, zs.data, &strm, hsize, tsize, zs.counts, pass)
+#define PASS(x) { if(x) (void)writebuf(STDOUT_FILENO, outbuf, outsz); }
+#define ELAB(s) { if(!quiet) (void)stats_block_elab(s); }
+//#define ELAB(s) { if(!quiet) (void)(s)->elab(s); }
 
 static inline void usage(const char *name) {
     perr("\n"\
@@ -427,9 +432,6 @@ static inline void usage(const char *name) {
 "   -t: skip tail (N:bytes, max:256)\n"\
 "\n", name, name);
 }
-
-#define ZDEF(f) zs.bsize = zdeflating(f, zs.data, &strm, hsize, tsize, zs.counts, pass)
-#define ELAB(s) { if(!quiet) (s)->elab(s); }
 
 int main(int argc, char *argv[]) {
     z_stream strm = {0};
@@ -535,7 +537,9 @@ int main(int argc, char *argv[]) {
         // read data from input stream
         outsz = (J_ON) ? jsize : BLOCK_SIZE;
         rs.bsize = readbuf(STDIN_FILENO, rs.data, outsz, 0);
-        if(!rs.bsize) break; else setout(rs.data, rs.bsize);
+        if(!rs.bsize) break;
+
+        setout(rs.data, rs.bsize);
         ELAB(&rs);
 
         // write stdin stream on stdout, if requested
@@ -547,12 +551,14 @@ int main(int argc, char *argv[]) {
             strm.avail_in = outsz;
             strm.next_in = outbuf;
             ZDEF(Z_NO_FLUSH);
-            if(!zs.bsize) break; else setout(zs.data, zs.bsize);
+            setout(zs.data, zs.bsize);
             ELAB(&zs);
-        } else // zdeflating already provides pass-through when requested
-        if (P_ON) (void)writebuf(STDOUT_FILENO, outbuf, outsz);
-
+        } else { // zdeflating already provides pass-through when requested
+            PASS(P_ON);
+        }
+        
         if(quiet) continue;
+
         perr("DGB, rs(%03d)> avg: %7.3lf, ntot: %4ld, bsize: %4ld",
             ++k, rs.avg, rs.ntot, rs.bsize);
         if (J_ON) { perr(", djb2: "); print_hash(hash, 8); }
@@ -563,21 +569,18 @@ int main(int argc, char *argv[]) {
     if(!quiet) printallstats("rdata", rbuf, rsizetot, rs.counts, 1, 1);
 
     // Finalise the zlib compression process
-    if (Z_ON) {
+    if (Z_ON) { // zdeflating already provides pass-through when requested
         ZDEF(Z_FINISH);
         deflateEnd(&strm);
         ELAB(&zs);
+
         if(!quiet) {
             printallstats("zdata", zs.data, zsizetot, zs.counts,
                 (double)zsizetot / rsizetot, 1);
         }
     }
 
-    if(!quiet) {
-      fprintf(stderr, "\n");
-      fflush(stderr);
-    }
-    fflush(stdout);
+    if(!quiet) perr("\n");
 
     return 0;
 }
