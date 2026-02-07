@@ -3,7 +3,7 @@
  *
  * Usage: binary stream | flat [-p] [-q] [-zN]
  *
- * Compile with lib math: gcc flatz.c -O3 -lm -lz -o flatz
+ * Compile with lib math: gcc flatz.c -O3 -ffast-math -lm -lz -o flatz
  *
  */
 
@@ -212,6 +212,7 @@ typedef struct stats {
     void    *pbuf;                // keep tract of the buffer address
     uint8_t *data;                // buffer pointer for data elaboration
     unsigned (*elab)(st_t *st);   // function pointer for block elaboration
+    size_t   (*calc)(st_t *st);   // function pointer for total elaboration
     double   avg;                 // average as 'ent' provides
     double   avg_sum;             // for progressive sum of data elements
     double   avg_exp;             // expected average (by type)
@@ -222,6 +223,7 @@ typedef struct stats {
     double   x2;                  // Chi-square as 'ent' provides
     double   k2;                  // Squared mean freq. deviations
     double   ratio;               // sizes ratio compared to original dataset
+    double   log2s;               // store the log2(nsybl) value, calculated once
     size_t   bsize;               // size in bytes of the elaboration block
     size_t   ntot;                // total size in bytes of the original dataset
 
@@ -417,6 +419,7 @@ size_t zdeflating(const int action, uint8_t const *zbuf, z_stream *pstrm,
 #define ZDEF(f) zs.bsize = zdeflating(f, zs.data, &strm, hsize, tsize, zs.counts, pass)
 #define PASS(x) { if(x) (void)writebuf(STDOUT_FILENO, outbuf, outsz); }
 #define ELAB(s) { if(!quiet) (void)stats_block_elab(s); }
+#define CALC(s) { if(!quiet) (void)stats_total_calc(s); }
 //#define ELAB(s) { if(!quiet) (void)(s)->elab(s); }
 
 static inline void usage(const char *name) {
@@ -431,6 +434,58 @@ static inline void usage(const char *name) {
 "   -h: skip header (N:bytes, max:256)\n"\
 "   -t: skip tail (N:bytes, max:256)\n"\
 "\n", name, name);
+}
+
+static inline float fastlog2(float val) {
+    union { float f; uint32_t i; } vx = { val };
+    register float y = (float)vx.i;
+    y *= 1.1920928955078125e-7f;    //= 1 / 2^23
+    return y - 124.22551499f;
+}
+
+size_t stats_total_calc(stats_t *st) {
+    #define LOG2 fastlog2
+    if (!st) return 0;
+
+    // Localized variables for compiler optimisation
+    // register keywords and while uusage for speed.
+    const bool entdone    =(st->entropy != 0);
+    const size_t nread    = st->ntot;
+    register size_t   len = st->ntot;
+    register uint8_t *d   = st->data;
+    uint32_t         *c   = st->counts;
+    double            sum = 0;
+
+    if(!len || !d || !st->avg_sum) return 0;   // !avg_sum --> elab() never done
+
+    // Filling the stats strucuture with precalculated values
+    if(!st->nsybl) {
+        register unsigned nsybl = 0;
+        for (register int i = 0; i < 256; i++)
+            if(c[i]) nsybl++;
+        st->nsybl = nsybl;
+        st->log2s = LOG2(nsybl);
+    }
+
+    if(!st->avg_pdv) st->avg_pdv = (st->avg/st->avg_exp - 1)*100;
+
+    const double ex = ((double)nread) / st->nsybl;
+    const double epx = 1.0 / st->nsybl;
+    register double px, x, s, k, e;
+    for (register int i = 0; i < 256; i++) {
+        x = ((double)c[i] - ex);
+        s += x * x / ex;
+        px = ((double)c[i]) / nread;
+        x = px - epx;
+        k += x * x;
+
+        if(entdone || !c[i])
+            continue;
+        e -= px * LOG2(px);
+    }
+    st->entropy = e;
+
+    return st->ntot;
 }
 
 int main(int argc, char *argv[]) {
@@ -451,7 +506,7 @@ int main(int argc, char *argv[]) {
     unsigned char rbuf[MAX_READ_SIZE+64];
     unsigned char jbuf[MAX_READ_SIZE+64];
     unsigned char zbuf[MAX_COMP_SIZE+64];
-    
+
     // Zeroing the structures
     memset(&rs, 0, sizeof(rs));
     memset(&js, 0, sizeof(js));
@@ -472,6 +527,12 @@ int main(int argc, char *argv[]) {
     rs.elab = stats_block_elab;
     js.elab = stats_block_elab;
     zs.elab = stats_block_elab;
+    rs.calc = stats_total_calc;
+    js.calc = stats_total_calc;
+    zs.calc = stats_total_calc;
+    rs.avg_exp = AVGV;
+    js.avg_exp = AVGV;
+    zs.avg_exp = AVGV;
 
     // TODO: temporary trick to make it compile
     #define rsizetot rs.ntot
@@ -556,7 +617,7 @@ int main(int argc, char *argv[]) {
         } else { // zdeflating already provides pass-through when requested
             PASS(P_ON);
         }
-        
+   
         if(quiet) continue;
 
         perr("DGB, rs(%03d)> avg: %7.3lf, ntot: %4ld, bsize: %4ld",
@@ -564,6 +625,13 @@ int main(int argc, char *argv[]) {
         if (J_ON) { perr(", djb2: "); print_hash(hash, 8); }
         perr("\n");
     } //-- service while end ---------------------------------------------- --//
+
+/*
+    fprintf(stderr,
+        "%s%s: %3ld, Eñ: %8.6lf / %4.2f = %8.6lf, X²: %10.3lf, k²: %9.5lf, avg: %9.5lf %+.4lf %%\n",
+        idnt?"  ":"", str, MIN(nread,nsymb), entropy, lg2s, entropy/lg2s, s, k * nsymb, avg, pavg);
+
+*/
 
     // Show input data statistics, if not inhibited
     if(!quiet) printallstats("rdata", rbuf, rsizetot, rs.counts, 1, 1);
