@@ -251,7 +251,7 @@ unsigned stats_block_elab(stats_t *st) {
     st->ntot += len;
 
     while(len--) {
-        uint8_t v = *d++;
+        uint8_t v = *d++; // equivalent to v=*d; d++
         sum += v;
         c[v]++;
     }
@@ -263,12 +263,10 @@ unsigned stats_block_elab(stats_t *st) {
     return st->ntot;
 }
 
-#define ELAB(s) ( (s)->elab(s) )
-
 void printallstats(const char *dstr, const unsigned char *buf, size_t size,
     uint32_t *counts, double ratio, bool rset)
 {
-    if(rset) {
+    if(rset && false) {
         printstats(0, 0, 0, 0, 0, 1);
         memset(counts, 0, sizeof(size_t) << 8);
         for (size_t i = 0; i < size; i++)
@@ -430,6 +428,9 @@ static inline void usage(const char *name) {
 "\n", name, name);
 }
 
+#define ZDEF(f) zs.bsize = zdeflating(f, zs.data, &strm, hsize, tsize, zs.counts, pass)
+#define ELAB(s) { if(!quiet) (s)->elab(s); }
+
 int main(int argc, char *argv[]) {
     z_stream strm = {0};
     int pass = 0, zipl = -1, quiet = 0;
@@ -445,9 +446,14 @@ int main(int argc, char *argv[]) {
     (void) get_nanos(); //----------------------------------------------------//
 
     // Static memory allocation: it fails immediately or it runs forever
-    unsigned char *rbuffer, rbuf[MAX_READ_SIZE+64];
-    unsigned char *jbuffer, jbuf[MAX_READ_SIZE+64];
-    unsigned char *zbuffer, zbuf[MAX_COMP_SIZE+64];
+    unsigned char rbuf[MAX_READ_SIZE+64];
+    unsigned char jbuf[MAX_READ_SIZE+64];
+    unsigned char zbuf[MAX_COMP_SIZE+64];
+    
+    // Zeroing the structures
+    memset(&rs, 0, sizeof(rs));
+    memset(&js, 0, sizeof(js));
+    memset(&zs, 0, sizeof(zs));
 
     // Memory alignment at 64 bit: more an attitude than an optimisation
     rs.pbuf = (void *)memalign(rbuf);
@@ -530,6 +536,7 @@ int main(int argc, char *argv[]) {
         outsz = (J_ON) ? jsize : BLOCK_SIZE;
         rs.bsize = readbuf(STDIN_FILENO, rs.data, outsz, 0);
         if(!rs.bsize) break; else setout(rs.data, rs.bsize);
+        ELAB(&rs);
 
         // write stdin stream on stdout, if requested
         if (J_ON) {
@@ -537,13 +544,14 @@ int main(int argc, char *argv[]) {
             setout(&hash, sizeof(hash));
         }
         if (Z_ON) {
-          strm.avail_in = outsz;
-          strm.next_in = outbuf;
-          outsz = zdeflating(Z_NO_FLUSH, zbuf, &strm, hsize, tsize, zs.counts, pass);
+            strm.avail_in = outsz;
+            strm.next_in = outbuf;
+            ZDEF(Z_NO_FLUSH);
+            if(!zs.bsize) break; else setout(zs.data, zs.bsize);
+            ELAB(&zs);
         } else // zdeflating already provides pass-through when requested
         if (P_ON) (void)writebuf(STDOUT_FILENO, outbuf, outsz);
 
-        ELAB(&rs);
         if(quiet) continue;
         perr("DGB, rs(%03d)> avg: %7.3lf, ntot: %4ld, bsize: %4ld",
             ++k, rs.avg, rs.ntot, rs.bsize);
@@ -556,11 +564,13 @@ int main(int argc, char *argv[]) {
 
     // Finalise the zlib compression process
     if (Z_ON) {
-        zsizetot = zdeflating(Z_FINISH, zbuf, &strm, hsize, tsize, zs.counts, pass);
+        ZDEF(Z_FINISH);
         deflateEnd(&strm);
-        if(!quiet)
-            printallstats("zdata", zbuf, zsizetot, zs.counts,
+        ELAB(&zs);
+        if(!quiet) {
+            printallstats("zdata", zs.data, zsizetot, zs.counts,
                 (double)zsizetot / rsizetot, 1);
+        }
     }
 
     if(!quiet) {
