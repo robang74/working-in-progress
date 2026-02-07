@@ -165,11 +165,23 @@ long get_nanos() {
     return ((long)ts.tv_sec * 1000000000L + ts.tv_nsec) - start;
 }
 
+static inline void stats_print_head(const char *dscr, size_t size, double ratio) {
+  perr("\n%s: %ld bytes, %.1lf Kb, %.3lf Mb", dscr,
+      size, (double)size / (1<<10), (double)size / (1<<20));
+  if(ratio > 0) {
+    perr(", rtio: %lf %% (1 : %.3lf)\n", ratio * 100, 1.0 / ratio);
+  } else {
+    long nsrun = get_nanos();
+    perr(", pid: %d, elab: %.1lf ms (%.1lf Kb/s)\n",
+        getpid(), (double)nsrun / E6, (double)size * (E9 >> 10) / nsrun);
+  }
+}
+
 /*
  * TODO: fare una stats_t as sharing struct
  */
 unsigned printstats(const char *str, size_t nread, unsigned nsymb,
-    uint32_t *counts, bool idnt, bool rset)
+    uint32_t *counts, double ratio, bool head, bool rset)
 {
     static char entdone = 0;
     static double entropy = 0, pavg = 0, avg = 0;
@@ -198,9 +210,11 @@ unsigned printstats(const char *str, size_t nread, unsigned nsymb,
     }
 
     double lg2s = log2(nsymb);
+
+    if(head) stats_print_head(str, nread, ratio);
     fprintf(stderr,
-        "%s%s: %3ld, Eñ: %8.6lf / %4.2f = %8.6lf, X²: %10.3lf, k²: %9.5lf, avg: %9.5lf %+4g %%\n",
-        idnt?"  ":"", str, MIN(nread,nsymb), entropy, lg2s, entropy/lg2s, s, k * nsymb, avg, pavg);
+        "%s: %3ld, Eñ: %8.6lf / %4.2f = %8.6lf, X²: %10.3lf, k²: %9.5lf, avg: %9.5lf %+4g %%\n",
+            str, MIN(nread,nsymb), entropy, lg2s, entropy/lg2s, s, k * nsymb, avg, pavg);
 
     return n;
 }
@@ -268,6 +282,8 @@ unsigned stats_block_elab(stats_t *st) {
 }
 
 void stats_print_line(stats_t *st) {
+    stats_print_head(st->name, st->ntot, st->ratio);
+/*
     perr("\n%s: %ld bytes, %.1lf Kb, %.3lf Mb", st->name,
         st->ntot, (double)st->ntot / (1<<10), (double)st->ntot / (1<<20));
     if(st->ratio > 0) {
@@ -277,16 +293,16 @@ void stats_print_line(stats_t *st) {
       perr(", pid: %d, elab: %.1lf ms (%.1lf Kb/s)\n",
           getpid(), (double)nsrun / E6, (double)st->ntot * (E9 >> 10) / nsrun);
     }
-
+*/
     perr("%s: %3ld symbl, Eñ: %5.3lf / %4.2f = %6.4lf, X²: %8.2lf, k²: %7.4lf, avg: %8.7g %+.4g %%\n",
         st->name, MIN(st->ntot, st->nsybl), st->entropy, st->log2s, st->ent1bit,
         st->x2, st->k2 * st->nsybl, st->avg, st->avg_pdv);
-    /*
+/*
         if (st->nenc < 8)
             (void)printstats("encdg", size, st->nmax, st->counts, 1, 0);
         if(st->nsybl < nmax)
             (void)printstats("symbl", size, st->nsybl, st->counts, 1, 0);
-    */
+*/
 }
 
 static inline ssize_t writebuf(int fd, const uint8_t *buffer, size_t ntwr) {
@@ -619,15 +635,28 @@ int main(int argc, char *argv[]) {
         if (J_ON) { perr(", djb2: "); print_hash(hash, 8); }
         perr("\n");
     } //-- service while end ---------------------------------------------- --//
-
+#if 0
     SHOW(&rs); // Show read data statistics, if not inhibited
+#else
+    CALC(&rs);
+    printstats(rs.name, rs.ntot, 256, rs.counts, 0, 1, 0);
+    printstats(0, 0, 0, 0, 0, 0, 1);
+#endif
+
 
     // Finalise the zlib compression process
     if (Z_ON) { // zdeflating already provides pass-through when requested
         ZDEF(Z_FINISH);
         deflateEnd(&strm);
         ELAB(&zs);
+        zs.ratio = (double)zs.ntot / rs.ntot;
+#if 0
         SHOW(&zs); // Show libz data statistics, if not inhibited
+#else
+        CALC(&zs);
+        printstats(zs.name, zs.ntot, 256, zs.counts, zs.ratio, 1, 0);
+        printstats(0, 0, 0, 0, 0, 0, 1);
+#endif
     }
 
     if(!quiet) perr("\n");
