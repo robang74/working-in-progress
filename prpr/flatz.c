@@ -519,19 +519,25 @@ int main(int argc, char *argv[]) {
 #define BLOCK_SIZE 64
 #endif
 
-    uint64_t hash = 0;
-    unsigned k = 0;
-    do { //-- service while start ----------------------------------------- --//
+    for (unsigned k = 0; true; k) { //-- service loop start --------------- --//
+        uint64_t hash;
+
+        // decoupling output from storage, uniforming API output
+        size_t outsz;
+        uint8_t *outbuf;
+        #define setout(b,s) { outbuf = (uint8_t *)(b); outsz = (size_t)(s); }
+
         // read data from input stream
         rs.bsize = readbuf(STDIN_FILENO, rs.data, (J_ON) ? jsize : BLOCK_SIZE, 0);
-        if(!rs.bsize) break;
+        if(!rs.bsize) break; else setout(rs.data, rs.bsize);
+
         // write stdin stream on stdout, if requested
-        if (J_ON) { hash = djb2sum(rs.data, 0); }
+        if (J_ON) {
+            hash = djb2sum(outbuf, 0);
+            setout(&hash, sizeof(hash));
+        }
         if (Z_ON) {}
-        if (P_ON) {
-            if (J_ON) { (void)writebuf(STDOUT_FILENO, (uint8_t *)&hash, 8); }
-            else { (void)writebuf(STDOUT_FILENO, rs.data, rs.bsize); }
-         }
+        if (P_ON) (void)writebuf(STDOUT_FILENO, outbuf, outsz);
 
         ELAB(&rs);
         if(quiet) continue;
@@ -539,7 +545,7 @@ int main(int argc, char *argv[]) {
             ++k, rs.avg, rs.ntot, rs.bsize);
         if (J_ON) { perr(", djb2: "); print_hash(hash, 8); }
         perr("\n");
-    } while (1);//-- service while end ------------------------------------ --//
+    } //-- service while end ---------------------------------------------- --//
 
 //== ====================================================================== ==//
 #if 0
