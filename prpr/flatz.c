@@ -276,7 +276,7 @@ void printallstats(const char *dstr, const unsigned char *buf, size_t size,
     }
 
     fprintf(stderr, "\n");
-    if (size > 256) {
+    if (size > 256 || true) {
         fprintf(stderr, "%s: %ld bytes, %.1lf Kb, %.3lf Mb", dstr,
             size, (double)size / (1<<10), (double)size / (1<<20));
         if(ratio > 0) {
@@ -512,7 +512,6 @@ int main(int argc, char *argv[]) {
     // Aesthetic blankline
     if(!quiet) perr("\n");
 
-//== ====================================================================== ==//
 #if 0
 #define BLOCK_SIZE MAX_READ_SIZE
 #else
@@ -540,7 +539,7 @@ int main(int argc, char *argv[]) {
         if (Z_ON) {
           strm.avail_in = outsz;
           strm.next_in = outbuf;
-          outsz = zdeflating(Z_NO_FLUSH, zbuf, &strm, hsize, tsize, rs.counts, pass);
+          outsz = zdeflating(Z_NO_FLUSH, zbuf, &strm, hsize, tsize, zs.counts, pass);
         } else // zdeflating already provides pass-through when requested
         if (P_ON) (void)writebuf(STDOUT_FILENO, outbuf, outsz);
 
@@ -552,62 +551,15 @@ int main(int argc, char *argv[]) {
         perr("\n");
     } //-- service while end ---------------------------------------------- --//
 
-//== ====================================================================== ==//
-#if 0
-    int k = 0;
-    while (1) {
-        k++;
-        // read input stream
-        if(jsize > 0) {
-            nr = readbuf(STDIN_FILENO, rbuffer, jsize << 3);
-            if (nr == 0) break;
-            rbuffer[nr] = 0; // String termination
-            uint64_t hj = djb2sum(rbuffer, 0);
-            if(!quiet) {
-                perr("%03d: djb2sum(%03ld): ", k, nr);
-                for (size_t i = 0; i < 8; i++, hj >>= 8) {
-                    perr("%01x%01x", (uint8_t)hj & 0x0F, ((uint8_t)hj & 0xF0) >> 4);
-                }
-                perr("\n");
-            }
-            *(uint64_t *)jbuffer = hj; jbuffer += 8; jsizetot += 8;
-        } else {
-            nr = read(STDIN_FILENO, rbuffer, MAX_READ_SIZE);
-            if (nr == 0) break;
-            if (nr < 0) {
-                if (errno == EINTR) continue;
-                perror("read");
-                exit(EXIT_FAILURE);
-            }
-        }
-        // increase the read sise
-        rsizetot += nr;
-        // write stdin stream on stdout
-        if(pass && !Z_ON) writebuf(STDOUT_FILENO, rbuffer, nr);
-        // check for zip
-        if (!Z_ON) continue;
-        // z-compressing
-        strm.avail_in = nr;
-        strm.next_in = rbuffer;
-        zdeflating(Z_NO_FLUSH, zbuf, &strm, hsize, tsize, zcounts, pass);
-    }
-    // pointers reset
-    rbuffer = rbuf;
-    jbuffer = jbuf;
-    zbuffer = zbuf;
+    // Show input data statistics, if not inhibited
+    if(!quiet) printallstats("rdata", rbuf, rsizetot, rs.counts, 1, 1);
 
-    if(!quiet) {
-        printallstats("rdata", rbuf, rsizetot, rcounts, 0, 1);
-        if(jsizetot > 0)
-            printallstats("jdata", jbuf, jsizetot, jcounts,
-                (double)jsizetot / rsizetot, 1);
-    }
-#endif
+    // Finalise the zlib compression process
     if (Z_ON) {
-        zsizetot = zdeflating(Z_FINISH, zbuf, &strm, hsize, tsize, zcounts, pass);
+        zsizetot = zdeflating(Z_FINISH, zbuf, &strm, hsize, tsize, zs.counts, pass);
         deflateEnd(&strm);
         if(!quiet)
-            printallstats("zdata", zbuf, zsizetot, zcounts,
+            printallstats("zdata", zbuf, zsizetot, zs.counts,
                 (double)zsizetot / rsizetot, 1);
     }
 
