@@ -347,14 +347,12 @@ size_t zdeflating(const int action, uint8_t const *zbuf, z_stream *pstrm,
     if(action != Z_NO_FLUSH && action != Z_FINISH)
         return 0;
 
-    unsigned char *tbuf = NULL, *tbuffer = NULL;
+    unsigned char *tbuffer = NULL;
     if (tsize > 0) {
-        tbuf = malloc(tsize+64);
-        if (!tbuf) {
-          perror("malloc");
-          exit(EXIT_FAILURE);
+        if (posix_memalign((void **)&tbuffer, 64, tsize)) {
+            perror("posix_memalign");
+            exit(EXIT_FAILURE);
         }
-        tbuf = (unsigned char *)memalign(tbuf);
     }
 
     do {
@@ -408,7 +406,9 @@ size_t zdeflating(const int action, uint8_t const *zbuf, z_stream *pstrm,
     } while( (action == Z_NO_FLUSH && pstrm->avail_out == 0)
           || (action == Z_FINISH   && ret != Z_STREAM_END) );
 
-    if(tbuf) free(tbuf); // TODO: use a fixed allocated buffer
+    if(tbuffer) //  useless here/now but for best practice
+        free(tbuffer);
+
     return zsize;
 }
 
