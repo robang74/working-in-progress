@@ -433,6 +433,8 @@ static inline void usage(const char *name) {
 "\n", name, name);
 }
 
+#if 0 /* ******************************************************************** */
+
 static inline float fastlog2(float val) { // for numbers above 1.00, only!
     union { float f; uint32_t i; } vx = { val };
     register float y = (float)vx.i;
@@ -440,7 +442,6 @@ static inline float fastlog2(float val) { // for numbers above 1.00, only!
     return (y - 124.22551499f);     //* 1.442695f natural logaritm conv.;
 }
 
-#if 0
 // 1. Definisci una tabella globale (o passala alla funzione)
 static float log2_table[256];
 static bool log2_table_ready = false;
@@ -479,7 +480,58 @@ size_t stats_total_calc(stats_t *st) {
     st->entropy = e;
     // ... resto dei calcoli ...
 }
-#endif
+
+static inline void print_tablog2() {
+    float f_val;
+    uint32_t u_val;
+
+    perr("\n#include <stdalign.h>\n");
+    perr("alignas(64) const uint32_t tablog2[256] = {\n");
+    for(int i = 0; i < 256; i++) {
+        f_val = log2f(i);
+        memcpy(&u_val, &f_val, sizeof(uint32_t));
+        perr("0x%08x,%c", u_val, (i+1)%8 ? ' ' : '\n');
+    }
+    perr("}; const float *ptablog2 = (const float *)tablog2;\n");
+}
+
+#include <stdalign.h>
+alignas(64) const uint32_t tablog2[256] = {
+0xff800000, 0x00000000, 0x3f800000, 0x3fcae00d, 0x40000000, 0x40149a78, 0x40257007, 0x4033abb4,
+0x40400000, 0x404ae00d, 0x40549a78, 0x405d6754, 0x40657007, 0x406cd401, 0x4073abb4, 0x407a0a7f,
+0x40800000, 0x4082cc7f, 0x40857007, 0x4087ef06, 0x408a4d3c, 0x408c8ddd, 0x408eb3aa, 0x4090c105,
+0x4092b803, 0x40949a78, 0x40966a01, 0x4098280a, 0x4099d5da, 0x409b7495, 0x409d053f, 0x409e88c7,
+0x40a00000, 0x40a16bad, 0x40a2cc7f, 0x40a42316, 0x40a57007, 0x40a6b3d8, 0x40a7ef06, 0x40a92204,
+0x40aa4d3c, 0x40ab7111, 0x40ac8ddd, 0x40ada3f6, 0x40aeb3aa, 0x40afbd43, 0x40b0c105, 0x40b1bf31,
+0x40b2b803, 0x40b3abb4, 0x40b49a78, 0x40b58482, 0x40b66a01, 0x40b74b20, 0x40b8280a, 0x40b900e6,
+0x40b9d5da, 0x40baa709, 0x40bb7495, 0x40bc3e9d, 0x40bd053f, 0x40bdc89a, 0x40be88c7, 0x40bf45e1,
+0x40c00000, 0x40c0b73d, 0x40c16bad, 0x40c21d67, 0x40c2cc7f, 0x40c37908, 0x40c42316, 0x40c4caba,
+0x40c57007, 0x40c6130b, 0x40c6b3d8, 0x40c7527c, 0x40c7ef06, 0x40c88984, 0x40c92204, 0x40c9b892,
+0x40ca4d3c, 0x40cae00d, 0x40cb7111, 0x40cc0053, 0x40cc8ddd, 0x40cd19bb, 0x40cda3f6, 0x40ce2c98,
+0x40ceb3aa, 0x40cf3935, 0x40cfbd43, 0x40d03fdb, 0x40d0c105, 0x40d140ca, 0x40d1bf31, 0x40d23c42,
+0x40d2b803, 0x40d3327c, 0x40d3abb4, 0x40d423b0, 0x40d49a78, 0x40d51012, 0x40d58482, 0x40d5f7d0,
+0x40d66a01, 0x40d6db19, 0x40d74b20, 0x40d7ba19, 0x40d8280a, 0x40d894f7, 0x40d900e6, 0x40d96bdb,
+0x40d9d5da, 0x40da3ee8, 0x40daa709, 0x40db0e41, 0x40db7495, 0x40dbda07, 0x40dc3e9d, 0x40dca259,
+0x40dd053f, 0x40dd6754, 0x40ddc89a, 0x40de2914, 0x40de88c7, 0x40dee7b4, 0x40df45e1, 0x40dfa34e,
+0x40e00000, 0x40e05bf9, 0x40e0b73d, 0x40e111cd, 0x40e16bad, 0x40e1c4e0, 0x40e21d67, 0x40e27546,
+0x40e2cc7f, 0x40e32314, 0x40e37908, 0x40e3ce5e, 0x40e42316, 0x40e47734, 0x40e4caba, 0x40e51daa,
+0x40e57007, 0x40e5c1d1, 0x40e6130b, 0x40e663b7, 0x40e6b3d8, 0x40e7036e, 0x40e7527c, 0x40e7a103,
+0x40e7ef06, 0x40e83c85, 0x40e88984, 0x40e8d603, 0x40e92204, 0x40e96d88, 0x40e9b892, 0x40ea0323,
+0x40ea4d3c, 0x40ea96df, 0x40eae00d, 0x40eb28c8, 0x40eb7111, 0x40ebb8e9, 0x40ec0053, 0x40ec474e,
+0x40ec8ddd, 0x40ecd401, 0x40ed19bb, 0x40ed5f0c, 0x40eda3f6, 0x40ede879, 0x40ee2c98, 0x40ee7052,
+0x40eeb3aa, 0x40eef6a0, 0x40ef3935, 0x40ef7b6b, 0x40efbd43, 0x40effebd, 0x40f03fdb, 0x40f0809d,
+0x40f0c105, 0x40f10114, 0x40f140ca, 0x40f18029, 0x40f1bf31, 0x40f1fde4, 0x40f23c42, 0x40f27a4c,
+0x40f2b803, 0x40f2f568, 0x40f3327c, 0x40f36f40, 0x40f3abb4, 0x40f3e7d9, 0x40f423b0, 0x40f45f3b,
+0x40f49a78, 0x40f4d56a, 0x40f51012, 0x40f54a6f, 0x40f58482, 0x40f5be4d, 0x40f5f7d0, 0x40f6310c,
+0x40f66a01, 0x40f6a2b0, 0x40f6db19, 0x40f7133f, 0x40f74b20, 0x40f782be, 0x40f7ba19, 0x40f7f132,
+0x40f8280a, 0x40f85ea1, 0x40f894f7, 0x40f8cb0e, 0x40f900e6, 0x40f9367f, 0x40f96bdb, 0x40f9a0f9,
+0x40f9d5da, 0x40fa0a7f, 0x40fa3ee8, 0x40fa7316, 0x40faa709, 0x40fadac2, 0x40fb0e41, 0x40fb4187,
+0x40fb7495, 0x40fba76a, 0x40fbda07, 0x40fc0c6d, 0x40fc3e9d, 0x40fc7096, 0x40fca259, 0x40fcd3e7,
+0x40fd053f, 0x40fd3664, 0x40fd6754, 0x40fd9810, 0x40fdc89a, 0x40fdf8f0, 0x40fe2914, 0x40fe5906,
+0x40fe88c7, 0x40feb856, 0x40fee7b4, 0x40ff16e3, 0x40ff45e1, 0x40ff74af, 0x40ffa34e, 0x40ffd1be
+}; const float *ptablog2 = (const float *)tablog2;
+
+#endif /* ******************************************************************* */
 
 size_t stats_total_calc(stats_t *st) {
     #define LOG2 log2f
@@ -547,6 +599,8 @@ int main(int argc, char *argv[]) {
     unsigned char rbuf[MAX_READ_SIZE+64];
     unsigned char jbuf[MAX_READ_SIZE+64];
     unsigned char zbuf[MAX_COMP_SIZE+64];
+
+    // print_tablog2();
 
     // Zeroing the structures, best practice only: given zeroed for security
     memset(&rs, 0, sizeof(rs));
@@ -620,11 +674,11 @@ int main(int argc, char *argv[]) {
     // Aesthetic blankline
     if(!quiet) perr("\n");
 
-#if 0
-#define BLOCK_SIZE MAX_READ_SIZE
-#else
-#define BLOCK_SIZE 64
-#endif
+    #if 0  // --------------------------------------------------------------- //
+    #define BLOCK_SIZE MAX_READ_SIZE
+    #else
+    #define BLOCK_SIZE 64
+    #endif
 
     // decoupling output from storage, uniforming API output
     size_t outsz;
