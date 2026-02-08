@@ -11,6 +11,10 @@ Because exceptions, do not need to be common but just exist:
 * [Novelties and Possibly mistakes]([https://chatgpt.com/share/69886a46-5d0c-8012-a863-0094dca59e83) but why do not investigate a bit deeper? 
 * New Proofs for NMAC and HMAC: [Security without Collision-Resistance](https://eprint.iacr.org/2006/043.pdf) by Mihir Bellare, April 2024.
 
+And sometime, an image is worth thousands of words...
+
+---
+
 ![YNSA](img/YNSA.jpg)
 
 ---
