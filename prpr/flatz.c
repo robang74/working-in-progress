@@ -213,7 +213,7 @@ unsigned printstats(const char *str, size_t nread, unsigned nsymb,
 
     if(head) stats_print_head(str, nread, ratio);
     fprintf(stderr,
-        "%s: syml: %3ld, Eñ: %8.6lf / %4.2f = %8.6lf, X²: %10.3lf, k²: %9.5lf, avg: %9.5lf %+4g %%\n",
+        "%s: syml: %3ld, Eñ: %8.6lf / %4.2f = %4.2lf, X²: %10.3lf, k²: %9.5lf, avg: %9.5lf %+4g %%\n",
             str, MIN(nread,nsymb), entropy, lg2s, entropy/lg2s, s, k * nsymb, avg, pavg);
 
     return n;
@@ -283,26 +283,13 @@ unsigned stats_block_elab(stats_t *st) {
 
 void stats_print_line(stats_t *st) {
     stats_print_head(st->name, st->ntot, st->ratio);
-/*
-    perr("\n%s: %ld bytes, %.1lf Kb, %.3lf Mb", st->name,
-        st->ntot, (double)st->ntot / (1<<10), (double)st->ntot / (1<<20));
-    if(st->ratio > 0) {
-      perr(", rtio: %lf %% (1 : %.3lf)\n", st->ratio * 100, 1.0 / st->ratio);
-    } else {
-      long nsrun = get_nanos();
-      perr(", pid: %d, elab: %.1lf ms (%.1lf Kb/s)\n",
-          getpid(), (double)nsrun / E6, (double)st->ntot * (E9 >> 10) / nsrun);
-    }
-*/
-    perr("%s: symbl: %3ld, Eñ: %5.3lf / %4.2f = %6.4lf, X²: %8.2lf, k²: %7.4lf, avg: %8.7g %+.4g %%\n",
+    perr("%s: symbl: %3ld, Eñ: %8.6lf / %4.2f = %4.2lf, X²: %8.2lf, k²: %7.4lf, avg: %8.7g %+.4g %%\n",
+        st->name, MIN(st->ntot, st->nmax), st->entropy, (double)st->nenc, st->entropy / st->nenc,
+        st->x2, st->k2 * st->nsybl, st->avg, st->avg_pdv);
+    if(st->nsybl < 256) return;
+    perr("%s: symbl: %3ld, Eñ: %8.6lf / %4.2f = %4.2lf, X²: %8.2lf, k²: %7.4lf, avg: %8.7g %+.4g %%\n",
         st->name, MIN(st->ntot, st->nsybl), st->entropy, st->log2s, st->ent1bit,
         st->x2, st->k2 * st->nsybl, st->avg, st->avg_pdv);
-/*
-        if (st->nenc < 8)
-            (void)printstats("encdg", size, st->nmax, st->counts, 1, 0);
-        if(st->nsybl < nmax)
-            (void)printstats("symbl", size, st->nsybl, st->counts, 1, 0);
-*/
 }
 
 static inline ssize_t writebuf(int fd, const uint8_t *buffer, size_t ntwr) {
@@ -369,6 +356,11 @@ size_t zdeflating(const int action, uint8_t const *zbuf, z_stream *pstrm,
         pstrm->next_out = zbuffer;
         pstrm->avail_out = MAX_COMP_SIZE;
         ret = deflate(pstrm, action);
+        if(ret !=  Z_OK && ret != Z_STREAM_END) {
+            perror("zlib::deflateEnd");
+            exit(EXIT_FAILURE);
+        }
+/*
         zsize = MAX_COMP_SIZE - pstrm->avail_out;
         if(hsize && zsize > 0) {
             if(zsize >= hsize) {
@@ -407,26 +399,22 @@ size_t zdeflating(const int action, uint8_t const *zbuf, z_stream *pstrm,
                 }
             }
         }
-        if(zsize > 0) {
-            writeout(zbuffer, zsize);
-            for (i = 0; i < zsize; i++) zcounts[ zbuffer[i] ]++;
-            zsizetot += zsize;
-        }
+*/
     } while( (action == Z_NO_FLUSH && pstrm->avail_out == 0)
           || (action == Z_FINISH   && ret != Z_STREAM_END) );
 
     if(tbuffer) //  useless here/now but for best practice
         free(tbuffer);
 
-    return zsize;
+    return MAX_COMP_SIZE - pstrm->avail_out;
 }
 
 #define Z_ON (zipl >= 0)
 #define J_ON (jsize > 0)
-#define P_ON (pass && !Z_ON)
+#define P_ON (pass)
 
-#define SHOW(s) { if(!quiet) { (void)stats_total_calc(s); stats_print_line(s); } }
 #define ZDEF(f) zs.bsize = zdeflating(f, zs.data, &strm, hsize, tsize, zs.counts, pass)
+#define SHOW(s) { if(!quiet) { (void)stats_total_calc(s); stats_print_line(s); } }
 #define PASS(x) { if(x) (void)writebuf(STDOUT_FILENO, outbuf, outsz); }
 #define ELAB(s) { if(!quiet) (void)stats_block_elab(s); }
 #define CALC(s) { if(!quiet) (void)stats_total_calc(s); }
@@ -453,7 +441,7 @@ static inline float fastlog2(float val) {
 }
 
 size_t stats_total_calc(stats_t *st) {
-    #define LOG2 fastlog2
+    #define LOG2 log2 //fastlog2
     if (!st) return 0;
 
     // Localized variables for compiler optimisation
@@ -583,7 +571,7 @@ int main(int argc, char *argv[]) {
         strm.next_out = zbuf;
         strm.avail_out = MAX_COMP_SIZE;
         if (deflateInit(&strm, zipl) != Z_OK) {
-            perror("deflateInit");
+            perror("libz::deflateInit");
             exit(EXIT_FAILURE);
         }
     }
@@ -597,13 +585,13 @@ int main(int argc, char *argv[]) {
 #define BLOCK_SIZE 64
 #endif
 
+    // decoupling output from storage, uniforming API output
+    size_t outsz;
+    uint8_t *outbuf;
+    #define setout(b,s) { outbuf = (uint8_t *)(b); outsz = (size_t)(s); }
+
     for (unsigned k = 0; true; k) { //-- service loop start --------------- --//
         static uint64_t hash;
-
-        // decoupling output from storage, uniforming API output
-        size_t outsz;
-        uint8_t *outbuf;
-        #define setout(b,s) { outbuf = (uint8_t *)(b); outsz = (size_t)(s); }
 
         // read data from input stream
         outsz = (J_ON) ? jsize : BLOCK_SIZE;
@@ -622,12 +610,12 @@ int main(int argc, char *argv[]) {
             strm.avail_in = outsz;
             strm.next_in = outbuf;
             ZDEF(Z_NO_FLUSH);
-            setout(zs.data, zs.bsize);
-            ELAB(&zs);
-        } else { // zdeflating already provides pass-through when requested
-            PASS(P_ON);
+            //TODO
+            //setout(zs.data, zs.bsize);
+            //ELAB(&zs);
         }
-   
+        else PASS(P_ON);
+
         if(quiet) continue;
 
         perr("DGB, rs(%03d)> avg: %7.3lf, ntot: %4ld, bsize: %4ld",
@@ -635,7 +623,7 @@ int main(int argc, char *argv[]) {
         if (J_ON) { perr(", djb2: "); print_hash(hash, 8); }
         perr("\n");
     } //-- service while end ---------------------------------------------- --//
-#if 0
+#if 1
     SHOW(&rs); // Show read data statistics, if not inhibited
 #else
     CALC(&rs);
@@ -643,14 +631,18 @@ int main(int argc, char *argv[]) {
     printstats(0, 0, 0, 0, 0, 0, 1);
 #endif
 
-
     // Finalise the zlib compression process
-    if (Z_ON) { // zdeflating already provides pass-through when requested
+    if (Z_ON) {
         ZDEF(Z_FINISH);
-        deflateEnd(&strm);
+        if(deflateEnd(&strm) != Z_OK) {
+            perror("zlib::deflateEnd");
+            exit(EXIT_FAILURE);
+        }
+        setout(zs.data, zs.bsize);
+        PASS(P_ON);
         ELAB(&zs);
         zs.ratio = (double)zs.ntot / rs.ntot;
-#if 0
+#if 1
         SHOW(&zs); // Show libz data statistics, if not inhibited
 #else
         CALC(&zs);
