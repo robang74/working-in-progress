@@ -442,58 +442,7 @@ static inline float fastlog2(float val) { // for numbers above 1.00, only!
     return (y - 124.22551499f);     //* 1.442695f natural logaritm conv.;
 }
 
-// 1. Definisci una tabella globale (o passala alla funzione)
-static float log2_table[256];
-static bool log2_table_ready = false;
-// 2. Inizializzala una sola volta (es. all'inizio di main)
-void init_log2_table() {
-    for (int i = 0; i < 256; i++) {
-        // log(0) non definito, gestito come 0 per entropia
-        if (i == 0) log2_table[i] = 0;
-        else log2_table[i] = log2f((float)i);
-    }
-    log2_table_ready = true;
-}
-// 3. Usa la proprietà dei logaritmi nel calcolo dell'entropia
-// log2(counts[i] / ntot) = log2(counts[i]) - log2(ntot)
-
-// Pre-calcola questa tabella una sola volta all'avvio del programma
-float log2_table[MAX_READ_SIZE + 1];
-// ... inizializzazione con log2f((float)i) ...
-
-size_t stats_total_calc(stats_t *st) {
-    if (!st || !st->ntot) return 0;
-
-    double e = 0;
-    double ntot_f = (double)st->ntot;
-    double log2_ntot = log2(ntot_f); // Calcolato una sola volta
-
-    for (int i = 0; i < 256; i++) {
-        if (st->counts[i] > 0) {
-            double cnt = (double)st->counts[i];
-            // px = cnt / ntot_f
-            // log2(px) = log2(cnt) - log2_ntot
-            double log2_px = log2(cnt) - log2_ntot;  // log2(cnt) si può tabellare
-            e -= (cnt / ntot_f) * log2_px;
-        }
-    }
-    st->entropy = e;
-    // ... resto dei calcoli ...
-}
-
-static inline void print_tablog2() {
-    float f_val;
-    uint32_t u_val;
-
-    perr("\n#include <stdalign.h>\n");
-    perr("alignas(64) const uint32_t tablog2[256] = {\n");
-    for(int i = 0; i < 256; i++) {
-        f_val = log2f(i);
-        memcpy(&u_val, &f_val, sizeof(uint32_t));
-        perr("0x%08x,%c", u_val, (i+1)%8 ? ' ' : '\n');
-    }
-    perr("}; const float *ptablog2 = (const float *)tablog2;\n");
-}
+#endif /* ******************************************************************* */
 
 #include <stdalign.h>
 alignas(64) const uint32_t tablog2[256] = {
@@ -531,22 +480,30 @@ alignas(64) const uint32_t tablog2[256] = {
 0x40fe88c7, 0x40feb856, 0x40fee7b4, 0x40ff16e3, 0x40ff45e1, 0x40ff74af, 0x40ffa34e, 0x40ffd1be
 }; const float *ptablog2 = (const float *)tablog2;
 
-#endif /* ******************************************************************* */
+/*
+ * NOTE: using ptablog2[] instead of log2f() is **educational** when running on
+ *       modern CPU w/FPU because the log2f() is still competitive and hot-cache
+ *       makes the difference between MEM/FPU competition. However, in others
+ *       architecture like ESP32 S3, the table approach is the sole that can helps
+ *       to speed-up entropy calculation. Because keeping in run a tool is the
+ *       best way to be forced in maintaining it, for when it will be necessary,
+ *       therefore I go with this pre-calculated table implementation. The other
+ *       is pretty straighforwad: s/(ptablog2[ ci ] - log2_nread)/log2f(px)/
+ */
+ #define tablog2_ptr ptablog2
 
 size_t stats_total_calc(stats_t *st) {
-    #define LOG2 log2f
     if (!st) return 0;
 
     // Localized variables for compiler optimisation
     // register keywords and while uusage for speed.
-    const bool entdone    =(st->entropy != 0);
     const size_t nread    = st->ntot;
     register size_t   len = st->ntot;
     register uint8_t *d   = st->data;
     uint32_t         *c   = st->counts;
     double            sum = 0;
 
-    if(!len || !d || !st->avg_sum) return 0;   // !avg_sum --> elab() never done
+    if(!len || !d || !st->avg_sum) return 0;
 
     // Filling the stats strucuture with precalculated values
     if(!st->nsybl) {
@@ -560,19 +517,25 @@ size_t stats_total_calc(stats_t *st) {
     if(!st->avg_pdv) st->avg_pdv = (st->avg/st->avg_exp - 1) * 100;
 
     double s = 0, k = 0, e = 0;
-    const double epx = 1.0 / (1U << st->base);             //st->nsybl;
-    const double ex = (double)nread / (1U << st->base);    //st->nsybl;
+    const double epx = 1.0 / (1U << st->base);              // st->nsybl;
+    const double ex = epx * nread;                          // st->nsybl;
+    const double ex_inv = 1.0 / ex;
+    const double nread_inv = 1.0 / nread;
+    const float log2_nread = log2f(nread);
 
     for (register int i = 0; i < 256; i++) {
-        register double x  = (double)c[i] - ex;
-        const double px = (double)c[i] / nread;
-        s += (x * x) / ex;
-        x = px - epx;
-        k += (x * x);
+        register int ci = c[i];
+        register double x  = - ex + ci ;
+        s += (x * x) * ex_inv;                              // X² aka chi-square
 
-        if(entdone || !c[i])
-            continue;
-        e -= px * LOG2(px);
+        const double px = nread_inv * ci;
+        x = px - epx;
+        k += (x * x);                                       // k² aka RMS freq. dev.
+#ifdef tablog2_ptr
+        if(ci) e -= px * (ptablog2[ ci ] - log2_nread);     // entropy
+#else                                                       // | equal within 1ppm.
+        if(ci) e -= px * log2f(px);                         // entropy
+#endif
     }
 
     st->x2 = s;
@@ -600,7 +563,9 @@ int main(int argc, char *argv[]) {
     unsigned char jbuf[MAX_READ_SIZE+64];
     unsigned char zbuf[MAX_COMP_SIZE+64];
 
-    // print_tablog2();
+#ifdef print_tablog2_func
+    print_tablog2_func();
+#endif
 
     // Zeroing the structures, best practice only: given zeroed for security
     memset(&rs, 0, sizeof(rs));
