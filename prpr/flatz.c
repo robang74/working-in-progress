@@ -213,7 +213,7 @@ unsigned printstats(const char *str, size_t nread, unsigned nsymb,
 
     if(head) stats_print_head(str, nread, ratio);
     fprintf(stderr,
-        "%s: %3ld, Eñ: %8.6lf / %4.2f = %8.6lf, X²: %10.3lf, k²: %9.5lf, avg: %9.5lf %+4g %%\n",
+        "%s: syml: %3ld, Eñ: %8.6lf / %4.2f = %8.6lf, X²: %10.3lf, k²: %9.5lf, avg: %9.5lf %+4g %%\n",
             str, MIN(nread,nsymb), entropy, lg2s, entropy/lg2s, s, k * nsymb, avg, pavg);
 
     return n;
@@ -294,7 +294,7 @@ void stats_print_line(stats_t *st) {
           getpid(), (double)nsrun / E6, (double)st->ntot * (E9 >> 10) / nsrun);
     }
 */
-    perr("%s: %3ld symbl, Eñ: %5.3lf / %4.2f = %6.4lf, X²: %8.2lf, k²: %7.4lf, avg: %8.7g %+.4g %%\n",
+    perr("%s: symbl: %3ld, Eñ: %5.3lf / %4.2f = %6.4lf, X²: %8.2lf, k²: %7.4lf, avg: %8.7g %+.4g %%\n",
         st->name, MIN(st->ntot, st->nsybl), st->entropy, st->log2s, st->ent1bit,
         st->x2, st->k2 * st->nsybl, st->avg, st->avg_pdv);
 /*
