@@ -442,6 +442,21 @@ static inline float fastlog2(float val) { // for numbers above 1.00, only!
     return (y - 124.22551499f);     //* 1.442695f natural logaritm conv.;
 }
 
+#define print_tablog2_func print_tablog2
+static inline void print_tablog2() {
+    float f_val;
+    uint32_t u_val;
+
+    perr("\n#include <stdalign.h>\n");
+    perr("alignas(64) const uint32_t tablog2[256] = {\n");
+    for(int i = 0; i < 256; i++) {
+        f_val = (float)log2(i);
+        memcpy(&u_val, &f_val, sizeof(uint32_t));
+        perr("0x%08x%c%c", u_val, (i!=0xff) ? ',' : ' ', (i+1)%8 ? ' ' : '\n');
+    }
+    perr("}; const float *ptablog2 = (const float *)tablog2;\n");
+}
+
 #endif /* ******************************************************************* */
 
 #include <stdalign.h>
@@ -490,7 +505,7 @@ alignas(64) const uint32_t tablog2[256] = {
  *       therefore I go with this pre-calculated table implementation. The other
  *       is pretty straighforwad: s/(ptablog2[ ci ] - log2_nread)/log2f(px)/
  */
- #define tablog2_ptr ptablog2
+#define tablog2_ptr ptablog2
 
 size_t stats_total_calc(stats_t *st) {
     if (!st) return 0;
