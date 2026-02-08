@@ -283,12 +283,12 @@ unsigned stats_block_elab(stats_t *st) {
 
 void stats_print_line(stats_t *st) {
     stats_print_head(st->name, st->ntot, st->ratio);
-    perr("%s: symbl: %3ld, Eñ: %8.6lf / %4.2f = %4.2lf, X²: %8.2lf, k²: %7.4lf, avg: %8.7g %+.4g %%\n",
-        st->name, MIN(st->ntot, st->nmax), st->entropy, (double)st->nenc, st->entropy / st->nenc,
+    perr("%s: symbl: %3ld, Eñ: %8.6lf / %4.2f = %5.1lf %%, X²: %8.2lf, k²: %7.4lf, avg: %8.7g %+6.4g %%\n",
+        st->name, MIN(st->ntot, st->nmax), st->entropy, (double)st->nenc, (st->entropy * 100) / st->nenc,
         st->x2, st->k2 * st->nsybl, st->avg, st->avg_pdv);
     if(st->nsybl < 256) return;
-    perr("%s: symbl: %3ld, Eñ: %8.6lf / %4.2f = %4.2lf, X²: %8.2lf, k²: %7.4lf, avg: %8.7g %+.4g %%\n",
-        st->name, MIN(st->ntot, st->nsybl), st->entropy, st->log2s, st->ent1bit,
+    perr("%s: symbl: %3ld, Eñ: %8.6lf / %4.2f = %5.1lf %%, X²: %8.2lf, k²: %7.4lf, avg: %8.7g %+6.4g %%\n",
+        st->name, MIN(st->ntot, st->nsybl), st->entropy, st->log2s, st->ent1bit * 100,
         st->x2, st->k2 * st->nsybl, st->avg, st->avg_pdv);
 }
 
@@ -360,7 +360,7 @@ size_t zdeflating(const int action, uint8_t const *zbuf, z_stream *pstrm,
             perror("zlib::deflateEnd");
             exit(EXIT_FAILURE);
         }
-/*
+/* TODO: -hN -tN
         zsize = MAX_COMP_SIZE - pstrm->avail_out;
         if(hsize && zsize > 0) {
             if(zsize >= hsize) {
@@ -433,15 +433,56 @@ static inline void usage(const char *name) {
 "\n", name, name);
 }
 
-static inline float fastlog2(float val) {
+static inline float fastlog2(float val) { // for numbers above 1.00, only!
     union { float f; uint32_t i; } vx = { val };
     register float y = (float)vx.i;
     y *= 1.1920928955078125e-7f;    //= 1 / 2^23
-    return y - 124.22551499f;
+    return (y - 124.22551499f);     //* 1.442695f natural logaritm conv.;
 }
 
+#if 0
+// 1. Definisci una tabella globale (o passala alla funzione)
+static float log2_table[256];
+static bool log2_table_ready = false;
+// 2. Inizializzala una sola volta (es. all'inizio di main)
+void init_log2_table() {
+    for (int i = 0; i < 256; i++) {
+        // log(0) non definito, gestito come 0 per entropia
+        if (i == 0) log2_table[i] = 0;
+        else log2_table[i] = log2f((float)i);
+    }
+    log2_table_ready = true;
+}
+// 3. Usa la proprietà dei logaritmi nel calcolo dell'entropia
+// log2(counts[i] / ntot) = log2(counts[i]) - log2(ntot)
+
+// Pre-calcola questa tabella una sola volta all'avvio del programma
+float log2_table[MAX_READ_SIZE + 1];
+// ... inizializzazione con log2f((float)i) ...
+
 size_t stats_total_calc(stats_t *st) {
-    #define LOG2 log2 //fastlog2
+    if (!st || !st->ntot) return 0;
+
+    double e = 0;
+    double ntot_f = (double)st->ntot;
+    double log2_ntot = log2(ntot_f); // Calcolato una sola volta
+
+    for (int i = 0; i < 256; i++) {
+        if (st->counts[i] > 0) {
+            double cnt = (double)st->counts[i];
+            // px = cnt / ntot_f
+            // log2(px) = log2(cnt) - log2_ntot
+            double log2_px = log2(cnt) - log2_ntot;  // log2(cnt) si può tabellare
+            e -= (cnt / ntot_f) * log2_px;
+        }
+    }
+    st->entropy = e;
+    // ... resto dei calcoli ...
+}
+#endif
+
+size_t stats_total_calc(stats_t *st) {
+    #define LOG2 log2f
     if (!st) return 0;
 
     // Localized variables for compiler optimisation
