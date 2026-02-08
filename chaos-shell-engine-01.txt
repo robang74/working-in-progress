@@ -1,0 +1,62 @@
+## Abstract: Chaos Shell Engine
+
+The Chaos Shell Engine represents a paradigm shift in entropy collection by moving from a reactive model of "waiting for events" to a proactive model of "creating events". While traditional computer systems are deterministic in their logic, they exhibit non-deterministic execution times due to hardware latencies and jitter.
+
+This proof-of-concept demonstrates that high-quality random numbers—comparable to those from dedicated hardware—can be generated through software-defined multi-threading using standard tools like Bash and hashing utilities. By capturing infinitesimal timing uncertainties (jitter) and processing them through deterministic hashing functions, the system transforms execution variances into unpredictable bitstreams. Ultimately, the engine suggests that when the underlying "clockwork" is sufficiently balanced, the barrier of observability becomes high enough to ensure cryptographic indistinguishability without specialized physical components.
+
+---
+
+First of all, it should be noted that when approaching the Chaos Shell Engine, a name chosen for its evocative rather than formal qualities, it is necessary to view it as the product of a paradigm shift in considering entropy within information theory.
+
+Without this premise, it is nothing more than “creating events to collect entropy” instead of “waiting for events”. So let's start with the assumption of what “entropy” means when we refer to random number generators. Curiously, the practical definition is that a block of bits has high entropy when it has low symbol redundancy. For example, I can predict the next letter of a word, and AI can predict the next word in a sentence.
+
+A good random number generator, on the other hand, produces sequences of numbers that cannot be predicted even if the previous ones are known. So let's take a step back: pseudo-random number generators are algorithms that start from a seed and generate sequences that cannot be predicted unless the initial seed is known. It's a bit like cryptography, which cannot be deciphered unless the key is known.
+
+Then there are other aspects such as the flat distribution of values, the chi-square, the ability to approximate pi using the Monte Carlo method, etc. Then there are tools such as “ent” that look for patterns because redundancy is only the most trivial of patterns, and if a block of bits contains some pattern, then even if it is not totally predictable, the probability of certain symbols is greater than others. In short, it is not white noise.
+
+So in information theory, from a practical point of view, we measure the entropy (or rather, the information density) of an added character as a measure of the probability of the next symbol. For example, we have N symbols and the next one has a probability of being any other symbol equal to 1/N. Obviously, this entails some typical characteristics because 0... N repeating has a flat but predictable distribution.
+
+So in practice, at the state of the art, the issue could be resolved by finding the seed of the pseudo-random number generator randomly and changing it often. However, this reasoning is a dog chasing its tail because the fundamental question is how to “create” an intrinsically random number from a computer system that is deterministic.
+
+Simply deleting a state (seed) does not in itself mean a lack of determinism. At best, it can be a security measure against a local attacker, but the fundamental issue is that a remote attacker can predict the seed. A trivial choice is to use the number of nanoseconds provided by “date” as the seed because, fundamentally, the start-up time of a deterministic system is known, but with uncertainty about the last digits of the nanoseconds.
+
+In practice, given an operation that takes an average time T, the average varies according to a Gaussian distribution between T-dt and T+dt. If dt is the standard deviation, then the multiplier 3 is usually used.", then the multiplier 3 is usually used. However, in this interval, the distribution of values between T-3dt and T+3dt is not flat. However, hashing functions guarantee that if there is a small, even minimal, difference between two values, the two relative hashes will be “completely” different.
+
+But a deterministic system in terms of input-output or, more generally, input, states -> output, states is not necessarily also deterministic in terms of execution time. In fact, modern processing systems are not. We observe latencies, and these latencies are not constant and therefore jitter. In general, these are relatively small fractions and sometimes even more significant. However, this is not relevant.
+
+So the underlying question is: can I get the system to work in a condition where these uncertainties, through a deterministic algorithm, are transformed into a stream of bits that is unpredictable because it contains information such as the jitter measurement, which is unpredictable? This is where the concept of observability comes in. If an attacker can access the chip level, they already have access to all lower levels.
+
+So the question of unpredictability is not whether it exists due to the very nature of the physical phenomena involved or simply because the degree of access required to the system transcends the attacker's capabilities or, at least, the minimum observability barrier is so high that in practice it is not the generation of random numbers that is the weak link in the security chain, even if they are pseudorandom but indistinguishable.
+
+Chaos Shell Engine is, in a nutshell, a proof-of-concept that aims to demonstrate that it is possible to generate random numbers that would otherwise require dedicated hardware, simply by using multi-threading, which is also available to users who access a text console with bash, utilities and hashing utilities. Because considering a paradigm shift is only a reasonable choice if there is a practical example that demonstrates its usefulness.
+
+Some implementations, which are characterised by rules for constructing random number sequences that are paradoxically more symmetrical than other implementations, show that the more regular and balanced the mechanism (aka clockwork) underlying the Chaos Shell Engine is, the more likely it is that the generator can compete in terms of output with those produced by dedicated hardware systems in terms of sequence unpredictability.
+
+---
+
+Prima di tutto occorre premettere che nell'approcciarsi a "Chaos Shell Engine", un nome scelto perché evocativo piuttosto che formale, è necessario osservarlo come il prodotto di un cambio di paradigma nel considerare l'entropia nell'ambito della teoria dell'informazione.
+
+Senza questa premessa non è altro che "creare eventi per raccogliere entropia" invece di "aspettare eventi". Quindi partiamo dal pressupposto di cosa significhi "entropia" quando ci riferiamo a generatori di numeri casuali. Curiosamente, la definizione pratica è che un blocco di bit abbia alta entropia quando ha bassa ridondanza di simboli. Per esempio io posso prevedere la prossima lettera di una parola e l'AI può prevedere la prossima parola di una frase.
+
+Un buon generatore di numeri casuali invece produce delle sequenze di numeri che non è possibile prevedere anche conoscendo i precedenti. Facciamo quindi un passo indietro, i generatori di numeri pseudo casuali sono invece degli algoritmi che partendo da un seed generano delle sequenze che NON è possibile prevedere se non conoscendo il seed iniziale. Un po' come la crittografia per cui non è possibile decifrare se non si conosce la chiave.
+
+Poi ci sono altri aspetti come la distribuzione piatta dei valori, il chi quadro, la capacità di approssimare pi-greco mediante metodo Monte Carlo, etc. Poi ci sono tool come "ent" che cercano pattern perché la ridondanza è solo il più banale degli schemi e se un blocco di bit contiene un qualche schema allora anche se non è totalmente prevedibile la probabilità di certi simboli è maggiore di altri. Insomma, non è rumore bianco.
+
+Quindi in teoria dell'informazione, da un punto di vista pratico, si misura l'entropia (o meglio, la densità di informazione) di un carattere aggiunto come misura della probabilità del prossimo simbolo. Esempio, abbiamo N simboli e il successivo ha una probabilità di essere un qualsiasi altro simbolo pari a 1/N. Ovviamente questo comporta alcune caratteristiche tipiche perché 0...N che si ripete ha una distribuzione piatta ma prevedibile.
+
+Quindi in pratica, allo stato dell'arte, la questione potrebbe risolversi in trovare il seed del generatore di numeri psuedocasuale in modo casuale e cambiarlo spesso. Il ragionamento però è un cane che si morde la coda perché la domanda fondamentale è come si possa "creare" un numero intrinsecamente casuale da un sistema informatico che invece è deterministico.
+
+La mera cancellazione di uno stato (seed) non è di per sé stessa mancanza di determinismo. Al più può essere una misura di sicurezza contro un attaccante locale ma il problema che un attaccante remoto possa prevedere il seed, è la questione fondamentale. Una scelta banale è quella di usare il numero di nanosecond fornito da "date" da usare come seed perché fondamentalmente il tempo di avvio di un sistema deterministico è noto ma con un'incertezza sulle ultime cifre dei nanosecondi.
+
+In pratica data un'operazione che in media richiede il tempo T, la media varia rispetto ad una distribuzione gaussiana fra T-dt e T+dt. Se dt è la varianza allora di solito si usa il moltiplicatore 3. Però in questo intervallo la distribuzione di valori fra T-3dt e T+3dt non è piatta. Però le funzioni di hashing ci garantiscono che se c'è una piccola, anche minima, differenza fra due valori, i due hash relativi saranno "completamente" diversi.
+
+Ma un sistema deterministico in termini di input-output o più in generale input, states -> output, states non è necessariamente anche deterministico in termini di tempo di esecuzione. Infatti i moderni sistemi di elaborazione non lo sono. Osserviamo delle latenze e le stesse latenze non sono costanti e quindi dei jitter. In generale si tratta di relativamente piccole frazioni e a volte anche più significative. Però ciò non è rilevante.
+
+Quindi la domanda alla base è: posso portare il sistema a lavorare in una condizione per la quale queste incertezze, mediante un algoritmo deterministico, si trasforminio in un flusso di bit che non sia prevedibile perché contengono delle informazioni quale la misura di jitter che sono imprevedibili? Qui rientra il concetto di osservabilità. Se un attaccante può accedere al livello chip ha già accesso a tutti i livelli inferiori.
+
+Quindi la questione dell'imprevedibilità non è se essa esista per natura stessa dei fenomeni fisici coinvolti oppure semplicemente perché il grado di accesso richiesto al sistema trascende dalle capacità dell'attaccante o, per lo meno, la barriera minima di osservabilità è talmente elevata che in pratica non è il generato di numeri casuali ad essere l'anello debole della catena di sicurezza, anche se pseudocasuali ma indistinguibili.
+
+Chaos Shell Engine è, in estrema sintesi, un proof-of-concept che intende dimostrare che è possibile generare numeri casuali che altrimenti avrebbero richiesto un hardware dedicato, semplicemente usando il multi-threading che è disponibile anche all'utente che accede ad una console testuale con bash, utility e comandi di hash. Perché prendere in considerazione un cambio di paradigma è una scelta ragionevole solo se esiste un esempio pratica che ne mostra l'opportunità.
+
+Alcune implementazioni, che sono tipicizzate da regole di costruzione della sequenza di numeri casuali paradossalmente più simmetriche di altre implementazioni, mostra che più è regolare e bilanciato il meccanismo (aka clockwork) alla base dello Chaos Shell Engine, più è probabile che il generatore possa competere in termini di output con quelli prodotti da sistemi hardware dedicati in termini di imprevidibilità della sequenza.
+
