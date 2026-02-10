@@ -75,7 +75,7 @@ uint64_t mix_time_xor(uint64_t h, uint8_t c, struct timespec ts) {
     return h;
 }
 
-
+#include <sched.h>
 uint64_t djb2tum(const char *str, uint64_t seed) {
 /*
  * One of the most popular and efficient hash functions for strings in C is
@@ -95,16 +95,17 @@ uint64_t djb2tum(const char *str, uint64_t seed) {
     if(!*str) return 0;
 
     while((c = *str++)) {
-        struct timespec ts;                   /*
-        clock_gettime(CLOCK_MONOTONIC, &ts);   * getting ns in a hot loop is the limit
-        /*                                     * and we want to see this limit, in VMs
-         * (16+1) (32-1 or 32+1) (64-1)
-         *   01     10      00     11
-         */
+        struct timespec ts;                   //
+        clock_gettime(CLOCK_MONOTONIC, &ts);  // getting ns in a hot loop is the limit
+        sched_yield();                        // and we want to see this limit, in VMs
+
         uint8_t b1 = ts.tv_nsec & 0x03;
         uint8_t b0 = b1 & 0x01;
         b1 &= 0x02;
-
+        /*
+         * (16+1) (32-1 or 32+1) (64-1)
+         *   01     10      00     11
+         */
         h = ( ( h << (4 + (b0 ? b1 : 1)) ) + (b1 ? -h : h) ) ^ c;
     }
 
