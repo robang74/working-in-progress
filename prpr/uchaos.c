@@ -246,7 +246,7 @@ int main(int argc, char *argv[]) {
         else
             exit(EXIT_FAILURE);
         // single run
-        if(!ntsts) return 0;
+        if(ntsts < 2) return 0;
 
         // testing
         for (size_t n = 0; n < size; n++) {
