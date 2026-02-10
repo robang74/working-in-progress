@@ -169,10 +169,33 @@ static inline ssize_t readbuf(int fd, uint8_t *buffer, size_t size, bool intr) {
     return tot;
 }
 
+static inline void usage(const char *name) {
+    perr("\n"\
+"%s read on stdin, stats on stderr, and data on stdout\n"\
+"\n"\
+"Usage: %s [-tN]\n"\
+"   -t: number of collision tests\n"\
+"\n", name, name);
+    exit(0);
+}
+
 #define BLOCK_SIZE 512
 
-int main () {
-    unsigned char *str = NULL;
+int main(int argc, char *argv[]) {
+    uint8_t *str = NULL;
+    uint32_t ntsts = 0;
+
+    // Collect arguments from optional command line parameters
+    while (1) {
+        int opt = getopt(argc, argv, "ht:");
+        if(opt == '?' && !optarg) {
+            usage("uchaos");
+        } else if(opt == -1) break;
+
+        switch (opt) {
+            case 't': ntsts = atoi(optarg); break;
+        }
+    }
 
     if (posix_memalign((void **)&str, 64, BLOCK_SIZE)) {
         perror("posix_memalign");
@@ -183,20 +206,26 @@ int main () {
     if(n < 1) exit(EXIT_FAILURE);
     str[n] = 0;
 
-    size_t size;
-    uint64_t *h = str2ht64(str, &size);
-    if(h)
-        writebuf(STDOUT_FILENO, (uint8_t *)h, size << 3);
+    size_t nk = 0, nt = 0;
+    for (uint32_t a = ntsts; a; a--) { 
+        size_t size;
+        uint64_t *h = str2ht64(str, &size);
+        if(h)
+            writebuf(STDOUT_FILENO, (uint8_t *)h, size << 3);
 
-    size_t k = 0, nm = (size + 1) >> 1;
-    for (n = 0; n < nm; n++) {
-        for(size_t i = 1; i < size; i++) {
-            if(i == n) continue;
-            if(h[i] == h[n]) k++;
+        if(!ntsts) return 0;
+     
+        size_t nm = (size + 1) >> 1;
+        for (n = 0; n < nm; n++) {
+            for(size_t i = 1; i < size; i++) {
+                if(i == n) continue;
+                if(h[i] == h[n]) nk++;
+            }
         }
+        nt += size;
     }
-    perr("\nCollisions: %ld\n", k);
-
+    perr("\nTests: %d, collisions: %ld over %ld hashes (%.2lf%%) -- %s\n\n",
+        ntsts, nk, nt, (float)100*nk/nt, nk?"KO":"OK");
 
     return 0; // exit() do free()
 }
