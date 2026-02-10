@@ -14,7 +14,6 @@
 #include <stddef.h>
 #include <time.h>
 #include <math.h>
-#include <zlib.h>
 
 #define AVGV 127.5
 #define E3 1000L
@@ -79,36 +78,55 @@ uint64_t djb2tum(const char *str, uint64_t seed) {
     return h;
 }
 
-uint64_t * str2ht64(uint8_t *str, size_t *size) {
-    if(!str || !size) return NULL;
+uint64_t *str2ht64(uint8_t *str, size_t *size) {
+    if (!str || !size) return NULL;
 
-    size_t n = strlen(str);
-    if(!n) return NULL;
+    size_t n = strlen((char *)str);
+    if (n == 0) return NULL;
 
-    uint8_t r = n & 3;
-
+    // 1. Determine rotation offset using monotonic time
     struct timespec ts;
     clock_gettime(CLOCK_MONOTONIC, &ts);
+    size_t k = ts.tv_nsec % n;
 
-    uint8_t *s = NULL;
-    if (posix_memalign((void **)&s, 64, n + 8 - r)) {
+    // 2. Calculate padding and allocation
+    // We need enough 64-bit blocks to cover n bytes.
+    size_t num_blocks = (n + 7) >> 3;
+    size_t total_bytes = num_blocks << 3;
+    *size = num_blocks;
+
+    // Allocate aligned memory for the processed string
+    uint8_t *rotated_str = NULL;
+    if (posix_memalign((void **)&rotated_str, 64, total_bytes)) {
         perror("posix_memalign");
-        exit(EXIT_FAILURE);
+        return NULL;
+    }
+    // Initialize with zeros for automatic padding
+    memset(rotated_str, 0, total_bytes);
+
+    // 3. Perform rotation into the new buffer
+    // Copy from k to end
+    memcpy(rotated_str, str + k, n - k);
+    // Copy from beginning to k
+    if (k > 0) {
+        memcpy(rotated_str + (n - k), str, k);
     }
 
-    size_t k = ts % n;
-    for (uint8_t *p = str[k]; p; p++, s++) *s = *p;
-    for (p = str; p && k; p++, k--) *s = *p;
-    for (r; r; r--, p++) *p = 0;
-
-    uint64_t *h = s;
-    n = (n + 63) >> 6;
-    *size = n;
-    for (p = s, k = 0; n; n--) {
-        for(uint8_t i = 0; i < 8; i++) str[i] = p[i];
-        str[0]; h[k++] = djb2tum(str, 0); p += 8;
+    // 4. Generate the uint64_t array
+    // Note: We allocate a separate array for hashes if that was the intent,
+    // or we cast the rotated string. Based on your code, you want a hash per 8-byte block.
+    if(posix_memalign(&h, 64, num_blocks << 3)) {
+        perror("posix_memalign");
+        free(rotated_str);
+        return NULL;
     }
 
+    for (size_t i = 0; i < num_blocks; i++) {
+        // Process each 8-byte chunk of the rotated/padded string
+        h[i] = djb2tum(rotated_str + (i << 3), 0);
+    }
+
+    free(rotated_str);
     return h;
 }
 
