@@ -63,15 +63,6 @@ static inline uint64_t rotl64(uint64_t n, uint8_t c) {
     c &= 63; return (n << c) | (n >> ((-c) & 63));
 }
 
-static inline uint64_t rt64xor(uint64_t h, uint8_t c, uint8_t ns) {
-    uint8_t r = 1 + (ns & 0x07);
-    h ^= rotl64((uint64_t)c, r);
-    r = 5 + ((ns >> 3) & 0x03);
-    h = rotl64(h, r) + h;
-
-    return h;
-}
-
 #include <sched.h>
 uint64_t djb2tum(const char *str, uint64_t seed) {
 /*
@@ -104,8 +95,14 @@ uint64_t djb2tum(const char *str, uint64_t seed) {
          * (16+1) (32-1 or 32+1) (64-1)
          *   01     10      00     11
          */
-        h = ( ( h << (4 + (b0 ? b1 : 1)) ) + (b1 ? -h : h) );
-        h = rt64xor(h ^ c, c, ns);
+        // 1. nacro-mix in djb2-style
+        h  = ( ( h << (4 + (b0 ? b1 : 1)) ) + (b1 ? -h : h) );
+
+        // 2. char injection w/ rotated
+        h ^= c ^ rotl64(c, 1 + (ns & 0x07));
+
+        // 3. stochastics micro-mix
+        h  = rotl64(h, 5 + ((ns >> 3) & 0x03)) + h;
     }
 
     return h;
