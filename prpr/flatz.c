@@ -65,7 +65,7 @@ static inline uint64_t rotl64(uint64_t n, unsigned int c) {
     c &= mask;  return (n << c) | (n >> ((-c) & mask));
 }
 
-uint64_t mix_time_xor(uint64_t h, uint8_t c, struct timespec ts) {
+static inline uint64_t rt64xor(uint64_t h, uint8_t c, struct timespec ts) {
     uint8_t r1 = 1 + (ts.tv_nsec & 0x07);
     uint8_t r2 = 5 + ((ts.tv_nsec >> 3) & 0x03);
 
@@ -106,7 +106,8 @@ uint64_t djb2tum(const char *str, uint64_t seed) {
          * (16+1) (32-1 or 32+1) (64-1)
          *   01     10      00     11
          */
-        h = ( ( h << (4 + (b0 ? b1 : 1)) ) + (b1 ? -h : h) ) ^ c;
+        h = ( ( h << (4 + (b0 ? b1 : 1)) ) + (b1 ? -h : h) );
+        h = rt64xor(h ^ c, c, ts);
     }
 
     return h;
