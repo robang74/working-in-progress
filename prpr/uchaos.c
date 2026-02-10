@@ -222,21 +222,31 @@ int main(int argc, char *argv[]) {
     str[n] = 0;
 
     long mt = 0;
-    size_t nk = 0, nt = 0;
-    for (uint32_t a = ntsts; a; a--) { 
+    uint64_t bic = 0;
+    size_t nk = 0, nt = 0, nx = 0;
+    for (uint32_t a = ntsts; a; a--) {
+        // hashing
         long st = get_nanos();
         size_t size;
         uint64_t *h = str2ht64(str, &size);
         mt += get_nanos() - st;
+
+        // output
         if(h)
             writebuf(STDOUT_FILENO, (uint8_t *)h, size << 3);
 
         if(!ntsts) return 0;
+
+        // testing
         for (size_t n = 0; n < size; n++) {
             for (size_t i = n + 1; i < size; i++) {
                 if (h[i] == h[n]) {
-                    nk++;
+                    nk++; continue;
                 }
+                uint64_t cb = h[i] ^ h[n];
+                for (int a = 0; a < 64; a++)
+                    bic += (cb >> a) & 0x01;
+                nx++;
             }
         }
         nt += size;
@@ -244,10 +254,17 @@ int main(int argc, char *argv[]) {
 
     long rt = get_nanos();
     perr("\nTests: %d, collisions: %ld over %ld hashes (%.2lf%%) -- %s\n",
-        ntsts, nk, nt, (float)100*nk/nt, nk?"KO":"OK");
-    perr("\nTimes: running: %.3lf s, hashing: %.3lf s, speed: %.1lf Kh/s\n\n",
-        (float)rt/E9, (float)mt/E9, (float)E6*nt/rt); 
-
+        ntsts, nk, nt, (double)100*nk/nt, nk?"KO":"OK");
+    perr("\nTimes: running: %.3lf s, hashing: %.3lf s, speed: %.1lf Kh/s\n",
+        (double)rt/E9, (double)mt/E9, (double)E6*nt/rt);
+/*
+    perr("\nBit in common: %ld on %ld, compared to 50%% avg is %lf %%\n",
+        bic, nx << 6, (double)100 / 64 * bic / nx);
+ */
+    double ratio = (double)100 / 64 * bic / nx;
+    perr("\nBits in common compared to 50 %% avg is %.4lf %% (%+.1lf ppm)\n",
+        ratio, (ratio-50) * E6 / 100);
+    perr("\n");
 
     return 0; // exit() do free()
 }
