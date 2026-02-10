@@ -59,18 +59,15 @@ uint64_t djb2sum(const char *str, uint64_t seed) {
     return hash;
 }
 
-
-static inline uint64_t rotl64(uint64_t n, unsigned int c) {
-    const unsigned int mask = (CHAR_BIT * sizeof(n) - 1);  // 63 per uint64_t
-    c &= mask;  return (n << c) | (n >> ((-c) & mask));
+static inline uint64_t rotl64(uint64_t n, uint8_t c) {
+    c &= 63; return (n << c) | (n >> ((-c) & 63));
 }
 
-static inline uint64_t rt64xor(uint64_t h, uint8_t c, struct timespec ts) {
-    uint8_t r1 = 1 + (ts.tv_nsec & 0x07);
-    uint8_t r2 = 5 + ((ts.tv_nsec >> 3) & 0x03);
-
-    h ^= rotl64((uint64_t)c, r1);
-    h = rotl64(h, r2) + h;
+static inline uint64_t rt64xor(uint64_t h, uint8_t c, uint8_t ns) {
+    uint8_t r = 1 + (ns & 0x07);
+    h ^= rotl64((uint64_t)c, r);
+    r = 5 + ((ns >> 3) & 0x03);
+    h = rotl64(h, r) + h;
 
     return h;
 }
@@ -99,15 +96,16 @@ uint64_t djb2tum(const char *str, uint64_t seed) {
         clock_gettime(CLOCK_MONOTONIC, &ts);  // getting ns in a hot loop is the limit
         sched_yield();                        // and we want to see this limit, in VMs
 
-        uint8_t b1 = ts.tv_nsec & 0x03;
-        uint8_t b0 = b1 & 0x01;
-        b1 &= 0x02;
+
+        uint8_t ns = ts.tv_nsec & 0xff;
+        uint8_t b1 = ns & 0x02;
+        uint8_t b0 = ns & 0x01;
         /*
          * (16+1) (32-1 or 32+1) (64-1)
          *   01     10      00     11
          */
         h = ( ( h << (4 + (b0 ? b1 : 1)) ) + (b1 ? -h : h) );
-        h = rt64xor(h ^ c, c, ts);
+        h = rt64xor(h ^ c, c, ns);
     }
 
     return h;
