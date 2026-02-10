@@ -131,3 +131,55 @@ uint64_t *str2ht64(uint8_t *str, size_t *size) {
     return h;
 }
 
+static inline ssize_t writebuf(int fd, const uint8_t *buffer, size_t ntwr) {
+    ssize_t tot = 0;
+    while (ntwr > tot) {
+        errno = 0;
+        ssize_t nw = write(fd, buffer + tot, ntwr - tot);
+        if (nw < 1) {
+            if (errno == EINTR) continue;
+            perror("write");
+            exit(EXIT_FAILURE);
+        }
+        tot += nw;
+   }
+   return tot;
+}
+
+static inline ssize_t readbuf(int fd, char *buffer, size_t size, bool intr) {
+    ssize_t tot = 0;
+    while (size > tot) {
+        errno = 0;
+        ssize_t nr = read(fd, buffer + tot, size - tot);
+        if (nr == 0) break;
+        if (nr < 0) {
+            if (errno == EINTR) {
+              if(intr) return tot;
+              else continue;
+            }
+            perror("read");
+            exit(EXIT_FAILURE);
+        }
+        tot += nr;
+    }
+    return tot;
+}
+
+int main () {
+    size_t size;
+    uint64_t hash;
+    unsigned char *str = NULL;
+    if (tsize > 0) {
+        if (posix_memalign((void **)&str, 512, tsize)) {
+            perror("posix_memalign");
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    n = readbuf(STDIN_FILENO, str, 512, 1);
+    hash = str2ht64(str, &size);
+    if(hash)
+      writebuf(STDOUT_FILENO, hash, size << 3);
+
+    return 0;
+}
