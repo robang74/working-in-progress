@@ -1,7 +1,7 @@
 /*
  * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2 license
  *
- * test: time for i in $(seq 100); do cat uchaos.c | ./chaos; done | ent
+ * test: cat uchaos.c | ./chaos -T 1000 | ent
  *
  * Compile with lib math: gcc uchaos.c -O3 -Wall -o uchaos
  */
@@ -196,7 +196,7 @@ static inline void usage(const char *name) {
 "%s read on stdin, stats on stderr, and data on stdout\n"\
 "\n"\
 "Usage: %s [-tN]\n"\
-"   -t: number of collision tests on the same input\n"\
+"   -T: number of collision tests on the same input\n"\
 "\n", name, name);
     exit(0);
 }
@@ -211,13 +211,13 @@ int main(int argc, char *argv[]) {
 
     // Collect arguments from optional command line parameters
     while (1) {
-        int opt = getopt(argc, argv, "ht:");
+        int opt = getopt(argc, argv, "hT:");
         if(opt == '?' && !optarg) {
             usage("uchaos");
         } else if(opt == -1) break;
 
         switch (opt) {
-            case 't': ntsts = atoi(optarg); break;
+            case 'T': ntsts = atoi(optarg); break;
         }
     }
 
