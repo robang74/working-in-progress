@@ -5,7 +5,7 @@
  *
  * Compile with lib math: gcc uchaos.c -O3 -Wall -o uchaos
  *
- * ***************************************************************************
+ * *****************************************************************************
  * PRESENTATION
  *
  * despite a relatively simple coding, this uchaos binary is able to provide
@@ -33,7 +33,35 @@
  * provide an ordered sequence (white, red, green, etc.) but every other
  * sequence (red, green, white, etc.) is also fine.
  *
+ * *****************************************************************************
+ * OUTPUT TESTS
+ *
  * The first run of commit (#9c8f4f00) passed all the dieharder tests with 49MB.
+ *
+ * gcc uchaos.c -O3 -Wall -o chaos && strip chaos
+ * time cat ../prpr/uchaos.c | ./chaos -T 100000 > uchaos.data.01
+ *
+ * Tests: 100000, collisions: 0 over 6400000 hashes (0.00%) -- OK
+ * Times: running: 19.981 s, hashing: 12.980 s, speed: 320.3 Kh/s
+ * Bits in common compared to 50 % avg is 50.0000 % (-0.2 ppm)
+ *
+ * Collisions here are expected to be 100% for a traditional hash w/fixed input.
+ *
+ * cat uchaos.data.01 | ent
+ * Entropy = 7.999997 bits per byte.
+ * Optimum compression would reduce the size of this 51200000 byte file by 0 percent.
+ * Chi square distribution for 51200000 samples is 247.48, and randomly would exceed
+ * this value 62.04 percent of the times (50% is the ideal value, but 10-90% is fine).
+ * Arithmetic mean value of data bytes is 127.5076 (127.5 = random).
+ * Monte Carlo value for Pi is 3.140672935 (error 0.03 percent).
+ * Serial correlation coefficient is 0.000300 (totally uncorrelated = 0.0).
+ *
+ **************************************************************************** */
+
+real	0m20.000s
+user	0m9.606s
+sys	0m10.378s
+
  *
  */
 
