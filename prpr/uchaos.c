@@ -98,12 +98,13 @@ uint64_t *str2ht64(uint8_t *str, uint64_t **ph,  size_t *size) {
     uint64_t *h = NULL;
     size_t num_blocks = (n + 7) >> 3;
     size_t total_bytes = num_blocks << 3;
-    if(ph && *size > 0 && num_blocks != *size) {
-        perror("*size != expected");
-        perr("%ld, %ld\n",*size, num_blocks);
-        return NULL;
+    if(ph) {
+        if(*size > 0 && num_blocks != *size) {
+            perror("*size != expected");
+            return NULL;
+        }
+        h = *ph;
     }
-    h = *ph;
 
     // Allocate aligned memory for the processed string
     uint8_t *rotated_str = NULL;
@@ -111,8 +112,6 @@ uint64_t *str2ht64(uint8_t *str, uint64_t **ph,  size_t *size) {
         perror("posix_memalign");
         return NULL;
     }
-    // Initialize with zeros for automatic padding
-    memset(rotated_str, 0, total_bytes);
 
     // 3. Perform rotation into the new buffer
     // Copy from k to end
@@ -121,24 +120,27 @@ uint64_t *str2ht64(uint8_t *str, uint64_t **ph,  size_t *size) {
     if (k > 0) {
         memcpy(rotated_str + (n - k), str, k);
     }
+    // Padding with zeros
+    for(size_t i = n; i < total_bytes; i++)
+        rotated_str[i] = 0;
 
     // 4. Generate the uint64_t array
-    // Note: We allocate a separate array for hashes if that was the intent,
-    // or we cast the rotated string. Based on your code, you want a hash per 8-byte block.
+    // We allocate a separate array for hashes if that was the intent, or we cast
+    // the rotated string. Based on your code, you want a hash per 8-byte block.
     if(!h) {
         if(posix_memalign((void **)&h, 64, num_blocks << 3)) {
             perror("posix_memalign");
             free(rotated_str);
             return NULL;
         }
-        *size = num_blocks;
     }
     for (size_t i = 0; i < num_blocks; i++) {
         // Process each 8-byte chunk of the rotated/padded string
         h[i] = djb2tum(rotated_str + (i << 3), 0, 8);
     }
-
     free(rotated_str);
+
+    *size = num_blocks;
     return h;
 }
 
