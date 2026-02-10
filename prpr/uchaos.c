@@ -1,7 +1,7 @@
 /*
  * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2 license
  *
- * test: time for i in $(seq 100); do cat ../prpr/uchaos.c | ./chaos; done | ent
+ * test: time for i in $(seq 100); do cat uchaos.c | ./chaos; done | ent
  *
  * Compile with lib math: gcc uchaos.c -O3 -Wall -o uchaos
  */
@@ -184,9 +184,19 @@ int main () {
     str[n] = 0;
 
     size_t size;
-    uint64_t *hash = str2ht64(str, &size);
-    if(hash)
-        writebuf(STDOUT_FILENO, (uint8_t *)hash, size << 3);
+    uint64_t *h = str2ht64(str, &size);
+    if(h)
+        writebuf(STDOUT_FILENO, (uint8_t *)h, size << 3);
+
+    size_t k = 0, nm = (size + 1) >> 1;
+    for (n = 0; n < nm; n++) {
+        for(size_t i = 1; i < size; i++) {
+            if(i == n) continue;
+            if(h[i] == h[n]) k++;
+        }
+    }
+    perr("\nCollisions: %ld\n", k);
+
 
     return 0; // exit() do free()
 }
