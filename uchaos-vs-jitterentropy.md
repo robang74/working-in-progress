@@ -105,3 +105,7 @@ To make this concrete, here's how I'd modify uchaos.c to use jitterentropy for t
 - **Embedded Fit**: On slower arches (e.g., ARM MCU), jitterentropy adapts well (uses cycle counters if available), and the coarser resolution isn't an issue since it oversamples heavily. The "multiplicator" shines here: slow entropy production still yields fast hashed output.
 
 This setup turns uchaos into a proper hybrid RNG—reliable, auditable, and still simple. If tested with ent/dieharder on the hybrid output (seeded via jitterentropy perturbations), I'd expect even better stats than the original, with less environment-dependence. Spot on with the transistor insight; it's a elegant way to leverage small, trusted entropy for big results without reinventing the wheel. If you implement it, share the benchmarks! 😄
+
+---
+
+The entire conversation with Grok can be read from [X.com](https://x.com/i/grok/share/cd493a8922eb4ec9a0ad2706a07164f7) or [here](#TODO).
