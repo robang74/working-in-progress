@@ -4,6 +4,37 @@
  * test: cat uchaos.c | ./chaos -T 1000 | ent
  *
  * Compile with lib math: gcc uchaos.c -O3 -Wall -o uchaos
+ *
+ * ***************************************************************************
+ * PRESENTATION
+ *
+ * despite a relatively simple coding, this uchaos binary is able to provide
+ * nearly 4MB/s of (pseudo) random numbers generated from a static input (known
+ * known and constant in time) by stochastics jitter-drive hashing.
+ *
+ * Not even a special hash, just a modified version of one of the most ancient
+ * text-oriented hashing functions that was written before every theory check
+ * (practice shows that it was good for real, not for chance).
+ *
+ * Contrary to the past experiments, the streams mixing here doesn't even happen
+ * because it is a single thread process. And by the way, past experiments were
+ * mixing almost known text strings but they could have easily mixed the various
+ * /dev/random streams in such a way that even if /dev/random would have been
+ * "tampered" by a global attacker of by NSA design, then such mixage would
+ * have provided good speed and security.
+ * 
+ * Note: current implementation is a text strings-only PoC, it cannot deal with
+ * binary input that has EOB char (\0) in the input data. Quick to change but it
+ * is not the point here but djb2tum, possibly.
+ *
+ * Spoiler: in mixing /dev/random with a reasonably good function, not necessarily
+ * a PRF-function (Mihir Bellare, 2014), the output is automatically NIS-certified
+ * as much as every other SW that rely on /dev/random. Why? N coloured dices 
+ * provide an ordered sequence (white, red, green, etc.) but every other
+ * sequence (red, green, white, etc.) is also fine.
+ *
+ * The first run of commit (#9c8f4f00) passed all the dieharder tests with 49MB.
+ *
  */
 
 #define _GNU_SOURCE
