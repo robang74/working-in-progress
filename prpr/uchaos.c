@@ -34,7 +34,9 @@ static inline uint64_t rotl64(uint64_t n, uint8_t c) {
 }
 
 #include <sched.h>
-uint64_t djb2tum(const char *str, uint64_t seed) {
+uint64_t djb2tum(const char *str, uint64_t seed, uint8_t maxn) {
+    if(!str) return 0;
+    if(!*str || !maxn) return 0;
 /*
  * One of the most popular and efficient hash functions for strings in C is
  * the djb2 algorithm created by Dan Bernstein. It strikes a great balance
@@ -50,9 +52,8 @@ uint64_t djb2tum(const char *str, uint64_t seed) {
      * 14695981039346656037	  The FNV-1 offset basis (64-bit).
      */
     if(seed) h = seed;
-    if(!*str) return 0;
 
-    while((c = *str++)) {
+    while((c = *str++) && maxn--) {
         struct timespec ts;                   //
         clock_gettime(CLOCK_MONOTONIC, &ts);  // getting ns in a hot loop is the limit
         sched_yield();                        // and we want to see this limit, in VMs
@@ -123,7 +124,7 @@ uint64_t *str2ht64(uint8_t *str, size_t *size) {
 
     for (size_t i = 0; i < num_blocks; i++) {
         // Process each 8-byte chunk of the rotated/padded string
-        h[i] = djb2tum(rotated_str + (i << 3), 0);
+        h[i] = djb2tum(rotated_str + (i << 3), 0, 8);
     }
 
     free(rotated_str);
