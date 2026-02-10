@@ -82,7 +82,7 @@ uint64_t djb2tum(const uint8_t *str, uint64_t seed, uint8_t maxn) {
     return h;
 }
 
-uint64_t *str2ht64(uint8_t *str, size_t *size) {
+uint64_t *str2ht64(uint8_t *str, uint64_t **ph,  size_t *size) {
     if (!str || !size) return NULL;
 
     size_t n = strlen((char *)str);
@@ -95,9 +95,15 @@ uint64_t *str2ht64(uint8_t *str, size_t *size) {
 
     // 2. Calculate padding and allocation
     // We need enough 64-bit blocks to cover n bytes.
+    uint64_t *h = NULL;
     size_t num_blocks = (n + 7) >> 3;
     size_t total_bytes = num_blocks << 3;
-    *size = num_blocks;
+    if(ph && *size > 0 && num_blocks != *size) {
+        perror("*size != expected");
+        perr("%ld, %ld\n",*size, num_blocks);
+        return NULL;
+    }
+    h = *ph;
 
     // Allocate aligned memory for the processed string
     uint8_t *rotated_str = NULL;
@@ -119,13 +125,14 @@ uint64_t *str2ht64(uint8_t *str, size_t *size) {
     // 4. Generate the uint64_t array
     // Note: We allocate a separate array for hashes if that was the intent,
     // or we cast the rotated string. Based on your code, you want a hash per 8-byte block.
-    uint64_t *h = NULL;
-    if(posix_memalign((void **)&h, 64, num_blocks << 3)) {
-        perror("posix_memalign");
-        free(rotated_str);
-        return NULL;
+    if(!h) {
+        if(posix_memalign((void **)&h, 64, num_blocks << 3)) {
+            perror("posix_memalign");
+            free(rotated_str);
+            return NULL;
+        }
+        *size = num_blocks;
     }
-
     for (size_t i = 0; i < num_blocks; i++) {
         // Process each 8-byte chunk of the rotated/padded string
         h[i] = djb2tum(rotated_str + (i << 3), 0, 8);
@@ -223,12 +230,12 @@ int main(int argc, char *argv[]) {
 
     long mt = 0;
     uint64_t bic = 0;
-    size_t nk = 0, nt = 0, nx = 0;
+    uint64_t *h = NULL;
+    size_t nk = 0, nt = 0, nx = 0, size = 0;
     for (uint32_t a = ntsts; a; a--) {
         // hashing
         long st = get_nanos();
-        size_t size;
-        uint64_t *h = str2ht64(str, &size);
+        h = str2ht64(str, &h, &size);
         mt += get_nanos() - st;
 
         // output
@@ -250,7 +257,9 @@ int main(int argc, char *argv[]) {
             }
         }
         nt += size;
-        free(h); // TODO: passing to str2ht64 a valid (h, size) should reused it
+#if 0                      // Just for test
+        free(h); h = NULL; // passing to str2ht64 a valid (h, size) should reused it
+#endif
     }
 
     long rt = get_nanos();
