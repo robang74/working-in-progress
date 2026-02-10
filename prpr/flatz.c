@@ -59,6 +59,23 @@ uint64_t djb2sum(const char *str, uint64_t seed) {
     return hash;
 }
 
+
+static inline uint64_t rotl64(uint64_t n, unsigned int c) {
+    const unsigned int mask = (CHAR_BIT * sizeof(n) - 1);  // 63 per uint64_t
+    c &= mask;  return (n << c) | (n >> ((-c) & mask));
+}
+
+uint64_t mix_time_xor(uint64_t h, uint8_t c, struct timespec ts) {
+    uint8_t r1 = 1 + (ts.tv_nsec & 0x07);
+    uint8_t r2 = 5 + ((ts.tv_nsec >> 3) & 0x03);
+
+    h ^= rotl64((uint64_t)c, r1);
+    h = rotl64(h, r2) + h;
+
+    return h;
+}
+
+
 uint64_t djb2tum(const char *str, uint64_t seed) {
 /*
  * One of the most popular and efficient hash functions for strings in C is
@@ -78,9 +95,9 @@ uint64_t djb2tum(const char *str, uint64_t seed) {
     if(!*str) return 0;
 
     while((c = *str++)) {
-        struct timespec ts;
-        clock_gettime(CLOCK_MONOTONIC, &ts);
-        /*
+        struct timespec ts;                   /*
+        clock_gettime(CLOCK_MONOTONIC, &ts);   * getting ns in a hot loop is the limit
+        /*                                     * and we want to see this limit, in VMs
          * (16+1) (32-1 or 32+1) (64-1)
          *   01     10      00     11
          */
@@ -88,7 +105,7 @@ uint64_t djb2tum(const char *str, uint64_t seed) {
         uint8_t b0 = b1 & 0x01;
         b1 &= 0x02;
 
-        h = ( ( h << (4 + b0 ? b1 : 1) ) + b1 ? -h : h ) ^ c;
+        h = ( ( h << (4 + (b0 ? b1 : 1)) ) + (b1 ? -h : h) ) ^ c;
     }
 
     return h;
