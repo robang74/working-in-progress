@@ -3,7 +3,7 @@
  *
  * Usage: binary stream | flat [-p] [-q] [-zN]
  *
- * Compile with lib math: gcc flatz.c -O3 -ffast-math -lm -lz -o flatz
+ * Compile with lib math: gcc flatz.c -O3 -Wall -ffast-math -lm -lz -o flatz
  *
  */
 
@@ -34,7 +34,7 @@
 
 /* *** HASHING  ************************************************************* */
 
-uint64_t djb2sum(const char *str, uint64_t seed) {
+uint64_t djb2sum(const uint8_t *str, uint64_t seed) {
 /*
  * One of the most popular and efficient hash functions for strings in C is
  * the djb2 algorithm created by Dan Bernstein. It strikes a great balance
@@ -64,7 +64,7 @@ static inline uint64_t rotl64(uint64_t n, uint8_t c) {
 }
 
 #include <sched.h>
-uint64_t djb2tum(const char *str, uint64_t seed) {
+uint64_t djb2tum(const uint8_t *str, uint64_t seed) {
 /*
  * One of the most popular and efficient hash functions for strings in C is
  * the djb2 algorithm created by Dan Bernstein. It strikes a great balance
@@ -356,7 +356,7 @@ static inline ssize_t writebuf(int fd, const uint8_t *buffer, size_t ntwr) {
    return tot;
 }
 
-static inline ssize_t readbuf(int fd, char *buffer, size_t size, bool intr) {
+static inline ssize_t readbuf(int fd, uint8_t *buffer, size_t size, bool intr) {
     ssize_t tot = 0;
     while (size > tot) {
         errno = 0;
@@ -385,9 +385,8 @@ static inline void *ptralign(void *buf) {
 size_t zdeflating(const int action, uint8_t const *zbuf, z_stream *pstrm,
     uint32_t hsize, uint32_t tsize, uint32_t *zcounts, bool pass)
 {
-    static size_t tsved = 0, zsizetot = 0, zsize = 0;
     uint8_t *zbuffer;
-    int i, ret;
+    int ret;
 
     if(action != Z_NO_FLUSH && action != Z_FINISH)
         return 0;
@@ -565,7 +564,6 @@ size_t stats_total_calc(stats_t *st) {
     register size_t   len = st->ntot;
     register uint8_t *d   = st->data;
     uint32_t         *c   = st->counts;
-    double            sum = 0;
 
     if(!len || !d || !st->avg_sum) return 0;
 
@@ -615,7 +613,7 @@ size_t stats_total_calc(stats_t *st) {
 int main(int argc, char *argv[]) {
     z_stream strm = {0};
     int pass = 0, zipl = -1, quiet = 0;
-    size_t i, hsize = 0, tsize = 0, jsize = 0;
+    size_t hsize = 0, tsize = 0, jsize = 0;
     stats_t rs = {0}, js = {0}, zs = {0};
 
     (void) get_nanos(); //----------------------------------------------------//
@@ -714,12 +712,12 @@ int main(int argc, char *argv[]) {
     uint8_t *outbuf;
     #define setout(b,s) { outbuf = (uint8_t *)(b); outsz = (size_t)(s); }
 
-    for (unsigned k = 0; true; k) { //-- service loop start --------------- --//
+    for (unsigned k = 0; true; ) { //-- service loop start --------------- --//
         static uint64_t hash;
 
         // read data from input stream
         outsz = (J_ON) ? jsize : BLOCK_SIZE;
-        rs.bsize = readbuf(STDIN_FILENO, rs.data, outsz, 0);
+        rs.bsize = readbuf(STDIN_FILENO, (uint8_t *)rs.data, outsz, 0);
         if(!rs.bsize) break;
 
         setout(rs.data, rs.bsize);
