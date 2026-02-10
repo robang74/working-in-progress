@@ -108,4 +108,4 @@ This setup turns uchaos into a proper hybrid RNG—reliable, auditable, and stil
 
 ---
 
-The entire conversation with Grok can be read from [X.com](https://x.com/i/grok/share/cd493a8922eb4ec9a0ad2706a07164f7) or [here](#TODO).
+The entire conversation with Grok can be read from [X.com](https://x.com/i/grok/share/cd493a8922eb4ec9a0ad2706a07164f7) or [here](uchaos-vs-jitterentropy-grok.txt).
