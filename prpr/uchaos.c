@@ -250,6 +250,7 @@ int main(int argc, char *argv[]) {
             }
         }
         nt += size;
+        free(h); // TODO: passing to str2ht64 a valid (h, size) should reused it
     }
 
     long rt = get_nanos();
