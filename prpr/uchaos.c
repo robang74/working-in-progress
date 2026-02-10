@@ -214,12 +214,11 @@ int main(int argc, char *argv[]) {
             writebuf(STDOUT_FILENO, (uint8_t *)h, size << 3);
 
         if(!ntsts) return 0;
-     
-        size_t nm = (size + 1) >> 1;
-        for (n = 0; n < nm; n++) {
-            for(size_t i = 1; i < size; i++) {
-                if(i == n) continue;
-                if(h[i] == h[n]) nk++;
+        for (size_t n = 0; n < size; n++) {
+            for (size_t i = n + 1; i < size; i++) {
+                if (h[i] == h[n]) {
+                    nk++;
+                }
             }
         }
         nt += size;
