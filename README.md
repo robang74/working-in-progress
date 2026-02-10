@@ -4,7 +4,8 @@ Working in progress and other stuff that I prefer to share here to give them a c
 
 ### Index
 
-* **Chaos Shell Engine** background documentation: 1. [presentation](chaos-shell-engine.md), &nbsp; 2. [lab notes](random.txt) &nbsp; 3. [thesys on jitters](2007-07-30-Tesi_Foglietta-051a.pdf)
+* **Chaos Shell Engine** documentation: 1. [presentation](chaos-shell-engine.md), &nbsp; 2. [lab notes](random.txt) &nbsp; 3. [thesys on jitters](2007-07-30-Tesi_Foglietta-051a.pdf)
+* **Micro Chaos Engine** documentation: 1. [presentation](uchaos-vs-jitterentropy.md), &nbsp; 2. [uchaos.c](prpr/uchaos.c), 3. [vs jitterentropy](uchaos-vs-jitterentropy-grok.txt) w/Grok
 
 Because exceptions, do not need to be common but just exist. In particular, about Chaos Shell Engine:
 
