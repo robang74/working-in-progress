@@ -1,15 +1,16 @@
-# uCHAOS IS NOT A COMPETITOR OF JITTERENTROPY!
+# uChaos is not a jitterentropy's competitor
 
-Apart from comparing uChaos with JitterEntropy is about comparing a 14 days preparation 1 day writing code with a 14 years project 1 year coding which is a massive 300-400x difference in effort invested. So, relax...
+Apart from comparing uChaos Engine with JitterEntropy is about comparing a 14 days preparation 1 day writing code with a 14 years project 1 year coding which is a massive 300-400x difference in effort invested. So, relax...
 
 ```
   logs (text) --> uChaos --> randomness
+                    |
   jitters (ns) -----^
 ```
 
 If jitters are not available or like in VMs or uController not so good, then jitterentropy can be used to replace the bare-metal jittering with a good but usually very slow RNDG. In that scenario uChaos is a multiplier like a transistor that multiplies the current.
 
-- [uchaos.c](prpr/uchaos.c) C-language code
+- uChaos Engine is a C-language code file: [uchaos.c](prpr/uchaos.c)
 
 ---
 
