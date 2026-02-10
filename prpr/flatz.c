@@ -59,6 +59,41 @@ uint64_t djb2sum(const char *str, uint64_t seed) {
     return hash;
 }
 
+uint64_t djb2tum(const char *str, uint64_t seed) {
+/*
+ * One of the most popular and efficient hash functions for strings in C is
+ * the djb2 algorithm created by Dan Bernstein. It strikes a great balance
+ * between speed and low collision rates. Great for text.
+ */
+    uint64_t c, h = 5381;
+    /*
+     * 5381              Prime number choosen by Dan Bernstein, as 1010100000101
+     *                   empirically is one of the best for English words text.
+     * Alternatives:
+     *
+     * 16777619               The FNV-1 offset basis (32-bit).
+     * 14695981039346656037	  The FNV-1 offset basis (64-bit).
+     */
+    if(seed) h = seed;
+    if(!*str) return 0;
+
+    while((c = *str++)) {
+        struct timespec ts;
+        clock_gettime(CLOCK_MONOTONIC, &ts);
+        /*
+         * (16+1) (32-1 or 32+1) (64-1)
+         *   01     10      00     11
+         */
+        uint8_t b1 = ts.tv_nsec & 0x03;
+        uint8_t b0 = b1 & 0x01;
+        b1 &= 0x02;
+
+        h = ( ( h << (4 + b0 ? b1 : 1) ) + b1 ? -h : h ) ^ c;
+    }
+
+    return h;
+}
+
 #ifdef __APPLE__
     #include <libkern/OSByteOrder.h>
     #define htole64(x) OSSwapHostToLittleInt64(x)
