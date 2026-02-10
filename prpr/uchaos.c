@@ -241,7 +241,9 @@ int main(int argc, char *argv[]) {
         // output
         if(h)
             writebuf(STDOUT_FILENO, (uint8_t *)h, size << 3);
-
+        else
+            exit(EXIT_FAILURE);
+        // single run
         if(!ntsts) return 0;
 
         // testing
