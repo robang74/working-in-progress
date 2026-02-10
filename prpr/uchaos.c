@@ -82,7 +82,13 @@ uint64_t djb2tum(const uint8_t *str, uint64_t seed, uint8_t maxn) {
     return h;
 }
 
+# define rotated_str_free { free(rotated_str); rotated_str = NULL; rotated_str_len = 0; }
+
 uint64_t *str2ht64(uint8_t *str, uint64_t **ph,  size_t *size) {
+    static uint8_t *rotated_str = NULL;
+    static size_t rotated_str_len = 0;
+
+    if (!str && !size) rotated_str_free;
     if (!str || !size) return NULL;
 
     size_t n = strlen((char *)str);
@@ -107,10 +113,14 @@ uint64_t *str2ht64(uint8_t *str, uint64_t **ph,  size_t *size) {
     }
 
     // Allocate aligned memory for the processed string
-    uint8_t *rotated_str = NULL;
-    if (posix_memalign((void **)&rotated_str, 64, total_bytes)) {
-        perror("posix_memalign");
-        return NULL;
+    if(rotated_str && rotated_str_len < total_bytes)
+        rotated_str_free;
+    if (!rotated_str) {
+        if (posix_memalign((void **)&rotated_str, 64, total_bytes)) {
+            perror("posix_memalign");
+            return NULL;
+        }
+        rotated_str_len = total_bytes;
     }
 
     // 3. Perform rotation into the new buffer
@@ -130,7 +140,6 @@ uint64_t *str2ht64(uint8_t *str, uint64_t **ph,  size_t *size) {
     if(!h) {
         if(posix_memalign((void **)&h, 64, num_blocks << 3)) {
             perror("posix_memalign");
-            free(rotated_str);
             return NULL;
         }
     }
@@ -138,7 +147,6 @@ uint64_t *str2ht64(uint8_t *str, uint64_t **ph,  size_t *size) {
         // Process each 8-byte chunk of the rotated/padded string
         h[i] = djb2tum(rotated_str + (i << 3), 0, 8);
     }
-    free(rotated_str);
 
     *size = num_blocks;
     return h;
@@ -280,6 +288,7 @@ int main(int argc, char *argv[]) {
         ratio, (ratio-50) * E6 / 100);
     perr("\n");
 
-    return 0; // exit() do free()
+    str2ht64(0, 0, 0);      // pedantic free()
+    return 0;               // exit() do free()
 }
 
