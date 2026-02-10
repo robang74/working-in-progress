@@ -169,12 +169,25 @@ static inline ssize_t readbuf(int fd, uint8_t *buffer, size_t size, bool intr) {
     return tot;
 }
 
+// Funzione per ottenere il tempo in nanosecondi
+long get_nanos() {
+    static long start = 0;
+    struct timespec ts;
+
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    if (!start) {
+      start = (long)ts.tv_sec * 1000000000L + ts.tv_nsec;
+      return start;
+    }
+    return ((long)ts.tv_sec * 1000000000L + ts.tv_nsec) - start;
+}
+
 static inline void usage(const char *name) {
     perr("\n"\
 "%s read on stdin, stats on stderr, and data on stdout\n"\
 "\n"\
 "Usage: %s [-tN]\n"\
-"   -t: number of collision tests\n"\
+"   -t: number of collision tests on the same input\n"\
 "\n", name, name);
     exit(0);
 }
@@ -184,6 +197,8 @@ static inline void usage(const char *name) {
 int main(int argc, char *argv[]) {
     uint8_t *str = NULL;
     uint32_t ntsts = 0;
+
+    (void) get_nanos();
 
     // Collect arguments from optional command line parameters
     while (1) {
@@ -206,10 +221,13 @@ int main(int argc, char *argv[]) {
     if(n < 1) exit(EXIT_FAILURE);
     str[n] = 0;
 
+    long mt = 0;
     size_t nk = 0, nt = 0;
     for (uint32_t a = ntsts; a; a--) { 
+        long st = get_nanos();
         size_t size;
         uint64_t *h = str2ht64(str, &size);
+        mt += get_nanos() - st;
         if(h)
             writebuf(STDOUT_FILENO, (uint8_t *)h, size << 3);
 
@@ -223,8 +241,13 @@ int main(int argc, char *argv[]) {
         }
         nt += size;
     }
-    perr("\nTests: %d, collisions: %ld over %ld hashes (%.2lf%%) -- %s\n\n",
+
+    long rt = get_nanos();
+    perr("\nTests: %d, collisions: %ld over %ld hashes (%.2lf%%) -- %s\n",
         ntsts, nk, nt, (float)100*nk/nt, nk?"KO":"OK");
+    perr("\nTimes: running: %.3lf s, hashing: %.3lf s, speed: %.1lf Kh/s\n\n",
+        (float)rt/E9, (float)mt/E9, (float)E6*nt/rt); 
+
 
     return 0; // exit() do free()
 }
