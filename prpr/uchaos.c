@@ -1,6 +1,7 @@
 /*
  * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2 license
  *
+  * Compile with lib math: gcc uchaos.c -O3 -Wall -o uchaos
  */
 
 #define _GNU_SOURCE
@@ -34,7 +35,7 @@ static inline uint64_t rotl64(uint64_t n, uint8_t c) {
 }
 
 #include <sched.h>
-uint64_t djb2tum(const char *str, uint64_t seed, uint8_t maxn) {
+uint64_t djb2tum(const uint8_t *str, uint64_t seed, uint8_t maxn) {
     if(!str) return 0;
     if(!*str || !maxn) return 0;
 /*
@@ -116,7 +117,8 @@ uint64_t *str2ht64(uint8_t *str, size_t *size) {
     // 4. Generate the uint64_t array
     // Note: We allocate a separate array for hashes if that was the intent,
     // or we cast the rotated string. Based on your code, you want a hash per 8-byte block.
-    if(posix_memalign(&h, 64, num_blocks << 3)) {
+    uint64_t *h = NULL;
+    if(posix_memalign((void **)&h, 64, num_blocks << 3)) {
         perror("posix_memalign");
         free(rotated_str);
         return NULL;
@@ -146,7 +148,7 @@ static inline ssize_t writebuf(int fd, const uint8_t *buffer, size_t ntwr) {
    return tot;
 }
 
-static inline ssize_t readbuf(int fd, char *buffer, size_t size, bool intr) {
+static inline ssize_t readbuf(int fd, uint8_t *buffer, size_t size, bool intr) {
     ssize_t tot = 0;
     while (size > tot) {
         errno = 0;
@@ -165,21 +167,24 @@ static inline ssize_t readbuf(int fd, char *buffer, size_t size, bool intr) {
     return tot;
 }
 
+#define BLOCK_SIZE 512
+
 int main () {
-    size_t size;
-    uint64_t hash;
     unsigned char *str = NULL;
-    if (tsize > 0) {
-        if (posix_memalign((void **)&str, 512, tsize)) {
-            perror("posix_memalign");
-            exit(EXIT_FAILURE);
-        }
+
+    if (posix_memalign((void **)&str, 64, BLOCK_SIZE)) {
+        perror("posix_memalign");
+        exit(EXIT_FAILURE);
     }
 
-    n = readbuf(STDIN_FILENO, str, 512, 1);
-    hash = str2ht64(str, &size);
+    size_t n = readbuf(STDIN_FILENO, str, BLOCK_SIZE, 1);
+    if(n < 1) exit(EXIT_FAILURE);
+
+    size_t size;
+    uint64_t *hash = str2ht64(str, &size);
     if(hash)
-      writebuf(STDOUT_FILENO, hash, size << 3);
+        writebuf(STDOUT_FILENO, (uint8_t *)hash, size << 3);
 
     return 0;
 }
+
