@@ -177,14 +177,15 @@ int main () {
         exit(EXIT_FAILURE);
     }
 
-    size_t n = readbuf(STDIN_FILENO, str, BLOCK_SIZE, 1);
+    size_t n = readbuf(STDIN_FILENO, str, BLOCK_SIZE - 1, 1);
     if(n < 1) exit(EXIT_FAILURE);
+    str[n] = 0;
 
     size_t size;
     uint64_t *hash = str2ht64(str, &size);
     if(hash)
         writebuf(STDOUT_FILENO, (uint8_t *)hash, size << 3);
 
-    return 0;
+    return 0; // exit() do free()
 }
 
