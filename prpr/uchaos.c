@@ -1,7 +1,9 @@
 /*
  * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2 license
  *
-  * Compile with lib math: gcc uchaos.c -O3 -Wall -o uchaos
+ * test: time for i in $(seq 100); do cat ../prpr/uchaos.c | ./chaos; done | ent
+ *
+ * Compile with lib math: gcc uchaos.c -O3 -Wall -o uchaos
  */
 
 #define _GNU_SOURCE
