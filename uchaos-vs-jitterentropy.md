@@ -27,7 +27,9 @@ This hybrid approach aligns exactly with the spoiler comment in uchaos.c—mixin
 ### How This "Multiplicator" Would Work in Practice
 
 - **Entropy as Control Signal**: In the djb2tum loop, variables like `ns`, `b0`, and `b1` (derived from low bits of ns) decide the rotations, shifts, and conditional operations. These are the "control points" where small inputs flip the hash state dramatically (avalanche effect). By sourcing `ns` from jitterentropy instead of timings, each perturbation is now driven by true entropy, making the overall output inherit that quality.
+
 - **Amplification Effect**: Jitterentropy might produce only kB/s of entropy (due to heavy sampling and tests), but once injected into uchaos, it can "drive" MB/s of output because the hash processes large text inputs quickly. For example, 32 bytes of jitterentropy could perturb hashing a 4KB text block multiple times, yielding 100–1000× more pseudo-random bytes.
+
 - **Transistor Analogy Holds**: Just like a few mA at the base can switch amps at the collector in a BJT (e.g., gain β=100–1000), here a few bytes of good entropy control the mixing of kilobytes of hashed data. The "gain" comes from the hash's diffusion properties—small changes propagate massively.
 
 ### Proposed Code Modifications for Integration
@@ -101,7 +103,9 @@ To make this concrete, here's how I'd modify uchaos.c to use jitterentropy for t
    This way, one 256-byte entropy fetch (slow but high-quality) drives 256 perturbations (fast hashing), amplifying output massively.
 
 - **Build/Dependencies**: Compile with `gcc uchaos.c -O3 -Wall -ljitterentropy -o uchaos` (after `make install` on jitterentropy lib). No other deps needed—it's lightweight for embedded.
+
 - **Quality/Speed Tradeoff**: Throughput might drop 10–50× vs original (depending on jitterentropy rate), but output passes SP800-90B health tests inherently. Use `jent_read_entropy_safe` for auto-recovery on failures.
+
 - **Embedded Fit**: On slower arches (e.g., ARM MCU), jitterentropy adapts well (uses cycle counters if available), and the coarser resolution isn't an issue since it oversamples heavily. The "multiplicator" shines here: slow entropy production still yields fast hashed output.
 
 This setup turns uchaos into a proper hybrid RNG—reliable, auditable, and still simple. If tested with ent/dieharder on the hybrid output (seeded via jitterentropy perturbations), I'd expect even better stats than the original, with less environment-dependence. Spot on with the transistor insight; it's a elegant way to leverage small, trusted entropy for big results without reinventing the wheel. If you implement it, share the benchmarks! 😄
