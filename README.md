@@ -18,6 +18,9 @@ And sometime, an image is worth thousands of words...
 
 ![YNSA](img/YNSA.jpg)
 
+- **metadata** of the image: [YNSA.jpg.txt](img/YNSA.jpg.txt) which contains a stenographic secret
+- **sha256sum** of the image: 12390eb1db675f4308c2ac3af1442c730ff5904e
+
 ---
 
 ### Copyright
