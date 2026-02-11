@@ -1,0 +1,32 @@
+ExifTool Version Number         : 12.40
+File Name                       : YNSA.jpg
+Directory                       : img
+File Size                       : 72 KiB
+File Modification Date/Time     : 2026:02:11 05:16:30+01:00
+File Access Date/Time           : 2026:02:11 05:16:32+01:00
+File Inode Change Date/Time     : 2026:02:11 05:16:30+01:00
+File Permissions                : -rw-rw-r--
+File Type                       : JPEG
+File Type Extension             : jpg
+MIME Type                       : image/jpeg
+JFIF Version                    : 1.01
+Exif Byte Order                 : Big-endian (Motorola, MM)
+X Resolution                    : 1
+Y Resolution                    : 1
+Resolution Unit                 : None
+Artist                          : Roberto A. Foglietta <roberto.foglietta@gmail.com>
+Y Cb Cr Positioning             : Centered
+Current IPTC Digest             : 0dcf0dd2414449b4746f11c5c7f24ad1
+Source                          : https://github.com/robang74/work
+Application Record Version      : 4
+XMP Toolkit                     : Image::ExifTool 12.40
+Description                     : YNSA: the uchaos engine exploit
+Comment                         : Earth is polluted of ruins that once upon a time were temples of empires believed eternal
+Image Width                     : 590
+Image Height                    : 590
+Encoding Process                : Baseline DCT, Huffman coding
+Bits Per Sample                 : 8
+Color Components                : 3
+Y Cb Cr Sub Sampling            : YCbCr4:2:0 (2 2)
+Image Size                      : 590x590
+Megapixels                      : 0.348
