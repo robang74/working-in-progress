@@ -3,7 +3,7 @@
 nfle=${1:-test.txt}
 echo "Appending: $nfle"
 
-time { cat uchaos.c | ./uchaos -T 10000 2>>$nfle | ent >> $nfle; }
+time { cat uchaos.c | ./uchaos -T 100000 -d 3 2>>$nfle | ent >> $nfle; }
 
 if false; then
     hgstr="{ time date +%N 2>&1 | dd bs=1; } 2>&1"
