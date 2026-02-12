@@ -3,10 +3,12 @@
 nfle=${1:-test.txt}
 echo "Appending: $nfle"
 reseeding_test() {
-    for i in $(seq 0 7); do
-        printf "\n### using -T 1000 x8\n";
-        { date +%N; cat uchaos.c; } | nice -n19 ./uchaos -T 1000;
-    done 2>> $nfle | ent >> $nfle
+    printf "\n### uschaos x8 using -T 100\n" >> $nfle;
+    for j in $(seq 16); do
+        for i in $(seq 8); do
+            { date +%N; cat uchaos.c; } | ./uchaos -T 100 &
+        done 2>> $nfle
+    done | ent >> $nfle
 }
 
 if [ ! -x ./uchaos ]; then
@@ -22,5 +24,5 @@ if false; then
     time for i in $(seq 0 7); do
         printf "\n### using -s $i -d 15\n";
         cat uchaos.c | ./uchaos -T 10000 -s $i -d 15 | ent;
-    done >> $nfle 2>&1
+    done
 fi
