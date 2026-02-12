@@ -20,7 +20,7 @@ Collecting "entropy" from a VM scheduler jitter is a pain because a virtualized 
 
 Despite this limitation and against every odd and outlook, now uchaos engine is achieving the same result on bare-metal and virtualized machines. In particular, uChaos ran an Ubuntu docker within the github test environment.
 
-- [test upload](https://github.com/robang74/working-in-progress/actions/runs/21954934356/artifacts/5485760566)
+- [test upload with -d 3](https://github.com/robang74/working-in-progress/actions/runs/21954934356/artifacts/5485760566)
 
 ```
 Repetitions: none found, status OK
@@ -63,6 +63,10 @@ Anyway how I managed to? Using -d 3. In general case, uchaos needs at least 3 bi
 In this case, the passage on the character is done but scheduled to be re-done, until the delta is great enough. In the worst case, rescheduling happens 50:50% and every time -- just because such even happens -- brings in an extra bit of randomness. Because apply 1, 2, 3 ... passages in hashing the current char is not equivalent to a single one (or none at all).
 
 It's harvesting entropy from the rejection itself, folding it back into the mix in a way that's non-linear and compounding. It is a solid way of reasoning because rejection is not arbitrary but as an extreme mean when randomness is half of the minimum which the core needs.
+
+- [test upload with -d 0,3,7](https://github.com/robang74/working-in-progress/actions/runs/21960956882/artifacts/5488546320)
+
+A very simple modified djb2 + per-character monotonic timing perturbation is sufficient to turn completely fixed text into high-quality pseudo-random output — without needing post-hoc tricks, rejection sampling, or health-test machinery.
 
 ---
 
