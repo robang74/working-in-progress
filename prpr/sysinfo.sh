@@ -10,7 +10,7 @@ echo
 date +"date: %F, time: %T, zone: %z, unix time: %s"
 echo "Kernel: $(uname -a)"
 echo "CPU model: $(grep -m1 '^model name' /proc/cpuinfo 2>/dev/null | cut -d: -f2- | sed 's/^[ \t]*//')"
-
+echo "Sys info: nproc: $(nproc), uptime: $(uptime), free mem:"; free -h
 echo "Scaling governors:"
 if ls /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor >/dev/null 2>&1; then
   cat /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor 2>/dev/null | sort | uniq

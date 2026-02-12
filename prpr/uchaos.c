@@ -360,7 +360,7 @@ int main(int argc, char *argv[]) {
         for (size_t n = 0; n < size; n++) {
             for (size_t i = n + 1; i < size; i++) {
                 if (h[i] == h[n]) {
-                    perr("%ld:%ld ", i, n);
+                    perr("%ld:%ld ", n, i);
                     nk++; continue;
                 }
                 uint64_t cb = h[i] ^ h[n];
