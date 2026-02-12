@@ -7,7 +7,6 @@ nfle=${1:-test.txt}
 echo "uchaos.sh is appending to file: $nfle"
 
 testfunc() {
-    tcmd="./uchaos -T $((100*1024)) -d $i /\\_"
     printf "\n|\/ Testing with $tcmd" | tee -a $nfle.$i
     {
         printf "_%.0s" {1..32}; printf "\n|";
@@ -19,6 +18,7 @@ for i in 0 3 7 16; do
     tcmd="./uchaos -T $((100*1024)) -d $i -r 64 /\\_"
     testfunc & sleep 0.01
 done
+echo
 time wait
 for i in 0 3 7 16; do cat $nfle.$i >> $nfle; done
 echo
