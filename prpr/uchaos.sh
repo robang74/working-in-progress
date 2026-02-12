@@ -1,18 +1,22 @@
 #!/bin/sh
+# (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2 license
 
 entgr() { ent "$@" | grep -E "error|samples|127.5 |Entropy|exceed|uncorrelated"; }
 
 nfle=${1:-test.txt}
-echo "Appending to file: $nfle"
+echo "uchaos.sh is appending to file: $nfle"
 
-for i in 0 3 7; do
+for i in 0 3 7 16; do
     tcmd="./uchaos -T $((100*1024)) -d $i /\\_"
-    printf "\n|\/ Testing with $tcmd" | tee -a $nfle
+    printf "\n|\/ Testing with $tcmd" | tee -a $nfle.$i
     {
         printf "_%.0s" {1..32}; printf "\n|";
         time cat uchaos.c | { $tcmd 2>&3; printf "\n|\n" >&3; } | entgr
-    } 3>&1 | grep . >> $nfle
+    } 3>&1 | grep . >> $nfle.$i &
+    sleep 0.25
 done
+time wait
+for i in 0 3 7 16; do cat $nfle.$i >> $nfle; done
 
 if false; then
     hgstr="{ time date +%N 2>&1 | dd bs=1; } 2>&1"

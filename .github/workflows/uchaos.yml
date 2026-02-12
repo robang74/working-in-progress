@@ -25,10 +25,14 @@ jobs:
     - name: compile uchaos
       run: gcc prpr/uchaos.c -O3 -Wall -o uchaos
 
+    - name: Runner info
+      run: |
+        cp prpr/sysinfo.sh .
+        bash ./sysinfo.sh test.txt
+
     - name: run uchaos and check output
       run: |
-        # using uchaos.c as the input for its compiled binary and deliver it
-        cp prpr/uchaos.c uchaos.c
+        cp prpr/uchaos.c prpr/uchaos.sh .
         bash prpr/uchaos.sh test.txt
         echo "File text.txt generated"
 
@@ -37,6 +41,8 @@ jobs:
       with:
         name: uchaos-test-results
         path: |
+          sysinfo.sh
+          uchaos.sh
           uchaos.c
           test.txt
 
