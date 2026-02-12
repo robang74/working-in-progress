@@ -90,7 +90,14 @@ static inline uint64_t rotl64(uint64_t n, uint8_t c) {
 
 #include <sched.h>
 uint64_t djb2tum(const uint8_t *str, uint64_t seed, uint8_t maxn) {
-    if(!str) return 0;
+    static size_t ncl = 0, dmx = 0, dmn = -1, nexp = 0;
+    static uint64_t avg = 0;
+    if(!str) {
+        if(ncl)
+            perr("\nTime deltas avg: %ld <%.2lf> %.0lfK ns over %.0lfK (+%ld) cicles\n",
+                dmn, (double)avg/ncl, (double)dmx/E3, (double)ncl/E3, nexp);
+        return 0;
+    }
     if(!*str || !maxn) return 0;
 /*
  * One of the most popular and efficient hash functions for strings in C is
@@ -107,12 +114,12 @@ uint64_t djb2tum(const uint8_t *str, uint64_t seed, uint8_t maxn) {
      * 14695981039346656037	  The FNV-1 offset basis (64-bit).
      */
     if(seed) h = seed;
-
+    
+    uint64_t ohs = 0; long ons = 0;
     while((c = *str++) && maxn--) {
-        struct timespec ts;                   //
-        clock_gettime(CLOCK_MONOTONIC, &ts);  // getting ns in a hot loop is the limit
-        sched_yield();                        // and we want to see this limit, in VMs
-
+        struct timespec ts;                      // using sched_yield() to creates chaos,
+        clock_gettime(CLOCK_MONOTONIC, &ts);     // getting ns in a hot loop is the limit
+                                                 // and we want to see this limit, in VMs
 
         uint8_t ns = ts.tv_nsec & 0xff;
         uint8_t b1 = ns & 0x02;
@@ -129,6 +136,27 @@ uint64_t djb2tum(const uint8_t *str, uint64_t seed, uint8_t maxn) {
 
         // 3. stochastics micro-mix
         h  = rotl64(h, 5 + ((ns >> 3) & 0x03)) + h;
+        
+
+        // 4. time deltas management
+        if(ons) {
+            uint64_t dlt = (ts.tv_nsec < ons) ? E9 + ts.tv_nsec - ons : ts.tv_nsec - ons;
+            if(dlt < dmn) dmn = dlt;
+            if(dlt > dmx) dmx = dlt;
+            if(dlt < 8 || h == ohs) {   // copying with the VMs scheduler timings
+                struct timespec nslp = { 0 };
+                nslp.tv_nsec = 8;
+                nanosleep(&nslp, &nslp);
+                str--;                  // repeat the action even if it made changes
+                nexp++;
+                continue;
+            }
+            avg += dlt;
+            ncl++;
+        }
+        ohs = h;
+        ons = ts.tv_nsec;
+        sched_yield();
     }
 
     return h;
@@ -330,6 +358,7 @@ int main(int argc, char *argv[]) {
     double ratio = (double)100 / 64 * bic / nx;
     perr("\nBits in common compared to 50 %% avg is %.4lf %% (%+.1lf ppm)\n",
         ratio, (ratio-50) * E6 / 100);
+    djb2tum(0,0,0);
     perr("\n");
 
     return 0; // exit() do free()
