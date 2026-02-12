@@ -1,7 +1,7 @@
 /*
  * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2 license
  *
- * test: cat uchaos.c | ./chaos -T 1000 | ent
+ * test: cat uchaos.c | ./chaos -T 1000 [-s 6] | ent
  *
  * Compile with: gcc uchaos.c -O3 -Wall -o uchaos
  *
@@ -89,7 +89,7 @@ static inline uint64_t rotl64(uint64_t n, uint8_t c) {
 }
 
 #include <sched.h>
-uint64_t djb2tum(const uint8_t *str, uint64_t seed, uint8_t maxn) {
+uint64_t djb2tum(const uint8_t *str, uint64_t seed, uint8_t maxn, const uint8_t nbtls) {
     static size_t ncl = 0, dmx = 0, dmn = -1, nexp = 0;
     static uint64_t avg = 0;
     if(!str) {
@@ -121,7 +121,7 @@ uint64_t djb2tum(const uint8_t *str, uint64_t seed, uint8_t maxn) {
         clock_gettime(CLOCK_MONOTONIC, &ts);     // getting ns in a hot loop is the limit
                                                  // and we want to see this limit, in VMs
 
-        uint8_t ns = ts.tv_nsec & 0xff;
+        uint8_t ns = (ts.tv_nsec >> nbtls) & 0xff;
         uint8_t b1 = ns & 0x02;
         uint8_t b0 = ns & 0x01;
         /*
@@ -162,7 +162,7 @@ uint64_t djb2tum(const uint8_t *str, uint64_t seed, uint8_t maxn) {
     return h;
 }
 
-uint64_t *str2ht64(uint8_t *str, uint64_t **ph,  size_t *size) {
+uint64_t *str2ht64(uint8_t *str, uint64_t **ph,  size_t *size, uint8_t nbtls) {
     if (!str || !size) return NULL;
 
     size_t n = strlen((char *)str);
@@ -216,7 +216,7 @@ uint64_t *str2ht64(uint8_t *str, uint64_t **ph,  size_t *size) {
     }
     for (size_t i = 0; i < num_blocks; i++) {
         // Process each 8-byte chunk of the rotated/padded string
-        h[i] = djb2tum(rotated_str + (i << 3), 0, 8);
+        h[i] = djb2tum(rotated_str + (i << 3), 0, 8, nbtls);
     }
     free(rotated_str);
 
@@ -277,6 +277,7 @@ static inline void usage(const char *name) {
 "\n"\
 "Usage: %s [-tN]\n"\
 "   -T: number of collision tests on the same input\n"\
+"   -s: number of bits to left shift on ns timings\n"\
 "\n", name, name);
     exit(0);
 }
@@ -284,20 +285,21 @@ static inline void usage(const char *name) {
 #define BLOCK_SIZE 512
 
 int main(int argc, char *argv[]) {
-    uint8_t *str = NULL;
+    uint8_t *str = NULL, nbtls = 0;
     uint32_t ntsts = 0;
 
     (void) get_nanos();
 
     // Collect arguments from optional command line parameters
     while (1) {
-        int opt = getopt(argc, argv, "hT:");
+        int opt = getopt(argc, argv, "hT:s:");
         if(opt == '?' && !optarg) {
             usage("uchaos");
         } else if(opt == -1) break;
 
         switch (opt) {
             case 'T': ntsts = atoi(optarg); break;
+            case 's': nbtls = atoi(optarg); break;
         }
     }
 
@@ -317,7 +319,7 @@ int main(int argc, char *argv[]) {
     for (uint32_t a = ntsts; a; a--) {
         // hashing
         long st = get_nanos();
-        h = str2ht64(str, &h, &size);
+        h = str2ht64(str, &h, &size, nbtls);
         mt += get_nanos() - st;
 
         // output
@@ -347,8 +349,8 @@ int main(int argc, char *argv[]) {
     }
 
     long rt = get_nanos();
-    perr("\nTests: %d, collisions: %ld over %ld hashes (%.2lf%%) -- %s\n",
-        ntsts, nk, nt, (double)100*nk/nt, nk?"KO":"OK");
+    perr("\nTests: %d, collisions: %ld over %ld hashes (%.2lf ppm): %s\n",
+        ntsts, nk, nt, (double)E6*nk/nt, nk?"KO":"OK");
     perr("\nTimes: running: %.3lf s, hashing: %.3lf s, speed: %.1lf Kh/s\n",
         (double)rt/E9, (double)mt/E9, (double)E6*nt/rt);
 /*
@@ -358,7 +360,7 @@ int main(int argc, char *argv[]) {
     double ratio = (double)100 / 64 * bic / nx;
     perr("\nBits in common compared to 50 %% avg is %.4lf %% (%+.1lf ppm)\n",
         ratio, (ratio-50) * E6 / 100);
-    djb2tum(0,0,0);
+    djb2tum(0, 0, 0, 0);
     perr("\n");
 
     return 0; // exit() do free()
