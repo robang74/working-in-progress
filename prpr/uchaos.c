@@ -3,7 +3,7 @@
  *
  * test: cat uchaos.c | ./chaos -T 1000 | ent
  *
- * Compile with lib math: gcc uchaos.c -O3 -Wall -o uchaos
+ * Compile with: gcc uchaos.c -O3 -Wall -o uchaos
  *
  * *****************************************************************************
  * PRESENTATION
