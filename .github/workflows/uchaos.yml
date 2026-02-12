@@ -1,0 +1,37 @@
+name: build and test uchaos
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: checkout repository
+      uses: actions/checkout@v4
+
+    - name: install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y ent dieharder
+
+    - name: compile uchaos
+      run: gcc uchaos.c -O3 -Wall -o uchaos
+
+    - name: run uchaos and check output
+      run: |
+        # Usiamo il sorgente stesso come seed/input come nel tuo esempio
+        time cat uchaos.c | { ./uchaos -T 1000 | ent; } > uchaos.test 2>&1 
+        echo "--- File data.out generato con successo ---"
+
+    - name: upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: uchaos-test-results
+        path: |
+          uchaos
+          data.out
