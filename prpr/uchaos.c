@@ -92,20 +92,27 @@ static inline uint64_t rotl64(uint64_t n, uint8_t c) {
 uint64_t djb2tum(const uint8_t *str, uint64_t seed, uint8_t maxn,
     const long nsdly, const uint8_t nbtls)
 {
-    static size_t ncl = 0, dmx = 0, dmn = -1, nexp = 0;
+    static double dmx = 0;
+    static size_t ncl = 0, dmn = -1, nexp = 0;
     static uint64_t avg = 0;
+
     if(!str) {
-        if(ncl)
-            perr("\nTime deltas avg: %ld <%.2lf> %.0lfK ns over %.0lfK (+%ld) cicles\n",
-                dmn, (double)avg/ncl, (double)dmx/E3, (double)ncl/E3, nexp);
+        if(ncl) {
+            double mean = (double)avg / ncl;
+            perr("\nTime deltas avg: %ld <%.1lf> %.0lf ns over %.0lfK (+%ld) values\n",
+                dmn, mean, dmx, (double)ncl/E3, nexp);
+            perr("\nRatios over avg: %.2lf <1U> %.2lf, over min: 1U <%.2lf> %.2lf\n",
+                (double)dmn/mean, (double)dmx/mean, mean/dmn, (double)dmx/dmn);
+        }
         return 0;
     }
     if(!*str || !maxn) return 0;
-/*
- * One of the most popular and efficient hash functions for strings in C is
- * the djb2 algorithm created by Dan Bernstein. It strikes a great balance
- * between speed and low collision rates. Great for text.
- */
+
+    /*
+     * One of the most popular and efficient hash functions for strings in C is
+     * the djb2 algorithm created by Dan Bernstein. It strikes a great balance
+     * between speed and low collision rates. Great for text.
+     */
     uint64_t c, h = 5381;
     /*
      * 5381              Prime number choosen by Dan Bernstein, as 1010100000101
@@ -140,13 +147,12 @@ uint64_t djb2tum(const uint8_t *str, uint64_t seed, uint8_t maxn,
 
         // 3. stochastics micro-mix
         h  = rotl64(h, 5 + ((ns >> 3) & 0x03)) + h;
-        
 
         // 4. time deltas management
         if(ons) {
             uint64_t dlt = (ts.tv_nsec < ons) ? E9 + ts.tv_nsec - ons : ts.tv_nsec - ons;
             if(dlt < dmn) dmn = dlt;
-            if(dlt > dmx) dmx = dlt;
+            if(dlt > dmx) dmx += (dmx ? dmx/dlt : 1.0);
             long nstw = dmn + nsdly;
             if(dlt < nstw || h == ohs) {   // copying with the VMs scheduler timings
 #if 0
@@ -163,8 +169,10 @@ uint64_t djb2tum(const uint8_t *str, uint64_t seed, uint8_t maxn,
                 nexp++;
                 continue;
             }
-            avg += dlt;
-            ncl++;
+            if(dmn << 1 > dlt) {
+                avg += dlt;
+                ncl++;
+            }
         }
         ohs = h;
         ons = ts.tv_nsec;
