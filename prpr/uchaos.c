@@ -90,8 +90,9 @@ static inline uint64_t rotl64(uint64_t n, uint8_t c) {
 
 #include <sched.h>
 uint64_t djb2tum(const uint8_t *str, uint64_t seed, uint8_t maxn,
-    const long nsdly, const uint8_t nbtls)
+    const long nsdly, const unsigned pmdly, const uint8_t nbtls)
 {
+    #define pmdly2ns ( ( ( (uint64_t)dmn * pmdly ) + 127 ) >> 8 )
     static double dmx = 0;
     static size_t ncl = 0, dmn = -1, nexp = 0;
     static uint64_t avg = 0;
@@ -104,6 +105,8 @@ uint64_t djb2tum(const uint8_t *str, uint64_t seed, uint8_t maxn,
             perr("\nRatios over avg: %.2lf <1U> %.2lf, over min: 1U <%.2lf> %.2lf\n",
                 (double)dmn/mean, (double)dmx/mean, mean/dmn, (double)dmx/dmn);
         }
+        if(pmdly && !seed && !maxn && !nsdly && !nbtls)
+            return pmdly2ns;
         return 0;
     }
     if(!*str || !maxn) return 0;
@@ -153,7 +156,7 @@ uint64_t djb2tum(const uint8_t *str, uint64_t seed, uint8_t maxn,
             uint64_t dlt = (ts.tv_nsec < ons) ? E9 + ts.tv_nsec - ons : ts.tv_nsec - ons;
             if(dlt < dmn) dmn = dlt;
             if(dlt > dmx) dmx += (dmx ? dmx/dlt : 1.0);
-            long nstw = dmn + nsdly;
+            long nstw = dmn + nsdly + (pmdly ?  pmdly2ns : 0);
             if(dlt < nstw || h == ohs) {   // copying with the VMs scheduler timings
 #if 0
                 struct timespec nslp = { 0 };
@@ -183,7 +186,7 @@ uint64_t djb2tum(const uint8_t *str, uint64_t seed, uint8_t maxn,
 }
 
 uint64_t *str2ht64(uint8_t *str, uint64_t **ph,  size_t *size,
-    const long nsdly, const uint8_t nbtls)
+    const long nsdly, const unsigned pmdly, const uint8_t nbtls)
 {
     if (!str || !size) return NULL;
 
@@ -238,7 +241,7 @@ uint64_t *str2ht64(uint8_t *str, uint64_t **ph,  size_t *size,
     }
     for (size_t i = 0; i < num_blocks; i++) {
         // Process each 8-byte chunk of the rotated/padded string
-        h[i] = djb2tum(rotated_str + (i << 3), 0, 8, nsdly, nbtls);
+        h[i] = djb2tum(rotated_str + (i << 3), 0, 8, nsdly, pmdly, nbtls);
     }
     free(rotated_str);
 
@@ -299,7 +302,8 @@ static inline void usage(const char *name) {
 "\n"\
 "Usage: %s [-tN]\n"\
 "   -T: number of collision tests on the same input\n"\
-"   -d: number of ns above avg as the minimum delay\n"\
+"   -d: number of ns above min as the minimum delay\n"\
+"   -p: number of parts as min/256 ns above the min\n"\
 "   -s: number of bits to left shift on ns timings\n"\
 "   -r: number of preliminary runs (default: 1)\n"\
 "\n", name, name);
@@ -309,28 +313,31 @@ static inline void usage(const char *name) {
 #define BLOCK_SIZE 512
 
 int main(int argc, char *argv[]) {
-    unsigned nrdry = 1;
+    unsigned nrdry = 1, pmdly = 0;
     uint8_t *str = NULL, nbtls = 0;
     uint32_t ntsts = 0;
     long nsdly = 0;
 
-    (void) get_nanos();
-
     // Collect arguments from optional command line parameters
     while (1) {
-        int opt = getopt(argc, argv, "hT:s:d:r:");
+        int opt = getopt(argc, argv, "hT:s:d:p:r:");
         if(opt == '?' && !optarg) {
             usage("uchaos");
         } else if(opt == -1) break;
 
+        long x = atoi(optarg);
         switch (opt) {
-            case 'T': ntsts = atoi(optarg); break;
-            case 's': nbtls = atoi(optarg); break;
-            case 'd': nsdly = atoi(optarg); break;
-            case 'r': nrdry = atoi(optarg); break;
+            // ABS sanitises the parametric inputs
+            case 'T': ntsts = ABS(x); break;
+            case 's': nbtls = ABS(x); break;
+            case 'd': nsdly = ABS(x); break;
+            case 'r': nrdry = ABS(x); break;
+            case 'p': pmdly = ABS(x); break;
         }
     }
-    //TODO: sanitise the parametric inputs
+
+    // Counting time of running starts here, after parameters
+    (void) get_nanos();
 
     if (posix_memalign((void **)&str, 64, BLOCK_SIZE)) {
         perror("posix_memalign");
@@ -341,19 +348,20 @@ int main(int argc, char *argv[]) {
     if(n < 1) exit(EXIT_FAILURE);
     str[n] = 0;
 
+    size_t size = 0;
+    uint64_t *h = NULL;
+    for(unsigned a = 0; a < nrdry; a++)
+        h = str2ht64(str, &h, &size, nsdly, pmdly, nbtls);
+
     long mt = 0;
     uint64_t bic = 0;
-    uint64_t *h = NULL;
-    size_t nk = 0, nt = 0, nx = 0, size = 0;
-
-    while(nrdry--)
-        h = str2ht64(str, &h, &size, nsdly, nbtls);
+    size_t nk = 0, nt = 0, nx = 0;
 
     perr("\nRepetitions: ");
     for (uint32_t a = ntsts; a; a--) {
         // hashing
         long st = get_nanos();
-        h = str2ht64(str, &h, &size, nsdly, nbtls);
+        h = str2ht64(str, &h, &size, nsdly, pmdly, nbtls);
         mt += get_nanos() - st;
 
         // output
@@ -396,7 +404,9 @@ int main(int argc, char *argv[]) {
     double ratio = (double)100 / 64 * bic / nx;
     perr("\nBits in common compared to 50 %% avg is %.4lf %% (%+.1lf ppm)\n",
         ratio, (ratio-50) * E6 / 100);
-    djb2tum(0, 0, 0, 0, 0);
+    unsigned pmns = (unsigned)djb2tum(0, 0, 0, 0, pmdly, 0);
+    perr("\nParameter settings: s(%d), d(%ldns), p(%d:%dns), r(%d)\n",
+        nbtls, nsdly, pmdly, pmns, nrdry);
     perr("\n");
 
     return 0; // exit() do free()
