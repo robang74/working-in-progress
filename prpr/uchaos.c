@@ -118,13 +118,14 @@ uint64_t djb2tum(const uint8_t *str, uint64_t seed, uint8_t maxn,
     if(seed) h = seed;
     
     long ons = 0;
-    static uint64_t ohs = 0;
+    static uint64_t ohs = 5381;
     while((c = *str++) && maxn--) {
         struct timespec ts;                      // using sched_yield() to creates chaos,
         clock_gettime(CLOCK_MONOTONIC, &ts);     // getting ns in a hot loop is the limit
                                                  // and we want to see this limit, in VMs
 
-        uint8_t ns = (0xff & (ts.tv_nsec >> nbtls)) ^ (0xff & ohs);
+        uint8_t ns = 0xff ^ (ts.tv_nsec >> nbtls);
+        ns ^= (ns >> 3) ^ (0xff & ohs);
         uint8_t b1 = ns & 0x02;
         uint8_t b0 = ns & 0x01;
         /*
