@@ -6,7 +6,7 @@ nfle=${1:-test.txt}
 echo "Appending to file: $nfle"
 
 for i in 0 3 7; do
-    tcmd="./uchaos -T $((1*1024)) -d $i /\\_"
+    tcmd="./uchaos -T $((100*1024)) -d $i /\\_"
     printf "\n|\/ Testing with $tcmd" | tee -a $nfle
     {
         printf "_%.0s" {1..32}; printf "\n|";
