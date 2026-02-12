@@ -24,7 +24,7 @@ jobs:
       run: |
         # using uchaos.c as the input for its compiled binary and deliver it
         cp prpr/uchaos.c uchaos.c
-        time for i in $(seq 0 7); do echo "### using -s $i"; cat uchaos.c | ./uchaos -T 10000 -s $i | ent; done >> test.txt 2>&1 
+        time for i in $(seq 0 7); do printf "\n### using -s $i\n"; cat uchaos.c | ./uchaos -T 10000 -s $i | ent; done >> test.txt 2>&1 
         echo "File text.txt generated"
 
     - name: upload artifacts
