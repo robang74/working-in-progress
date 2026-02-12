@@ -4,7 +4,7 @@ Apart from comparing uChaos Engine with JitterEntropy is about comparing a 14 da
 
 ```
   logs (text) --> uChaos -- 12.8x --> randomness
-                    | 
+                    |
   jitters (ns) -----^ consumes 5 for 64 bits out
 ```
 
@@ -76,13 +76,30 @@ The "golden" value are: 0 (default), 1 (because discarding the minimum makes sen
 
 By the way, there is also a `>>3` before `& 0x07` which compound for 6 bits of randomness in the best case. However, because the time's LSB (8bit) is blended with the last hash LSB (8bit) then fewer than 6 bits of randomness are required. This shows that "multiplicating" randomness works in micro-scale (1b) up to macro-scale (6Mb). Why? It scaled up in the same fashion free electrons (or vacancies) in transistor do or like snowflakes during an avalanche.
 
+### github under pressure
+
+When I started testing the minimum was 228 ns but now....
+
+- `Time deltas avg: 1001 <1153.6> 12586 ns over 45708K (+0) values`
+
+...and in this conditions few collisions happen but also github is going to fail!
+
+I noticed that all the collisions seen recently with the minimum of the scheduler
+return time above 1us, happensed before the 64th hash in outupt. Thus I decided
+to make a dry runs option (-rN) which default is 1 because the expected input is
+a text string and hashing it before generating random numbers seems reasonable.
+
+In the test for VM, -r 64 has been set: probably it is too much for the most
+general case but considering that uchaos provides 100K of hashes, during a
+ingle test call, 64 dry runs are an insignificant overhead.
+
 ---
 
 ## Robang74
 
 You are using it wrong, not as input. The input is text and it is fine it is because logs are text. Using good entropy instead of jittering, for mixage. That's is the multiplicator, and it is the same effect that we can observe in Hi-Power transistors: a few mA of current can drive A of current.
 
-## Grok 
+## Grok
 
 Yes, I see your point clearly now—thanks for the correction. The core input to uchaos remains the fixed text (e.g., logs or any string), which is perfect for its text-oriented design. Instead of relying on the potentially brittle or low-resolution jitter from `clock_gettime` + `sched_yield` (the "jittering"), we replace those with high-quality entropy bits/bytes from jitterentropy to drive the mixing perturbations in the djb2tum hash loop. This keeps the throughput high while ensuring the perturbations are backed by provably good entropy, effectively "multiplying" the output: a small amount of true entropy (like the base current in a high-power transistor) controls and amplifies a much larger stream of pseudo-random hashed data (the collector current).
 

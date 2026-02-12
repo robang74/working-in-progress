@@ -4813,7 +4813,7 @@ Serial correlation coefficient is 0.000533 (totally uncorrelated = 0.0).
 
 -- 013 (v0.1.6) ----------------------------------------------------------------
 
-repetitions: 
+repetitions:
 Tests: 10000, collisions: 0 over 640000 hashes (0.00 ppm): OK
 
 Times: running: 5.335 s, hashing: 4.630 s, speed: 120.0 Kh/s
@@ -4857,4 +4857,63 @@ would exceed this value 61.05 percent of the times.
 Arithmetic mean value of data bytes is 127.4934 (127.5 = random).
 Monte Carlo value for Pi is 3.141668560 (error 0.00 percent).
 Serial correlation coefficient is 0.000017 (totally uncorrelated = 0.0).
+
+-- 015 -------------------------------------------------------------------------
+
+I noticed that all the collisions seen recently with the minimum of the scheduler
+return time above 1us, happensed before the 64th hash in outupt. Thus I decided
+to make a dry runs option (-rN) which default is 1 because the expected input is
+a text string and hashing it before generating random numbers seems reasonable.
+
+In the test for VM, -r 64 has been set: probably it is too much for the most
+general case but considering that uchaos provides 100K of hashes, during a
+ingle test call, 64 dry runs are an insignificant overhead.
+
+|\/ Testing with ./uchaos -T 102400 -d 0 /\_________________________________
+|
+Repetitions: 62:59 , status KO
+Tests: 102400, collisions: 1 over 6553600 hashes (0.15 ppm)
+Times: running: 72.000 s, hashing: 61.152 s, speed: 91.0 Kh/s
+Bits in common compared to 50 % avg is 49.9999 % (-0.6 ppm)
+Time deltas avg: 1001 <1153.6> 12586 ns over 45708K (+0) values
+Ratios over avg: 0.87 <1U> 10.91, over min: 1U <1.15> 12.57
+|
+Entropy = 7.999996 bits per byte.
+Chi square distribution for 52428800 samples is 268.84, and randomly
+would exceed this value 26.38 percent of the times.
+Arithmetic mean value of data bytes is 127.5197 (127.5 = random).
+Monte Carlo value for Pi is 3.141145597 (error 0.01 percent).
+Serial correlation coefficient is 0.000038 (totally uncorrelated = 0.0).
+
+|\/ Testing with ./uchaos -T 102400 -d 3 /\_________________________________
+|
+Repetitions: 18:10 23:16 52:46 , status KO
+Tests: 102400, collisions: 3 over 6553600 hashes (0.46 ppm)
+Times: running: 71.693 s, hashing: 61.165 s, speed: 91.4 Kh/s
+Bits in common compared to 50 % avg is 49.9999 % (-1.0 ppm)
+Time deltas avg: 1001 <1154.1> 12883 ns over 45708K (+32) values
+Ratios over avg: 0.87 <1U> 11.16, over min: 1U <1.15> 12.87
+|
+Entropy = 7.999995 bits per byte.
+Chi square distribution for 52428800 samples is 328.88, and randomly
+would exceed this value 0.12 percent of the times.
+Arithmetic mean value of data bytes is 127.5105 (127.5 = random).
+Monte Carlo value for Pi is 3.140935484 (error 0.02 percent).
+Serial correlation coefficient is -0.000066 (totally uncorrelated = 0.0).
+
+|\/ Testing with ./uchaos -T 102400 -d 7 /\_________________________________
+|
+Repetitions: 35:29 47:41 58:55 , status KO
+Tests: 102400, collisions: 3 over 6553600 hashes (0.46 ppm)
+Times: running: 71.815 s, hashing: 61.215 s, speed: 91.3 Kh/s
+Bits in common compared to 50 % avg is 49.9995 % (-4.7 ppm)
+Time deltas avg: 1001 <1154.6> 13357 ns over 45707K (+272) values
+Ratios over avg: 0.87 <1U> 11.57, over min: 1U <1.15> 13.34
+|
+Entropy = 7.999997 bits per byte.
+Chi square distribution for 52428800 samples is 234.12, and randomly
+would exceed this value 82.16 percent of the times.
+Arithmetic mean value of data bytes is 127.4982 (127.5 = random).
+Monte Carlo value for Pi is 3.141974607 (error 0.01 percent).
+Serial correlation coefficient is 0.000038 (totally uncorrelated = 0.0).
 
