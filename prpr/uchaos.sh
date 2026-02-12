@@ -1,9 +1,18 @@
 #!/bin/sh
 
-nfle=${1:-test.txt}
-echo "Appending: $nfle"
+entgr() { ent "$@" | grep -E "error|samples|127.5 |Entropy|exceed|uncorrelated"; }
 
-time { cat uchaos.c | ./uchaos -T 100000 -d 3 2>>$nfle | ent >> $nfle; }
+nfle=${1:-test.txt}
+echo "Appending to file: $nfle"
+
+for i in 0 3 7; do
+    tcmd="./uchaos -T $((1*1024)) -d $i /\\_"
+    printf "\n|\/ Testing with $tcmd" | tee -a $nfle
+    {
+        printf "_%.0s" {1..32}; printf "\n|";
+        time cat uchaos.c | { $tcmd 2>&3; printf "\n|\n" >&3; } | entgr
+    } 3>&1 | grep . >> $nfle
+done
 
 if false; then
     hgstr="{ time date +%N 2>&1 | dd bs=1; } 2>&1"
@@ -15,7 +24,7 @@ if false; then
             for i in $(seq 8); do
                 ./mtrd -t4 "$hgstr" | ./uchaos -T 1600 | dd bs=1 status=none &
             done 2>> $nfle
-        done | dd ibs=1 status=none | tee test.bin | ent >> $nfle
+        done | dd ibs=1 status=none | tee test.bin | entgr >> $nfle
     }
 
     if [ ! -x ./uchaos ]; then
@@ -23,6 +32,9 @@ if false; then
     fi
 
     time reseeding_test
+
+### ATTENTION: most of these test are keen to fail becuase requires Nx GB of data
+###            otherwise the test run-over the same dataset MANY times (like 80+)
 
     # Run dieharder (all tests, file input, 100 trials—~5-10min on VM)
     # dieharder -a -g 201 -f test.bin -n 100
@@ -38,10 +50,12 @@ fi
 if false; then
     time for i in $(seq 0 7); do
         printf "\n### using -s $i -d 7\n";
-        cat uchaos.c | ./uchaos -T 10000 -s $i -d 7 | ent;
+        cat uchaos.c | ./uchaos -T 10000 -s $i -d 7 | entgr;
     done >> $nfle 2>&1
     time for i in $(seq 0 7); do
         printf "\n### using -s $i -d 15\n";
-        cat uchaos.c | ./uchaos -T 10000 -s $i -d 15 | ent;
+        cat uchaos.c | ./uchaos -T 10000 -s $i -d 15 | entgr;
     done
 fi
+
+test -f $nfle
