@@ -5,7 +5,7 @@ echo "Appending: $nfle"
 reseeding_test() {
     for i in $(seq 0 7); do
         printf "\n### using -T 1000 x8\n";
-        { date +%N; cat uchaos.c; } | ./uchaos -T 1000;
+        { date +%N; cat uchaos.c; } | nice -n19 ./uchaos -T 1000;
     done 2>> $nfle | ent >> $nfle
 }
 
