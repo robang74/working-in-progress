@@ -22,14 +22,14 @@
  * /dev/random streams in such a way that even if /dev/random would have been
  * "tampered" by a global attacker of by NSA design, then such mixage would
  * have provided good speed and security.
- * 
+ *
  * Note: current implementation is a text strings-only PoC, it cannot deal with
  * binary input that has EOB char (\0) in the input data. Quick to change but it
  * is not the point here but djb2tum, possibly.
  *
  * Spoiler: in mixing /dev/random with a reasonably good function, not necessarily
  * a PRF-function (Mihir Bellare, 2014), the output is automatically NIS-certified
- * as much as every other SW that rely on /dev/random. Why? N coloured dices 
+ * as much as every other SW that rely on /dev/random. Why? N coloured dices
  * provide an ordered sequence (white, red, green, etc.) but every other
  * sequence (red, green, white, etc.) is also fine.
  *
@@ -123,7 +123,7 @@ uint64_t djb2tum(const uint8_t *str, uint64_t seed, uint8_t maxn,
      * 14695981039346656037	  The FNV-1 offset basis (64-bit).
      */
     if(seed) h = seed;
-    
+
     long ons = 0;
     static uint64_t ohs = 5381;
     while((c = *str++) && maxn--) {
@@ -301,6 +301,7 @@ static inline void usage(const char *name) {
 "   -T: number of collision tests on the same input\n"\
 "   -d: number of ns above avg as the minimum delay\n"\
 "   -s: number of bits to left shift on ns timings\n"\
+"   -r: number of preliminary runs (default: 1)\n"\
 "\n", name, name);
     exit(0);
 }
@@ -308,6 +309,7 @@ static inline void usage(const char *name) {
 #define BLOCK_SIZE 512
 
 int main(int argc, char *argv[]) {
+    unsigned nrdry = 1;
     uint8_t *str = NULL, nbtls = 0;
     uint32_t ntsts = 0;
     long nsdly = 0;
@@ -316,7 +318,7 @@ int main(int argc, char *argv[]) {
 
     // Collect arguments from optional command line parameters
     while (1) {
-        int opt = getopt(argc, argv, "hT:s:d:");
+        int opt = getopt(argc, argv, "hT:s:d:r:");
         if(opt == '?' && !optarg) {
             usage("uchaos");
         } else if(opt == -1) break;
@@ -325,8 +327,10 @@ int main(int argc, char *argv[]) {
             case 'T': ntsts = atoi(optarg); break;
             case 's': nbtls = atoi(optarg); break;
             case 'd': nsdly = atoi(optarg); break;
+            case 'r': nrdry = atoi(optarg); break;
         }
     }
+    //TODO: sanitise the parametric inputs
 
     if (posix_memalign((void **)&str, 64, BLOCK_SIZE)) {
         perror("posix_memalign");
@@ -341,6 +345,10 @@ int main(int argc, char *argv[]) {
     uint64_t bic = 0;
     uint64_t *h = NULL;
     size_t nk = 0, nt = 0, nx = 0, size = 0;
+
+    while(nrdry--)
+        h = str2ht64(str, &h, &size, nsdly, nbtls);
+
     perr("\nRepetitions: ");
     for (uint32_t a = ntsts; a; a--) {
         // hashing
