@@ -333,6 +333,7 @@ int main(int argc, char *argv[]) {
     uint64_t bic = 0;
     uint64_t *h = NULL;
     size_t nk = 0, nt = 0, nx = 0, size = 0;
+    perr("\nrepetitions: ");
     for (uint32_t a = ntsts; a; a--) {
         // hashing
         long st = get_nanos();
@@ -351,6 +352,7 @@ int main(int argc, char *argv[]) {
         for (size_t n = 0; n < size; n++) {
             for (size_t i = n + 1; i < size; i++) {
                 if (h[i] == h[n]) {
+                    perr("%ld:%ld ", i, n);
                     nk++; continue;
                 }
                 uint64_t cb = h[i] ^ h[n];
@@ -364,6 +366,7 @@ int main(int argc, char *argv[]) {
         free(h); h = NULL; // passing to str2ht64 a valid (h, size) should reused it
 #endif
     }
+    if(nk) perr("\n");
 
     long rt = get_nanos();
     perr("\nTests: %d, collisions: %ld over %ld hashes (%.2lf ppm): %s\n",
