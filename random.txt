@@ -3429,3 +3429,1432 @@ Arithmetic mean value of data bytes is 127.3744 (127.5 = random).
 Monte Carlo value for Pi is 3.144047417 (error 0.08 percent).
 Serial correlation coefficient is -0.000739 (totally uncorrelated = 0.0).
 
+================================================================================
+
+  prpr/uchaos.c testing
+
+================================================================================
+
+# Testing uchaos.c in the github VM docker: results collection
+
+-- 001 -------------------------------------------------------------------------
+
+Tests: 1000, collisions: 0 over 64000 hashes (0.00%) -- OK
+
+Times: running: 0.205 s, hashing: 0.124 s, speed: 312.7 Kh/s
+
+Bits in common compared to 50 % avg is 50.0023 % (+23.4 ppm)
+
+Entropy = 7.999637 bits per byte.
+
+Optimum compression would reduce the size
+of this 512000 byte file by 0 percent.
+
+Chi square distribution for 512000 samples is 258.18, and randomly
+would exceed this value 43.26 percent of the times.
+
+Arithmetic mean value of data bytes is 127.6371 (127.5 = random).
+Monte Carlo value for Pi is 3.128965348 (error 0.40 percent).
+Serial correlation coefficient is 0.000411 (totally uncorrelated = 0.0).
+
+real	0m0.206s
+user  0m0.095s
+sys 	0m0.122s
+
+-- 002 -------------------------------------------------------------------------
+
+Tests: 10000, collisions: 509 over 640000 hashes (0.08%) -- KO
+
+Times: running: 3.723 s, hashing: 3.116 s, speed: 171.9 Kh/s
+
+Bits in common compared to 50 % avg is 49.9990 % (-9.8 ppm)
+
+Entropy = 7.999768 bits per byte.
+
+Optimum compression would reduce the size
+of this 5120000 byte file by 0 percent.
+
+Chi square distribution for 5120000 samples is 1650.41, and randomly
+would exceed this value less than 0.01 percent of the times.
+
+Arithmetic mean value of data bytes is 127.3508 (127.5 = random).
+Monte Carlo value for Pi is 3.148487167 (error 0.22 percent).
+Serial correlation coefficient is -0.000928 (totally uncorrelated = 0.0).
+
+real	0m3.724s
+user	0m1.224s
+sys 	0m2.632s
+
+-- 003 -------------------------------------------------------------------------
+
+Tests: 10000, collisions: 215 over 640000 hashes (0.03%) -- KO
+
+Times: running: 3.809 s, hashing: 3.136 s, speed: 168.0 Kh/s
+
+Bits in common compared to 50 % avg is 50.0009 % (+9.2 ppm)
+
+Entropy = 7.999910 bits per byte.
+
+Optimum compression would reduce the size
+of this 5120000 byte file by 0 percent.
+
+Chi square distribution for 5120000 samples is 641.37, and randomly
+would exceed this value less than 0.01 percent of the times.
+
+Arithmetic mean value of data bytes is 127.5000 (127.5 = random).
+Monte Carlo value for Pi is 3.139651226 (error 0.06 percent).
+Serial correlation coefficient is 0.000358 (totally uncorrelated = 0.0).
+
+real	0m3.810s
+user	0m1.320s
+sys 	0m2.656s
+
+-- 004 (v0.1.2) ----------------------------------------------------------------
+
+Tests: 10000, collisions: 64 over 640000 hashes (0.01%) -- KO
+
+Times: running: 3.862 s, hashing: 3.156 s, speed: 165.7 Kh/s
+
+Bits in common compared to 50 % avg is 50.0003 % (+3.5 ppm)
+
+Time deltas avg: 581 <615.51> 41K ns over 4470K (+0) cicles
+
+Entropy = 7.999942 bits per byte.
+
+Optimum compression would reduce the size
+of this 5120000 byte file by 0 percent.
+
+Chi square distribution for 5120000 samples is 412.31, and randomly
+would exceed this value less than 0.01 percent of the times.
+
+Arithmetic mean value of data bytes is 127.5071 (127.5 = random).
+Monte Carlo value for Pi is 3.142651228 (error 0.03 percent).
+Serial correlation coefficient is -0.001209 (totally uncorrelated = 0.0).
+
+real	0m3.863s
+user	0m1.405s
+sys 	0m2.617s
+
+-- 005 -------- ----------------------------------------------------------------
+
+Tests: 10000, collisions: 91 over 640000 hashes (142.19 ppm): KO
+
+Times: running: 4.073 s, hashing: 3.149 s, speed: 157.1 Kh/s
+
+Bits in common compared to 50 % avg is 49.9996 % (-3.8 ppm)
+
+Time deltas avg: 561 <613.77> 69K ns over 4470K (+0) cicles
+
+Entropy = 7.999953 bits per byte.
+
+Optimum compression would reduce the size
+of this 5120000 byte file by 0 percent.
+
+Chi square distribution for 5120000 samples is 334.43, and randomly
+would exceed this value 0.06 percent of the times.
+
+Arithmetic mean value of data bytes is 127.4943 (127.5 = random).
+Monte Carlo value for Pi is 3.139515289 (error 0.07 percent).
+Serial correlation coefficient is -0.000561 (totally uncorrelated = 0.0).
+
+real	0m4.074s
+user	0m1.616s
+sys 	0m2.604s
+
+-- 006 -------------------------------------------------------------------------
+
+-s: 0
+Tests: 10000, collisions: 11 over 640000 hashes (17.19 ppm): KO
+
+Times: running: 4.167 s, hashing: 3.173 s, speed: 153.6 Kh/s
+
+Bits in common compared to 50 % avg is 50.0029 % (+28.6 ppm)
+
+Time deltas avg: 590 <618.66> 50K ns over 4470K (+0) cicles
+
+Entropy = 7.999935 bits per byte.
+
+Optimum compression would reduce the size
+of this 5120000 byte file by 0 percent.
+
+Chi square distribution for 5120000 samples is 457.80, and randomly
+would exceed this value less than 0.01 percent of the times.
+
+Arithmetic mean value of data bytes is 127.5296 (127.5 = random).
+Monte Carlo value for Pi is 3.142332477 (error 0.02 percent).
+Serial correlation coefficient is -0.000069 (totally uncorrelated = 0.0).
+
+-s: 1
+Tests: 10000, collisions: 37 over 640000 hashes (57.81 ppm): KO
+
+Times: running: 4.076 s, hashing: 3.160 s, speed: 157.0 Kh/s
+
+Bits in common compared to 50 % avg is 49.9999 % (-1.0 ppm)
+
+Time deltas avg: 590 <616.11> 62K ns over 4470K (+0) cicles
+
+Entropy = 7.999914 bits per byte.
+
+Optimum compression would reduce the size
+of this 5120000 byte file by 0 percent.
+
+Chi square distribution for 5120000 samples is 612.78, and randomly
+would exceed this value less than 0.01 percent of the times.
+
+Arithmetic mean value of data bytes is 127.5372 (127.5 = random).
+Monte Carlo value for Pi is 3.142149665 (error 0.02 percent).
+Serial correlation coefficient is 0.000441 (totally uncorrelated = 0.0).
+
+-s: 2
+Tests: 10000, collisions: 114 over 640000 hashes (178.12 ppm): KO
+
+Times: running: 4.097 s, hashing: 3.178 s, speed: 156.2 Kh/s
+
+Bits in common compared to 50 % avg is 49.9978 % (-21.8 ppm)
+
+Time deltas avg: 590 <619.53> 245K ns over 4470K (+0) cicles
+
+Entropy = 7.999880 bits per byte.
+
+Optimum compression would reduce the size
+of this 5120000 byte file by 0 percent.
+
+Chi square distribution for 5120000 samples is 855.93, and randomly
+would exceed this value less than 0.01 percent of the times.
+
+Arithmetic mean value of data bytes is 127.5633 (127.5 = random).
+Monte Carlo value for Pi is 3.144624666 (error 0.10 percent).
+Serial correlation coefficient is 0.000020 (totally uncorrelated = 0.0).
+
+-s: 3
+Tests: 10000, collisions: 286 over 640000 hashes (446.88 ppm): KO
+
+Times: running: 4.086 s, hashing: 3.171 s, speed: 156.6 Kh/s
+
+Bits in common compared to 50 % avg is 49.9991 % (-9.0 ppm)
+
+Time deltas avg: 590 <618.28> 134K ns over 4470K (+0) cicles
+
+Entropy = 7.999931 bits per byte.
+
+Optimum compression would reduce the size
+of this 5120000 byte file by 0 percent.
+
+Chi square distribution for 5120000 samples is 490.94, and randomly
+would exceed this value less than 0.01 percent of the times.
+
+Arithmetic mean value of data bytes is 127.5203 (127.5 = random).
+Monte Carlo value for Pi is 3.143635603 (error 0.07 percent).
+Serial correlation coefficient is 0.000425 (totally uncorrelated = 0.0).
+
+-s: 4
+Tests: 10000, collisions: 607 over 640000 hashes (948.44 ppm): KO
+
+Times: running: 4.084 s, hashing: 3.164 s, speed: 156.7 Kh/s
+
+Bits in common compared to 50 % avg is 50.0009 % (+9.4 ppm)
+
+Time deltas avg: 590 <616.68> 79K ns over 4470K (+0) cicles
+
+Entropy = 7.999718 bits per byte.
+
+Optimum compression would reduce the size
+of this 5120000 byte file by 0 percent.
+
+Chi square distribution for 5120000 samples is 2004.10, and randomly
+would exceed this value less than 0.01 percent of the times.
+
+Arithmetic mean value of data bytes is 127.5437 (127.5 = random).
+Monte Carlo value for Pi is 3.139937164 (error 0.05 percent).
+Serial correlation coefficient is -0.000363 (totally uncorrelated = 0.0).
+
+-s: 5
+Tests: 10000, collisions: 708 over 640000 hashes (1106.25 ppm): KO
+
+Times: running: 4.109 s, hashing: 3.162 s, speed: 155.7 Kh/s
+
+Bits in common compared to 50 % avg is 49.9997 % (-3.1 ppm)
+
+Time deltas avg: 581 <616.47> 40K ns over 4470K (+0) cicles
+
+Entropy = 7.998674 bits per byte.
+
+Optimum compression would reduce the size
+of this 5120000 byte file by 0 percent.
+
+Chi square distribution for 5120000 samples is 9456.55, and randomly
+would exceed this value less than 0.01 percent of the times.
+
+Arithmetic mean value of data bytes is 127.4303 (127.5 = random).
+Monte Carlo value for Pi is 3.145496541 (error 0.12 percent).
+Serial correlation coefficient is 0.000713 (totally uncorrelated = 0.0).
+
+-s: 6
+Tests: 10000, collisions: 304 over 640000 hashes (475.00 ppm): KO
+
+Times: running: 4.055 s, hashing: 3.166 s, speed: 157.8 Kh/s
+
+Bits in common compared to 50 % avg is 49.9996 % (-3.6 ppm)
+
+Time deltas avg: 590 <617.15> 45K ns over 4470K (+0) cicles
+
+Entropy = 7.998410 bits per byte.
+
+Optimum compression would reduce the size
+of this 5120000 byte file by 0 percent.
+
+Chi square distribution for 5120000 samples is 11366.88, and randomly
+would exceed this value less than 0.01 percent of the times.
+
+Arithmetic mean value of data bytes is 127.7588 (127.5 = random).
+Monte Carlo value for Pi is 3.140682477 (error 0.03 percent).
+Serial correlation coefficient is -0.003502 (totally uncorrelated = 0.0).
+
+-s: 7
+Tests: 10000, collisions: 993 over 640000 hashes (1551.56 ppm): KO
+
+Times: running: 4.175 s, hashing: 3.207 s, speed: 153.3 Kh/s
+
+Bits in common compared to 50 % avg is 49.9951 % (-48.6 ppm)
+
+Time deltas avg: 590 <625.10> 146K ns over 4470K (+0) cicles
+
+Entropy = 7.998569 bits per byte.
+
+Optimum compression would reduce the size
+of this 5120000 byte file by 0 percent.
+
+Chi square distribution for 5120000 samples is 10152.87, and randomly
+would exceed this value less than 0.01 percent of the times.
+
+Arithmetic mean value of data bytes is 127.3733 (127.5 = random).
+Monte Carlo value for Pi is 3.146884042 (error 0.17 percent).
+Serial correlation coefficient is 0.003497 (totally uncorrelated = 0.0).
+
+-- 007 -------------------------------------------------------------------------
+
+-s: 0
+Tests: 10000, collisions: 22 over 640000 hashes (34.38 ppm): KO
+
+Times: running: 4.097 s, hashing: 3.165 s, speed: 156.2 Kh/s
+
+Bits in common compared to 50 % avg is 50.0013 % (+13.0 ppm)
+
+Time deltas avg: 590 <617.05> 42K ns over 4470K (+0) cicles
+
+Entropy = 7.999934 bits per byte.
+
+Optimum compression would reduce the size
+of this 5120000 byte file by 0 percent.
+
+Chi square distribution for 5120000 samples is 465.68, and randomly
+would exceed this value less than 0.01 percent of the times.
+
+Arithmetic mean value of data bytes is 127.5635 (127.5 = random).
+Monte Carlo value for Pi is 3.138985601 (error 0.08 percent).
+Serial correlation coefficient is 0.000284 (totally uncorrelated = 0.0).
+
+-s: 1
+Tests: 10000, collisions: 22 over 640000 hashes (34.38 ppm): KO
+
+Times: running: 4.081 s, hashing: 3.174 s, speed: 156.8 Kh/s
+
+Bits in common compared to 50 % avg is 49.9988 % (-12.0 ppm)
+
+Time deltas avg: 590 <618.69> 71K ns over 4470K (+0) cicles
+
+Entropy = 7.999939 bits per byte.
+
+Optimum compression would reduce the size
+of this 5120000 byte file by 0 percent.
+
+Chi square distribution for 5120000 samples is 435.00, and randomly
+would exceed this value less than 0.01 percent of the times.
+
+Arithmetic mean value of data bytes is 127.4829 (127.5 = random).
+Monte Carlo value for Pi is 3.140537164 (error 0.03 percent).
+Serial correlation coefficient is -0.000333 (totally uncorrelated = 0.0).
+
+-s: 2
+Tests: 10000, collisions: 79 over 640000 hashes (123.44 ppm): KO
+
+Times: running: 4.009 s, hashing: 3.136 s, speed: 159.6 Kh/s
+
+Bits in common compared to 50 % avg is 50.0004 % (+4.5 ppm)
+
+Time deltas avg: 581 <611.59> 31K ns over 4470K (+0) cicles
+
+Entropy = 7.999936 bits per byte.
+
+Optimum compression would reduce the size
+of this 5120000 byte file by 0 percent.
+
+Chi square distribution for 5120000 samples is 453.21, and randomly
+would exceed this value less than 0.01 percent of the times.
+
+Arithmetic mean value of data bytes is 127.6188 (127.5 = random).
+Monte Carlo value for Pi is 3.135577787 (error 0.19 percent).
+Serial correlation coefficient is 0.000459 (totally uncorrelated = 0.0).
+
+-s: 3
+Tests: 10000, collisions: 259 over 640000 hashes (404.69 ppm): KO
+
+Times: running: 4.098 s, hashing: 3.137 s, speed: 156.2 Kh/s
+
+Bits in common compared to 50 % avg is 49.9994 % (-6.3 ppm)
+
+Time deltas avg: 590 <611.74> 34K ns over 4470K (+0) cicles
+
+Entropy = 7.999924 bits per byte.
+
+Optimum compression would reduce the size
+of this 5120000 byte file by 0 percent.
+
+Chi square distribution for 5120000 samples is 539.15, and randomly
+would exceed this value less than 0.01 percent of the times.
+
+Arithmetic mean value of data bytes is 127.4295 (127.5 = random).
+Monte Carlo value for Pi is 3.140616852 (error 0.03 percent).
+Serial correlation coefficient is -0.000211 (totally uncorrelated = 0.0).
+
+Tests: 10000, collisions: 320 over 640000 hashes (500.00 ppm): KO
+
+-s: 4
+Times: running: 4.077 s, hashing: 3.154 s, speed: 157.0 Kh/s
+
+Bits in common compared to 50 % avg is 50.0012 % (+12.1 ppm)
+
+Time deltas avg: 590 <614.91> 29K ns over 4470K (+0) cicles
+
+Entropy = 7.999832 bits per byte.
+
+Optimum compression would reduce the size
+of this 5120000 byte file by 0 percent.
+
+Chi square distribution for 5120000 samples is 1189.66, and randomly
+would exceed this value less than 0.01 percent of the times.
+
+Arithmetic mean value of data bytes is 127.5731 (127.5 = random).
+Monte Carlo value for Pi is 3.140082477 (error 0.05 percent).
+Serial correlation coefficient is -0.000429 (totally uncorrelated = 0.0).
+
+-s: 5
+Tests: 10000, collisions: 352 over 640000 hashes (550.00 ppm): KO
+
+Times: running: 4.131 s, hashing: 3.190 s, speed: 154.9 Kh/s
+
+Bits in common compared to 50 % avg is 49.9999 % (-0.5 ppm)
+
+Time deltas avg: 590 <621.94> 54K ns over 4470K (+0) cicles
+
+Entropy = 7.999500 bits per byte.
+
+Optimum compression would reduce the size
+of this 5120000 byte file by 0 percent.
+
+Chi square distribution for 5120000 samples is 3565.83, and randomly
+would exceed this value less than 0.01 percent of the times.
+
+Arithmetic mean value of data bytes is 127.4124 (127.5 = random).
+Monte Carlo value for Pi is 3.146635604 (error 0.16 percent).
+Serial correlation coefficient is 0.000844 (totally uncorrelated = 0.0).
+
+Tests: 10000, collisions: 336 over 640000 hashes (525.00 ppm): KO
+
+-s: 6
+Times: running: 4.088 s, hashing: 3.169 s, speed: 156.6 Kh/s
+
+Bits in common compared to 50 % avg is 49.9991 % (-9.1 ppm)
+
+Time deltas avg: 590 <617.70> 29K ns over 4470K (+0) cicles
+
+Entropy = 7.998600 bits per byte.
+
+Optimum compression would reduce the size
+of this 5120000 byte file by 0 percent.
+
+Chi square distribution for 5120000 samples is 10020.40, and randomly
+would exceed this value less than 0.01 percent of the times.
+
+Arithmetic mean value of data bytes is 127.7486 (127.5 = random).
+Monte Carlo value for Pi is 3.140630914 (error 0.03 percent).
+Serial correlation coefficient is -0.003168 (totally uncorrelated = 0.0).
+
+-s: 7
+Tests: 10000, collisions: 1422 over 640000 hashes (2221.88 ppm): KO
+
+Times: running: 4.096 s, hashing: 3.174 s, speed: 156.3 Kh/s
+
+Bits in common compared to 50 % avg is 49.9984 % (-15.6 ppm)
+
+Time deltas avg: 590 <618.91> 31K ns over 4470K (+0) cicles
+
+Entropy = 7.998626 bits per byte.
+
+Optimum compression would reduce the size
+of this 5120000 byte file by 0 percent.
+
+Chi square distribution for 5120000 samples is 9751.72, and randomly
+would exceed this value less than 0.01 percent of the times.
+
+Arithmetic mean value of data bytes is 127.2681 (127.5 = random).
+Monte Carlo value for Pi is 3.143326228 (error 0.06 percent).
+Serial correlation coefficient is 0.004501 (totally uncorrelated = 0.0).
+
+-- 008 -------------------------------------------------------------------------
+
+### using -s 0
+
+Tests: 10000, collisions: 0 over 640000 hashes (0.00 ppm): OK
+
+Times: running: 2.094 s, hashing: 1.207 s, speed: 305.6 Kh/s
+
+Bits in common compared to 50 % avg is 50.0005 % (+5.3 ppm)
+
+Time deltas avg: 222 <234.92> 34K ns over 4470K (+0) cicles
+
+Entropy = 7.999962 bits per byte.
+
+Optimum compression would reduce the size
+of this 5120000 byte file by 0 percent.
+
+Chi square distribution for 5120000 samples is 267.80, and randomly
+would exceed this value 27.85 percent of the times.
+
+Arithmetic mean value of data bytes is 127.5844 (127.5 = random).
+Monte Carlo value for Pi is 3.139594976 (error 0.06 percent).
+Serial correlation coefficient is -0.000638 (totally uncorrelated = 0.0).
+
+### using -s 1
+
+Tests: 10000, collisions: 2 over 640000 hashes (3.12 ppm): KO
+
+Times: running: 2.041 s, hashing: 1.204 s, speed: 313.6 Kh/s
+
+Bits in common compared to 50 % avg is 50.0023 % (+23.2 ppm)
+
+Time deltas avg: 223 <234.32> 128K ns over 4470K (+0) cicles
+
+Entropy = 7.999962 bits per byte.
+
+Optimum compression would reduce the size
+of this 5120000 byte file by 0 percent.
+
+Chi square distribution for 5120000 samples is 267.16, and randomly
+would exceed this value 28.79 percent of the times.
+
+Arithmetic mean value of data bytes is 127.4726 (127.5 = random).
+Monte Carlo value for Pi is 3.142669978 (error 0.03 percent).
+Serial correlation coefficient is -0.000171 (totally uncorrelated = 0.0).
+
+### using -s 2
+
+Tests: 10000, collisions: 12 over 640000 hashes (18.75 ppm): KO
+
+Times: running: 2.065 s, hashing: 1.209 s, speed: 310.0 Kh/s
+
+Bits in common compared to 50 % avg is 49.9988 % (-12.3 ppm)
+
+Time deltas avg: 223 <235.21> 35K ns over 4470K (+0) cicles
+
+Entropy = 7.999947 bits per byte.
+
+Optimum compression would reduce the size
+of this 5120000 byte file by 0 percent.
+
+Chi square distribution for 5120000 samples is 375.57, and randomly
+would exceed this value less than 0.01 percent of the times.
+
+Arithmetic mean value of data bytes is 127.4669 (127.5 = random).
+Monte Carlo value for Pi is 3.141601227 (error 0.00 percent).
+Serial correlation coefficient is -0.000767 (totally uncorrelated = 0.0).
+
+### using -s 3
+
+Tests: 10000, collisions: 145 over 640000 hashes (226.56 ppm): KO
+
+Times: running: 2.052 s, hashing: 1.202 s, speed: 311.9 Kh/s
+
+Bits in common compared to 50 % avg is 49.9988 % (-11.6 ppm)
+
+Time deltas avg: 223 <234.02> 19K ns over 4470K (+0) cicles
+
+Entropy = 7.999801 bits per byte.
+
+Optimum compression would reduce the size
+of this 5120000 byte file by 0 percent.
+
+Chi square distribution for 5120000 samples is 1411.71, and randomly
+would exceed this value less than 0.01 percent of the times.
+
+Arithmetic mean value of data bytes is 127.3373 (127.5 = random).
+Monte Carlo value for Pi is 3.143734041 (error 0.07 percent).
+Serial correlation coefficient is -0.001891 (totally uncorrelated = 0.0).
+
+### using -s 4
+
+Tests: 10000, collisions: 157 over 640000 hashes (245.31 ppm): KO
+
+Times: running: 2.048 s, hashing: 1.211 s, speed: 312.5 Kh/s
+
+Bits in common compared to 50 % avg is 49.9999 % (-1.0 ppm)
+
+Time deltas avg: 224 <235.75> 52K ns over 4470K (+0) cicles
+
+Entropy = 7.999618 bits per byte.
+
+Optimum compression would reduce the size
+of this 5120000 byte file by 0 percent.
+
+Chi square distribution for 5120000 samples is 2708.97, and randomly
+would exceed this value less than 0.01 percent of the times.
+
+Arithmetic mean value of data bytes is 127.5039 (127.5 = random).
+Monte Carlo value for Pi is 3.143429353 (error 0.06 percent).
+Serial correlation coefficient is 0.000445 (totally uncorrelated = 0.0).
+
+### using -s 5
+
+Tests: 10000, collisions: 93 over 640000 hashes (145.31 ppm): KO
+
+Times: running: 2.073 s, hashing: 1.202 s, speed: 308.7 Kh/s
+
+Bits in common compared to 50 % avg is 49.9996 % (-4.3 ppm)
+
+Time deltas avg: 221 <233.93> 27K ns over 4470K (+0) cicles
+
+Entropy = 7.999065 bits per byte.
+
+Optimum compression would reduce the size
+of this 5120000 byte file by 0 percent.
+
+Chi square distribution for 5120000 samples is 6668.75, and randomly
+would exceed this value less than 0.01 percent of the times.
+
+Arithmetic mean value of data bytes is 127.5276 (127.5 = random).
+Monte Carlo value for Pi is 3.136609038 (error 0.16 percent).
+Serial correlation coefficient is -0.001597 (totally uncorrelated = 0.0).
+
+### using -s 6
+
+Tests: 10000, collisions: 34 over 640000 hashes (53.12 ppm): KO
+
+Times: running: 2.042 s, hashing: 1.204 s, speed: 313.4 Kh/s
+
+Bits in common compared to 50 % avg is 49.9981 % (-19.4 ppm)
+
+Time deltas avg: 223 <234.11> 35K ns over 4470K (+0) cicles
+
+Entropy = 7.998640 bits per byte.
+
+Optimum compression would reduce the size
+of this 5120000 byte file by 0 percent.
+
+Chi square distribution for 5120000 samples is 9673.27, and randomly
+would exceed this value less than 0.01 percent of the times.
+
+Arithmetic mean value of data bytes is 127.4693 (127.5 = random).
+Monte Carlo value for Pi is 3.145637166 (error 0.13 percent).
+Serial correlation coefficient is 0.001242 (totally uncorrelated = 0.0).
+
+### using -s 7
+
+Tests: 10000, collisions: 54 over 640000 hashes (84.38 ppm): KO
+
+Times: running: 2.070 s, hashing: 1.206 s, speed: 309.1 Kh/s
+
+Bits in common compared to 50 % avg is 50.0033 % (+33.0 ppm)
+
+Time deltas avg: 219 <234.70> 32K ns over 4470K (+0) cicles
+
+Entropy = 7.997950 bits per byte.
+
+Optimum compression would reduce the size
+of this 5120000 byte file by 0 percent.
+
+Chi square distribution for 5120000 samples is 14665.33, and randomly
+would exceed this value less than 0.01 percent of the times.
+
+Arithmetic mean value of data bytes is 127.0576 (127.5 = random).
+Monte Carlo value for Pi is 3.156329358 (error 0.47 percent).
+Serial correlation coefficient is -0.000686 (totally uncorrelated = 0.0).
+
+-- 009 -------------------------------------------------------------------------
+
+### using -s 0
+
+Tests: 10000, collisions: 15 over 640000 hashes (23.44 ppm): KO
+
+Times: running: 3.913 s, hashing: 3.188 s, speed: 163.6 Kh/s
+
+Bits in common compared to 50 % avg is 49.9989 % (-11.1 ppm)
+
+Time deltas avg: 581 <621.49> 129K ns over 4470K (+0) cicles
+
+Entropy = 7.999950 bits per byte.
+
+Optimum compression would reduce the size
+of this 5120000 byte file by 0 percent.
+
+Chi square distribution for 5120000 samples is 356.48, and randomly
+would exceed this value less than 0.01 percent of the times.
+
+Arithmetic mean value of data bytes is 127.5379 (127.5 = random).
+Monte Carlo value for Pi is 3.138432476 (error 0.10 percent).
+Serial correlation coefficient is -0.000696 (totally uncorrelated = 0.0).
+
+### using -s 1
+
+Tests: 10000, collisions: 48 over 640000 hashes (75.00 ppm): KO
+
+Times: running: 3.905 s, hashing: 3.178 s, speed: 163.9 Kh/s
+
+Bits in common compared to 50 % avg is 49.9988 % (-11.8 ppm)
+
+Time deltas avg: 571 <619.46> 102K ns over 4470K (+0) cicles
+
+Entropy = 7.999944 bits per byte.
+
+Optimum compression would reduce the size
+of this 5120000 byte file by 0 percent.
+
+Chi square distribution for 5120000 samples is 394.02, and randomly
+would exceed this value less than 0.01 percent of the times.
+
+Arithmetic mean value of data bytes is 127.5446 (127.5 = random).
+Monte Carlo value for Pi is 3.138563726 (error 0.10 percent).
+Serial correlation coefficient is -0.000138 (totally uncorrelated = 0.0).
+
+### using -s 2
+
+Tests: 10000, collisions: 282 over 640000 hashes (440.62 ppm): KO
+
+Times: running: 3.857 s, hashing: 3.168 s, speed: 166.0 Kh/s
+
+Bits in common compared to 50 % avg is 49.9993 % (-7.1 ppm)
+
+Time deltas avg: 581 <617.50> 52K ns over 4470K (+0) cicles
+
+Entropy = 7.999855 bits per byte.
+
+Optimum compression would reduce the size
+of this 5120000 byte file by 0 percent.
+
+Chi square distribution for 5120000 samples is 1028.63, and randomly
+would exceed this value less than 0.01 percent of the times.
+
+Arithmetic mean value of data bytes is 127.5803 (127.5 = random).
+Monte Carlo value for Pi is 3.141971540 (error 0.01 percent).
+Serial correlation coefficient is 0.000894 (totally uncorrelated = 0.0).
+
+### using -s 3
+
+Tests: 10000, collisions: 177 over 640000 hashes (276.56 ppm): KO
+
+Times: running: 3.885 s, hashing: 3.168 s, speed: 164.7 Kh/s
+
+Bits in common compared to 50 % avg is 49.9998 % (-1.7 ppm)
+
+Time deltas avg: 590 <617.59> 51K ns over 4470K (+0) cicles
+
+Entropy = 7.999867 bits per byte.
+
+Optimum compression would reduce the size
+of this 5120000 byte file by 0 percent.
+
+Chi square distribution for 5120000 samples is 942.54, and randomly
+would exceed this value less than 0.01 percent of the times.
+
+Arithmetic mean value of data bytes is 127.5319 (127.5 = random).
+Monte Carlo value for Pi is 3.143373103 (error 0.06 percent).
+Serial correlation coefficient is 0.000467 (totally uncorrelated = 0.0).
+
+### using -s 4
+
+Tests: 10000, collisions: 455 over 640000 hashes (710.94 ppm): KO
+
+Times: running: 3.867 s, hashing: 3.200 s, speed: 165.5 Kh/s
+
+Bits in common compared to 50 % avg is 50.0000 % (+0.1 ppm)
+
+Time deltas avg: 590 <623.82> 40K ns over 4470K (+0) cicles
+
+Entropy = 7.999757 bits per byte.
+
+Optimum compression would reduce the size
+of this 5120000 byte file by 0 percent.
+
+Chi square distribution for 5120000 samples is 1724.04, and randomly
+would exceed this value less than 0.01 percent of the times.
+
+Arithmetic mean value of data bytes is 127.6160 (127.5 = random).
+Monte Carlo value for Pi is 3.136777788 (error 0.15 percent).
+Serial correlation coefficient is 0.000294 (totally uncorrelated = 0.0).
+
+### using -s 5
+
+Tests: 10000, collisions: 843 over 640000 hashes (1317.19 ppm): KO
+
+Times: running: 3.852 s, hashing: 3.175 s, speed: 166.1 Kh/s
+
+Bits in common compared to 50 % avg is 49.9969 % (-31.0 ppm)
+
+Time deltas avg: 581 <618.84> 50K ns over 4470K (+0) cicles
+
+Entropy = 7.998735 bits per byte.
+
+Optimum compression would reduce the size
+of this 5120000 byte file by 0 percent.
+
+Chi square distribution for 5120000 samples is 9008.01, and randomly
+would exceed this value less than 0.01 percent of the times.
+
+Arithmetic mean value of data bytes is 127.3697 (127.5 = random).
+Monte Carlo value for Pi is 3.147938730 (error 0.20 percent).
+Serial correlation coefficient is -0.000545 (totally uncorrelated = 0.0).
+
+### using -s 6
+
+Tests: 10000, collisions: 1682 over 640000 hashes (2628.12 ppm): KO
+
+Times: running: 3.846 s, hashing: 3.175 s, speed: 166.4 Kh/s
+
+Bits in common compared to 50 % avg is 49.9979 % (-20.6 ppm)
+
+Time deltas avg: 590 <618.93> 38K ns over 4470K (+0) cicles
+
+Entropy = 7.998667 bits per byte.
+
+Optimum compression would reduce the size
+of this 5120000 byte file by 0 percent.
+
+Chi square distribution for 5120000 samples is 9506.29, and randomly
+would exceed this value less than 0.01 percent of the times.
+
+Arithmetic mean value of data bytes is 127.6977 (127.5 = random).
+Monte Carlo value for Pi is 3.135966850 (error 0.18 percent).
+Serial correlation coefficient is -0.002021 (totally uncorrelated = 0.0).
+
+### using -s 7
+
+Tests: 10000, collisions: 1752 over 640000 hashes (2737.50 ppm): KO
+
+Times: running: 3.866 s, hashing: 3.180 s, speed: 165.5 Kh/s
+
+Bits in common compared to 50 % avg is 49.9958 % (-41.8 ppm)
+
+Time deltas avg: 581 <619.97> 55K ns over 4470K (+0) cicles
+
+Entropy = 7.998696 bits per byte.
+
+Optimum compression would reduce the size
+of this 5120000 byte file by 0 percent.
+
+Chi square distribution for 5120000 samples is 9251.10, and randomly
+would exceed this value less than 0.01 percent of the times.
+
+Arithmetic mean value of data bytes is 127.3319 (127.5 = random).
+Monte Carlo value for Pi is 3.144596541 (error 0.10 percent).
+Serial correlation coefficient is 0.003621 (totally uncorrelated = 0.0).
+
+-- 010 -------------------------------------------------------------------------
+
+### using -s 0 -d 7
+
+Tests: 10000, collisions: 46 over 640000 hashes (71.88 ppm): KO
+
+Times: running: 5.857 s, hashing: 5.146 s, speed: 109.3 Kh/s
+
+Bits in common compared to 50 % avg is 49.9981 % (-18.6 ppm)
+
+Time deltas avg: 590 <1066.60> 125K ns over 4438K (+32140) cicles
+
+Entropy = 7.999937 bits per byte.
+
+Optimum compression would reduce the size
+of this 5120000 byte file by 0 percent.
+
+Chi square distribution for 5120000 samples is 445.42, and randomly
+would exceed this value less than 0.01 percent of the times.
+
+Arithmetic mean value of data bytes is 127.5827 (127.5 = random).
+Monte Carlo value for Pi is 3.138751226 (error 0.09 percent).
+Serial correlation coefficient is -0.000205 (totally uncorrelated = 0.0).
+
+### using -s 1 -d 7
+
+Tests: 10000, collisions: 68 over 640000 hashes (106.25 ppm): KO
+
+Times: running: 4.323 s, hashing: 3.604 s, speed: 148.0 Kh/s
+
+Bits in common compared to 50 % avg is 49.9995 % (-5.4 ppm)
+
+Time deltas avg: 581 <715.75> 255K ns over 4463K (+6951) cicles
+
+Entropy = 7.999929 bits per byte.
+
+Optimum compression would reduce the size
+of this 5120000 byte file by 0 percent.
+
+Chi square distribution for 5120000 samples is 500.79, and randomly
+would exceed this value less than 0.01 percent of the times.
+
+Arithmetic mean value of data bytes is 127.4910 (127.5 = random).
+Monte Carlo value for Pi is 3.140799664 (error 0.03 percent).
+Serial correlation coefficient is -0.000112 (totally uncorrelated = 0.0).
+
+### using -s 2 -d 7
+
+Tests: 10000, collisions: 78 over 640000 hashes (121.88 ppm): KO
+
+Times: running: 4.128 s, hashing: 3.418 s, speed: 155.0 Kh/s
+
+Bits in common compared to 50 % avg is 50.0005 % (+4.7 ppm)
+
+Time deltas avg: 581 <673.64> 393K ns over 4466K (+3828) cicles
+
+Entropy = 7.999898 bits per byte.
+
+Optimum compression would reduce the size
+of this 5120000 byte file by 0 percent.
+
+Chi square distribution for 5120000 samples is 725.20, and randomly
+would exceed this value less than 0.01 percent of the times.
+
+Arithmetic mean value of data bytes is 127.6436 (127.5 = random).
+Monte Carlo value for Pi is 3.138371538 (error 0.10 percent).
+Serial correlation coefficient is -0.000252 (totally uncorrelated = 0.0).
+
+### using -s 3 -d 7
+
+Tests: 10000, collisions: 182 over 640000 hashes (284.38 ppm): KO
+
+Times: running: 3.975 s, hashing: 3.296 s, speed: 161.0 Kh/s
+
+Bits in common compared to 50 % avg is 49.9994 % (-6.0 ppm)
+
+Time deltas avg: 571 <646.34> 102K ns over 4468K (+2061) cicles
+
+Entropy = 7.999860 bits per byte.
+
+Optimum compression would reduce the size
+of this 5120000 byte file by 0 percent.
+
+Chi square distribution for 5120000 samples is 992.02, and randomly
+would exceed this value less than 0.01 percent of the times.
+
+Arithmetic mean value of data bytes is 127.5518 (127.5 = random).
+Monte Carlo value for Pi is 3.141034039 (error 0.02 percent).
+Serial correlation coefficient is 0.001634 (totally uncorrelated = 0.0).
+
+### using -s 4 -d 7
+
+Tests: 10000, collisions: 589 over 640000 hashes (920.31 ppm): KO
+
+Times: running: 4.026 s, hashing: 3.320 s, speed: 159.0 Kh/s
+
+Bits in common compared to 50 % avg is 49.9973 % (-26.6 ppm)
+
+Time deltas avg: 581 <651.64> 632K ns over 4468K (+2379) cicles
+
+Entropy = 7.999729 bits per byte.
+
+Optimum compression would reduce the size
+of this 5120000 byte file by 0 percent.
+
+Chi square distribution for 5120000 samples is 1929.83, and randomly
+would exceed this value less than 0.01 percent of the times.
+
+Arithmetic mean value of data bytes is 127.5732 (127.5 = random).
+Monte Carlo value for Pi is 3.141249665 (error 0.01 percent).
+Serial correlation coefficient is -0.000517 (totally uncorrelated = 0.0).
+
+### using -s 5 -d 7
+
+Tests: 10000, collisions: 661 over 640000 hashes (1032.81 ppm): KO
+
+Times: running: 4.300 s, hashing: 3.610 s, speed: 148.8 Kh/s
+
+Bits in common compared to 50 % avg is 49.9982 % (-18.3 ppm)
+
+Time deltas avg: 581 <717.42> 93K ns over 4463K (+7174) cicles
+
+Entropy = 7.998548 bits per byte.
+
+Optimum compression would reduce the size
+of this 5120000 byte file by 0 percent.
+
+Chi square distribution for 5120000 samples is 10362.30, and randomly
+would exceed this value less than 0.01 percent of the times.
+
+Arithmetic mean value of data bytes is 127.4042 (127.5 = random).
+Monte Carlo value for Pi is 3.146082479 (error 0.14 percent).
+Serial correlation coefficient is -0.000435 (totally uncorrelated = 0.0).
+
+### using -s 6 -d 7
+
+Tests: 10000, collisions: 1142 over 640000 hashes (1784.38 ppm): KO
+
+Times: running: 4.120 s, hashing: 3.415 s, speed: 155.4 Kh/s
+
+Bits in common compared to 50 % avg is 49.9981 % (-19.2 ppm)
+
+Time deltas avg: 590 <672.40> 101K ns over 4466K (+3633) cicles
+
+Entropy = 7.998940 bits per byte.
+
+Optimum compression would reduce the size
+of this 5120000 byte file by 0 percent.
+
+Chi square distribution for 5120000 samples is 7547.82, and randomly
+would exceed this value less than 0.01 percent of the times.
+
+Arithmetic mean value of data bytes is 127.6411 (127.5 = random).
+Monte Carlo value for Pi is 3.137368413 (error 0.13 percent).
+Serial correlation coefficient is -0.002402 (totally uncorrelated = 0.0).
+
+### using -s 7 -d 7
+
+Tests: 10000, collisions: 1393 over 640000 hashes (2176.56 ppm): KO
+
+Times: running: 6.337 s, hashing: 5.628 s, speed: 101.0 Kh/s
+
+Bits in common compared to 50 % avg is 49.9977 % (-22.5 ppm)
+
+Time deltas avg: 590 <1177.11> 200K ns over 4431K (+39908) cicles
+
+Entropy = 7.998706 bits per byte.
+
+Optimum compression would reduce the size
+of this 5120000 byte file by 0 percent.
+
+Chi square distribution for 5120000 samples is 9198.36, and randomly
+would exceed this value less than 0.01 percent of the times.
+
+Arithmetic mean value of data bytes is 127.3485 (127.5 = random).
+Monte Carlo value for Pi is 3.137115288 (error 0.14 percent).
+Serial correlation coefficient is 0.004321 (totally uncorrelated = 0.0).
+
+-- 011 -------------------------------------------------------------------------
+
+### using -s 0 -d 7
+
+Tests: 10000, collisions: 193 over 640000 hashes (301.56 ppm): KO
+
+Times: running: 3.901 s, hashing: 3.198 s, speed: 164.1 Kh/s
+
+Bits in common compared to 50 % avg is 49.9996 % (-4.2 ppm)
+
+Time deltas avg: 581 <624.09> 96K ns over 4470K (+367) cicles
+
+Entropy = 7.999940 bits per byte.
+
+Optimum compression would reduce the size
+of this 5120000 byte file by 0 percent.
+
+Chi square distribution for 5120000 samples is 429.12, and randomly
+would exceed this value less than 0.01 percent of the times.
+
+Arithmetic mean value of data bytes is 127.5319 (127.5 = random).
+Monte Carlo value for Pi is 3.144709041 (error 0.10 percent).
+Serial correlation coefficient is -0.000244 (totally uncorrelated = 0.0).
+
+### using -s 1 -d 7
+
+Tests: 10000, collisions: 89 over 640000 hashes (139.06 ppm): KO
+
+Times: running: 4.048 s, hashing: 3.358 s, speed: 158.1 Kh/s
+
+Bits in common compared to 50 % avg is 49.9978 % (-22.1 ppm)
+
+Time deltas avg: 581 <659.99> 79K ns over 4467K (+2883) cicles
+
+Entropy = 7.999918 bits per byte.
+
+Optimum compression would reduce the size
+of this 5120000 byte file by 0 percent.
+
+Chi square distribution for 5120000 samples is 581.15, and randomly
+would exceed this value less than 0.01 percent of the times.
+
+Arithmetic mean value of data bytes is 127.5376 (127.5 = random).
+Monte Carlo value for Pi is 3.139004351 (error 0.08 percent).
+Serial correlation coefficient is 0.000084 (totally uncorrelated = 0.0).
+
+### using -s 2 -d 7
+
+Tests: 10000, collisions: 104 over 640000 hashes (162.50 ppm): KO
+
+Times: running: 4.158 s, hashing: 3.473 s, speed: 153.9 Kh/s
+
+Bits in common compared to 50 % avg is 49.9959 % (-41.0 ppm)
+
+Time deltas avg: 581 <685.74> 512K ns over 4465K (+4657) cicles
+
+Entropy = 7.999840 bits per byte.
+
+Optimum compression would reduce the size
+of this 5120000 byte file by 0 percent.
+
+Chi square distribution for 5120000 samples is 1138.16, and randomly
+would exceed this value less than 0.01 percent of the times.
+
+Arithmetic mean value of data bytes is 127.4925 (127.5 = random).
+Monte Carlo value for Pi is 3.144755916 (error 0.10 percent).
+Serial correlation coefficient is -0.000085 (totally uncorrelated = 0.0).
+
+### using -s 3 -d 7
+
+Tests: 10000, collisions: 171 over 640000 hashes (267.19 ppm): KO
+
+Times: running: 3.912 s, hashing: 3.216 s, speed: 163.6 Kh/s
+
+Bits in common compared to 50 % avg is 50.0010 % (+10.5 ppm)
+
+Time deltas avg: 581 <628.29> 138K ns over 4469K (+675) cicles
+
+Entropy = 7.999879 bits per byte.
+
+Optimum compression would reduce the size
+of this 5120000 byte file by 0 percent.
+
+Chi square distribution for 5120000 samples is 861.00, and randomly
+would exceed this value less than 0.01 percent of the times.
+
+Arithmetic mean value of data bytes is 127.5227 (127.5 = random).
+Monte Carlo value for Pi is 3.143968416 (error 0.08 percent).
+Serial correlation coefficient is 0.001604 (totally uncorrelated = 0.0).
+
+### using -s 4 -d 7
+
+Tests: 10000, collisions: 666 over 640000 hashes (1040.62 ppm): KO
+
+Times: running: 3.891 s, hashing: 3.185 s, speed: 164.5 Kh/s
+
+Bits in common compared to 50 % avg is 49.9978 % (-22.1 ppm)
+
+Time deltas avg: 581 <621.13> 93K ns over 4470K (+130) cicles
+
+Entropy = 7.999742 bits per byte.
+
+Optimum compression would reduce the size
+of this 5120000 byte file by 0 percent.
+
+Chi square distribution for 5120000 samples is 1833.40, and randomly
+would exceed this value less than 0.01 percent of the times.
+
+Arithmetic mean value of data bytes is 127.6551 (127.5 = random).
+Monte Carlo value for Pi is 3.136590288 (error 0.16 percent).
+Serial correlation coefficient is 0.000087 (totally uncorrelated = 0.0).
+
+### using -s 5 -d 7
+
+Tests: 10000, collisions: 755 over 640000 hashes (1179.69 ppm): KO
+
+Times: running: 4.487 s, hashing: 3.770 s, speed: 142.6 Kh/s
+
+Bits in common compared to 50 % avg is 49.9991 % (-8.9 ppm)
+
+Time deltas avg: 581 <753.35> 655K ns over 4460K (+9619) cicles
+
+Entropy = 7.998793 bits per byte.
+
+Optimum compression would reduce the size
+of this 5120000 byte file by 0 percent.
+
+Chi square distribution for 5120000 samples is 8605.67, and randomly
+would exceed this value less than 0.01 percent of the times.
+
+Arithmetic mean value of data bytes is 127.4408 (127.5 = random).
+Monte Carlo value for Pi is 3.146884042 (error 0.17 percent).
+Serial correlation coefficient is -0.000037 (totally uncorrelated = 0.0).
+
+### using -s 6 -d 7
+
+Tests: 10000, collisions: 793 over 640000 hashes (1239.06 ppm): KO
+
+Times: running: 3.877 s, hashing: 3.180 s, speed: 165.1 Kh/s
+
+Bits in common compared to 50 % avg is 50.0025 % (+24.8 ppm)
+
+Time deltas avg: 581 <619.89> 76K ns over 4470K (+29) cicles
+
+Entropy = 7.998766 bits per byte.
+
+Optimum compression would reduce the size
+of this 5120000 byte file by 0 percent.
+
+Chi square distribution for 5120000 samples is 8787.16, and randomly
+would exceed this value less than 0.01 percent of the times.
+
+Arithmetic mean value of data bytes is 127.7350 (127.5 = random).
+Monte Carlo value for Pi is 3.139079351 (error 0.08 percent).
+Serial correlation coefficient is -0.002268 (totally uncorrelated = 0.0).
+
+### using -s 7 -d 7
+
+Tests: 10000, collisions: 1632 over 640000 hashes (2550.00 ppm): KO
+
+Times: running: 5.135 s, hashing: 4.436 s, speed: 124.6 Kh/s
+
+Bits in common compared to 50 % avg is 49.9982 % (-17.7 ppm)
+
+Time deltas avg: 590 <904.40> 84K ns over 4450K (+20383) cicles
+
+Entropy = 7.998751 bits per byte.
+
+Optimum compression would reduce the size
+of this 5120000 byte file by 0 percent.
+
+Chi square distribution for 5120000 samples is 8867.06, and randomly
+would exceed this value less than 0.01 percent of the times.
+
+Arithmetic mean value of data bytes is 127.3050 (127.5 = random).
+Monte Carlo value for Pi is 3.141160602 (error 0.01 percent).
+Serial correlation coefficient is 0.004004 (totally uncorrelated = 0.0).
+
+### using -s 0 -d 15
+
+Tests: 10000, collisions: 142 over 640000 hashes (221.88 ppm): KO
+
+Times: running: 12.422 s, hashing: 11.728 s, speed: 51.5 Kh/s
+
+Bits in common compared to 50 % avg is 50.0022 % (+22.4 ppm)
+
+Time deltas avg: 581 <2604.34> 172K ns over 4332K (+140378) cicles
+
+Entropy = 7.999939 bits per byte.
+
+Optimum compression would reduce the size
+of this 5120000 byte file by 0 percent.
+
+Chi square distribution for 5120000 samples is 430.45, and randomly
+would exceed this value less than 0.01 percent of the times.
+
+Arithmetic mean value of data bytes is 127.5215 (127.5 = random).
+Monte Carlo value for Pi is 3.140101227 (error 0.05 percent).
+Serial correlation coefficient is 0.000607 (totally uncorrelated = 0.0).
+
+### using -s 1 -d 15
+
+Tests: 10000, collisions: 42 over 640000 hashes (65.62 ppm): KO
+
+Times: running: 8.354 s, hashing: 7.665 s, speed: 76.6 Kh/s
+
+Bits in common compared to 50 % avg is 50.0013 % (+13.0 ppm)
+
+Time deltas avg: 581 <1609.21> 98K ns over 4397K (+73978) cicles
+
+Entropy = 7.999900 bits per byte.
+
+Optimum compression would reduce the size
+of this 5120000 byte file by 0 percent.
+
+Chi square distribution for 5120000 samples is 710.68, and randomly
+would exceed this value less than 0.01 percent of the times.
+
+Arithmetic mean value of data bytes is 127.5040 (127.5 = random).
+Monte Carlo value for Pi is 3.137649663 (error 0.13 percent).
+Serial correlation coefficient is 0.000637 (totally uncorrelated = 0.0).
+
+### using -s 2 -d 15
+
+Tests: 10000, collisions: 117 over 640000 hashes (182.81 ppm): KO
+
+Times: running: 6.026 s, hashing: 5.319 s, speed: 106.2 Kh/s
+
+Bits in common compared to 50 % avg is 50.0015 % (+15.4 ppm)
+
+Time deltas avg: 581 <1091.74> 91K ns over 4435K (+35187) cicles
+
+Entropy = 7.999944 bits per byte.
+
+Optimum compression would reduce the size
+of this 5120000 byte file by 0 percent.
+
+Chi square distribution for 5120000 samples is 400.76, and randomly
+would exceed this value less than 0.01 percent of the times.
+
+Arithmetic mean value of data bytes is 127.4917 (127.5 = random).
+Monte Carlo value for Pi is 3.141029352 (error 0.02 percent).
+Serial correlation coefficient is -0.000700 (totally uncorrelated = 0.0).
+
+### using -s 3 -d 15
+
+Tests: 10000, collisions: 219 over 640000 hashes (342.19 ppm): KO
+
+Times: running: 5.698 s, hashing: 4.985 s, speed: 112.3 Kh/s
+
+Bits in common compared to 50 % avg is 49.9987 % (-13.4 ppm)
+
+Time deltas avg: 581 <1008.54> 240K ns over 4441K (+29338) cicles
+
+Entropy = 7.999896 bits per byte.
+
+Optimum compression would reduce the size
+of this 5120000 byte file by 0 percent.
+
+Chi square distribution for 5120000 samples is 739.30, and randomly
+would exceed this value less than 0.01 percent of the times.
+
+Arithmetic mean value of data bytes is 127.5142 (127.5 = random).
+Monte Carlo value for Pi is 3.144324666 (error 0.09 percent).
+Serial correlation coefficient is 0.000634 (totally uncorrelated = 0.0).
+
+### using -s 4 -d 15
+
+Tests: 10000, collisions: 548 over 640000 hashes (856.25 ppm): KO
+
+Times: running: 7.488 s, hashing: 6.785 s, speed: 85.5 Kh/s
+
+Bits in common compared to 50 % avg is 49.9999 % (-0.6 ppm)
+
+Time deltas avg: 581 <1435.32> 231K ns over 4412K (+59176) cicles
+
+Entropy = 7.999743 bits per byte.
+
+Optimum compression would reduce the size
+of this 5120000 byte file by 0 percent.
+
+Chi square distribution for 5120000 samples is 1824.01, and randomly
+would exceed this value less than 0.01 percent of the times.
+
+Arithmetic mean value of data bytes is 127.6392 (127.5 = random).
+Monte Carlo value for Pi is 3.139112164 (error 0.08 percent).
+Serial correlation coefficient is -0.000432 (totally uncorrelated = 0.0).
+
+### using -s 5 -d 15
+
+Tests: 10000, collisions: 1366 over 640000 hashes (2134.38 ppm): KO
+
+Times: running: 7.128 s, hashing: 6.450 s, speed: 89.8 Kh/s
+
+Bits in common compared to 50 % avg is 49.9970 % (-29.9 ppm)
+
+Time deltas avg: 581 <1355.60> 356K ns over 4417K (+53735) cicles
+
+Entropy = 7.999163 bits per byte.
+
+Optimum compression would reduce the size
+of this 5120000 byte file by 0 percent.
+
+Chi square distribution for 5120000 samples is 5957.39, and randomly
+would exceed this value less than 0.01 percent of the times.
+
+Arithmetic mean value of data bytes is 127.4148 (127.5 = random).
+Monte Carlo value for Pi is 3.148632480 (error 0.22 percent).
+Serial correlation coefficient is -0.000309 (totally uncorrelated = 0.0).
+
+### using -s 6 -d 15
+
+Tests: 10000, collisions: 694 over 640000 hashes (1084.38 ppm): KO
+
+Times: running: 7.331 s, hashing: 6.611 s, speed: 87.3 Kh/s
+
+Bits in common compared to 50 % avg is 49.9983 % (-16.9 ppm)
+
+Time deltas avg: 581 <1378.39> 87K ns over 4414K (+56338) cicles
+
+Entropy = 7.998946 bits per byte.
+
+Optimum compression would reduce the size
+of this 5120000 byte file by 0 percent.
+
+Chi square distribution for 5120000 samples is 7523.92, and randomly
+would exceed this value less than 0.01 percent of the times.
+
+Arithmetic mean value of data bytes is 127.7302 (127.5 = random).
+Monte Carlo value for Pi is 3.139566851 (error 0.06 percent).
+Serial correlation coefficient is -0.002781 (totally uncorrelated = 0.0).
+
+### using -s 7 -d 15
+
+Tests: 10000, collisions: 1373 over 640000 hashes (2145.31 ppm): KO
+
+Times: running: 5.358 s, hashing: 4.654 s, speed: 119.4 Kh/s
+
+Bits in common compared to 50 % avg is 49.9983 % (-16.7 ppm)
+
+Time deltas avg: 581 <944.77> 100K ns over 4446K (+24342) cicles
+
+Entropy = 7.998558 bits per byte.
+
+Optimum compression would reduce the size
+of this 5120000 byte file by 0 percent.
+
+Chi square distribution for 5120000 samples is 10241.71, and randomly
+would exceed this value less than 0.01 percent of the times.
+
+Arithmetic mean value of data bytes is 127.2938 (127.5 = random).
+Monte Carlo value for Pi is 3.144957478 (error 0.11 percent).
+Serial correlation coefficient is 0.003990 (totally uncorrelated = 0.0).
+
+-- 012 (v0.1.6) ----------------------------------------------------------------
+
+Tests: 10000, collisions: 1 over 640000 hashes (1.56 ppm): KO
+
+Times: running: 3.937 s, hashing: 3.208 s, speed: 162.6 Kh/s
+
+Bits in common compared to 50 % avg is 50.0011 % (+11.1 ppm)
+
+Time deltas avg: 590 <625.24> 25K ns over 4470K (+0) cicles
+
+Entropy = 7.999966 bits per byte.
+
+Optimum compression would reduce the size
+of this 5120000 byte file by 0 percent.
+
+Chi square distribution for 5120000 samples is 243.23, and randomly
+would exceed this value 69.14 percent of the times.
+
+Arithmetic mean value of data bytes is 127.4750 (127.5 = random).
+Monte Carlo value for Pi is 3.143059040 (error 0.05 percent).
+Serial correlation coefficient is 0.000533 (totally uncorrelated = 0.0).
+
+-- 013 (v0.1.6) ----------------------------------------------------------------
+
+repetitions: 
+Tests: 10000, collisions: 0 over 640000 hashes (0.00 ppm): OK
+
+Times: running: 5.335 s, hashing: 4.630 s, speed: 120.0 Kh/s
+
+Bits in common compared to 50 % avg is 50.0029 % (+28.9 ppm)
+
+Time deltas avg: 861 <903.43> 228K ns over 4470K (+0) cicles
+
+Entropy = 7.999964 bits per byte.
+
+Optimum compression would reduce the size
+of this 5120000 byte file by 0 percent.
+
+Chi square distribution for 5120000 samples is 258.57, and randomly
+would exceed this value 42.58 percent of the times.
+
+Arithmetic mean value of data bytes is 127.5215 (127.5 = random).
+Monte Carlo value for Pi is 3.142834040 (error 0.04 percent).
+Serial correlation coefficient is -0.000118 (totally uncorrelated = 0.0).
+
+-- 014 -------------------------------------------------------------------------
+
+Repetitions: none found, status OK
+
+Tests: 100000, collisions: 0 over 6400000 hashes (0.00 ppm)
+
+Times: running: 41.127 s, hashing: 32.004 s, speed: 155.6 Kh/s
+
+Bits in common compared to 50 % avg is 50.0002 % (+2.1 ppm)
+
+Time deltas avg: 581 <624.00> 166K ns over 44699K (+592) cicles
+
+Entropy = 7.999997 bits per byte.
+
+Optimum compression would reduce the size
+of this 51200000 byte file by 0 percent.
+
+Chi square distribution for 51200000 samples is 248.06, and randomly
+would exceed this value 61.05 percent of the times.
+
+Arithmetic mean value of data bytes is 127.4934 (127.5 = random).
+Monte Carlo value for Pi is 3.141668560 (error 0.00 percent).
+Serial correlation coefficient is 0.000017 (totally uncorrelated = 0.0).
+

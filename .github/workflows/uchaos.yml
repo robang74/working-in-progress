@@ -1,8 +1,13 @@
 name: build and test uchaos
 
 on:
+  # 1. Manual trigger (GitHub CLI or Web UI)
+  workflow_dispatch:
+
+  # 2. Trigger on tag creation
   push:
-    branches: [ "main" ]
+    tags:
+      - 'uchaos-v*' # Triggers on any tag starting with v (e.g., v1.0)
 
 jobs:
   build-and-test:
@@ -24,7 +29,7 @@ jobs:
       run: |
         # using uchaos.c as the input for its compiled binary and deliver it
         cp prpr/uchaos.c uchaos.c
-        source prpr/uchaos.sh test.txt
+        bash prpr/uchaos.sh test.txt
         echo "File text.txt generated"
 
     - name: upload artifacts

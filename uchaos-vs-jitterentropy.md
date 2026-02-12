@@ -1,6 +1,6 @@
 # uChaos is not a jitterentropy's competitor
 
-Apart from comparing uChaos Engine with JitterEntropy is about comparing a 14 days preparation 1 day writing code with a 14 years project 1 year coding which is a massive 300-400x difference in effort invested. So, relax...
+Apart from comparing uChaos Engine with JitterEntropy is about comparing a 14 days preparation 1 day writing code with a 14 years project one year coding which is a massive 300-400x difference in effort invested. So, relax...
 
 ```
   logs (text) --> uChaos -- 12.8x --> randomness
@@ -11,6 +11,58 @@ Apart from comparing uChaos Engine with JitterEntropy is about comparing a 14 da
 If jitters are not available or like in VMs or uController not so good, then jitterentropy can be used to replace the bare-metal jittering with a good but usually very slow RNDG. In that scenario uChaos is a multiplier like a transistor that multiplies the current.
 
 - uChaos Engine is a C-language code file: [uchaos.c](prpr/uchaos.c)
+
+---
+
+## Virtual machine support added in uchaos
+
+Collecting "entropy" from a VM scheduler jitter is a pain because a virtualized environment usually shows regular patterns in timings much more than when a Linux kernel is running on a bare-metal machine.
+
+Despite this limitation and against every odd and outlook, now uchaos engine is achieving the same result on bare-metal and virtualized machines. In particular, uChaos ran an Ubuntu docker within the github test environment.
+
+- [test upload](https://github.com/robang74/working-in-progress/actions/runs/21954934356/artifacts/5485760566)
+
+```
+Repetitions: none found, status OK
+
+Tests: 100000, collisions: 0 over 6400000 hashes (0.00 ppm)
+
+Times: running: 20.815 s, hashing: 12.470 s, speed: 307.5 Kh/s
+
+Bits in common compared to 50 % avg is 50.0005 % (+4.6 ppm)
+
+Time deltas avg: 228 <241.0> 5685 ns over 44647K (+2316) values
+
+Ratios over avg: 0.95 <1U> 23.59, over min: 1U <1.06> 24.94
+
+```
+```
+Entropy = 7.999996 bits per byte.
+
+Optimum compression would reduce the size of this file by 0 percent.
+
+Chi square distribution for 51200000 samples is 249.16, and randomly would exceed this value 59.13 percent of the times.
+
+Arithmetic mean value of data bytes is 127.5001 (127.5 = random).
+
+Monte Carlo value for Pi is 3.140993091 (error 0.02 percent).
+
+Serial correlation coefficient is -0.000156 (totally uncorrelated = 0.0).
+```
+
+- [test action](https://github.com/robang74/working-in-progress/blob/main/.github/workflows/uchaos.yml)
+
+This doesn't mean that uChaos can be able to provide suitable output for cryptography because the matter is much more "complicated" than it seems. However, at least the internal test and the "ent" output is confirming that also the VMs barrier has been overcome.
+
+- Is entropy magic? A provocative post about what is what: [lkdn](https://www.linkedin.com/posts/robertofoglietta_uchaos-is-not-a-competitor-of-jitterentropy-activity-7427192580448260097-5M2W) [fcbk](https://www.facebook.com/roberto.a.foglietta/posts/10162930705103736)
+
+The VM barrier is not an easy one. Otherwise jitterentropy would have not required years of work to be developed. Right?
+
+Anyway how I managed to? Using -d 3. In general case, uchaos needs at least 3 bits of randomness (6 at its best, 3 is the core). When the scheduler returns 3 ns with the minimum (circa 220 in RM or 580 in VM) it means that it did not encounter any I/O or IRQ traffic on its way back and it brings less than 2 bits of randomness.
+
+In this case, the passage on the character is done but scheduled to be re-done, until the delta is great enough. In the worst case, rescheduling happens 50:50% and every time -- just because such even happens -- brings in an extra bit of randomness. Because apply 1, 2, 3 ... passages in hashing the current char is not equivalent to a single one (or none at all).
+
+It's harvesting entropy from the rejection itself, folding it back into the mix in a way that's non-linear and compounding. It is a solid way of reasoning because rejection is not arbitrary but as an extreme mean when randomness is half of the minimum which the core needs.
 
 ---
 
