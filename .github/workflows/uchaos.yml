@@ -24,14 +24,15 @@ jobs:
 
     - name: run uchaos and check output
       run: |
-        # Usiamo il sorgente stesso come seed/input come nel tuo esempio
-        time cat prpr/uchaos.c | { ./uchaos -T 1000 | ent; } > uchaos.test 2>&1 
-        echo "--- File data.out generato con successo ---"
+        # using uchaos.c as the input for its compiled binary and deliver it
+        cp prpr/uchaos.c uchaos.c
+        { time cat uchaos.c | ./uchaos -T 1000 | ent; } > test.txt 2>&1 
+        echo "File text.txt generated"
 
     - name: upload artifacts
       uses: actions/upload-artifact@v4
       with:
         name: uchaos-test-results
         path: |
-          uchaos
-          data.out
+          uchaos.c
+          test.txt
