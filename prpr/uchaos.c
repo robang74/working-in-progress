@@ -89,7 +89,9 @@ static inline uint64_t rotl64(uint64_t n, uint8_t c) {
 }
 
 #include <sched.h>
-uint64_t djb2tum(const uint8_t *str, uint64_t seed, uint8_t maxn, const uint8_t nbtls) {
+uint64_t djb2tum(const uint8_t *str, uint64_t seed, uint8_t maxn,
+    const long nsdly, const uint8_t nbtls)
+{
     static size_t ncl = 0, dmx = 0, dmn = -1, nexp = 0;
     static uint64_t avg = 0;
     if(!str) {
@@ -143,11 +145,17 @@ uint64_t djb2tum(const uint8_t *str, uint64_t seed, uint8_t maxn, const uint8_t 
             uint64_t dlt = (ts.tv_nsec < ons) ? E9 + ts.tv_nsec - ons : ts.tv_nsec - ons;
             if(dlt < dmn) dmn = dlt;
             if(dlt > dmx) dmx = dlt;
-            if(dlt < 8 || h == ohs) {   // copying with the VMs scheduler timings
+            long nstw = dmn + nsdly;
+            if(dlt < nstw || h == ohs) {   // copying with the VMs scheduler timings
                 struct timespec nslp = { 0 };
-                nslp.tv_nsec = 8;
-                nanosleep(&nslp, &nslp);
-                str--;                  // repeat the action even if it made changes
+                nslp.tv_nsec = ( nstw + dlt ) >> 1;
+#if 1
+                if(nstw > 1000 + dlt)
+                    usleep((nstw + 499 - dlt) / 1000);
+                else
+#endif
+                    nanosleep(&nslp, &nslp);
+                str--;                    // repeat the action even if it made changes
                 nexp++;
                 continue;
             }
@@ -162,7 +170,9 @@ uint64_t djb2tum(const uint8_t *str, uint64_t seed, uint8_t maxn, const uint8_t 
     return h;
 }
 
-uint64_t *str2ht64(uint8_t *str, uint64_t **ph,  size_t *size, uint8_t nbtls) {
+uint64_t *str2ht64(uint8_t *str, uint64_t **ph,  size_t *size,
+    const long nsdly, const uint8_t nbtls)
+{
     if (!str || !size) return NULL;
 
     size_t n = strlen((char *)str);
@@ -216,7 +226,7 @@ uint64_t *str2ht64(uint8_t *str, uint64_t **ph,  size_t *size, uint8_t nbtls) {
     }
     for (size_t i = 0; i < num_blocks; i++) {
         // Process each 8-byte chunk of the rotated/padded string
-        h[i] = djb2tum(rotated_str + (i << 3), 0, 8, nbtls);
+        h[i] = djb2tum(rotated_str + (i << 3), 0, 8, nsdly, nbtls);
     }
     free(rotated_str);
 
@@ -277,6 +287,7 @@ static inline void usage(const char *name) {
 "\n"\
 "Usage: %s [-tN]\n"\
 "   -T: number of collision tests on the same input\n"\
+"   -d: number of nanoseconds for the minimum delay\n"\
 "   -s: number of bits to left shift on ns timings\n"\
 "\n", name, name);
     exit(0);
@@ -287,12 +298,13 @@ static inline void usage(const char *name) {
 int main(int argc, char *argv[]) {
     uint8_t *str = NULL, nbtls = 0;
     uint32_t ntsts = 0;
+    long nsdly = 0;
 
     (void) get_nanos();
 
     // Collect arguments from optional command line parameters
     while (1) {
-        int opt = getopt(argc, argv, "hT:s:");
+        int opt = getopt(argc, argv, "hT:s:d:");
         if(opt == '?' && !optarg) {
             usage("uchaos");
         } else if(opt == -1) break;
@@ -300,6 +312,7 @@ int main(int argc, char *argv[]) {
         switch (opt) {
             case 'T': ntsts = atoi(optarg); break;
             case 's': nbtls = atoi(optarg); break;
+            case 'd': nsdly = atoi(optarg); break;
         }
     }
 
@@ -319,7 +332,7 @@ int main(int argc, char *argv[]) {
     for (uint32_t a = ntsts; a; a--) {
         // hashing
         long st = get_nanos();
-        h = str2ht64(str, &h, &size, nbtls);
+        h = str2ht64(str, &h, &size, nsdly, nbtls);
         mt += get_nanos() - st;
 
         // output
@@ -360,7 +373,7 @@ int main(int argc, char *argv[]) {
     double ratio = (double)100 / 64 * bic / nx;
     perr("\nBits in common compared to 50 %% avg is %.4lf %% (%+.1lf ppm)\n",
         ratio, (ratio-50) * E6 / 100);
-    djb2tum(0, 0, 0, 0);
+    djb2tum(0, 0, 0, 0, 0);
     perr("\n");
 
     return 0; // exit() do free()
