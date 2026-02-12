@@ -68,6 +68,14 @@ It's harvesting entropy from the rejection itself, folding it back into the mix 
 
 A very simple modified djb2 + per-character monotonic timing perturbation is sufficient to turn completely fixed text into high-quality pseudo-random output — without needing post-hoc tricks, rejection sampling, or health-test machinery.
 
+Considering the code:
+
+- `long nstw = dmn + nsdly; if(dlt < nstw || h == ohs) { /* do tricks */ }`
+
+The "golden" value are: 0 (default), 1 (because discarding the minimum makes sense, anyway), 2 (because `& 0x03` is the core of operations) and 6 (because `& 0x07` is the core of the rotation). However, we can notice that 2 isn't good enough like 3, for the same reason 7 instead of 6. For the same reason because the sequence should have been 1,3,7 but because of 0 is the default "no tricks", then 0 is more significative.
+
+By the way, there is also a `>>3` before `& 0x07` which compound for 6 bits of randomness in the best case. However, because the time's LSB (8bit) is blended with the last hash LSB (8bit) then fewer than 6 bits of randomness are required. This shows that "multiplicating" randomness works in micro-scale (1b) up to macro-scale (6Mb). Why? It scaled up in the same fashion free electrons (or vacancies) in transistor do or like snowflakes during an avalanche.
+
 ---
 
 ## Robang74
