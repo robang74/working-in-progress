@@ -333,7 +333,7 @@ int main(int argc, char *argv[]) {
     uint64_t bic = 0;
     uint64_t *h = NULL;
     size_t nk = 0, nt = 0, nx = 0, size = 0;
-    perr("\nrepetitions: ");
+    perr("\nRepetitions: ");
     for (uint32_t a = ntsts; a; a--) {
         // hashing
         long st = get_nanos();
@@ -366,10 +366,10 @@ int main(int argc, char *argv[]) {
         free(h); h = NULL; // passing to str2ht64 a valid (h, size) should reused it
 #endif
     }
-    if(nk) perr("\n");
+    perr("%s\n", nk ? "" : "none found, OK");
 
     long rt = get_nanos();
-    perr("\nTests: %d, collisions: %ld over %ld hashes (%.2lf ppm): %s\n",
+    perr("\nTests: %d, collisions: %ld over %ld hashes (%.2lf ppm, %s)\n",
         ntsts, nk, nt, (double)E6*nk/nt, nk?"KO":"OK");
     perr("\nTimes: running: %.3lf s, hashing: %.3lf s, speed: %.1lf Kh/s\n",
         (double)rt/E9, (double)mt/E9, (double)E6*nt/rt);
