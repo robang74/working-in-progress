@@ -287,7 +287,7 @@ static inline void usage(const char *name) {
 "\n"\
 "Usage: %s [-tN]\n"\
 "   -T: number of collision tests on the same input\n"\
-"   -d: number of nanoseconds for the minimum delay\n"\
+"   -d: number of ns above avg as the minimum delay\n"\
 "   -s: number of bits to left shift on ns timings\n"\
 "\n", name, name);
     exit(0);
