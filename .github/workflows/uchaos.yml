@@ -25,7 +25,7 @@ jobs:
     - name: run uchaos and check output
       run: |
         # Usiamo il sorgente stesso come seed/input come nel tuo esempio
-        time cat uchaos.c | { ./uchaos -T 1000 | ent; } > uchaos.test 2>&1 
+        time cat prpr/uchaos.c | { ./uchaos -T 1000 | ent; } > uchaos.test 2>&1 
         echo "--- File data.out generato con successo ---"
 
     - name: upload artifacts
