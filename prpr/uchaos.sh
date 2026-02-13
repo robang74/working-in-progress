@@ -1,5 +1,5 @@
 #!/bin/sh
-# (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2 license
+# (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, MOT license
 
 entgr() { ent "$@" | grep -E "error|samples|127.5 |Entropy|exceed|uncorrelated"; }
 
@@ -31,6 +31,8 @@ i="7"; testfunc & sleep 0.01
 sleep 0.1; echo; time wait
 for i in "n" 3 "d" 7; do cat $nfle.$i >> $nfle; done
 echo
+
+################################################################################
 
 if false; then
     hgstr="{ time date +%N 2>&1 | dd bs=1; } 2>&1"
@@ -75,5 +77,7 @@ if false; then
         cat uchaos.c | ./uchaos -T 10000 -s $i -d 15 | entgr;
     done
 fi
+
+################################################################################
 
 test -f $nfle

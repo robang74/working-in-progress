@@ -1,5 +1,5 @@
 #!/bin/bash
-# (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2 license
+# (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, MIT license
 
 nfle=${1:-test.txt}
 echo "sysinfo.sh is appending to file: $nfle"

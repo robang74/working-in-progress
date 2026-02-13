@@ -300,13 +300,13 @@ static inline void usage(const char *name) {
     perr("\n"\
 "%s read on stdin, stats on stderr, and data on stdout\n"\
 "\n"\
-"Usage: %s [-tN]\n"\
+"Usage: %s [-h] [-tN] [-dN] [-pN] [-sN] [-rN]\n"\
 "   -T: number of collision tests on the same input\n"\
 "   -d: number of ns above min as the minimum delay\n"\
 "   -p: number of parts as min/256 ns above the min\n"\
 "   -s: number of bits to left shift on ns timings\n"\
 "   -r: number of preliminary runs (default: 1)\n"\
-"\n", name, name);
+"\nWith -pN is suggested -r32+ for stats pre-evaluation\n\n", name, name);
     exit(0);
 }
 
@@ -321,7 +321,7 @@ int main(int argc, char *argv[]) {
     // Collect arguments from optional command line parameters
     while (1) {
         int opt = getopt(argc, argv, "hT:s:d:p:r:");
-        if(opt == '?' && !optarg) {
+        if(opt == '?' || opt == 'h' || !optarg) {
             usage("uchaos");
         } else if(opt == -1) break;
 
