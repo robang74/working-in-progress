@@ -27,7 +27,7 @@ jobs:
 
     - name: Runner info
       run: |
-        cp prpr/sysinfo.sh .
+        cp prpr/sysinfo.sh prpr/uchaos.txt .
         bash ./sysinfo.sh test.txt
 
     - name: run uchaos and check output
@@ -42,6 +42,7 @@ jobs:
         name: uchaos-test-results
         path: |
           sysinfo.sh
+          uchaos.txt
           uchaos.sh
           uchaos.c
           test.txt
