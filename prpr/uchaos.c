@@ -313,7 +313,7 @@ static inline void usage(const char *name) {
 #define BLOCK_SIZE 512
 
 int main(int argc, char *argv[]) {
-    unsigned nrdry = 0, pmdly = 0;
+    unsigned nrdry = 1, pmdly = 0;
     uint8_t *str = NULL, nbtls = 0, prsts = 0;
     uint32_t ntsts = 1;
     long nsdly = 0;
@@ -329,7 +329,6 @@ int main(int argc, char *argv[]) {
 
         if(!optarg) continue;
 
-        if(!nrdry) nrdry = 1;
         long x = atoi(optarg);
         switch (opt) {
             // ABS sanitises the parametric inputs
