@@ -18,12 +18,16 @@ tcmd="./uchaos -T $((${2:-100} * 1024))"
 
 i="n"; testfunc "(VMs weak) __" & sleep 0.01
 icmd=$tcmd
-for i in 3 7; do
-    tcmd="$icmd -p $i -r 64"
-    testfunc "__" & sleep 0.01
-done
+
+tcmd="$icmd -d0 -p3 -r64"
+i="3"; testfunc & sleep 0.01
+
 tcmd="$icmd -d3 -p3 -r32"
 i="d"; testfunc & sleep 0.01
+
+tcmd="$icmd -d7 -p3 -r64"
+i="7"; testfunc & sleep 0.01
+
 sleep 0.1; echo; time wait
 for i in "n" "d" 3 7; do cat $nfle.$i >> $nfle; done
 echo
