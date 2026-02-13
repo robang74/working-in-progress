@@ -29,7 +29,7 @@ tcmd="$icmd -d7 -p3 -r64"
 i="7"; testfunc & sleep 0.01
 
 sleep 0.1; echo; time wait
-for i in "n" "d" 3 7; do cat $nfle.$i >> $nfle; done
+for i in "n" 3 "d" 7; do cat $nfle.$i >> $nfle; done
 echo
 
 if false; then
