@@ -134,7 +134,7 @@ uint64_t djb2tum(const uint8_t *str, uint64_t seed, uint8_t maxn,
         clock_gettime(CLOCK_MONOTONIC, &ts);        // getting ns in a hot loop is the limit
                                                     // and we want to see this limit, in VMs
 
-        uint8_t ns = 0xff ^ (ts.tv_nsec >> nbtls);  // 0xff ^ is a good-luck typo (3C-rule!)
+        uint8_t ns = 0xff & (ts.tv_nsec >> nbtls);  // 0xff ^ is a good-luck typo (3C-rule!)
         ns ^= (ns >> 3) ^ (0xff & ohs);
         uint8_t b1 = ns & 0x02;
         uint8_t b0 = ns & 0x01;
