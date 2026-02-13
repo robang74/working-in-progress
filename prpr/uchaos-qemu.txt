@@ -1,0 +1,43 @@
+#
+# (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, MIT license
+#
+################################################################################
+
+tinycore-download() {
+    url="http://www.tinycorelinux.net/17.x/x86"
+    if [ "${1:-}" != "64" ]; then # TinyCore basic 64 bit
+        url="${url}_64/release"
+        wget -c ${url}/CorePure64-17.0.iso
+        wget -c ${url}/CorePure64-17.0.iso.md5.txt -O- | md5sum -c
+        return $?
+    fi
+    # TinyCore basic 32 bit
+    wget -c ${url}/release/Core-17.0.iso
+    wget -c ${url}/release/Core-17.0.iso.md5.txt -O- | md5sum -c
+    return $?
+}
+
+# 32
+sudo apt install gcc-multilib
+gcc -m32 prpr/uchaos.c -O3 --fast-math -Wall --static -o uchaos.bin
+
+# 64
+gcc -m64 prpr/uchaos.c -O3 --fast-math -Wall --static -o uchaos.bin
+
+dd if=/dev/zero count=10k bs=10k of=sda.img && mkfs.vfat sda.img
+strip uchaos.bin; mcopy -n -i sda.img uchaos.bin prpr/uchaos.c ::/
+
+qhwcfg="-m 512 -smp 4 -enable-kvm"
+qoscfg="-display curses -no-reboot -boot d -cdrom"
+qdrcfg="-drive file=sda.img,format=raw,index=0,media=disk"
+
+# 32
+qemu-system-x86_64 $qhwcfg $qdrcfg $qoscfg Core-17.0.iso
+
+# 64
+qemu-system-x86_64 $qhwcfg $qdrcfg $qoscfg CorePure64-17.0.iso
+
+# Tiny Core test
+sudo mount /dev/sda /mnt && cd /mnt
+cat uchaos.c | time ./uchaos.bin -T 10240 -d3 -p3 -r32 | wc -c >&2
+sudo reboot   # to stop the session
