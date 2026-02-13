@@ -3,7 +3,7 @@
  *
  * test: cat uchaos.c | ./chaos -T 1000 [-s 6] | ent
  *
- * Compile with: gcc uchaos.c -O3 -Wall -o uchaos
+ * Compile with: gcc uchaos.c -O3 --fast-math -Wall -o uchaos
  *
  * *****************************************************************************
  * PRESENTATION
@@ -100,7 +100,7 @@ uint64_t djb2tum(const uint8_t *str, uint64_t seed, uint8_t maxn,
     if(!str) {
         if(ncl) {
             double mean = (double)avg / ncl;
-            perr("\nTime deltas avg: %ld <%.1lf> %.0lf ns over %.0lfK (+%ld) values\n",
+            perr("\nTime deltas avg: %zu <%.1lf> %.0lf ns over %.0lfK (+%zu) values\n",
                 dmn, mean, dmx, (double)ncl/E3, nexp);
             perr("\nRatios over avg: %.2lf <1U> %.2lf, over min: 1U <%.2lf> %.2lf\n",
                 (double)dmn/mean, (double)dmx/mean, mean/dmn, (double)dmx/dmn);
@@ -313,22 +313,27 @@ static inline void usage(const char *name) {
 #define BLOCK_SIZE 512
 
 int main(int argc, char *argv[]) {
-    unsigned nrdry = 1, pmdly = 0;
-    uint8_t *str = NULL, nbtls = 0;
-    uint32_t ntsts = 0;
+    unsigned nrdry = 0, pmdly = 0;
+    uint8_t *str = NULL, nbtls = 0, prsts = 0;
+    uint32_t ntsts = 1;
     long nsdly = 0;
 
     // Collect arguments from optional command line parameters
     while (1) {
         int opt = getopt(argc, argv, "hT:s:d:p:r:");
-        if(opt == '?' || opt == 'h' || !optarg) {
+        if(opt == '?' || opt == 'h') {
             usage("uchaos");
-        } else if(opt == -1) break;
+        } else if(opt == -1) {
+            break;
+        }
 
+        if(!optarg) continue;
+
+        if(!nrdry) nrdry = 1;
         long x = atoi(optarg);
         switch (opt) {
             // ABS sanitises the parametric inputs
-            case 'T': ntsts = ABS(x); break;
+            case 'T': ntsts = ABS(x); prsts = 1; break;
             case 's': nbtls = ABS(x); break;
             case 'd': nsdly = ABS(x); break;
             case 'r': nrdry = ABS(x); break;
@@ -357,7 +362,7 @@ int main(int argc, char *argv[]) {
     uint64_t bic = 0;
     size_t nk = 0, nt = 0, nx = 0;
 
-    perr("\nRepetitions: ");
+    if(prsts) perr("\nRepetitions: ");
     for (uint32_t a = ntsts; a; a--) {
         // hashing
         long st = get_nanos();
@@ -376,7 +381,7 @@ int main(int argc, char *argv[]) {
         for (size_t n = 0; n < size; n++) {
             for (size_t i = n + 1; i < size; i++) {
                 if (h[i] == h[n]) {
-                    perr("%ld:%ld ", n, i);
+                    perr("%zu:%zu ", n, i);
                     nk++; continue;
                 }
                 uint64_t cb = h[i] ^ h[n];
@@ -390,10 +395,11 @@ int main(int argc, char *argv[]) {
         free(h); h = NULL; // passing to str2ht64 a valid (h, size) should reused it
 #endif
     }
+    if(!prsts) return 0;
     perr("%s\n", nk ? ", status KO" : "none found, status OK");
 
     long rt = get_nanos();
-    perr("\nTests: %d, collisions: %ld over %ld hashes (%.2lf ppm)\n",
+    perr("\nTests: %d, collisions: %zu over %zu hashes (%.2lf ppm)\n",
         ntsts, nk, nt, (double)E6*nk/nt);
     perr("\nTimes: running: %.3lf s, hashing: %.3lf s, speed: %.1lf Kh/s\n",
         (double)rt/E9, (double)mt/E9, (double)E6*nt/rt);
