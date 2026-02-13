@@ -90,7 +90,7 @@ static inline uint64_t rotl64(uint64_t n, uint8_t c) {
 
 #include <sched.h>
 uint64_t djb2tum(const uint8_t *str, uint64_t seed, uint8_t maxn,
-    const long nsdly, const unsigned pmdly, const uint8_t nbtls)
+    const uint32_t nsdly, const unsigned pmdly, const uint8_t nbtls)
 {
     #define pmdly2ns ( ( ( (uint64_t)dmn * pmdly ) + 127 ) >> 8 )
     static double dmx = 0;
@@ -127,7 +127,7 @@ uint64_t djb2tum(const uint8_t *str, uint64_t seed, uint8_t maxn,
      */
     if(seed) h = seed;
 
-    long ons = 0;
+    uint32_t ons = 0;
     static uint64_t ohs = 5381;
     while((c = *str++) && maxn--) {
         struct timespec ts;                         // using sched_yield() to creates chaos,
@@ -156,7 +156,7 @@ uint64_t djb2tum(const uint8_t *str, uint64_t seed, uint8_t maxn,
             uint64_t dlt = (ts.tv_nsec < ons) ? E9 + ts.tv_nsec - ons : ts.tv_nsec - ons;
             if(dlt < dmn) dmn = dlt;
             if(dlt > dmx) dmx += (dmx ? dmx/dlt : 1.0);
-            long nstw = dmn + nsdly + (pmdly ?  pmdly2ns : 0);
+            uint32_t nstw = dmn + nsdly + (pmdly ?  pmdly2ns : 0);
             if(dlt < nstw || h == ohs) {   // copying with the VMs scheduler timings
 #if 0
                 struct timespec nslp = { 0 };
@@ -186,7 +186,7 @@ uint64_t djb2tum(const uint8_t *str, uint64_t seed, uint8_t maxn,
 }
 
 uint64_t *str2ht64(uint8_t *str, uint64_t **ph,  size_t *size,
-    const long nsdly, const unsigned pmdly, const uint8_t nbtls)
+    const uint32_t nsdly, const unsigned pmdly, const uint8_t nbtls)
 {
     if (!str || !size) return NULL;
 
@@ -284,16 +284,16 @@ static inline ssize_t readbuf(int fd, uint8_t *buffer, size_t size, bool intr) {
 }
 
 // Funzione per ottenere il tempo in nanosecondi
-long get_nanos() {
-    static long start = 0;
+uint64_t get_nanos() {
+    static uint64_t start = 0;
     struct timespec ts;
 
     clock_gettime(CLOCK_MONOTONIC, &ts);
     if (!start) {
-      start = (long)ts.tv_sec * 1000000000L + ts.tv_nsec;
+      start = (uint64_t)ts.tv_sec * 1000000000L + ts.tv_nsec;
       return start;
     }
-    return ((long)ts.tv_sec * 1000000000L + ts.tv_nsec) - start;
+    return ((uint64_t)ts.tv_sec * 1000000000L + ts.tv_nsec) - start;
 }
 
 static inline void usage(const char *name) {
@@ -315,8 +315,7 @@ static inline void usage(const char *name) {
 int main(int argc, char *argv[]) {
     unsigned nrdry = 1, pmdly = 0;
     uint8_t *str = NULL, nbtls = 0, prsts = 0;
-    uint32_t ntsts = 1;
-    long nsdly = 0;
+    uint32_t ntsts = 1, nsdly = 0;
 
     // Collect arguments from optional command line parameters
     while (1) {
@@ -357,14 +356,13 @@ int main(int argc, char *argv[]) {
     for(unsigned a = 0; a < nrdry; a++)
         h = str2ht64(str, &h, &size, nsdly, pmdly, nbtls);
 
-    long mt = 0;
-    uint64_t bic = 0;
+    uint64_t bic = 0, mt = 0;
     size_t nk = 0, nt = 0, nx = 0;
 
     if(prsts) perr("\nRepetitions: ");
     for (uint32_t a = ntsts; a; a--) {
         // hashing
-        long st = get_nanos();
+        uint64_t st = get_nanos();
         h = str2ht64(str, &h, &size, nsdly, pmdly, nbtls);
         mt += get_nanos() - st;
 
@@ -397,7 +395,7 @@ int main(int argc, char *argv[]) {
     if(!prsts) return 0;
     perr("%s\n", nk ? ", status KO" : "none found, status OK");
 
-    long rt = get_nanos();
+    uint64_t rt = get_nanos();
     perr("\nTests: %d, collisions: %zu over %zu hashes (%.2lf ppm)\n",
         ntsts, nk, nt, (double)E6*nk/nt);
     perr("\nTimes: running: %.3lf s, hashing: %.3lf s, speed: %.1lf Kh/s\n",
@@ -410,7 +408,7 @@ int main(int argc, char *argv[]) {
     perr("\nBits in common compared to 50 %% avg is %.4lf %% (%+.1lf ppm)\n",
         ratio, (ratio-50) * E6 / 100);
     unsigned pmns = (unsigned)djb2tum(0, 0, 0, 0, pmdly, 0);
-    perr("\nParameter settings: s(%d), d(%ldns), p(%d:%dns), r(%d)\n",
+    perr("\nParameter settings: s(%d), d(%dns), p(%d:%dns), r(%d)\n",
         nbtls, nsdly, pmdly, pmns, nrdry);
     perr("\n");
 
