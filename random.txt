@@ -5039,7 +5039,7 @@ real	19m21.813s
 user	11m6.773s
 sys	8m34.167s
 
--- The primes pairs on Saint Valentine day -------------------------------------
+-- The primes pairs on Saint Valentine's day -----------------------------------
 
 $ gcc uchaos.c -O3 --fast-math -Wall -o uchaos -D_USE_PRIMES_2564
 
