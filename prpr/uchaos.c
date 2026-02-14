@@ -98,11 +98,24 @@ static inline uint64_t get_rdtsc_clock(uint32_t *pcpuid) {
 #define USE_GET_TIME 1
 #endif
 
-/* *** HASHING  ************************************************************* */
+#ifdef _USE_PRIMES_2564
+/*
+ * This sequence of primes has a peculiar structure: x, y where x + y = 64.
+ * Both members of each pair is a prime number, and by rotl64 are like x, -x.
+ * They are only five pair of these numbers summing up 64, thus 10 = 3.32 bits.
+ */
+static const uint8_t primes64[10] = { 3, 61, 5, 59, 11, 53, 17, 47, 23, 41 };
+#define USE_PRIMES_2564 1
+#else
+#define USE_PRIMES_2564 0
+#endif
 
 static inline uint64_t rotl64(uint64_t n, uint8_t c) {
     c &= 63; return (n << c) | (n >> ((-c) & 63));
 }
+
+
+/* *** HASHING  ************************************************************* */
 
 #include <sched.h>
 uint64_t djb2tum(const uint8_t *str, uint64_t seed, uint8_t maxn,
@@ -171,8 +184,11 @@ uint64_t djb2tum(const uint8_t *str, uint64_t seed, uint8_t maxn,
         h  = ( ( h << (4 + (b0 ? b1 : 1)) ) + (b1 ? -h : h) );
 
         // 2. char injection w/ rotated
+#if USE_PRIMES_2564
+        h ^= c ^ rotl64(c, primes64[ns%10]);
+#else
         h ^= c ^ rotl64(c, 1 + (ns & 0x07));
-
+#endif
         // 3. stochastics micro-mix
         h  = rotl64(h, 5 + ((ns >> 3) & 0x03)) + h;
 
