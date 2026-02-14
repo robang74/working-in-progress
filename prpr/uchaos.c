@@ -3,7 +3,7 @@
  *
  * test: cat uchaos.c | ./chaos -T 1000 [-s 6] | ent
  *
- * Compile with: gcc uchaos.c -O3 --fast-math -Wall -o uchaos
+ * Compile with: gcc uchaos.c -O3 --fast-math -Wall -o uchaos [-D_USE_GET_RTSC]
  *
  * *****************************************************************************
  * PRESENTATION
@@ -143,10 +143,9 @@ uint64_t djb2tum(const uint8_t *str, uint64_t seed, uint8_t maxn,
      */
     if(seed) h = seed;
 
-#if USE_GET_TIME
-    uint32_t ons = 0;
-#else
     uint64_t ons = 0;
+#if USE_GET_TIME
+#else
     static uint32_t oid = -1;
 #endif
     static uint64_t ohs = 5381;
@@ -219,7 +218,7 @@ reschedule:
         sched_yield();
     }
 
-    return h;
+    return h ^ (0xFF & (h >> 32));
 }
 
 uint64_t *str2ht64(uint8_t *str, uint64_t **ph,  size_t *size,
