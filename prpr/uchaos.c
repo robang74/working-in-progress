@@ -350,13 +350,16 @@ static inline void usage(const char *name) {
 #define BLOCK_SIZE 512
 
 int main(int argc, char *argv[]) {
-    unsigned nrdry = 1, pmdly = 0;
-    uint8_t *str = NULL, nbtls = 0, prsts = 0;
+    uint8_t *str = NULL, nbtls = 0, prsts = 0, quiet = 0;
     uint32_t ntsts = 1, nsdly = 0;
+    unsigned nrdry = 1, pmdly = 0;
 
     // Collect arguments from optional command line parameters
     while (1) {
         int opt = getopt(argc, argv, "hT:s:d:p:r:");
+        if(opt == 'q') {
+            quiet = 1;
+        } else
         if(opt == '?' || opt == 'h') {
             usage("uchaos");
         } else if(opt == -1) {
@@ -396,7 +399,7 @@ int main(int argc, char *argv[]) {
     uint64_t bic = 0, mt = 0;
     size_t nk = 0, nt = 0, nx = 0;
 
-    if(prsts) perr("\nRepetitions: ");
+    if(prsts && !quiet) perr("\nRepetitions: ");
     for (uint32_t a = ntsts; a; a--) {
         // hashing
         uint64_t st = get_nanos();
@@ -412,10 +415,13 @@ int main(int argc, char *argv[]) {
         if(ntsts < 2) return 0;
 
         // testing
+        // expected zero collisions and the nested-for can be verified by:
+        // xxd -p -c 8 data.test | sort | uniq -c | awk '$1 >1' | wc -l
+
         for (size_t n = 0; n < size; n++) {
             for (size_t i = n + 1; i < size; i++) {
                 if (h[i] == h[n]) {
-                    perr("%zu:%zu ", n, i);
+                    if(!quiet) perr("%zu:%zu ", n, i);
                     nk++; continue;
                 }
                 uint64_t cb = h[i] ^ h[n];
@@ -429,7 +435,7 @@ int main(int argc, char *argv[]) {
         free(h); h = NULL; // passing to str2ht64 a valid (h, size) should reused it
 #endif
     }
-    if(!prsts) return 0;
+    if(!prsts || quiet) return 0;
     perr("%s\n", nk ? ", status KO" : "none found, status OK");
 
     uint64_t rt = get_nanos();
