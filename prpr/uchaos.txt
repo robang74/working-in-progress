@@ -17,7 +17,7 @@ tinycore-download() {
     return $?
 }
 
-baremini-zip-download() {
+barezip-download() {
     url="https://github.com/robang74/bare-minimal-linux-system"
     wget -c "${url}/archive/refs/tags/pull-01.tar.gz" -O baremini.tgz
     du -ks baremini.tgz
@@ -27,6 +27,15 @@ baremini-zip-download() {
 baremini-download() {
     url="https://github.com/robang74/bare-minimal-linux-system"
     wget -c "${url}/raw/refs/heads/main/initramfs.cpio.gz"
+    wget -c "${url}/raw/refs/heads/main/bzImage"
+    wget -c "${url}/raw/refs/heads/main/start.sh"
+    du -ks initramfs.cpio.gz bzImage start.sh
+    return $?
+}
+
+baremicro-download() {
+    url="https://github.com/robang74/bare-minimal-linux-system"
+    wget -c "${url}/raw/refs/heads/main/initrobfs.cpio.gz"
     wget -c "${url}/raw/refs/heads/main/bzImage"
     wget -c "${url}/raw/refs/heads/main/start.sh"
     du -ks initramfs.cpio.gz bzImage start.sh

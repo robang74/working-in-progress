@@ -1,7 +1,7 @@
 /*
  * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2 license
  *
- * test: cat uchaos.c | ./chaos -T 1000 [-s 6] | ent
+ * Quick test: cat uchaos.c | ./chaos -T 1000 | ent
  *
  * Compile with: gcc uchaos.c -O3 --fast-math -Wall -o uchaos [-D_USE_GET_RTSC]
  *
