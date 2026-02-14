@@ -17,15 +17,35 @@ tinycore-download() {
     return $?
 }
 
+baremini-zip-download() {
+    url="https://github.com/robang74/bare-minimal-linux-system"
+    wget -c "${url}/archive/refs/tags/pull-01.tar.gz" -O baremini.tgz
+    du -ks baremini.tgz
+    return $?
+}
+
+baremini-download() {
+    url="https://github.com/robang74/bare-minimal-linux-system"
+    wget -c "${url}/raw/refs/heads/main/initramfs.cpio.gz"
+    wget -c "${url}/raw/refs/heads/main/bzImage"
+    wget -c "${url}/raw/refs/heads/main/start.sh"
+    du -ks initramfs.cpio.gz bzImage start.sh
+    return $?
+}
+
+# == uchaos static cross compiling =============================================
+
 # 32
 sudo apt install gcc-multilib
-gcc -m32 prpr/uchaos.c -O3 --fast-math -Wall --static -o uchaos.bin
+gcc -m32 uchaos.c -O3 --fast-math -Wall --static -o uchaos.bin
 
 # 64
-gcc -m64 prpr/uchaos.c -O3 --fast-math -Wall --static -o uchaos.bin
+gcc -m64 uchaos.c -O3 --fast-math -Wall --static -o uchaos.bin
+
+# == uchaos test in qemu/tinycore ==============================================
 
 dd if=/dev/zero count=10k bs=10k of=sda.img && mkfs.vfat sda.img
-strip uchaos.bin; mcopy -n -i sda.img uchaos.bin prpr/uchaos.c ::/
+strip uchaos.bin; mcopy -n -i sda.img uchaos.bin uchaos.c ::/
 
 qhwcfg="-m 512 -smp 4 -enable-kvm"
 qoscfg="-display curses -no-reboot -boot d -cdrom"
@@ -41,3 +61,15 @@ qemu-system-x86_64 $qhwcfg $qdrcfg $qoscfg CorePure64-17.0.iso
 sudo mount /dev/sda /mnt && cd /mnt
 cat uchaos.c | time ./uchaos.bin -T 10240 -d3 -p3 -r32 | wc -c >&2
 sudo reboot   # to stop the session
+
+# == uchaos test in qemu/baremini ==============================================
+
+strip uchaos.bin; find uchaos.bin uchaos.c | cpio -o -H newc > uchaos.cpio
+{ zcat initramfs.cpio.gz; cat uchaos.cpio; } | pigz -9cp8 > uchaosfs.cpio.gz
+sh start.sh uchaosfs.cpio.gz
+
+# Bare Mini test
+cat /proc/cpuinfo; uname -a; free -m; echo
+cat uchaos.c | time ./uchaos.bin -T 10240 | wc -c >&2
+reboot
+
