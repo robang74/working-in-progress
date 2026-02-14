@@ -4989,3 +4989,53 @@ Arithmetic mean value of data bytes is 127.5076 (127.5 = random).
 Monte Carlo value for Pi is 3.141066404 (error 0.02 percent).
 Serial correlation coefficient is 0.000076 (totally uncorrelated = 0.0).
 
+================================================================================
++ 2eeb3c0a3fc812766a4452506 - 2026-02-14 - prpr/uchaos.c: RNG_test stdin64, pass
+================================================================================
+
+time cat uchaos.c | ./uchaos -q -T 4000000 | RNG_test stdin64
+
+RNG_test using PractRand version 0.96
+RNG = RNG_stdin64, seed = unknown
+test set = core, folding = standard (64 bit)
+
+rng=RNG_stdin64, seed=unknown
+length= 8 megabytes (2^23 bytes), time= 3.9 seconds
+  no anomalies in 135 test result(s)
+
+rng=RNG_stdin64, seed=unknown
+length= 16 megabytes (2^24 bytes), time= 8.0 seconds
+  no anomalies in 147 test result(s)
+
+rng=RNG_stdin64, seed=unknown
+length= 32 megabytes (2^25 bytes), time= 16.3 seconds
+  no anomalies in 159 test result(s)
+
+rng=RNG_stdin64, seed=unknown
+length= 64 megabytes (2^26 bytes), time= 36.0 seconds
+  no anomalies in 172 test result(s)
+
+rng=RNG_stdin64, seed=unknown
+length= 128 megabytes (2^27 bytes), time= 75.6 seconds
+  no anomalies in 185 test result(s)
+
+rng=RNG_stdin64, seed=unknown
+length= 256 megabytes (2^28 bytes), time= 151 seconds
+  no anomalies in 199 test result(s)
+
+rng=RNG_stdin64, seed=unknown
+length= 512 megabytes (2^29 bytes), time= 301 seconds
+  no anomalies in 213 test result(s)
+
+rng=RNG_stdin64, seed=unknown
+length= 1 gigabyte (2^30 bytes), time= 609 seconds
+  Test Name                         Raw       Processed     Evaluation       
+  [Low1/64]BCFN(2+0,13-5U)          R=  +9.6  p =  6.2e-4   unusual          
+  ...and 226 test result(s) without anomalies
+
+error reading from file
+
+real	19m21.813s
+user	11m6.773s
+sys	8m34.167s
+
