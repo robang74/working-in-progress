@@ -3,7 +3,7 @@
  *
  * Usage: mtrd -nN "command or binary to execute"; or -tN for timestamps also
  *
- * Compile with lib pthread: gcc mtrd.c -O3 -o mtrd -lpthread
+ * Compile with lib pthread: gcc mtrd.c -O3 -o mtrd -lpthread -Wall
  *
  */
 
@@ -54,9 +54,9 @@ static inline void prt_nanos(unsigned char a, unsigned char b) {
     nanos = get_nanos();
     if(first) {
         first = 0;
-        snprintf(buf, BFLN, "%cs.%09ld%c\n", a, nanos % NS, b);
+        snprintf((char *)buf, BFLN, "%cs.%09ld%c\n", a, nanos % NS, b);
     } else {
-        snprintf(buf, BFLN, "\n%c%ld.%09ld%c\n", a, nanos / NS, nanos % NS, b);
+        snprintf((char *)buf, BFLN, "\n%c%ld.%09ld%c\n", a, nanos / NS, nanos % NS, b);
     }
 
     buf[BFLN-1] = 0;
@@ -96,8 +96,6 @@ void *spawn_and_mix(void* arg) {
 
     close(pipefd[1]);
     unsigned char ch;
-    char buffer[128];
-    struct timespec ts;
 
     // Lettura a basso livello
     while (read(pipefd[0], &ch, 1) > 0) {
