@@ -88,9 +88,11 @@
  * necessarily synchronised anymore but also the CPU switch
  * is a matter of stochastics, and it is fine but not monotonic.
  */
+#include <x86intrin.h>
 static inline uint64_t get_rdtsc_clock(uint32_t *pcpuid) {
     _mm_lfence(); return __rdtscp(pcpuid);
 }
+#define USE_GET_TIME 0
 
 /* *** HASHING  ************************************************************* */
 
@@ -137,14 +139,24 @@ uint64_t djb2tum(const uint8_t *str, uint64_t seed, uint8_t maxn,
      */
     if(seed) h = seed;
 
+#if USE_GET_TIME
     uint32_t ons = 0;
+#else
+    uint64_t ons = 0;
+    static uint32_t oid = -1;
+#endif
     static uint64_t ohs = 5381;
     while((c = *str++) && maxn--) {
+        uint64_t ts_tv_nsec;
+#if USE_GET_TIME
         struct timespec ts;                         // using sched_yield() to creates chaos,
         clock_gettime(CLOCK_MONOTONIC, &ts);        // getting ns in a hot loop is the limit
-                                                    // and we want to see this limit, in VMs
-
-        uint8_t ns = 0xff & (ts.tv_nsec >> nbtls);  // 0xff ^ is a good-luck typo (3C-rule!)
+        ts_tv_nsec = ts.tv_nsec;                    // and we want to see this limit, in VMs
+#else
+        uint32_t cpuid;
+        ts_tv_nsec = get_rdtsc_clock(&cpuid);
+#endif
+        uint8_t ns = 0xff & (ts_tv_nsec >> nbtls);  // 0xff ^ is a good-luck typo (3C-rule!)
         ns ^= (ns >> 3) ^ (0xff & ohs);
         uint8_t b1 = ns & 0x02;
         uint8_t b0 = ns & 0x01;
@@ -163,23 +175,29 @@ uint64_t djb2tum(const uint8_t *str, uint64_t seed, uint8_t maxn,
 
         // 4. time deltas management
         if(ons) {
-            uint64_t dlt = (ts.tv_nsec < ons) ? E9 + ts.tv_nsec - ons : ts.tv_nsec - ons;
+#if USE_GET_TIME
+            uint64_t dlt = (ts_tv_nsec < ons) ? E9 + ts_tv_nsec - ons : ts_tv_nsec - ons;
+#else
+            uint64_t dlt = (ts_tv_nsec < ons) ? (uint64_t)(-1)  + ons - ts_tv_nsec : ts_tv_nsec - ons;
+#endif
             if(dlt < dmn) dmn = dlt;
             if(dlt > dmx) dmx += (dmx ? dmx/dlt : 1.0);
-            uint32_t nstw = dmn + nsdly + (pmdly ?  pmdly2ns : 0);
-            if(dlt < nstw || h == ohs) {   // copying with the VMs scheduler timings
-#if 0
-                struct timespec nslp = { 0 };
-                nslp.tv_nsec = ( nstw + dlt ) >> 1;
-                if(nstw > 1000 + dlt)
-                    usleep((nstw + 499 - dlt) / 1000);
-                else
-                    nanosleep(&nslp, &nslp);
+#if USE_GET_TIME
 #else
-                sched_yield();
+            if(cpuid != oid) {
+                  oid = cpuid;
+                  goto reschedule;
+            }
+#endif
+            uint32_t nstw = dmn + nsdly + (pmdly ?  pmdly2ns : 0);
+            if(dlt < nstw || h == ohs) {  // copying with the VMs scheduler timings
+#if USE_GET_TIME
+#else
+reschedule:
 #endif
                 str--;                    // repeat the action even if it made changes
                 nexp++;
+                sched_yield();
                 continue;
             }
             if(dmn << 1 > dlt) {
@@ -188,7 +206,11 @@ uint64_t djb2tum(const uint8_t *str, uint64_t seed, uint8_t maxn,
             }
         }
         ohs = h;
-        ons = ts.tv_nsec;
+        ons = ts_tv_nsec;
+#if USE_GET_TIME
+#else
+        oid = cpuid;
+#endif
         sched_yield();
     }
 
