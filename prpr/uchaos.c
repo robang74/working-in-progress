@@ -356,13 +356,14 @@ int main(int argc, char *argv[]) {
 
     // Collect arguments from optional command line parameters
     while (1) {
-        int opt = getopt(argc, argv, "hT:s:d:p:r:");
+        int opt = getopt(argc, argv, "hT:s:d:p:r:q");
         if(opt == 'q') {
             quiet = 1;
         } else
         if(opt == '?' || opt == 'h') {
             usage("uchaos");
-        } else if(opt == -1) {
+        } else
+        if(opt == -1) {
             break;
         }
 
@@ -378,6 +379,7 @@ int main(int argc, char *argv[]) {
             case 'p': pmdly = ABS(x); break;
         }
     }
+    if(quiet) prsts = 0;
 
     // Counting time of running starts here, after parameters
     (void) get_nanos();
@@ -399,7 +401,7 @@ int main(int argc, char *argv[]) {
     uint64_t bic = 0, mt = 0;
     size_t nk = 0, nt = 0, nx = 0;
 
-    if(prsts && !quiet) perr("\nRepetitions: ");
+    if(prsts) perr("\nRepetitions: ");
     for (uint32_t a = ntsts; a; a--) {
         // hashing
         uint64_t st = get_nanos();
@@ -421,7 +423,7 @@ int main(int argc, char *argv[]) {
         for (size_t n = 0; n < size; n++) {
             for (size_t i = n + 1; i < size; i++) {
                 if (h[i] == h[n]) {
-                    if(!quiet) perr("%zu:%zu ", n, i);
+                    if(prsts) perr("%zu:%zu ", n, i);
                     nk++; continue;
                 }
                 uint64_t cb = h[i] ^ h[n];
@@ -435,7 +437,8 @@ int main(int argc, char *argv[]) {
         free(h); h = NULL; // passing to str2ht64 a valid (h, size) should reused it
 #endif
     }
-    if(!prsts || quiet) return 0;
+
+    if(!prsts) return 0;
     perr("%s\n", nk ? ", status KO" : "none found, status OK");
 
     uint64_t rt = get_nanos();
