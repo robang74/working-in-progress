@@ -70,6 +70,6 @@ sh start.sh uchaosfs.cpio.gz
 
 # Bare Mini test
 cat /proc/cpuinfo; uname -a; free -m; echo
-cat uchaos.c | time ./uchaos.bin -T 10240 | wc -c >&2
+cat uchaos.c | time ./uchaos.bin -T 102400 | wc -c
 reboot
 

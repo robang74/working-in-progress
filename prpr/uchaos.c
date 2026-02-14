@@ -82,6 +82,16 @@
 #define ALGN64(n) ( ( ( (n) + 63) >> 6 ) << 6 )
 #define perr(x...) fprintf(stderr, x)
 
+/*
+ * Available only on x86 architecture, thus not portable
+ * moreover, when the CPU id changes the two clocks aren't
+ * necessarily synchronised anymore but also the CPU switch
+ * is a matter of stochastics, and it is fine but not monotonic.
+ */
+static inline uint64_t get_rdtsc_clock(uint32_t *pcpuid) {
+    _mm_lfence(); return __rdtscp(pcpuid);
+}
+
 /* *** HASHING  ************************************************************* */
 
 static inline uint64_t rotl64(uint64_t n, uint8_t c) {
