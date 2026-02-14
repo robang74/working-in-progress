@@ -182,7 +182,7 @@ uint64_t djb2tum(const uint8_t *str, uint64_t seed, uint8_t maxn,
 #if USE_GET_TIME
             uint64_t dlt = (ts_tv_nsec < ons) ? E9 + ts_tv_nsec - ons : ts_tv_nsec - ons;
 #else
-            uint64_t dlt = (ts_tv_nsec < ons) ? (uint64_t)(-1) + ts_tv_nsec - ons : ts_tv_nsec - ons;
+            uint64_t dlt = (ts_tv_nsec < ons) ? ((uint64_t)(-1) - ons) + ts_tv_nsec + 1 : ts_tv_nsec - ons;
 #endif
             if(dlt < dmn) dmn = dlt;
             if(dlt > dmx) dmx += (dmx ? dmx/dlt : 1.0);
