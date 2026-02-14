@@ -92,7 +92,11 @@
 static inline uint64_t get_rdtsc_clock(uint32_t *pcpuid) {
     _mm_lfence(); return __rdtscp(pcpuid);
 }
+#ifdef _USE_GET_RTSC
 #define USE_GET_TIME 0
+#else
+#define USE_GET_TIME 1
+#endif
 
 /* *** HASHING  ************************************************************* */
 
@@ -178,7 +182,7 @@ uint64_t djb2tum(const uint8_t *str, uint64_t seed, uint8_t maxn,
 #if USE_GET_TIME
             uint64_t dlt = (ts_tv_nsec < ons) ? E9 + ts_tv_nsec - ons : ts_tv_nsec - ons;
 #else
-            uint64_t dlt = (ts_tv_nsec < ons) ? (uint64_t)(-1)  + ons - ts_tv_nsec : ts_tv_nsec - ons;
+            uint64_t dlt = (ts_tv_nsec < ons) ? (uint64_t)(-1) + ts_tv_nsec - ons : ts_tv_nsec - ons;
 #endif
             if(dlt < dmn) dmn = dlt;
             if(dlt > dmx) dmx += (dmx ? dmx/dlt : 1.0);
@@ -186,6 +190,7 @@ uint64_t djb2tum(const uint8_t *str, uint64_t seed, uint8_t maxn,
 #else
             if(cpuid != oid) {
                   oid = cpuid;
+                  ons = ts_tv_nsec;
                   goto reschedule;
             }
 #endif
@@ -440,8 +445,8 @@ int main(int argc, char *argv[]) {
     perr("\nBits in common compared to 50 %% avg is %.4lf %% (%+.1lf ppm)\n",
         ratio, (ratio-50) * E6 / 100);
     unsigned pmns = (unsigned)djb2tum(0, 0, 0, 0, pmdly, 0);
-    perr("\nParameter settings: s(%d), d(%dns), p(%d:%dns), r(%d)\n",
-        nbtls, nsdly, pmdly, pmns, nrdry);
+    perr("\nParameter settings: s(%d), d(%dns), p(%d:%dns), r(%d), RTSC(%d)\n",
+        nbtls, nsdly, pmdly, pmns, nrdry, !USE_GET_TIME);
     perr("\n");
 
     return 0; // exit() do free()
