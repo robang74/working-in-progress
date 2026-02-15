@@ -98,16 +98,14 @@ static inline uint64_t get_rdtsc_clock(uint32_t *pcpuid) {
 #define USE_GET_TIME 1
 #endif
 
-#ifdef _USE_PRIMES_2564
+#define USE_PRIMES_2564 1
+#if     USE_PRIMES_2564
 /*
  * This sequence of primes has a peculiar structure: x, y where x + y = 64.
  * Both members of each pair is a prime number, and by rotl64 are like x, -x.
  * They are only five pair of these numbers summing up 64, thus 10 = 3.32 bits.
  */
 static const uint8_t primes64[10] = { 3, 61, 5, 59, 11, 53, 17, 47, 23, 41 };
-#define USE_PRIMES_2564 1
-#else
-#define USE_PRIMES_2564 0
 #endif
 
 static inline uint64_t rotl64(uint64_t n, uint8_t c) {
