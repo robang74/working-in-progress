@@ -153,6 +153,13 @@ struct rand_pool_info_buf {
 
 /* *** HASHING  ************************************************************* */
 
+static inline uint64_t getnstime(uint32_t *pcpuid) {
+    if(pcpuid) return get_rdtsc_clock(pcpuid);
+    struct timespec ts;                         // using sched_yield() to creates chaos,
+    clock_gettime(CLOCK_MONOTONIC, &ts);        // getting ns in a hot loop is the limit
+    return ts.tv_nsec;                          // and we want to see this limit, in VMs
+}
+
 #include <sched.h>
 uint64_t djb2tum(const uint8_t *str, uint8_t maxn, uint64_t seed,
     const uint32_t nsdly, const unsigned pmdly, const uint8_t nbtls)
@@ -201,12 +208,10 @@ uint64_t djb2tum(const uint8_t *str, uint8_t maxn, uint64_t seed,
     while((c = *str++) && maxn--) {
         uint64_t ts_tv_nsec;
 #if USE_GET_TIME
-        struct timespec ts;                         // using sched_yield() to creates chaos,
-        clock_gettime(CLOCK_MONOTONIC, &ts);        // getting ns in a hot loop is the limit
-        ts_tv_nsec = ts.tv_nsec;                    // and we want to see this limit, in VMs
+        ts_tv_nsec = getnstime(NULL);
 #else
         uint32_t cpuid;
-        ts_tv_nsec = get_rdtsc_clock(&cpuid);
+        ts_tv_nsec = getnstime(&cpuid);
 #endif
         uint8_t ns = 0xff & (ts_tv_nsec >> nbtls);  // 0xff ^ is a good-luck typo (3C-rule!)
         ns ^= (ns >> 3) ^ (0xff & ohs);
@@ -282,9 +287,7 @@ uint64_t *str2ht64(uint8_t *str, uint64_t **ph,  size_t *size,
     if (n == 0) return NULL;
 
     // 1. Determine rotation offset using monotonic time
-    struct timespec ts;
-    clock_gettime(CLOCK_MONOTONIC, &ts);
-    size_t k = ts.tv_nsec % n;
+    size_t k = getnstime(NULL) % n;
 
     // 2. Calculate padding and allocation
     // We need enough 64-bit blocks to cover n bytes.
@@ -387,11 +390,22 @@ static inline ssize_t readblocks(int fd, uint8_t *buf, unsigned nblks) {
         if(n < 1) exit(EXIT_FAILURE);
         maxn = MAX(maxn, n);
         for (size_t a = 0; a < n; a++)
-            buf[a] += inp[a];
+            buf[a] ^= (inp[a] << 3) | (inp[a] >> 5);
+//          buf[a] ^= inp[a]; // very simple alternative, to consider
+//          buf[a] += inp[a]; // it creates a subtle mod5x3 at 2GB -> fails at 4GB
     }
     buf[maxn] = 0;
     return maxn;
 }
+
+static inline uint8_t *bin2str(uint8_t *buf, size_t nmax) {
+    for(register size_t i = 0; i < nmax; i++) {
+        if(!buf[i]) buf[i--] = 0xFF & getnstime(NULL);
+    }
+    return buf;
+}
+
+/* ** main & its supporters ************************************************* */
 
 // Funzione per ottenere il tempo in nanosecondi
 uint64_t get_nanos() {
@@ -400,8 +414,8 @@ uint64_t get_nanos() {
 
     clock_gettime(CLOCK_MONOTONIC, &ts);
     if (!start) {
-      start = (uint64_t)ts.tv_sec * 1000000000L + ts.tv_nsec;
-      return start;
+        start = (uint64_t)ts.tv_sec * 1000000000L + ts.tv_nsec;
+        return start;
     }
     return ((uint64_t)ts.tv_sec * 1000000000L + ts.tv_nsec) - start;
 }
@@ -494,6 +508,7 @@ int main(int argc, char *argv[]) {
 
         // output
         if(!h) return EXIT_FAILURE;
+
         size_t sz = size << 3;
         if(devfd) {
             entrnd.buf_size = sz;
@@ -509,6 +524,7 @@ int main(int argc, char *argv[]) {
 
         // single run
         if(ntsts < 2) return 0;
+
         // skip stats
         if(!prsts) continue;
 
@@ -544,6 +560,8 @@ int main(int argc, char *argv[]) {
 #if 0                      // Just for test
         free(h); h = NULL; // passing to str2ht64 a valid (h, size) should reused it
 #endif
+        sched_yield();   // Statistics are a block of CPU data-crunching but also
+                         // a predictable delay which sched_yield() can jeopardise
     }
 
     if(!prsts) return 0;
