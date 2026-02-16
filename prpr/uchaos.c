@@ -69,6 +69,10 @@
 #include <stddef.h>
 #include <time.h>
 #include <math.h>
+#include <sys/ioctl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 #define AVGV 127.5
 #define E3 1000L
@@ -112,6 +116,18 @@ static inline uint64_t rotl64(uint64_t n, uint8_t c) {
     c &= 63; return (n << c) | (n >> ((-c) & 63));
 }
 
+#define BLOCK_SIZE 512
+
+#ifdef _USE_LINUX_RANDOM_H
+#include <linux/random.h>
+#else
+#define RNDADDENTROPY 0x40085203
+struct rand_pool_info_buf {
+    int entropy_count;
+    int buf_size;
+    uint32_t buf[BLOCK_SIZE >> 2];
+} __attribute__((packed));
+#endif
 
 /* *** HASHING  ************************************************************* */
 
@@ -356,20 +372,21 @@ static inline void usage(const char *name) {
 "   -p: number of parts as min/256 ns above the min\n"\
 "   -s: number of bits to left shift on ns timings\n"\
 "   -r: number of preliminary runs (default: 1)\n"\
+"   -k: randomness injection in kernel by ioctl\n"\
 "\nWith -pN is suggested -r32+ for stats pre-evaluation\n\n", name, name);
     exit(0);
 }
 
-#define BLOCK_SIZE 512
-
 int main(int argc, char *argv[]) {
+    struct rand_pool_info_buf entrnd;
     uint8_t *str = NULL, nbtls = 0, prsts = 0, quiet = 0;
     uint32_t ntsts = 1, nsdly = 0;
     unsigned nrdry = 1, pmdly = 0;
+    int devfd = 0;
 
     // Collect arguments from optional command line parameters
     while (1) {
-        int opt = getopt(argc, argv, "hT:s:d:p:r:q");
+        int opt = getopt(argc, argv, "hT:s:d:p:r:k:q");
         if(opt == 'q') {
             quiet = 1;
         } else
@@ -390,7 +407,12 @@ int main(int argc, char *argv[]) {
             case 'd': nsdly = ABS(x); break;
             case 'r': nrdry = ABS(x); break;
             case 'p': pmdly = ABS(x); break;
+            case 'k': devfd = open(optarg, O_WRONLY); break;
         }
+    }
+    if (devfd < 0) {
+        perror("open device");
+        return EXIT_FAILURE;
     }
     if(quiet) prsts = 0;
 
@@ -399,11 +421,11 @@ int main(int argc, char *argv[]) {
 
     if (posix_memalign((void **)&str, 64, BLOCK_SIZE)) {
         perror("posix_memalign");
-        exit(EXIT_FAILURE);
+        return EXIT_FAILURE;
     }
 
     size_t n = readbuf(STDIN_FILENO, str, BLOCK_SIZE - 1, 1);
-    if(n < 1) exit(EXIT_FAILURE);
+    if(n < 1) return EXIT_FAILURE;
     str[n] = 0;
 
     size_t size = 0;
@@ -422,10 +444,20 @@ int main(int argc, char *argv[]) {
         mt += get_nanos() - st;
 
         // output
-        if(h)
-            writebuf(STDOUT_FILENO, (uint8_t *)h, size << 3);
-        else
-            exit(EXIT_FAILURE);
+        if(!h) return EXIT_FAILURE;
+        size_t sz = size << 3;
+        if(devfd) {
+            entrnd.buf_size = sz;
+            // cautelatively 7 bits per byte
+            entrnd.entropy_count = (sz << 3) - sz;
+            memcpy((uint8_t *)entrnd.buf, (uint8_t *)h, sz);
+            if (ioctl(devfd, RNDADDENTROPY, &entrnd) < 0) {
+                perror("ioctl entrnd");
+                return EXIT_FAILURE;
+            }         // WARNING!!
+        } /* else  */ // skip else expose the data but it is useful for debuging
+        writebuf(STDOUT_FILENO, (uint8_t *)h, size << 3);
+
         // single run
         if(ntsts < 2) return 0;
 
