@@ -27,11 +27,17 @@
  * binary input that has EOB char (\0) in the input data. Quick to change but it
  * is not the point here but djb2tum, possibly.
  *
- * Spoiler: in mixing /dev/random with a reasonably good function, not necessarily
- * a PRF-function (Mihir Bellare, 2014), the output is automatically NIS-certified
- * as much as every other SW that rely on /dev/random. Why? N coloured dices
- * provide an ordered sequence (white, red, green, etc.) but every other
- * sequence (red, green, white, etc.) is also fine.
+ * While uchaos.c has been developed as early source for /dev/random leveraging
+ * dmesg timings in the boot log, it can works with a simple adaptation (text
+ * ending with \0 to binary) also with /dev/random stream as input (source).
+ *
+ * SPOILER
+ *
+ * When processing /dev/random output, uchaos acts as a conditioning
+ * function. Per Bellare (2006/2014), non-PRF functions can preserve
+ * security in specific constructions. The kernel's mixing tolerates
+ * this, though uchaos itself is not independently NIST-certified.
+ *
  *
  * *****************************************************************************
  * OUTPUT TESTS

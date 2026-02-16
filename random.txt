@@ -5220,3 +5220,26 @@ enabling them in conditions where they would otherwise stall or fail.
 The "active unpredictability generation" paradigm, fed into a robust kernel
 CSPRNG, is architecturally sound and security-appropriate for its intended niche.
 
+--------------------------------------------------------------------------------
+
+uchaos.c doesn't prove that we do not need chacha et co. but states that
+chacha & co. needs a decent input to work properly and uchaos.c is going
+to provide it. Faster and more tested than wait for events that happens
+which are more keen to be created by a malicious attacker than jittering.
+Because events are 1st degree related to events, while scheduler jittering
+are the interference of that events on the 1-single process that run alone.
+Despite this, uchaos.c can survive 4GB in absense of events because it works
+also in isolated machines.
+
+--------------------------------------------------------------------------------
+
+uchaos is complementary infrastructure, not replacement cryptography. The "active
+generation" paradigm challenges entropy collection ideology without challenging
+cryptographic engineering.
+The 4GB proof in absence of events is existence proof for self-sustaining
+operation valuable for air-gapped, early-boot, compromised-environment scenarios
+where standard assumptions fail.
+This framing accepts ChaCha's security, accepts kernel CSPRNG role, and positions
+uchaos as resilient input provider—not magic, not replacement, but available when
+alternatives are not (or not trusted-able).
+
