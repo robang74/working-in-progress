@@ -400,7 +400,10 @@ static inline ssize_t readblocks(int fd, uint8_t *buf, unsigned nblks) {
 
 static inline uint8_t *bin2str(uint8_t *buf, size_t nmax) {
     for(register size_t i = 0; i < nmax; i++) {
-        if(!buf[i]) buf[i--] = 0xFF & getnstime(NULL);
+        if(!buf[i]) {
+            buf[i--] = 0xFF & getnstime(NULL);
+            sched_yield();
+        }
     }
     return buf;
 }
