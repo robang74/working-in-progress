@@ -114,7 +114,11 @@ int main(int argc, char *argv[]) {
     str[n] = 0;
 
     n = str2s64(str, n);
-    perr("%s\n\n", str);
+    for (size_t i = 0; i < n; i += 64) {
+        perr("\n");
+        writebuf(STDERR_FILENO, &str[i], 64);
+    }
+    perr("\n\n");
 #ifdef _OUTPUT_TEXT_ONLY
     writebuf(STDOUT_FILENO, str, n);
     return 0;
