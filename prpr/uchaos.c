@@ -1,8 +1,8 @@
 /*
  * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2 license
  *
- * Quick test: cat uchaos.c | ./chaos -T 1000 | ent
- *
+ * Quick 2k test: cat uchaos.c  | ./chaos -T 2048 | ent
+ * Boot log test: cat dmesg.txt | ./uchaos -i 16 -r64 | ent
  * Compile with: gcc uchaos.c -O3 --fast-math -Wall -o uchaos [-D_USE_GET_RTSC]
  *
  * *****************************************************************************
@@ -93,6 +93,20 @@
 #define ALGN64(n) ( ( ( (n) + 63) >> 6 ) << 6 )
 #define perr(x...) fprintf(stderr, x)
 
+#define ALPH64 "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz0123456789@\n"
+
+static inline uint8_t *bin2s64(uint8_t *buf, size_t nmax) {
+    static const uint8_t c[] = ALPH64;
+    for(register size_t i = 0; i < nmax; i++)
+        buf[i] = c[ 0x3F & buf[i] ];
+    return buf;
+}
+
+#ifdef _USE_GET_RTSC
+#define USE_GET_TIME 0
+#else
+#define USE_GET_TIME 1
+#endif
 /*
  * Available only on x86 architecture, thus not portable
  * moreover, when the CPU id changes the two clocks aren't
@@ -109,11 +123,6 @@
 static inline uint64_t get_rdtsc_clock(uint32_t *pcpuid) {
     _mm_lfence(); return __rdtscp(pcpuid);
 }
-#ifdef _USE_GET_RTSC
-#define USE_GET_TIME 0
-#else
-#define USE_GET_TIME 1
-#endif
 
 #define USE_PRIMES_2564 1
 #if     USE_PRIMES_2564
@@ -145,7 +154,7 @@ struct rand_pool_info_buf {
 /* *** HASHING  ************************************************************* */
 
 #include <sched.h>
-uint64_t djb2tum(const uint8_t *str, uint64_t seed, uint8_t maxn,
+uint64_t djb2tum(const uint8_t *str, uint8_t maxn, uint64_t seed,
     const uint32_t nsdly, const unsigned pmdly, const uint8_t nbtls)
 {
     #define pmdly2ns ( ( ( (uint64_t)dmn * pmdly ) + 127 ) >> 8 )
@@ -320,13 +329,15 @@ uint64_t *str2ht64(uint8_t *str, uint64_t **ph,  size_t *size,
     }
     for (size_t i = 0; i < num_blocks; i++) {
         // Process each 8-byte chunk of the rotated/padded string
-        h[i] = djb2tum(rotated_str + (i << 3), 0, 8, nsdly, pmdly, nbtls);
+        h[i] = djb2tum(rotated_str + (i << 3), 8, 0, nsdly, pmdly, nbtls);
     }
     free(rotated_str);
 
     *size = num_blocks;
     return h;
 }
+
+/** I/O ***********************************************************************/
 
 static inline ssize_t writebuf(int fd, const uint8_t *buffer, size_t ntwr) {
     ssize_t tot = 0;
@@ -362,7 +373,7 @@ static inline ssize_t readbuf(int fd, uint8_t *buffer, size_t size, bool intr) {
     return tot;
 }
 
-static inline ssize_t readblocks(uint8_t *buf, unsigned nblks) {
+static inline ssize_t readblocks(int fd, uint8_t *buf, unsigned nblks) {
     uint8_t inp[BLOCK_SIZE];
     // Reading max 8 blocks to limit the overflow at min 5 LSB bits,
     // considering that ASCII text is almost all chars in 32-122 range.
@@ -372,8 +383,8 @@ static inline ssize_t readblocks(uint8_t *buf, unsigned nblks) {
     memset(buf, 0, BLOCK_SIZE);
     // Input size 16 * 512 = 8K as relevant initial dmesg log before init
     for(int i = 0; i < nblks; i++) {
-        size_t n = readbuf(STDIN_FILENO, inp, BLOCK_SIZE, 0);
-        if(n < 1) return EXIT_FAILURE;
+        size_t n = readbuf(fd, inp, BLOCK_SIZE, 0);
+        if(n < 1) exit(EXIT_FAILURE);
         maxn = MAX(maxn, n);
         for (size_t a = 0; a < n; a++)
             buf[a] += inp[a];
@@ -406,20 +417,21 @@ static inline void usage(const char *name) {
 "   -s: number of bits to left shift on ns timings\n"\
 "   -r: number of preliminary runs (default: 1)\n"\
 "   -k: randomness injection in kernel by ioctl\n"\
+"   -i: number of blocks to read from stdin\n"\
 "\nWith -pN is suggested -r32+ for stats pre-evaluation\n\n", name, name);
     exit(0);
 }
 
 int main(int argc, char *argv[]) {
     struct rand_pool_info_buf entrnd;
-    uint8_t *str = NULL, nbtls = 0, prsts = 0, quiet = 0;
+    uint8_t *str = NULL, nbtls = 0, prsts = 0, quiet = 0, nblks = 1;
     uint32_t ntsts = 1, nsdly = 0;
     unsigned nrdry = 1, pmdly = 0;
     int devfd = 0;
 
     // Collect arguments from optional command line parameters
     while (1) {
-        int opt = getopt(argc, argv, "hT:s:d:p:r:k:q");
+        int opt = getopt(argc, argv, "hT:s:d:p:r:k:i:q");
         if(opt == 'q') {
             quiet = 1;
         } else
@@ -440,6 +452,7 @@ int main(int argc, char *argv[]) {
             case 'd': nsdly = ABS(x); break;
             case 'r': nrdry = ABS(x); break;
             case 'p': pmdly = ABS(x); break;
+            case 'i': nblks = ABS(x); break;
             case 'k': devfd = open(optarg, O_WRONLY); break;
         }
     }
@@ -457,8 +470,10 @@ int main(int argc, char *argv[]) {
         return EXIT_FAILURE;
     }
 
-    size_t n = readbuf(STDIN_FILENO, str, BLOCK_SIZE, 0);
+    size_t n = (nblks < 2) ? readbuf(STDIN_FILENO, str, BLOCK_SIZE, 0) \
+                           : readblocks(STDIN_FILENO, str, nblks);
     if(n < 1) return EXIT_FAILURE;
+    if (nblks > 1) bin2s64(str, n);
     str[n] = 0;
 
     size_t size = 0;
@@ -524,10 +539,7 @@ int main(int argc, char *argv[]) {
         ntsts, nk, nt, (double)E6*nk/nt);
     perr("\nTimes: running: %.3lf s, hashing: %.3lf s, speed: %.1lf Kh/s\n",
         (double)rt/E9, (double)mt/E9, (double)E6*nt/rt);
-/*
-    perr("\nBit in common: %ld on %ld, compared to 50%% avg is %lf %%\n",
-        bic, nx << 6, (double)100 / 64 * bic / nx);
- */
+
     double ratio = (double)100 / 64 * bic / nx;
     perr("\nBits in common compared to 50 %% avg is %.4lf %% (%+.1lf ppm)\n",
         ratio, (ratio-50) * E6 / 100);
