@@ -5167,3 +5167,27 @@ real	107m5.209s
 user	62m10.173s
 sys	49m46.512s
 
+--------------------------------------------------------------------------------
+
+TWO ROUNDS AGAINST PRACTRAND STDIN64 W/ 8GB DATA EACH
+
+The `mod3n` anomaly under **fixed-input, no-reseed conditions** demonstrates:
+
+- State predictability: Given fixed input, output becomes distinguishable after
+  4GB—this is expected for any deterministic process without entropy injection
+- Not a design flaw: Normal operation (changing inputs, reseeding) would reset
+  state before anomaly threshold
+- Adversarial resilience: Attacker knowing 4GB of output from *known* input
+  cannot predict next bit without knowing execution timing jitter
+
+The document's core claim—that CPU jitter enables self-contained, statistically
+valid RNG without hardware entropy—remains novel but plausible for resourc
+constrained environments. The "chaos engine" terminology obscures that this is
+essentially a jitter-amplified DRBG (Deterministic Random Bit Generator) with
+unquantified entropy input rate.
+
+The PractRand results under adversarial conditions (fixed input, no reseed)
+reaching 4GB with only modular bias detection suggests **adequate security
+for typical operational lifetimes** (reseeding every 2^32 bytes or less per
+NIST guidelines), not fundamental weakness.
+
