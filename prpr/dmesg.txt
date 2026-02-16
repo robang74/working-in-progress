@@ -1,0 +1,120 @@
+[    0.000000] Linux version 5.13.2 (coold69@coold69) (gcc (Ubuntu 9.4.0-1ubuntu1~20.04.2) 9.4.0, GNU ld (GNU Binutils for Ubuntu) 2.34) #1 Wed Nov 1 10:52:43 IST 2023
+[    0.000000] Command line: HOST=x86_64 root=/dev/ram0 rdinit=/init console=ttyS0 net.ifnames=0
+[    0.000000] x86/fpu: Supporting XSAVE feature 0x001: 'x87 floating point registers'
+[    0.000000] x86/fpu: Supporting XSAVE feature 0x002: 'SSE registers'
+[    0.000000] x86/fpu: Supporting XSAVE feature 0x004: 'AVX registers'
+[    0.000000] x86/fpu: Supporting XSAVE feature 0x008: 'MPX bounds registers'
+[    0.000000] x86/fpu: Supporting XSAVE feature 0x010: 'MPX CSR'
+[    0.000000] x86/fpu: xstate_offset[2]:  576, xstate_sizes[2]:  256
+[    0.000000] x86/fpu: xstate_offset[3]:  832, xstate_sizes[3]:   64
+[    0.000000] x86/fpu: xstate_offset[4]:  896, xstate_sizes[4]:   64
+[    0.000000] x86/fpu: Enabled xstate features 0x1f, context size is 960 bytes, using 'compacted' format.
+[    0.000000] BIOS-provided physical RAM map:
+[    0.000000] BIOS-e820: [mem 0x0000000000000000-0x000000000009fbff] usable
+[    0.000000] BIOS-e820: [mem 0x000000000009fc00-0x000000000009ffff] reserved
+[    0.000000] BIOS-e820: [mem 0x00000000000f0000-0x00000000000fffff] reserved
+[    0.000000] BIOS-e820: [mem 0x0000000000100000-0x0000000007fdffff] usable
+[    0.000000] BIOS-e820: [mem 0x0000000007fe0000-0x0000000007ffffff] reserved
+[    0.000000] BIOS-e820: [mem 0x00000000feffc000-0x00000000feffffff] reserved
+[    0.000000] BIOS-e820: [mem 0x00000000fffc0000-0x00000000ffffffff] reserved
+[    0.000000] NX (Execute Disable) protection: active
+[    0.000000] SMBIOS 2.8 present.
+[    0.000000] DMI: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
+[    0.000000] e820: update [mem 0x00000000-0x00000fff] usable ==> reserved
+[    0.000000] e820: remove [mem 0x000a0000-0x000fffff] usable
+[    0.000000] last_pfn = 0x7fe0 max_arch_pfn = 0x400000000
+[    0.000000] x86/PAT: Configuration [0-7]: WB  WC  UC- UC  WB  WP  UC- WT  
+[    0.000000] found SMP MP-table at [mem 0x000f5ba0-0x000f5baf]
+[    0.000000] Using GB pages for direct mapping
+[    0.000000] RAMDISK: [mem 0x07f64000-0x07fdffff]
+[    0.000000] Zone ranges:
+[    0.000000] DMA      [mem 0x0000000000001000-0x0000000000ffffff]
+[    0.000000] DMA32    [mem 0x0000000001000000-0x0000000007fdffff]
+[    0.000000] Normal   empty
+[    0.000000] Movable zone start for each node
+[    0.000000] Early memory node ranges
+[    0.000000] node   0: [mem 0x0000000000001000-0x000000000009efff]
+[    0.000000] node   0: [mem 0x0000000000100000-0x0000000007fdffff]
+[    0.000000] Initmem setup node 0 [mem 0x0000000000001000-0x0000000007fdffff]
+[    0.000000] On node 0 totalpages: 32638
+[    0.000000] DMA zone: 64 pages used for memmap
+[    0.000000] DMA zone: 158 pages reserved
+[    0.000000] DMA zone: 3998 pages, LIFO batch:0
+[    0.000000] DMA32 zone: 448 pages used for memmap
+[    0.000000] DMA32 zone: 28640 pages, LIFO batch:7
+[    0.000000] On node 0, zone DMA: 1 pages in unavailable ranges
+[    0.000000] On node 0, zone DMA: 97 pages in unavailable ranges
+[    0.000000] On node 0, zone DMA32: 32 pages in unavailable ranges
+[    0.000000] Intel MultiProcessor Specification v1.4
+[    0.000000] MPTABLE: OEM ID: BOCHSCPU
+[    0.000000] MPTABLE: Product ID: 0.1         
+[    0.000000] MPTABLE: APIC at: 0xFEE00000
+[    0.000000] Processor #0 (Bootup-CPU)
+[    0.000000] IOAPIC[0]: apic_id 0, version 17, address 0xfec00000, GSI 0-23
+[    0.000000] Processors: 1
+[    0.000000] TSC deadline timer available
+[    0.000000] [mem 0x08000000-0xfeffbfff] available for PCI devices
+[    0.000000] clocksource: refined-jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 7645519600211568 ns
+[    0.000000] pcpu-alloc: s0 r0 d32768 u32768 alloc=1*32768
+[    0.000000] pcpu-alloc: [0] 0 
+[    0.000000] Built 1 zonelists, mobility grouping on.  Total pages: 31968
+[    0.000000] Kernel command line: HOST=x86_64 root=/dev/ram0 rdinit=/init console=ttyS0 net.ifnames=0
+[    0.000000] Dentry cache hash table entries: 16384 (order: 5, 131072 bytes, linear)
+[    0.000000] Inode-cache hash table entries: 8192 (order: 4, 65536 bytes, linear)
+[    0.000000] mem auto-init: stack:off, heap alloc:off, heap free:off
+[    0.000000] Memory: 116572K/130552K available (4098K kernel code, 771K rwdata, 476K rodata, 536K init, 708K bss, 13724K reserved, 0K cma-reserved)
+[    0.000000] SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=1, Nodes=1
+[    0.000000] NR_IRQS: 4352, nr_irqs: 48, preallocated irqs: 16
+[    0.000000] Console: colour VGA+ 80x25
+[    0.000000] printk: console [ttyS0] enabled
+[    0.004000] APIC: Switch to symmetric I/O mode setup
+[    0.004000] ..TIMER: vector=0x30 apic1=0 pin1=2 apic2=-1 pin2=-1
+[    0.036000] tsc: Using PIT calibration value
+[    0.040000] tsc: Detected 1895.169 MHz processor
+[    0.000001] clocksource: tsc-early: mask: 0xffffffffffffffff max_cycles: 0x36a2b0b7c68, max_idle_ns: 881590488928 ns
+[    0.001467] Calibrating delay loop (skipped), value calculated using timer frequency.. 3790.33 BogoMIPS (lpj=7580676)
+[    0.002917] pid_max: default: 32768 minimum: 301
+[    0.003466] Mount-cache hash table entries: 512 (order: 0, 4096 bytes, linear)
+[    0.004392] Mountpoint-cache hash table entries: 512 (order: 0, 4096 bytes, linear)
+[    0.005616] x86/cpu: User Mode Instruction Prevention (UMIP) activated
+[    0.006470] Last level iTLB entries: 4KB 0, 2MB 0, 4MB 0
+[    0.007108] Last level dTLB entries: 4KB 0, 2MB 0, 4MB 0, 1GB 0
+[    0.007842] CPU: Intel(R) Core(TM) i5-8365U CPU @ 1.60GHz (family: 0x6, model: 0x8e, stepping: 0xc)
+[    0.009469] Spectre V1 : Mitigation: usercopy/swapgs barriers and __user pointer sanitization
+[    0.010616] Spectre V2 : Mitigation: Enhanced IBRS
+[    0.011282] Spectre V2 : Spectre v2 / SpectreRSB mitigation: Filling RSB on context switch
+[    0.012395] Spectre V2 : mitigation: Enabling conditional Indirect Branch Prediction Barrier
+[    0.013471] Speculative Store Bypass: Mitigation: Speculative Store Bypass disabled via prctl
+[    0.015009] TAA: Mitigation: TSX disabled
+[    0.015612] SRBDS: Mitigation: TSX disabled
+[    0.016532] Performance Events: Skylake events, full-width counters, Intel PMU driver.
+[    0.017472] ... version:                2
+[    0.018056] ... bit width:              48
+[    0.018660] ... generic registers:      4
+[    0.019245] ... value mask:             0000ffffffffffff
+[    0.020114] ... max period:             00007fffffffffff
+[    0.021471] ... fixed-purpose events:   3
+[    0.022091] ... event mask:             000000070000000f
+[    0.023104] devtmpfs: initialized
+[    0.023599] clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 7645041785100000 ns
+[    0.025320] futex hash table entries: 256 (order: 0, 6144 bytes, linear)
+[    0.025467] clocksource: Switched to clocksource tsc-early
+[    0.025467] platform rtc_cmos: registered platform RTC device (no PNP device found)
+[    0.025467] Unpacking initramfs...
+[    0.029635] Freeing initrd memory: 496K
+[    0.030286] workingset: timestamp_bits=62 max_order=15 bucket_order=0
+[    0.031887] Serial: 8250/16550 driver, 4 ports, IRQ sharing disabled
+[    0.033116] serial8250: ttyS0 at I/O 0x3f8 (irq = 4, base_baud = 115200) is a 16550A
+[    0.034737] random: get_random_bytes called from init_oops_id+0x2f/0x40 with crng_init=0
+[    0.034745] sched_clock: Marking stable (77087789, -42532722)->(39834980, -5279913)
+[    0.037906] Freeing unused kernel image (initmem) memory: 536K
+[    0.038883] Write protecting the kernel read-only data: 8192k
+[    0.040026] Freeing unused kernel image (text/rodata gap) memory: 2044K
+[    0.041297] Freeing unused kernel image (rodata/data gap) memory: 1572K
+[    0.042454] Run /init as init process
+[    0.042972] with arguments:
+[    0.042973] /init
+[    0.042974] with environment:
+[    0.042974] HOME=/
+[    0.042975] TERM=linux
+[    0.042976] HOST=x86_64
