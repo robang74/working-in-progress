@@ -52,8 +52,11 @@ jobs:
       uses: softprops/action-gh-release@v2
       with:
         files: |
-          prpr/uchaos.c
-          uchaos.test.txt
+          sysinfo.sh
+          uchaos.txt
+          uchaos.sh
+          uchaos.c
+          test.txt
         body: |
           ## uchaos PRNG Release ${{ github.ref_name }}
           
