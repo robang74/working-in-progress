@@ -167,7 +167,7 @@ uint64_t djb2tum(const uint8_t *str, uint8_t maxn, uint64_t seed,
             double mean = (double)avg / ncl;
             perr("\nTime deltas avg: %zu <%.1lf> %.0lf ns over %.0lfK (+%zu) values\n",
                 dmn, mean, dmx, (double)ncl/E3, nexp);
-            perr("\nRatios over avg: %.2lf <1U> %.2lf, over min: 1U <%.2lf> %.2lf\n",
+            perr("Ratios over avg: %.2lf <1U> %.2lf, over min: 1U <%.2lf> %.2lf\n",
                 (double)dmn/mean, (double)dmx/mean, mean/dmn, (double)dmx/dmn);
         }
         if(pmdly && !seed && !maxn && !nsdly && !nbtls)
@@ -481,8 +481,9 @@ int main(int argc, char *argv[]) {
     for(unsigned a = 0; a < nrdry; a++)
         h = str2ht64(str, &h, &size, nsdly, pmdly, nbtls);
 
-    uint64_t bic = 0, mt = 0;
-    size_t nk = 0, nt = 0, nx = 0;
+    double avgbc = 0, avgmx = 0, avgmn = 256;
+    uint64_t bic = 0, max = 0, min = 256, avg = 0, mt = 0;
+    size_t nk = 0, nt = 0, nx = 0, nn = 0;
 
     if(prsts) perr("\nRepetitions: ");
     for (uint32_t a = ntsts; a; a--) {
@@ -508,11 +509,14 @@ int main(int argc, char *argv[]) {
 
         // single run
         if(ntsts < 2) return 0;
+        // skip stats
+        if(!prsts) continue;
 
         // testing
         // expected zero collisions and the nested-for can be verified by:
         // xxd -p -c 8 data.test | sort | uniq -c | awk '$1 >1' | wc -l
 
+        avg = 0, nn = 0;
         for (size_t n = 0; n < size; n++) {
             for (size_t i = n + 1; i < size; i++) {
                 if (h[i] == h[n]) {
@@ -520,32 +524,55 @@ int main(int argc, char *argv[]) {
                     nk++; continue;
                 }
                 uint64_t cb = h[i] ^ h[n];
+                int ham = 0;
                 for (int a = 0; a < 64; a++)
-                    bic += (cb >> a) & 0x01;
+                    ham += (cb >> a) & 0x01;
+                bic += ham;
+                avg += ham;
+                if(max < ham) max = ham;
+                if(min > ham) min = ham;
                 nx++;
+                nn++;
             }
         }
+        double curavg = (double)avg / nn;
+        if(avgmx < curavg) avgmx = curavg;
+        if(avgmn > curavg) avgmn = curavg;
+        avgbc += curavg;
         nt += size;
+
 #if 0                      // Just for test
         free(h); h = NULL; // passing to str2ht64 a valid (h, size) should reused it
 #endif
     }
 
     if(!prsts) return 0;
-    perr("%s\n", nk ? ", status KO" : "none found, status OK");
 
     uint64_t rt = get_nanos();
-    perr("\nTests: %d, collisions: %zu over %zu hashes (%.2lf ppm)\n",
-        ntsts, nk, nt, (double)E6*nk/nt);
-    perr("\nTimes: running: %.3lf s, hashing: %.3lf s, speed: %.1lf Kh/s\n",
-        (double)rt/E9, (double)mt/E9, (double)E6*nt/rt);
+    perr("%s\n", nk ? ", status KO" : "none found, status OK");
+    perr("\n");
+    perr("Tests: %d w/ collisions %zu over %.1lf K hashes (%.2lf ppm)\n",
+        ntsts, nk, (double)nt/E3, (double)E6*nk/nt);
 
-    double ratio = (double)100 / 64 * bic / nx;
-    perr("\nBits in common compared to 50 %% avg is %.4lf %% (%+.1lf ppm)\n",
-        ratio, (ratio-50) * E6 / 100);
+    avgbc /= ntsts;
+    double bic_nx_absl = (double)bic / nx;
+    double bic_nx = (double)100 / 64 * bic_nx_absl;
+    #define devppm(v,a) ( (v-a) * E6 / a )
+
+    perr("Hamming weight, avg is %.4lf %% expected 50 %% (%+.1lf ppm)\n",
+        bic_nx, devppm(bic_nx, 50));
+    perr("Hamming distance: %ld < %.5lf > %ld over %.4lg K XORs\n",
+        min, bic_nx_absl, max, (double)nx/E3);
+    perr("Hamming dist/avg: %.5lf < 1U:32 %+.1lf ppm > %.5lf\n",
+        avgmn/bic_nx_absl, devppm(bic_nx_absl, 32), avgmx/bic_nx_absl);
+
+    perr("\n");
+    perr("Times: running: %.3lf s, hashing: %.3lf s, speed: %.1lf Kh/s",
+        (double)rt/E9, (double)mt/E9, (double)E6*nt/rt);
     unsigned pmns = (unsigned)djb2tum(0, 0, 0, 0, pmdly, 0);
-    perr("\nParameter settings: s(%d), d(%dns), p(%d:%dns), r(%d), RTSC(%d)\n",
+    perr("Parameter settings: s(%d), d(%dns), p(%d:%dns), r(%d), RTSC(%d)\n",
         nbtls, nsdly, pmdly, pmns, nrdry, !USE_GET_TIME);
+
     perr("\n");
 
     return 0; // exit() do free()
