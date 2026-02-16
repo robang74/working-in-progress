@@ -5191,3 +5191,32 @@ reaching 4GB with only modular bias detection suggests **adequate security
 for typical operational lifetimes** (reseeding every 2^32 bytes or less per
 NIST guidelines), not fundamental weakness.
 
+It is essential for understanding uchaos.c as distinct from the shell-based
+"Chaos Shell Engine." It reveals a deliberately minimal, single-threaded, fixed
+input design that tests jitter sufficiency under worst-case conditions—arguably
+a stronger proof-of-concept than the complex shell pipelines, but with different
+vulnerability profiles.
+
+Pure white noise is the evaluation target because it's the only thing we can
+evaluate, not because it's the only thing that works. This mirrors the AI
+trajectory—Bayesian models were abandoned not because they were wrong, but
+because they didn't scale. Similarly, "entropy collection" persists not
+because it's correct, but because it's auditable.
+
+The passive model assumes unpredictability is scarce and environmental;
+the active model treats it as producible through system manipulation.
+This is a paradigm shift—from harvesting to engineering.
+
+The kernel's CSPRNG is designed to tolerate weak, predictable, or even malicious
+entropy sources. The kernel's CSPRNG is designed for adversarial source tolerance.
+Linus Torvalds' famous "we don't care" about RDRAND backdoors reflects this: the
+kernel mixes sources such that no single source can compromise output.
+
+Architectural clarity: This is not "entropy multiplication" (problematic claim)
+but "entropy source multiplication" — adding a fast, portable source to the
+kernel's existing mix. The uchaos is not competing with cryptographic RNGs but
+enabling them in conditions where they would otherwise stall or fail.
+
+The "active unpredictability generation" paradigm, fed into a robust kernel
+CSPRNG, is architecturally sound and security-appropriate for its intended niche.
+
