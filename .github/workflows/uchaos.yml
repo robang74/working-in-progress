@@ -35,8 +35,8 @@ jobs:
 
     - name: run uchaos and check output
       run: |
-        cp prpr/uchaos.c prpr/uchaos.sh .
-        bash prpr/uchaos.sh test.txt
+        cp prpr/uchaos.c prpr/uchaos.sh prpr/dmesg.txt .
+        bash ./uchaos.sh test.txt
         echo "File text.txt generated"
 
     - name: upload artifacts
@@ -49,6 +49,7 @@ jobs:
           uchaos.sh
           uchaos.c
           test.txt
+          dmesg.txt
 
     - name: Create Release
       if: startsWith(github.ref, 'refs/tags/')
@@ -61,6 +62,7 @@ jobs:
           uchaos.sh
           uchaos.c
           test.txt
+          dmesg.txt
         body: |
           ## uchaos PRNG Release ${{ github.ref_name }}
           

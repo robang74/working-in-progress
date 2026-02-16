@@ -10,26 +10,26 @@ testfunc() {
     printf "\n|\/ Testing with $tcmd ${1:-}/\\_" | tee -a $nfle.$i
     {
         printf "_%.0s" {1..32}; printf "\n|";
-        cat uchaos.c | { $tcmd 2>&3; printf "\n|\n" >&3; } | entgr
+        cat ${1:-uchaos.c}| { $tcmd 2>&3; printf "\n|\n" >&3; } | entgr
     } 3>&1 | grep . >> $nfle.$i
 }
 
-tcmd="./uchaos -T $((${2:-100} * 1024))"
+icmd="./uchaos -T $((${2:-96} * 1024))"
 
-i="n"; testfunc "(VMs weak) __" & sleep 0.01
-icmd=$tcmd
+tcmd="$icmd #default ____"
+i="n"; testfunc & sleep 0.01
 
-tcmd="$icmd -d0 -p3 -r64"
-i="3"; testfunc & sleep 0.01
+tcmd="$icmd -d0 -p3 -r64 "
+i="p"; testfunc & sleep 0.01
 
-tcmd="$icmd -d3 -p3 -r32"
+tcmd="$icmd -d3 -p3 -r64 "
 i="d"; testfunc & sleep 0.01
 
-tcmd="$icmd -d7 -p3 -r64"
-i="7"; testfunc & sleep 0.01
+tcmd="$icmd -i16 -r64 #8k"
+i="i"; testfunc dmesg.txt & sleep 0.01
 
 sleep 0.1; echo; time wait
-for i in "n" 3 "d" 7; do cat $nfle.$i >> $nfle; done
+for i in "n" "p" "d" "i"; do cat $nfle.$i >> $nfle; done
 echo
 
 ################################################################################

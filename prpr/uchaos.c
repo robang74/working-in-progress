@@ -490,8 +490,8 @@ int main(int argc, char *argv[]) {
     size_t n = (nblks < 2) ? readbuf(STDIN_FILENO, str, BLOCK_SIZE, 0) \
                            : readblocks(STDIN_FILENO, str, nblks);
     if(n < 1) return EXIT_FAILURE;
-    if (nblks > 1) bin2s64(str, n);
-    str[n] = 0;
+    if (nblks > 1) bin2str(str, n);   // necessary because djb2tum() born for text,
+    str[n] = 0;                       // refactoring it for binary input, is the way.
 
     size_t size = 0;
     uint64_t *h = NULL;
@@ -564,7 +564,8 @@ int main(int argc, char *argv[]) {
         free(h); h = NULL; // passing to str2ht64 a valid (h, size) should reused it
 #endif
         sched_yield();   // Statistics are a block of CPU data-crunching but also
-                         // a predictable delay which sched_yield() can jeopardise
+                         // a predictable delay which sched_yield() can jeopardise.
+                         // Stats makes the large size output slower 1.7x than -q.
     }
 
     if(!prsts) return 0;
