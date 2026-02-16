@@ -6,6 +6,7 @@
  * Compile with: gcc uchaos.c -O3 --fast-math -Wall -o uchaos [-D_USE_GET_RTSC]
  *
  * *****************************************************************************
+ *
  * PRESENTATION
  *
  * despite a relatively simple coding, this uchaos binary is able to provide
@@ -38,8 +39,8 @@
  * security in specific constructions. The kernel's mixing tolerates
  * this, though uchaos itself is not independently NIST-certified.
  *
- *
  * *****************************************************************************
+ *
  * OUTPUT TESTS
  *
  * The first run of commit (#9c8f4f00) passed all the dieharder tests with 49MB.
@@ -97,6 +98,12 @@
  * moreover, when the CPU id changes the two clocks aren't
  * necessarily synchronised anymore but also the CPU switch
  * is a matter of stochastics, and it is fine but not monotonic.
+ *
+ * WARNING
+ *
+ * When using uchaos.c to seed /dev/random at boot time, keep in consideration
+ * that TSC will be ready after one second while the system could have entered
+ * in /init esecution at 0.1s which suggest that TSC isn't suitable, anyway.
  */
 #include <x86intrin.h>
 static inline uint64_t get_rdtsc_clock(uint32_t *pcpuid) {
@@ -355,6 +362,26 @@ static inline ssize_t readbuf(int fd, uint8_t *buffer, size_t size, bool intr) {
     return tot;
 }
 
+static inline ssize_t readblocks(uint8_t *buf, unsigned nblks) {
+    uint8_t inp[BLOCK_SIZE];
+    // Reading max 8 blocks to limit the overflow at min 5 LSB bits,
+    // considering that ASCII text is almost all chars in 32-122 range.
+    // Anyway, pre-processing the input may help but it shouldn't matter
+    // when the final aim is to feed uchaos for providing randomness.
+    size_t maxn = 0;
+    memset(buf, 0, BLOCK_SIZE);
+    // Input size 16 * 512 = 8K as relevant initial dmesg log before init
+    for(int i = 0; i < nblks; i++) {
+        size_t n = readbuf(STDIN_FILENO, inp, BLOCK_SIZE, 0);
+        if(n < 1) return EXIT_FAILURE;
+        maxn = MAX(maxn, n);
+        for (size_t a = 0; a < n; a++)
+            buf[a] += inp[a];
+    }
+    buf[maxn] = 0;
+    return maxn;
+}
+
 // Funzione per ottenere il tempo in nanosecondi
 uint64_t get_nanos() {
     static uint64_t start = 0;
@@ -425,12 +452,12 @@ int main(int argc, char *argv[]) {
     // Counting time of running starts here, after parameters
     (void) get_nanos();
 
-    if (posix_memalign((void **)&str, 64, BLOCK_SIZE)) {
+    if (posix_memalign((void **)&str, 64, BLOCK_SIZE + 8)) {
         perror("posix_memalign");
         return EXIT_FAILURE;
     }
 
-    size_t n = readbuf(STDIN_FILENO, str, BLOCK_SIZE - 1, 1);
+    size_t n = readbuf(STDIN_FILENO, str, BLOCK_SIZE, 0);
     if(n < 1) return EXIT_FAILURE;
     str[n] = 0;
 
