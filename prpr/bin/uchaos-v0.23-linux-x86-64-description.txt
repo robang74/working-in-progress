@@ -1,0 +1,25 @@
+reference: prpr/uchaos.c, v0.23
+--------------------------------------------------------------------------------
+
+uchaos: ELF 64-bit LSB pie executable, x86-64, version 1 (SYSV),
+BuildID[sha1]=ba6fd1013bc073824d5034dc7a8a56af6630d0d8,
+for GNU/Linux 3.2.0, stripped, dynamically linked,
+interpreter:
+    /lib64/ld-linux-x86-64.so.2 (0x000073e11c124000)
+        libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x000073e11be00000)
+        linux-vdso.so.1 (0x00007fff6e89e000)
+sha1sum:
+     22896  64e85b4bccb1f9318595dd7c6af10e30bd7a6036  uchaos.original
+     18584  2043139f5b612b93208c59c2a5c21facb3fd3c9c  uchaos.stripped
+      7187  68936f419695b199158b01d0673ccad99c82bd05  uchaos.stripped.gz9
+
+--------------------------------------------------------------------------------
+
+uchaos: ELF 64-bit LSB executable, x86-64, version 1 (GNU/Linux),
+BuildID[sha1]=2f6ca5a15dd6860c75aa196eb967eefc61a484b7,
+for GNU/Linux 3.2.0, stripped, statically linked:
+    not a dynamic executable
+sha1sum:
+    919904  285cd0f6fe1476df96ae730513574c1545c4f061  uchaos.static.original
+    836080	724b3b0666eae23d5a7b2cac601818088e3bd31c  uchaos.static.stripped
+    348860	9eae2525365b95b5ae581ee1e4c2c00a097824b3  uchaos.static.stripped.gz9
