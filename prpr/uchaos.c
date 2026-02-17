@@ -377,7 +377,7 @@ static inline ssize_t readbuf(int fd, uint8_t *buffer, size_t size, bool intr) {
 }
 
 static inline ssize_t readblocks(int fd, uint8_t *buf, unsigned nblks) {
-    uint8_t inp[BLOCK_SIZE];
+    uint8_t inp[BLOCK_SIZE], fst[BLOCK_SIZE];
     // Reading max 8 blocks to limit the overflow at min 5 LSB bits,
     // considering that ASCII text is almost all chars in 32-122 range.
     // Anyway, pre-processing the input may help but it shouldn't matter
@@ -388,13 +388,27 @@ static inline ssize_t readblocks(int fd, uint8_t *buf, unsigned nblks) {
     for(int i = 0; i < nblks; i++) {
         size_t n = readbuf(fd, inp, BLOCK_SIZE, 0);
         if(n < 1) exit(EXIT_FAILURE);
+
+        if(i) {
+            if(n < BLOCK_SIZE) {
+                memcpy(&imp[n], fst, BLOCK_SIZE-n);
+                n = BLOCK_SIZE;
+            }
+        } else {
+            if(n == BLOCK_SIZE)
+                memcpy(fst, imp, BLOCK_SIZE);
+        }
         maxn = MAX(maxn, n);
-        for (size_t a = 0; a < n; a++)
-            buf[a] ^= (inp[a] << 4) | (inp[a] >> 4);
+
+        for (size_t a = 0; a < n; a++) {
+            buf[a] ^= inp[a];
+            buf[a] ^= (buf[a] << 3) | (buf[a] >> 5)
+//          buf[a] ^= (inp[a] << (8-(a&7))) | (inp[a] >> (a&7));
+//          buf[a] ^= (a & 0x01) ? imp[a] : (inp[a] << 4) | (inp[a] >> 4);
 //          buf[a] ^= inp[a]; // very simple alternative, to consider
 //          buf[a] += inp[a]; // it creates a subtle mod5x3 at 2GB -> fails at 4GB
+        }   
     }
-    buf[maxn] = 0;
     return maxn;
 }
 
