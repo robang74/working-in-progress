@@ -342,8 +342,8 @@ uint64_t *str2ht64(uint8_t *str, uint64_t **ph,  size_t *size,
 
 /** I/O ***********************************************************************/
 
-static inline ssize_t writebuf(int fd, const uint8_t *buffer, size_t ntwr) {
-    ssize_t tot = 0;
+static inline size_t writebuf(int fd, const uint8_t *buffer, size_t ntwr) {
+    size_t tot = 0;
     while (ntwr > tot) {
         errno = 0;
         ssize_t nw = write(fd, buffer + tot, ntwr - tot);
@@ -357,8 +357,8 @@ static inline ssize_t writebuf(int fd, const uint8_t *buffer, size_t ntwr) {
    return tot;
 }
 
-static inline ssize_t readbuf(int fd, uint8_t *buffer, size_t size, bool intr) {
-    ssize_t tot = 0;
+static inline size_t readbuf(int fd, uint8_t *buffer, size_t size, bool intr) {
+    size_t tot = 0;
     while (size > tot) {
         errno = 0;
         ssize_t nr = read(fd, buffer + tot, size - tot);
@@ -376,7 +376,7 @@ static inline ssize_t readbuf(int fd, uint8_t *buffer, size_t size, bool intr) {
     return tot;
 }
 
-static inline ssize_t readblocks(int fd, uint8_t *buf, unsigned nblks) {
+static inline size_t readblocks(int fd, uint8_t *buf, unsigned nblks) {
     uint8_t inp[BLOCK_SIZE], fst[BLOCK_SIZE];
     // Reading max 8 blocks to limit the overflow at min 5 LSB bits,
     // considering that ASCII text is almost all chars in 32-122 range.
@@ -387,24 +387,23 @@ static inline ssize_t readblocks(int fd, uint8_t *buf, unsigned nblks) {
     // Input size 16 * 512 = 8K as relevant initial dmesg log before init
     for(int i = 0; i < nblks; i++) {
         size_t n = readbuf(fd, inp, BLOCK_SIZE, 0);
-        if(n < 1) exit(EXIT_FAILURE);
 
         if(i) {
             if(n < BLOCK_SIZE) {
-                memcpy(&imp[n], fst, BLOCK_SIZE-n);
+                memcpy(&inp[n], fst, BLOCK_SIZE-n);
                 n = BLOCK_SIZE;
             }
         } else {
             if(n == BLOCK_SIZE)
-                memcpy(fst, imp, BLOCK_SIZE);
+                memcpy(fst, inp, BLOCK_SIZE);
         }
         maxn = MAX(maxn, n);
 
         for (size_t a = 0; a < n; a++) {
             buf[a] ^= inp[a];
-            buf[a] ^= (buf[a] << 3) | (buf[a] >> 5)
+            buf[a] ^= (buf[a] << 3) | (buf[a] >> 5);
 //          buf[a] ^= (inp[a] << (8-(a&7))) | (inp[a] >> (a&7));
-//          buf[a] ^= (a & 0x01) ? imp[a] : (inp[a] << 4) | (inp[a] >> 4);
+//          buf[a] ^= (a & 0x01) ? inp[a] : (inp[a] << 4) | (inp[a] >> 4);
 //          buf[a] ^= inp[a]; // very simple alternative, to consider
 //          buf[a] += inp[a]; // it creates a subtle mod5x3 at 2GB -> fails at 4GB
         }   
