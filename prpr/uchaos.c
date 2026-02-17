@@ -95,18 +95,15 @@
 
 #define ALPH64 "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz0123456789@\n"
 
-static inline uint8_t *bin2s64(uint8_t *buf, size_t nmax) {
+static inline uint8_t *bin2s64(uint8_t *buf, uint32_t nmax) {
     static const uint8_t c[] = ALPH64;
-    for(register size_t i = 0; i < nmax; i++)
+    for(register uint32_t i = 0; i < nmax; i++)
         buf[i] = c[ 0x3F & buf[i] ];
     return buf;
 }
 
 #ifdef _USE_GET_RTSC
 #define USE_GET_TIME 0
-#else
-#define USE_GET_TIME 1
-#endif
 /*
  * Available only on x86 architecture, thus not portable
  * moreover, when the CPU id changes the two clocks aren't
@@ -123,6 +120,9 @@ static inline uint8_t *bin2s64(uint8_t *buf, size_t nmax) {
 static inline uint64_t get_rdtsc_clock(uint32_t *pcpuid) {
     _mm_lfence(); return __rdtscp(pcpuid);
 }
+#else
+#define USE_GET_TIME 1
+#endif
 
 #define USE_PRIMES_2564 1
 #if     USE_PRIMES_2564
@@ -154,7 +154,10 @@ struct rand_pool_info_buf {
 /* *** HASHING  ************************************************************* */
 
 static inline uint64_t getnstime(uint32_t *pcpuid) {
+#if USE_GET_TIME
+#else
     if(pcpuid) return get_rdtsc_clock(pcpuid);
+#endif
     struct timespec ts;                         // using sched_yield() to creates chaos,
     clock_gettime(CLOCK_MONOTONIC, &ts);        // getting ns in a hot loop is the limit
     return ts.tv_nsec;                          // and we want to see this limit, in VMs
@@ -162,17 +165,17 @@ static inline uint64_t getnstime(uint32_t *pcpuid) {
 
 #include <sched.h>
 uint64_t djb2tum(const uint8_t *str, uint8_t maxn, uint64_t seed,
-    const uint32_t nsdly, const unsigned pmdly, const uint8_t nbtls)
+    const uint32_t nsdly, const uint32_t pmdly, const uint8_t nbtls)
 {
     #define pmdly2ns ( ( ( (uint64_t)dmn * pmdly ) + 127 ) >> 8 )
     static double dmx = 0;
-    static size_t ncl = 0, dmn = -1, nexp = 0;
+    static uint64_t ncl = 0, dmn = -1, nexp = 0;
     static uint64_t avg = 0;
 
     if(!str) {
         if(ncl) {
             double mean = (double)avg / ncl;
-            perr("\nTime deltas avg: %zu <%.1lf> %.0lf ns over %.0lfK (+%zu) values\n",
+            perr("\nTime deltas avg: %lld <%.1lf> %.0lf ns over %.0lfK (+%lld) values\n",
                 dmn, mean, dmx, (double)ncl/E3, nexp);
             perr("Ratios over avg: %.2lf <1U> %.2lf, over min: 1U <%.2lf> %.2lf\n",
                 (double)dmn/mean, (double)dmx/mean, mean/dmn, (double)dmx/dmn);
@@ -278,22 +281,22 @@ reschedule:
     return h ^ (0xFF & (h >> 32));
 }
 
-uint64_t *str2ht64(uint8_t *str, uint64_t **ph,  size_t *size,
-    const uint32_t nsdly, const unsigned pmdly, const uint8_t nbtls)
+uint64_t *str2ht64(uint8_t *str, uint64_t **ph,  uint32_t *size,
+    const uint32_t nsdly, const uint32_t pmdly, const uint8_t nbtls)
 {
     if (!str || !size) return NULL;
 
-    size_t n = strlen((char *)str);
+    uint32_t n = strlen((char *)str);
     if (n == 0) return NULL;
 
     // 1. Determine rotation offset using monotonic time
-    size_t k = getnstime(NULL) % n;
+    uint32_t k = getnstime(NULL) % n;
 
     // 2. Calculate padding and allocation
     // We need enough 64-bit blocks to cover n bytes.
     uint64_t *h = NULL;
-    size_t num_blocks = (n + 7) >> 3;
-    size_t total_bytes = num_blocks << 3;
+    uint32_t num_blocks = (n + 7) >> 3;
+    uint32_t total_bytes = num_blocks << 3;
     if(ph) {
         if(*size > 0 && num_blocks != *size) {
             perror("*size != expected");
@@ -317,7 +320,7 @@ uint64_t *str2ht64(uint8_t *str, uint64_t **ph,  size_t *size,
         memcpy(rotated_str + (n - k), str, k);
     }
     // Padding with zeros
-    for(size_t i = n; i < total_bytes; i++)
+    for(uint32_t i = n; i < total_bytes; i++)
         rotated_str[i] = 0;
 
     // 4. Generate the uint64_t array
@@ -330,7 +333,7 @@ uint64_t *str2ht64(uint8_t *str, uint64_t **ph,  size_t *size,
             return NULL;
         }
     }
-    for (size_t i = 0; i < num_blocks; i++) {
+    for (uint32_t i = 0; i < num_blocks; i++) {
         // Process each 8-byte chunk of the rotated/padded string
         h[i] = djb2tum(rotated_str + (i << 3), 8, 0, nsdly, pmdly, nbtls);
     }
@@ -342,11 +345,11 @@ uint64_t *str2ht64(uint8_t *str, uint64_t **ph,  size_t *size,
 
 /** I/O ***********************************************************************/
 
-static inline size_t writebuf(int fd, const uint8_t *buffer, size_t ntwr) {
-    size_t tot = 0;
+static inline uint32_t writebuf(int fd, const uint8_t *buffer, uint32_t ntwr) {
+    uint32_t tot = 0;
     while (ntwr > tot) {
         errno = 0;
-        ssize_t nw = write(fd, buffer + tot, ntwr - tot);
+        int nw = write(fd, buffer + tot, ntwr - tot);
         if (nw < 1) {
             if (errno == EINTR) continue;
             perror("write");
@@ -357,11 +360,11 @@ static inline size_t writebuf(int fd, const uint8_t *buffer, size_t ntwr) {
    return tot;
 }
 
-static inline size_t readbuf(int fd, uint8_t *buffer, size_t size, bool intr) {
-    size_t tot = 0;
+static inline uint32_t readbuf(int fd, uint8_t *buffer, uint32_t size, bool intr) {
+    uint32_t tot = 0;
     while (size > tot) {
         errno = 0;
-        ssize_t nr = read(fd, buffer + tot, size - tot);
+        int nr = read(fd, buffer + tot, size - tot);
         if (nr == 0) break;
         if (nr < 0) {
             if (errno == EINTR) {
@@ -376,17 +379,17 @@ static inline size_t readbuf(int fd, uint8_t *buffer, size_t size, bool intr) {
     return tot;
 }
 
-static inline size_t readblocks(int fd, uint8_t *buf, unsigned nblks) {
+static inline uint32_t readblocks(int fd, uint8_t *buf, uint32_t nblks) {
     uint8_t inp[BLOCK_SIZE], fst[BLOCK_SIZE];
     // Reading max 8 blocks to limit the overflow at min 5 LSB bits,
     // considering that ASCII text is almost all chars in 32-122 range.
     // Anyway, pre-processing the input may help but it shouldn't matter
     // when the final aim is to feed uchaos for providing randomness.
-    size_t maxn = 0;
+    uint32_t maxn = 0;
     memset(buf, 0, BLOCK_SIZE);
     // Input size 16 * 512 = 8K as relevant initial dmesg log before init
     for(int i = 0; i < nblks; i++) {
-        size_t n = readbuf(fd, inp, BLOCK_SIZE, 0);
+        uint32_t n = readbuf(fd, inp, BLOCK_SIZE, 0);
 
         if(i) {
             if(n < BLOCK_SIZE) {
@@ -399,7 +402,7 @@ static inline size_t readblocks(int fd, uint8_t *buf, unsigned nblks) {
         }
         maxn = MAX(maxn, n);
 
-        for (size_t a = 0; a < n; a++) {
+        for (uint32_t a = 0; a < n; a++) {
             buf[a] ^= inp[a];
             buf[a] ^= (buf[a] << 3) | (buf[a] >> 5);
 //          buf[a] ^= (inp[a] << (8-(a&7))) | (inp[a] >> (a&7));
@@ -411,8 +414,8 @@ static inline size_t readblocks(int fd, uint8_t *buf, unsigned nblks) {
     return maxn;
 }
 
-static inline uint8_t *bin2str(uint8_t *buf, size_t nmax) {
-    for(register size_t i = 0; i < nmax; i++) {
+static inline uint8_t *bin2str(uint8_t *buf, uint32_t nmax) {
+    for(register uint32_t i = 0; i < nmax; i++) {
         if(!buf[i]) {
             buf[i--] = 0xFF & getnstime(NULL);
             sched_yield();
@@ -456,7 +459,7 @@ int main(int argc, char *argv[]) {
     struct rand_pool_info_buf entrnd;
     uint8_t *str = NULL, nbtls = 0, prsts = 0, quiet = 0, nblks = 1;
     uint32_t ntsts = 1, nsdly = 0;
-    unsigned nrdry = 1, pmdly = 0;
+    uint32_t nrdry = 1, pmdly = 0;
     int devfd = 0;
 
     // Collect arguments from optional command line parameters
@@ -500,20 +503,20 @@ int main(int argc, char *argv[]) {
         return EXIT_FAILURE;
     }
 
-    size_t n = (nblks < 2) ? readbuf(STDIN_FILENO, str, BLOCK_SIZE, 0) \
+    uint32_t n = (nblks < 2) ? readbuf(STDIN_FILENO, str, BLOCK_SIZE, 0) \
                            : readblocks(STDIN_FILENO, str, nblks);
     if(n < 1) return EXIT_FAILURE;
     if (nblks > 1) bin2str(str, n);   // necessary because djb2tum() born for text,
     str[n] = 0;                       // refactoring it for binary input, is the way.
 
-    size_t size = 0;
+    uint32_t size = 0;
     uint64_t *h = NULL;
-    for(unsigned a = 0; a < nrdry; a++)
+    for(uint32_t a = 0; a < nrdry; a++)
         h = str2ht64(str, &h, &size, nsdly, pmdly, nbtls);
 
     double avgbc = 0, avgmx = 0, avgmn = 256;
     uint64_t bic = 0, max = 0, min = 256, avg = 0, mt = 0;
-    size_t nk = 0, nt = 0, nx = 0, nn = 0;
+    uint64_t nk = 0, nt = 0, nx = 0, nn = 0;
 
     if(prsts) perr("\nRepetitions: ");
     for (uint32_t a = ntsts; a; a--) {
@@ -525,7 +528,7 @@ int main(int argc, char *argv[]) {
         // output
         if(!h) return EXIT_FAILURE;
 
-        size_t sz = size << 3;
+        uint32_t sz = size << 3;
         if(devfd) {
             entrnd.buf_size = sz;
             // cautelatively 7 bits per byte
@@ -549,10 +552,10 @@ int main(int argc, char *argv[]) {
         // xxd -p -c 8 data.test | sort | uniq -c | awk '$1 >1' | wc -l
 
         avg = 0, nn = 0;
-        for (size_t n = 0; n < size; n++) {
-            for (size_t i = n + 1; i < size; i++) {
+        for (uint32_t n = 0; n < size; n++) {
+            for (uint32_t i = n + 1; i < size; i++) {
                 if (h[i] == h[n]) {
-                    if(prsts) perr("%zu:%zu ", n, i);
+                    if(prsts) perr("%d:%d ", n, i);
                     nk++; continue;
                 }
                 uint64_t cb = h[i] ^ h[n];
@@ -586,7 +589,7 @@ int main(int argc, char *argv[]) {
     uint64_t rt = get_nanos();
     perr("%s\n", nk ? ", status KO" : "none found, status OK");
     perr("\n");
-    perr("Tests: %d w/ collisions %zu over %.1lf K hashes (%.2lf ppm)\n",
+    perr("Tests: %d w/ collisions %lld over %.1lf K hashes (%.2lf ppm)\n",
         ntsts, nk, (double)nt/E3, (double)E6*nk/nt);
 
     avgbc /= ntsts;
@@ -596,7 +599,7 @@ int main(int argc, char *argv[]) {
 
     perr("Hamming weight, avg is %.4lf %% expected 50 %% (%+.1lf ppm)\n",
         bic_nx, devppm(bic_nx, 50));
-    perr("Hamming distance: %ld < %.5lf > %ld over %.4lg K XORs\n",
+    perr("Hamming distance: %lld < %.5lf > %lld over %.4lg K XORs\n",
         min, bic_nx_absl, max, (double)nx/E3);
     perr("Hamming dist/avg: %.5lf < 1U:32 %+.1lf ppm > %.5lf\n",
         avgmn/bic_nx_absl, devppm(bic_nx_absl, 32), avgmx/bic_nx_absl);
@@ -604,7 +607,7 @@ int main(int argc, char *argv[]) {
     perr("\n");
     perr("Times: running: %.3lf s, hashing: %.3lf s, speed: %.1lf Kh/s",
         (double)rt/E9, (double)mt/E9, (double)E6*nt/rt);
-    unsigned pmns = (unsigned)djb2tum(0, 0, 0, 0, pmdly, 0);
+    uint32_t pmns = (uint32_t)djb2tum(0, 0, 0, 0, pmdly, 0);
     perr("Parameter settings: s(%d), d(%dns), p(%d:%dns), r(%d), RTSC(%d)\n",
         nbtls, nsdly, pmdly, pmns, nrdry, !USE_GET_TIME);
 
