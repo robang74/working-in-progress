@@ -1,5 +1,5 @@
 #!/bin/sh
-# (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, MOT license
+# (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, MIT license
 
 entgr() { ent "$@" | grep -E "error|samples|127.5 |Entropy|exceed|uncorrelated"; }
 
