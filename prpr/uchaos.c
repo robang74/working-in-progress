@@ -390,7 +390,7 @@ static inline ssize_t readblocks(int fd, uint8_t *buf, unsigned nblks) {
         if(n < 1) exit(EXIT_FAILURE);
         maxn = MAX(maxn, n);
         for (size_t a = 0; a < n; a++)
-            buf[a] ^= (inp[a] << 3) | (inp[a] >> 5);
+            buf[a] ^= (inp[a] << 4) | (inp[a] >> 4);
 //          buf[a] ^= inp[a]; // very simple alternative, to consider
 //          buf[a] += inp[a]; // it creates a subtle mod5x3 at 2GB -> fails at 4GB
     }
