@@ -175,8 +175,8 @@ uint64_t djb2tum(const uint8_t *str, uint8_t maxn, uint64_t seed,
     if(!str) {
         if(ncl) {
             double mean = (double)avg / ncl;
-            perr("\nTime deltas avg: %lld <%.1lf> %.0lf ns over %.0lfK (+%lld) values\n",
-                dmn, mean, dmx, (double)ncl/E3, nexp);
+            perr("\nTime deltas avg: %.0lf <%.1lf> %.0lf ns over %.0lfK (+%.0lf) values\n",
+                (double)dmn, mean, dmx, (double)ncl/E3, (double)nexp);
             perr("Ratios over avg: %.2lf <1U> %.2lf, over min: 1U <%.2lf> %.2lf\n",
                 (double)dmn/mean, (double)dmx/mean, mean/dmn, (double)dmx/dmn);
         }
@@ -589,8 +589,8 @@ int main(int argc, char *argv[]) {
     uint64_t rt = get_nanos();
     perr("%s\n", nk ? ", status KO" : "none found, status OK");
     perr("\n");
-    perr("Tests: %d w/ collisions %lld over %.1lf K hashes (%.2lf ppm)\n",
-        ntsts, nk, (double)nt/E3, (double)E6*nk/nt);
+    perr("Tests: %d w/ collisions %.0lf over %.1lf K hashes (%.2lf ppm)\n",
+        ntsts, (double)nk, (double)nt/E3, (double)E6*nk/nt);
 
     avgbc /= ntsts;
     double bic_nx_absl = (double)bic / nx;
@@ -599,8 +599,8 @@ int main(int argc, char *argv[]) {
 
     perr("Hamming weight, avg is %.4lf %% expected 50 %% (%+.1lf ppm)\n",
         bic_nx, devppm(bic_nx, 50));
-    perr("Hamming distance: %lld < %.5lf > %lld over %.4lg K XORs\n",
-        min, bic_nx_absl, max, (double)nx/E3);
+    perr("Hamming distance: %.0lf < %.5lf > %.0lf over %.4lg K XORs\n",
+        (double)min, bic_nx_absl, (double)max, (double)nx/E3);
     perr("Hamming dist/avg: %.5lf < 1U:32 %+.1lf ppm > %.5lf\n",
         avgmn/bic_nx_absl, devppm(bic_nx_absl, 32), avgmx/bic_nx_absl);
 
