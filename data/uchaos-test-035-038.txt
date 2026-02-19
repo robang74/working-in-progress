@@ -1,0 +1,6 @@
+NOTE ABOUT TEST RESULTS [#34, #38]
+
+uchaos test archives from #35 and #38, extreme values included, have been made
+for developing the release procedure looking forward the v0.2 as 1st release and
+aren't included simple because the uchaos.yml was failing or failed to provide
+the regular output as expected even before and as expected after release v0.2 
