@@ -28,7 +28,7 @@ sha1sum:
 
 uchaos: ELF 64-bit LSB executable, x86-64, version 1 (SYSV/musl),
 stripped, statically linked:
-    not a dynamic executable
+    statically linked
 sha1sum:
      50504  dbf94b7091d481bc0714bd23357d0c6755e414ca uchaos.static.musl
      24975	38d7bbcc425c01e2763e41fcd385f6bec2b39cc3 uchaos.static.musl.sh.gz
@@ -43,3 +43,13 @@ sha1sum:
     771580  1b0eefd6a1a26ceb3bf2e9437dc2649541e53e27  uchaos.static.original
     698484  d90b0bf22c28e677fe358c79c90676d30e778fc9  uchaos.static.stripped
     318494  af4d9355caf97e46e2fa8214b9d367276294a4a2  uchaos.static.stripped.gz
+
+--------------------------------------------------------------------------------
+
+uchaos: ELF 32-bit LSB pie executable, Intel 80386, version 1 (SYSV),
+static-pie linked, stripped:
+    statically linked
+sha1sum:
+     38296	55e82c1727e065bd7c9ac187d5e74fb9d9fca4b2  uchaos.static.musl
+     24293	21a03b03902c57e45af2d0307cafbed504070baa  uchaos.static.musl.sh.gz
+
