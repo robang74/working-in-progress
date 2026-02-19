@@ -1,6 +1,7 @@
 reference: prpr/uchaos.c, v0.23
 --------------------------------------------------------------------------------
 
+filename: uchaos-v0.23-linux-x86-64-ld-3.20-elf64.gz
 uchaos: ELF 64-bit LSB pie executable, x86-64, version 1 (SYSV),
 BuildID[sha1]=ba6fd1013bc073824d5034dc7a8a56af6630d0d8,
 for GNU/Linux 3.2.0, stripped, dynamically linked,
@@ -15,6 +16,7 @@ sha1sum:
 
 --------------------------------------------------------------------------------
 
+filename: uchaos-v0.23-linux-x86-64-static-elf64.gz
 uchaos: ELF 64-bit LSB executable, x86-64, version 1 (GNU/Linux),
 BuildID[sha1]=2f6ca5a15dd6860c75aa196eb967eefc61a484b7,
 for GNU/Linux 3.2.0, stripped, statically linked:
@@ -26,6 +28,7 @@ sha1sum:
 
 --------------------------------------------------------------------------------
 
+filename: uchaos-v0.23-linux-x86-64-static-musl.gz.sh
 uchaos: ELF 64-bit LSB executable, x86-64, version 1 (SYSV/musl),
 stripped, statically linked:
     statically linked
@@ -35,6 +38,7 @@ sha1sum:
 
 --------------------------------------------------------------------------------
 
+filename: uchaos-v0.23-linux-x86-64-ld-3.20-elf32.gz
 uchaos: ELF 32-bit LSB executable, Intel 80386, version 1 (GNU/Linux),
 BuildID[sha1]=36af8e70d89f7258bc8f89c75c3cb7080afd42c2,
 for GNU/Linux 3.2.0, stripped, statically linked:
@@ -46,10 +50,11 @@ sha1sum:
 
 --------------------------------------------------------------------------------
 
+fimename: uchaos-v0.23-linux-x86-32-static-musl.gz.sh
 uchaos: ELF 32-bit LSB pie executable, Intel 80386, version 1 (SYSV),
 static-pie linked, stripped:
     statically linked
 sha1sum:
      38296	55e82c1727e065bd7c9ac187d5e74fb9d9fca4b2  uchaos.static.musl
-     24293	21a03b03902c57e45af2d0307cafbed504070baa  uchaos.static.musl.sh.gz
+     24293	21a03b03902c57e45af2d0307cafbed504070baa  uchaos.static.musl.gz.sh
 
