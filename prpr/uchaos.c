@@ -3,7 +3,8 @@
  *
  * Quick 2k test: cat uchaos.c  | ./chaos -T 2048 | ent
  * Boot log test: cat dmesg.txt | ./uchaos -i 16 -r64 | ent
- * Compile with: gcc uchaos.c -O3 --fast-math -Wall -o uchaos [-D_USE_GET_RTSC]
+ * Compile w/libc: gcc uchaos.c -O3 --fast-math -Wall -o uchaos [-D_USE_GET_RTSC]
+ * Compile w/musl: musl-gcc uchaos.c -O3 --fast-math -Wall -static -s -o uchaos
  *
  * *****************************************************************************
  *
