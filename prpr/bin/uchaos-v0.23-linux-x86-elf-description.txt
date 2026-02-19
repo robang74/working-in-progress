@@ -25,7 +25,7 @@ sha1sum:
     348860	9eae2525365b95b5ae581ee1e4c2c00a097824b3  uchaos.static.stripped.gz
 
 --------------------------------------------------------------------------------
-    
+
 uchaos: ELF 64-bit LSB executable, x86-64, version 1 (SYSV/musl),
 stripped, statically linked:
     not a dynamic executable
@@ -43,4 +43,3 @@ sha1sum:
     771580  1b0eefd6a1a26ceb3bf2e9437dc2649541e53e27  uchaos.static.original
     698484  d90b0bf22c28e677fe358c79c90676d30e778fc9  uchaos.static.stripped
     318494  af4d9355caf97e46e2fa8214b9d367276294a4a2  uchaos.static.stripped.gz
-
