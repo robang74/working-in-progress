@@ -43,6 +43,32 @@
  *
  * *****************************************************************************
  *
+ * PORPOSE
+ *
+ * .config - Linux/x86 6.12.71 Kernel Configuration → Kernel hacking 
+ *
+ * CONFIG_WARN_ALL_UNSEEDED_RANDOM:
+ *
+ * Some parts of the kernel contain bugs relating to their use of cryptographically
+ * secure random numbers before it's actually possible to generate those numbers
+ * securely. This setting ensures that these flaws don't go unnoticed, by enabling
+ * a message, should this ever occur. This will allow people with obscure setups
+ * to know when things are going wrong, so that they might contact developers
+ * about fixing it.                               
+ *
+ * Unfortunately, on some models of some architectures getting a fully seeded CRNG
+ * is extremely difficult, and so this can result in dmesg getting spammed for a
+ * surprisingly long time. This is really bad from a security perspective, and
+ * so architecture maintainers really need to do what they can to get the CRNG
+ * seeded sooner after the system is booted. However, since users cannot do
+ * anything actionable to address this, by default this option is disabled.
+ *
+ * Say Y here if you want to receive warnings for all uses of unseeded randomness.
+ * This will be of use primarily for those developers interested in improving the
+ * security of Linux kernels running on their architecture (or subarchitecture).
+ *
+ * *****************************************************************************      
+ *
  * OUTPUT TESTS
  *
  * The first run of commit (#9c8f4f00) passed all the dieharder tests with 49MB.
