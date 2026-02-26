@@ -180,6 +180,11 @@ struct rand_pool_info_buf {
 #endif
 
 /* *** HASHING  ************************************************************* */
+/*
+ * The gcc compiler is good at using registers, but other simpler compilers for
+ * micro architectures may be much less. So, when register as keyword is used,
+ * it is impose a pragma, and if compiler cannot satisfy it, warning at least.
+ */
 
 static inline uint64_t getnstime(uint32_t *pcpuid) {
 #if USE_GET_TIME
@@ -191,6 +196,34 @@ static inline uint64_t getnstime(uint32_t *pcpuid) {
     return ts.tv_nsec;                          // and we want to see this limit, in VMs
 }
 
+#if 0
+/*
+ * This function isn't 32bit fast but a variant of the original Park-Miller
+ * which has a 2^31-2 period. It is useful to introduce in the uchaos output
+ * a grid-biased distribution which the murmur3 cannot remove but amplify.
+ *
+ * ref. Marsaglia's theorem
+ */
+
+static inline uint64_t parkmiller32(uint64_t z) {
+    return (((z << 1) + 1) * 48271) % 0x7FFFFFFF;
+}
+
+/*
+ * These functions below are, like the above, relatively slow compared with
+ * bit operations because multiplications which impacts platforms without FPU
+ * or accelerated instructions. Therefore, they can be used at the end of the
+ * hot-loop producing the hash but inside they can kill the performances.
+ *
+ * For this reason, the uchaos multiply the 5-bit "entropy" from scheduler
+ * jittering using a Xoshiro approach that mix internal states with shift
+ * and rotations which are extremely fast on every architecture. Finally
+ * the hash is whitened with a diffusing avalanche 32 multiplication which
+ * impacts the 32+1 LSB which are mixed with 33 MLB, thus 1-bit overposition.
+ *
+ * ref. Lorenz strange attractors' theory
+ */
+
 static inline uint64_t murmur3(uint64_t hs) {
     register uint64_t z = hs;
     z = (z ^ (z >> 33)) * 0xff51afd7ed558ccdULL;
@@ -199,24 +232,25 @@ static inline uint64_t murmur3(uint64_t hs) {
     return z;
 }
 
-static inline uint64_t mm3ns32(uint64_t ks) {
+static inline uint64_t mm3ns32(uint64_t ks, uint64_t p) {
     register uint64_t z = ks;
-    z = (z ^ (z >> 31)) * 0xff51afd7ed558ccdULL;
+    z = (p ^ (z >> 31)) * 0xff51afd7ed558ccdULL;
     z = (z ^ (z >> 32)) * 0xc4ceb9fe1a85ec53ULL;
     z = (z ^ (z >> 33));
     return z;
 }
 
-static inline uint16_t mm3ns16(uint16_t ns) {
+static inline uint16_t mm3ns16(uint16_t ns, uint16_t p) {
     register uint32_t z = ns;
-    z = (z ^ (z >> 7)) * 0x45d9f3b;
+    z = (p ^ (z >> 7)) * 0x45d9f3b;
     z = (z ^ (z >> 8)) * 0x45d9f3b;
     z = (z ^ (z >> 9));
     return (uint16_t)z;
 }
+#endif
 
 #include <sched.h>
-uint64_t djb2tum(const uint8_t *str, uint8_t maxn, uint64_t seed,
+static uint64_t djb2tum(const uint8_t *str, uint8_t maxn, uint64_t seed,
     const uint32_t nsdly, const uint32_t pmdly, const uint8_t nbtls)
 {
     #define pmdly2ns ( ( ( (uint64_t)dmn * pmdly ) + 127 ) >> 8 )
@@ -243,7 +277,7 @@ uint64_t djb2tum(const uint8_t *str, uint8_t maxn, uint64_t seed,
      * the djb2 algorithm created by Dan Bernstein. It strikes a great balance
      * between speed and low collision rates. Great for text.
      */
-    uint64_t c, h = 5381;
+    register uint64_t h = 5381;
     /*
      * 5381              Prime number choosen by Dan Bernstein, as 1010100000101
      *                   empirically is one of the best for English words text.
@@ -254,7 +288,7 @@ uint64_t djb2tum(const uint8_t *str, uint8_t maxn, uint64_t seed,
      */
     if(seed) h = seed;
 
-    uint64_t ons = 0;
+    uint64_t c, ons = 0;
 #if USE_GET_TIME
 #else
     static uint32_t oid = -1;
@@ -268,7 +302,7 @@ uint64_t djb2tum(const uint8_t *str, uint8_t maxn, uint64_t seed,
         uint32_t cpuid;
         ts_tv_nsec = getnstime(&cpuid);
 #endif
-        uint8_t ns = 0xff & (ts_tv_nsec >> nbtls);  // 0xff ^ is a good-luck typo (3C-rule!)
+        uint8_t ns = 0xff & (ts_tv_nsec >> nbtls);
         ns ^= (ns >> 3) ^ (0xff & ohs);
         uint8_t b1 = ns & 0x02;
         uint8_t b0 = ns & 0x01;
@@ -330,18 +364,8 @@ reschedule:
         sched_yield();
     }
 
-#if 0
-    c = (h >> 32);
-    h =  h ^ (0xFF & c);     // original, very weak watermarks (few unsual)
-    return h ^ (h >> 33);    // pass at 2^34 (16GB, unsual sometimes)
-#else
-    return murmur3(h);       // pass at 2^34 (16GB, unsual sometimes)
-#endif
-/*
-    c = (h >> 32);
-    h =  h ^ (0xFF & c);     // original, very weak watermarks (few unsual)
-    return murmur3(h);       // pass at 2^34 (16GB, clean)
- */
+    // 5. finalising w/ a 32+1 bit mix
+    return (h * 0x45d9f3b) ^ (h >> 31);
 }
 
 uint64_t *str2ht64(uint8_t *str, uint64_t **ph,  uint32_t *size,
