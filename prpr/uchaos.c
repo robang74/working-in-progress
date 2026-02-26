@@ -326,8 +326,7 @@ reschedule:
 
     c = (h >> 32);
     h =  h ^ (0xFF & c);                              // original
-    h = (parkmiller32(h) << 32) | parkmiller32(c);    // fails at 2^28
-    return murmur3_64(h);                             // fails at 2^26
+    return murmur3_64(h);
 }
 
 uint64_t *str2ht64(uint8_t *str, uint64_t **ph,  uint32_t *size,
