@@ -191,15 +191,28 @@ static inline uint64_t getnstime(uint32_t *pcpuid) {
     return ts.tv_nsec;                          // and we want to see this limit, in VMs
 }
 
-static inline uint64_t murmur3(uint64_t z) {
+static inline uint64_t murmur3(uint64_t hs) {
+    register uint64_t z = hs;
     z = (z ^ (z >> 33)) * 0xff51afd7ed558ccdULL;
     z = (z ^ (z >> 33)) * 0xc4ceb9fe1a85ec53ULL;
     z = (z ^ (z >> 33));
     return z;
 }
 
-static inline uint64_t parkmiller32(uint64_t z) {
-  return (((z << 1) + 1) * 48271) % 0x7FFFFFFF;
+static inline uint64_t mm3ns32(uint64_t ks) {
+    register uint64_t z = ks;
+    z = (z ^ (z >> 31)) * 0xff51afd7ed558ccdULL;
+    z = (z ^ (z >> 32)) * 0xc4ceb9fe1a85ec53ULL;
+    z = (z ^ (z >> 33));
+    return z;
+}
+
+static inline uint16_t mm3ns16(uint16_t ns) {
+    register uint32_t z = ns;
+    z = (z ^ (z >> 7)) * 0x45d9f3b;
+    z = (z ^ (z >> 8)) * 0x45d9f3b;
+    z = (z ^ (z >> 9));
+    return (uint16_t)z;
 }
 
 #include <sched.h>
@@ -316,13 +329,19 @@ reschedule:
 #endif
         sched_yield();
     }
+
 #if 0
     c = (h >> 32);
-    h =  h ^ (0xFF & c);                              // original
-    return murmur3_64(h);                             // pass at 2^34 (16GB)
+    h =  h ^ (0xFF & c);     // original, very weak watermarks (few unsual)
+    return h ^ (h >> 33);    // pass at 2^34 (16GB, unsual sometimes)
 #else
-    return h ^ (h >> 33);
+    return murmur3(h);       // pass at 2^34 (16GB, unsual sometimes)
 #endif
+/*
+    c = (h >> 32);
+    h =  h ^ (0xFF & c);     // original, very weak watermarks (few unsual)
+    return murmur3(h);       // pass at 2^34 (16GB, clean)
+ */
 }
 
 uint64_t *str2ht64(uint8_t *str, uint64_t **ph,  uint32_t *size,
