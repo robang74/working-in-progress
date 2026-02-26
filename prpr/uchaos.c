@@ -198,6 +198,13 @@ static inline uint64_t murmur3(uint64_t z) {
     return (z ^ (z >> 31)) & 0xFFFFFFFF;
 }
 
+static inline uint64_t murmur3_64(uint64_t z) {
+    z = (z ^ (z >> 33)) * 0xff51afd7ed558ccdULL;
+    z = (z ^ (z >> 33)) * 0xc4ceb9fe1a85ec53ULL;
+    z = (z ^ (z >> 33));
+    return z;
+}
+
 static inline uint64_t parkmiller32(uint64_t z) {
   return (((z << 1) + 1) * 48271) % 0x7FFFFFFF;
 }
@@ -318,8 +325,9 @@ reschedule:
     }
 
     c = (h >> 32);
-    h =  h ^ (0xFF & c);
-    return (parkmiller32(h) << 32) | parkmiller32(c);
+    h =  h ^ (0xFF & c);                              // original
+    h = (parkmiller32(h) << 32) | parkmiller32(c);    // fails at 2^28
+    return murmur3_64(h);                             // fails at 2^26
 }
 
 uint64_t *str2ht64(uint8_t *str, uint64_t **ph,  uint32_t *size,
