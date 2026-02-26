@@ -191,6 +191,17 @@ static inline uint64_t getnstime(uint32_t *pcpuid) {
     return ts.tv_nsec;                          // and we want to see this limit, in VMs
 }
 
+static inline uint64_t murmur3(uint64_t z) {
+    z += (uint64_t)0x9E3779B97F4A7C15;
+    z =  (uint64_t)0xBF58476D1CE4E5B9 * (z ^ (z >> 30));
+    z =  (uint64_t)0x94D049BB133111EB * (z ^ (z >> 27));
+    return z ^ (z >> 31);
+}
+
+static inline uint64_t parkmiller3(uint64_t z) {
+  return (((z << 1) + 1) * 48271) % 2147483647;
+}
+
 #include <sched.h>
 uint64_t djb2tum(const uint8_t *str, uint8_t maxn, uint64_t seed,
     const uint32_t nsdly, const uint32_t pmdly, const uint8_t nbtls)
@@ -305,8 +316,7 @@ reschedule:
 #endif
         sched_yield();
     }
-
-    return h ^ (0xFF & (h >> 32));
+    return parkmiller3(h ^ (0xFF & (h >> 32)));
 }
 
 uint64_t *str2ht64(uint8_t *str, uint64_t **ph,  uint32_t *size,
