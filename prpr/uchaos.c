@@ -195,11 +195,11 @@ static inline uint64_t murmur3(uint64_t z) {
     z += (uint64_t)0x9E3779B97F4A7C15;
     z =  (uint64_t)0xBF58476D1CE4E5B9 * (z ^ (z >> 30));
     z =  (uint64_t)0x94D049BB133111EB * (z ^ (z >> 27));
-    return z ^ (z >> 31);
+    return (z ^ (z >> 31)) & 0xFFFFFFFF;
 }
 
-static inline uint64_t parkmiller3(uint64_t z) {
-  return (((z << 1) + 1) * 48271) % 2147483647;
+static inline uint64_t parkmiller32(uint64_t z) {
+  return (((z << 1) + 1) * 48271) % 0x7FFFFFFF;
 }
 
 #include <sched.h>
@@ -316,7 +316,10 @@ reschedule:
 #endif
         sched_yield();
     }
-    return parkmiller3(h ^ (0xFF & (h >> 32)));
+
+    c = (h >> 32);
+    h =  h ^ (0xFF & c);
+    return (parkmiller32(h) << 32) | parkmiller32(c);
 }
 
 uint64_t *str2ht64(uint8_t *str, uint64_t **ph,  uint32_t *size,
