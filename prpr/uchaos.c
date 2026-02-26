@@ -192,13 +192,6 @@ static inline uint64_t getnstime(uint32_t *pcpuid) {
 }
 
 static inline uint64_t murmur3(uint64_t z) {
-    z += (uint64_t)0x9E3779B97F4A7C15;
-    z =  (uint64_t)0xBF58476D1CE4E5B9 * (z ^ (z >> 30));
-    z =  (uint64_t)0x94D049BB133111EB * (z ^ (z >> 27));
-    return (z ^ (z >> 31)) & 0xFFFFFFFF;
-}
-
-static inline uint64_t murmur3_64(uint64_t z) {
     z = (z ^ (z >> 33)) * 0xff51afd7ed558ccdULL;
     z = (z ^ (z >> 33)) * 0xc4ceb9fe1a85ec53ULL;
     z = (z ^ (z >> 33));
@@ -323,10 +316,13 @@ reschedule:
 #endif
         sched_yield();
     }
-
+#if 0
     c = (h >> 32);
     h =  h ^ (0xFF & c);                              // original
-    return murmur3_64(h);
+    return murmur3_64(h);                             // pass at 2^34 (16GB)
+#else
+    return h ^ (h >> 33);
+#endif
 }
 
 uint64_t *str2ht64(uint8_t *str, uint64_t **ph,  uint32_t *size,
