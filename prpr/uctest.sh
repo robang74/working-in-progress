@@ -6,10 +6,14 @@
 # output to test with: cat $(ls -1 test-*.dat | sort) | RNG_test stdin64
 #
 
+if [ ! -r "dmesg.txt" -o ! -x "uchaos" ]; then
+  printf "\nERROR: dmesg.txt readable and uchaos executable are needed\n" >&2
+fi
+
 fn="test"
-ch=$((1024*1024))
-ch="./uchaos -i16 -d 7 -T $ch"
-tf() { time cat dmesg.txt | $ch | tee $1.dat | ent; }
+nh=$((1024*1024))
+ch="./uchaos -i16 -d 7 -T $nh"
+tf() { cat dmesg.txt | $ch | tee $1.dat | ent; }
 
 for i in $(seq 32); do
 
@@ -17,12 +21,11 @@ for i in $(seq 32); do
     n=$(printf "%04d" $i)
     nm="$fn-$t-$n"
     echo "$nm.txt $nm.dat"
-    { tf $nm; } > $nm.txt 2>&1 &
-    sleep 0.1
+    eval tf $nm >$nm.txt 2>&1 & sleep 0.1
   done
 
   wait
-  eq=$(du -k $(find . -name $fn-*.dat | sort) | cut -f1 | tr '\n' +)0
+  eq=$(du -k $(find . -name $fn-\*.dat | sort) | cut -f1 | tr '\n' +)0
   echo "$(( ( $eq ) >> 10 )) MB"
   grep -n "KO" $fn-*.txt &&
     break
