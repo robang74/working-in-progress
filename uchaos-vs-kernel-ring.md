@@ -86,6 +86,29 @@ While `uchaos` can work at kernel or userland levels -- both and almost identica
 
 This doesn't mean that `uchaos` is better compared something else or a full mature product by design. It is still a functional PoC improving by development. It means that has been designed from scratch to be suitable or reasonably easy to port. It is born ready, not being a full-flagged product, yet.
 
+### UPDATE ABOUT TESTING
+
+System test cpu: i5-8635, ssd: 97% after 256GB data creation
+
+```text
+cat $(find run01 run05 run02 run06 run03 run07 run04 run08 -name test-\*.dat) | RNG_test stdin64
+
+RNG_test using PractRand version 0.96
+RNG = RNG_stdin64, seed = unknown
+test set = core, folding = standard (64 bit)
+
+length= 256 megabytes (2^28 bytes), time= 2.6 seconds no anomalies in 199 test result(s)
+length= 512 megabytes (2^29 bytes), time= 5.6 seconds no anomalies in 213 test result(s)
+length= 1 gigabyte (2^30 bytes), time= 11.2 seconds no anomalies in 227 test result(s)
+length= 2 gigabytes (2^31 bytes), time= 22.3 seconds no anomalies in 242 test result(s)
+length= 4 gigabytes (2^32 bytes), time= 48.2 seconds no anomalies in 256 test result(s)
+length= 8 gigabytes (2^33 bytes), time= 98.8 seconds no anomalies in 270 test result(s)
+length= 16 gigabytes (2^34 bytes), time= 199 seconds no anomalies in 283 test result(s)
+length= 32 gigabytes (2^35 bytes), time= 393 seconds no anomalies in 296 test result(s)
+length= 64 gigabytes (2^36 bytes), time= 839 seconds no anomalies in 308 test result(s)
+length= 128 gigabytes (2^37 bytes), time= 1605 seconds no anomalies in 320 test result(s)
+length= 256 gigabytes (2^38 bytes), time= 3166 seconds no anomalies in 332 test result(s)
+```
 ---
 
 (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, CC BY-ND-NC 4.0
