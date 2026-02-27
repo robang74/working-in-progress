@@ -8,19 +8,17 @@ So, in trying to falsificate that [`uchaos.c`](https://github.com/robang74/worki
 
 This is a VERY good result, especially considering that `uchaos` provide the output starting with a fixed input and the 16GB has been produced by repetitively running `uchaos` on the same input. Because some algorithms like Park-Miller do not repeat for a HUGE number of steps but from the same seed they replicate the same sequence and the distribution of the number is not randomly homogeneous.
 
-Guess what? Passing each random number through a P-K hash, the result is a P-K distribution. In essence, what I am expecting is that `uchaos` with P-K filter applied at the end are going to fail the test before 16GB because P-K is expected to be identified at 2GB. Here, its application is more than a single hashing but two 32bit hashes. The test is ongoing and we will see.
+Guess what? Passing each random number through a Parker-Mill hash, the result is a P-M distribution. In essence, what I am expecting is that `uchaos` with P-M filter applied at the end are going to fail the test before 16GB because P-M is expected to be identified at 2GB. Here, its application is more than a single hashing but two 32bit hashes. The test is ongoing and we will see.
 
 Instead a different algorithm like murmur3 (rewritten in 64bit version) which is an avalanche based bit-mixer may have some better chance to destroy the `uchaos` single source output production. We will see.
 
-However, I consider a VERY meaningful result that PractRand would be able to catch the P-K hash structure in output even if it is applied in 32+32 way (which is supposedly quicker and easier to catch). And that is the reason because both functions have been written in 32bit in the first place.
-
-~> https://lnkd.in/dGeVGRBE (reference C-language code)
+However, I consider a VERY meaningful result that PractRand would be able to catch the P-M hash structure in output even if it is applied in 32+32 way (which is supposedly quicker and easier to catch). And that is the reason because both functions have been written in 32bit in the first place.
 
 ### UPDATE ABOUT TESTING
 
-1. the `uchaos` + P-K hashing fails as expected, improving randomness isn't an easy trick. Even with good "entropy" sources. It easier to do worse. By stdin32, it fails even quickly.
+1. the `uchaos` + P-M hashing fails as expected, improving randomness isn't an easy trick. Even with good "entropy" sources. It easier to do worse. By stdin32, it fails even quickly.
 
-2. `uchaos` + P-K + murmur4 64bit: there is no chance that mm3 can recover the output after being crippled into a P-K grid. The randomness is lost and the recovery attemps is worsening the situation by failing 4x time faster at 64bit (2^28-->2^26).
+2. `uchaos` + P-M + murmur4 64bit: there is no chance that mm3 can recover the output after being crippled into a P-M grid. The randomness is lost and the recovery attemps is worsening the situation by failing 4x time faster at 64bit (2^28-->2^26).
 
 3. `uchaos` + mm3: it passes smoothly 2^34 (16GB) test, showing that mm3 isn't the troubling one. Instead mm3 can blend away the fragile watermark that was affecting the last 3 or 5 bits. Something a trivial operation was doing but a trusted mixer grants.
 
@@ -38,7 +36,7 @@ We can add a grid-bias to white noise but not remove it and this shows that test
 
 > We can improve randomness by a lot. E.g. use a cryptographic PRNG, such as low bits of secure-hash of (seed appended to index).
 
-This answer is technically correct and in different ways we are saying the same thing: once we have good randomness we can multiply it (pseudo-RNG). But ONLY applying "good" algos and the Parker-Miller LCG (Linear congruential generator) isn't.
+This answer is technically correct and in different ways we are saying the same thing: once we have good randomness we can multiply it (pseudo-RNG). But ONLY applying "good" algos and the Park-Miller LCG (Linear congruential generator) isn't.
 
 This is about give "true entropy" in input and expect "better entropy" in output but "true entropy" in this specific context is a sequence of numbers (data, so what is the difference?) that are unpredictable, usually because they have no structure (auto-correlation).
 
