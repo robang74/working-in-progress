@@ -11,8 +11,8 @@ if [ ! -r "dmesg.txt" -o ! -x "uchaos" ]; then
 fi
 
 fn="test"
-nh=$((1024*1024))
-ch="./uchaos -i16 -d 7 -T $nh"
+nh=$((512*1024))
+ch="./uchaos -i 16 -d 3 -T $nh"
 tf() { cat dmesg.txt | $ch | tee $1.dat | ent; }
 
 for i in $(seq 32); do
