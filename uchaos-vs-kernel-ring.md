@@ -60,26 +60,30 @@ Finally, uchaos proves (aim to) that scheduling jitter is TRUE entropy, breaking
 
 - https://www.linkedin.com/posts/robertofoglietta_can-we-improve-randomness-not-really-this-activity-7433181877059907584-xSr3
 
-About this: "The danger is only when the adversary has side-channel access to the original jitter or can influence the scheduler." -- yes and no. Yes in the most general case, no in specific cases where:
+About this:
 
-1. proper jittering is taken into consideration (2nd derivative of time, because it is too sensible to micro-variation any side-attack can cope with unless in god-mode but again, get that mode isn't feasible);
+- The danger is only when the adversary has side-channel access to the original jitter or can influence the scheduler"
 
-2. even leveraging the 1st degree derivate to check the limit of an attack (or check if a very predictable VM can be too flat for providing entropy) there are some specific if/then/else condition that are inherently unpredictable because they still rely on very fine-grained limits and those limits are inheterly dynamics. 
+Yes and no. Yes in the most general case, no in specific cases where:
 
-Functionally, it is like having two 1st degree derivatives which are not totally independent but correlated by 60 bits over 64. Which is exactly the idea behind Lorenz irreversibility.
+- 1. proper jittering is taken into consideration aka 2nd derivative of time, because it is too sensible to micro-variations and any side-attack cannot cope with that unless in god-mode but again, get in that mode isn't feasible;
 
-Technically speaking a VM can be tampered in such a way to provide always predictable time -- it is absurd but for emulation we might use the CPU instruction counter instead of nanoseconds.
+- 2. even limited to the 1st degree derivative to check the limit of an attack or check if a very predictable VM can be too flat for providing entropy, there are some specific if/then/else conditions that are inherently unpredictable because they still rely on very fine-grained limits and those limits are inheterly dynamics. 
 
-When applications ask for time in nanoseconds, they get the number of instructions the CPU executed since boot. Nice, and uchaos has options on the command line like -d7 (or -p1) that set the line on what can be accepted and rejected.
+Functionally, it is like having two 1st degree derivatives which are not totally independent but correlated by e.g. 60 bits over 64. Which is exactly the idea behind Lorenz irreversibility.
+
+Technically speaking a VM can be tampered in such a way to provide always predictable time: it is absurd but for emulation we can use the CPU instructions counter instead of nanoseconds.
+
+When applications ask for time in nanoseconds, they get the number of instructions the CPU executed since boot. Nice, and uchaos has options on the command line like -d7 (or -p1) that set the threshold for a jitter being accepted and rejected.
 
 Therefore, a very crimped VM would let uchaos long to run or even completely fail but this isn't worse than accepting "garbage injection" instead of entropy, pretending everything is fine.
 
-The main point here is that the entropy engine in the kernel is based on CPU entropy; this doesn't work with VM unless they allow a transparent CPU access (but a man-in-the-middle attack can happen even if it is extremely hard to fake in a plausible way). 
+The main point here is that the entropy engine in the kernel is based on CPU entropy. This doesn't work with VM unless they allow a transparent CPU access but a man-in-the-middle attack can happen even if it is extremely hard to fake in a plausible way. 
 
-- Anyway, CPU is matter thus can provide entropy. Remains of the dogma. 
+- Anyway, CPU is matter thus can provide entropy. Remains the dogma. 
 
-Jitterentropy broke that dogma but in a way that can be acceptable in userland and at my first sight, jitterentropy cannot be ported in kernel space (anyway, earlier versions 2013-2014 were designed for kernel space and got adopted by Fuchsia OS, for example).
+Jitterentropy broke that dogma but in a way that can be acceptable in userland and at my first sight, jitterentropy cannot be ported in kernel space (anyway, earlier versions 2013-2014 were designed for kernel space and got adopted by Fuchsia OS and Android, for example).
 
-While uchaos can work at kernel or userland levels, both and almost identical apart the system calls replaced with kernel functions because it has been designed for it in mind and multi-architecture low-level coding porting as well.
+While uchaos can work at kernel or userland levels -- both and almost identical apart the system calls replaced with kernel functions -- because it has been designed for it in mind and multi-architecture low-level coding porting as well.
 
-This doesn't mean that uchaos is better compared something else or full mature by design, it is still a functional PoC improving by development. It means that has been designed by scratch to be suitable or reasonably easy to port. It is born ready, not being a full-flagged product, yet.
+This doesn't mean that uchaos is better compared something else or a full mature product by design. It is still a functional PoC improving by development. It means that has been designed by scratch to be suitable or reasonably easy to port. It is born ready, not being a full-flagged product, yet.
