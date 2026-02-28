@@ -7,25 +7,26 @@ nfle=${1:-test.txt}
 echo "uchaos.sh is appending to file: $nfle"
 
 testfunc() {
-    printf "\n|\/ Testing with $tcmd ${1:-}/\\_" | tee -a $nfle.$i
+    fn=${1:-uchaos.c }
+    printf "\n|\/ Testing with $tcmd $fn _/\\_" | tee -a $nfle.$i
     {
         printf "_%.0s" {1..32}; printf "\n|";
-        cat ${1:-uchaos.c}| { $tcmd 2>&3; printf "\n|\n" >&3; } | entgr
+        cat $fn | { $tcmd 2>&3; printf "\n|\n" >&3; } | entgr
     } 3>&1 | grep . >> $nfle.$i
 }
 
 icmd="./uchaos -T $((${2:-96} * 1024))"
 
-tcmd="$icmd #default ____"
+tcmd="$icmd    # default "
 i="n"; testfunc & sleep 0.01
 
-tcmd="$icmd -d0 -p3 -r64 "
+tcmd="$icmd -r32 -d3 -p0 "
 i="p"; testfunc & sleep 0.01
 
-tcmd="$icmd -d3 -p3 -r64 "
+tcmd="$icmd -r32 -d1 -p1 "
 i="d"; testfunc & sleep 0.01
 
-tcmd="$icmd -i16 -r64 #8k"
+tcmd="$icmd -r10 -d3 -i16"
 i="i"; testfunc dmesg.txt & sleep 0.01
 
 sleep 0.1; echo; time wait
