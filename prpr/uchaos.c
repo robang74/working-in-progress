@@ -253,9 +253,21 @@ static inline uint16_t mm3ns16(uint16_t ns, uint16_t p) {
 #endif
 
 #include <sched.h>
-#define minmix8(b) { b *= b&1 ? 0x4d : 0x65; b ^= b >> 3; }
+
 #define pmdly2ns ( ( ( (uint64_t)dmn * pmdly ) + 127 ) >> 8 )
-#define knuthmx(w) { w *= w&1 ? 0x9E3779B9 : 0x45d9f3b; w ^= w >> 13; }
+
+static inline uint8_t minmix8(uint8_t b) {
+    uint8_t n = primes64[ b & 2 ];
+    b = (b << n) | (b >> (8-n));
+    b *= (b & 1) ? 0x4d : 0x65;
+    return b ^ (b >> 3);
+}
+
+static inline uint64_t knuthmx(uint64_t w) {
+    w  = rotl64(w, primes64[(w & 0x07) + 1]);
+    w *= (w & 1) ? 0x9E3779B9 : 0x45d9f3b;
+    return w ^ (w >> 13);
+}
 
 static uint64_t djb2tum(const uint8_t *str, uint8_t maxn, uint64_t seed,
     const uint32_t nsdly, const uint32_t pmdly, const uint8_t nbtls)
