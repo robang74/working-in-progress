@@ -1,2 +1,3 @@
 978709ab270f18b6ef77c9fb5fb00a6f97a71f18  gzcmd-v0.1.5.gz.sh
-8601fb7d41c601397472897852a01df64b42a553  uchaos-v0.24-linux-x86-64-static-musl.gz.sh
+b0586199496bc56c344e97d4bdf595557cc51d18  practrnd-rnd_test-0.96-glibc-elf64.gz.sh
+8601fb7d41c601397472897852a01df64b42a553  uchaos-v0.24-linux-x86-64-musl-static.gz.sh
