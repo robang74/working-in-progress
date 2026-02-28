@@ -281,9 +281,7 @@ static uint64_t djb2tum(const uint8_t *str, uint8_t maxn, uint64_t seed,
      * One of the most popular and efficient hash functions for strings in C is
      * the djb2 algorithm created by Dan Bernstein. It strikes a great balance
      * between speed and low collision rates. Great for text.
-     */
-    register uint64_t hsh = 5381;
-    /*
+     *
      * 5381              Prime number choosen by Dan Bernstein, as 1010100000101
      *                   empirically is one of the best for English words text.
      * Alternatives:
@@ -291,9 +289,11 @@ static uint64_t djb2tum(const uint8_t *str, uint8_t maxn, uint64_t seed,
      * 16777619               The FNV-1 offset basis (32-bit).
      * 14695981039346656037	  The FNV-1 offset basis (64-bit).
      */
-    if( seed ) hsh = seed;
+#define HSHSEED 5381
+    static   uint64_t ohs = HSHSEED;
+    register uint64_t hsh = HSHSEED;
+    if( seed )        hsh = seed;
 
-    static uint64_t ohs = 5381;
 #if USE_GET_TIME
 #else
     static uint32_t cpuid, oid = -1;
@@ -309,8 +309,8 @@ hashotloop:                          // a loop made by ASM jumps
 #else
     ts_tv_nsec = getnstime(&cpuid) >> nbtls;
     if( cpuid != oid ) {
-          oid = cpuid;
-          ons = ts_tv_nsec;
+          oid  = cpuid;
+          ons  = ts_tv_nsec;
           goto reschedule;
     }
     oid = cpuid;
@@ -327,7 +327,7 @@ hashotloop:                          // a loop made by ASM jumps
 #if USE_GET_TIME
         dlt = (dlt < ons) ? E9 - ons + dlt : dlt - ons;
 #else
-        dlt = dlt - ons;             // overflow by uint64_t is 0xff..ff + 1 = 0
+        dlt =  dlt - ons;            // overflow by uint64_t is 0xff..ff + 1 = 0
 #endif
         // avg calculation can be omitted
         avg += dlt; ncl++;
@@ -585,15 +585,15 @@ int main(int argc, char *argv[]) {
         long x = atoi(optarg);
         switch (opt) {
             // ABS sanitises the parametric inputs
-            case 'T': ntsts = ABS(x);       prsts = 1; break;
-            case 'M': ntsts = ABS(x) << 11; prsts = 1; break;
-            case 'G': ntsts = ABS(x) << 21; prsts = 1; break;
             case 's': nbtls = ABS(x); break;
             case 'd': nsdly = ABS(x); break;
             case 'r': nrdry = ABS(x); break;
             case 'p': pmdly = ABS(x); break;
             case 'i': nblks = ABS(x); break;
-            case 'k': devfd = open(optarg, O_WRONLY); break;
+            case 'T': ntsts = ABS(x); ntsts <<=  1 ; prsts = 1; break;
+            case 'M': ntsts = ABS(x); ntsts <<= 11 ; prsts = 1; break;
+            case 'G': ntsts = ABS(x); ntsts <<= 21 ; prsts = 1; break;
+            case 'k': devfd = open( optarg , O_WRONLY)        ; break;
         }
     }
     if (devfd < 0) {
@@ -625,7 +625,11 @@ int main(int argc, char *argv[]) {
     uint64_t bic = 0, max = 0, min = 256, avg = 0, mt = 0;
     uint64_t nk = 0, nt = 0, nx = 0, nn = 0;
 
-    if(prsts) perr("\nuChaos: %s; repetitions: ", VERSION);
+    if(prsts) { //RAF, TODO: dealing with size one.
+        perr("\nuChaos: %s; repetitions: ", VERSION);
+        if(size < 2) { perr("too short input, try longer!\n\n"); prsts = 0; }
+    }
+
     for (uint32_t a = ntsts; a; a--) {
         // hashing
         uint64_t st = get_nanos();
@@ -646,7 +650,7 @@ int main(int argc, char *argv[]) {
                 return EXIT_FAILURE;
             }         // WARNING!!
         } /* else  */ // skip else expose the data but it is useful for debuging
-        writebuf(STDOUT_FILENO, (uint8_t *)h, size << 3);
+        writebuf(STDOUT_FILENO, (uint8_t *)h, sz);
 
         // single run
         if(ntsts < 2) return 0;
@@ -677,6 +681,7 @@ int main(int argc, char *argv[]) {
                 nn++;
             }
         }
+
         double curavg = (double)avg / nn;
         if(avgmx < curavg) avgmx = curavg;
         if(avgmn > curavg) avgmn = curavg;
