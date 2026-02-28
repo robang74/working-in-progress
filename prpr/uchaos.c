@@ -253,28 +253,29 @@ static inline uint16_t mm3ns16(uint16_t ns, uint16_t p) {
 #endif
 
 #include <sched.h>
+#define pmdly2ns ( ( ( (uint64_t)dmn * pmdly ) + 127 ) >> 8 )
+
 static uint64_t djb2tum(const uint8_t *str, uint8_t maxn, uint64_t seed,
     const uint32_t nsdly, const uint32_t pmdly, const uint8_t nbtls)
 {
-    #define pmdly2ns ( ( ( (uint64_t)dmn * pmdly ) + 127 ) >> 8 )
     static double dmx = 0;
-    static uint64_t ncl = 0, dmn = -1, nexp = 0;
-    static uint64_t avg = 0;
+    static uint64_t ncl = 0, dmn = -1, nexp = 0, avg = 0;
 
-    if(!str) {
-        if(ncl) {
+    if( !str ) {
+        if( ncl ) {
             double mean = (double)avg / ncl;
             perr("\nTime deltas avg: %.0lf <%.1lf> %.0lf ns over %.0lfK (+%.0lf) values\n",
                 (double)dmn, mean, dmx, (double)ncl/E3, (double)nexp);
             perr("Ratios over avg: %.2lf <1U> %.2lf, over min: 1U <%.2lf> %.2lf\n",
                 (double)dmn/mean, (double)dmx/mean, mean/dmn, (double)dmx/dmn);
         }
-        if(pmdly && !seed && !maxn && !nsdly && !nbtls)
+        if( pmdly && !seed && !maxn && !nsdly && !nbtls )
             return pmdly2ns;
         return 0;
     }
-    if(!*str || !maxn) return 0;
+    if( !*str || !maxn ) return 0;
 
+    // 0. hot loop preparation /////////////////////////////////////////////////
     /*
      * One of the most popular and efficient hash functions for strings in C is
      * the djb2 algorithm created by Dan Bernstein. It strikes a great balance
@@ -289,19 +290,19 @@ static uint64_t djb2tum(const uint8_t *str, uint8_t maxn, uint64_t seed,
      * 16777619               The FNV-1 offset basis (32-bit).
      * 14695981039346656037	  The FNV-1 offset basis (64-bit).
      */
-    if(seed) hsh = seed;
+    if( seed ) hsh = seed;
 
-    uint64_t ts_tv_nsec, dlt, chr, ons = 0;
-    uint8_t ns, b0, b1;
+    static uint64_t ohs = 5381;
 #if USE_GET_TIME
 #else
     static uint32_t cpuid, oid = -1;
 #endif
-    static uint64_t ohs = 5381;
+    uint32_t nstw;
+    uint64_t ts_tv_nsec, dlt, chr, ons = 0;
+    uint8_t ns, b0, b1;
 
-hashotloop:
-    if ( (chr = *str++) && maxn-- );   // a loop made by ASM jumps
-    else goto funcreturn;
+hashotloop:                          // a loop made by ASM jumps
+    if( !( (chr = *str++) && maxn-- ) ) goto funcreturn;
 
 #if USE_GET_TIME
     ts_tv_nsec = getnstime(NULL);
@@ -316,37 +317,37 @@ hashotloop:
      * (16+1) (32-1 or 32+1) (64-1)
      *   01     10      00     11
      */
-    // 1. nacro-mix in djb2-style
+    // 1. nacro-mix in djb2-style //////////////////////////////////////////////
     hsh = ( ( hsh << (4 + (b0 ? b1 : 1)) ) + (b1 ? -hsh : hsh) );
 
-    // 2. char injection w/ rotated
+    // 2. char injection + rotation ////////////////////////////////////////////
 #if USE_PRIMES_2564
     hsh ^= chr ^ rotl64(chr, primes64[ns%10]);
 #else
     hsh ^= chr ^ rotl64(chr, 1 + (ns & 0x07));
 #endif
-    // 3. stochastics micro-mix
+    // 3. stochastics micro-mix ////////////////////////////////////////////////
     hsh  = rotl64(hsh, 5 + ((ns >> 3) & 0x03)) + hsh;
 
-    // 4. time deltas management
-    if(!ons) goto proceeding;
+    // 4. time deltas management ///////////////////////////////////////////////
+    if( !ons ) goto proceeding;
 #if USE_GET_TIME
     dlt = ts_tv_nsec < ons ? 1E9 + ts_tv_nsec - ons : ts_tv_nsec - ons;
 #else
-    dlt = ts_tv_nsec - ons; // overflow by uint64_t is 0xff..ff + 1 = 0
+    dlt = ts_tv_nsec - ons;          // overflow by uint64_t is 0xff..ff + 1 = 0
 #endif
-    if(dlt < dmn) dmn = dlt;
-    if(dlt > dmx) dmx += (dmx ? dmx/dlt : 1.0);
+    if( dlt < dmn ) dmn = dlt;
+    if( dlt > dmx ) dmx += (dmx ? dmx/dlt : 1.0);
 #if USE_GET_TIME
 #else
-    if(cpuid != oid) {
+    if( cpuid != oid ) {
           oid = cpuid;
           ons = ts_tv_nsec;
           goto reschedule;
     }
 #endif
-    uint32_t nstw = dmn + nsdly + (pmdly ?  pmdly2ns : 0);
-    if(dlt < nstw || hsh == ohs) {     // copying with the VMs scheduler timings
+    nstw = dmn + nsdly + (pmdly ?  pmdly2ns : 0);
+    if( dlt < nstw || hsh == ohs ) { // copying with the VMs scheduler timings
 #if USE_GET_TIME
 #else
 reschedule:
@@ -356,7 +357,7 @@ reschedule:
         sched_yield();
         goto hashotloop;             // continue made by an ASM jump
     }
-    if(dmn << 1 > dlt) {
+    if( (dmn << 1) > dlt ) {
         avg += dlt;
         ncl++;
     }
@@ -371,7 +372,7 @@ proceeding:
     goto hashotloop;                 // a loop made by two ASM jumps
 
 funcreturn:
-    // 5. finalising w/ a 32+1 bit mix
+    // 5. finalising w/ a 32+1 bit mix /////////////////////////////////////////
     return (hsh * 0x45d9f3b) ^ (hsh >> 31);
 }
 
