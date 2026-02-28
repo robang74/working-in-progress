@@ -1,7 +1,7 @@
 /*
  * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2 license
  */
-#define VERSION "v0.2.5.1"
+#define VERSION "v0.2.5.2"
 /* Quick 2k test: cat uchaos.c  | ./chaos -T 2048 | ent
  * Boot log test: cat dmesg.txt | ./uchaos -i 16 -r64 | ent
  * Compile w/libc: gcc uchaos.c -O3 --fast-math -Wall -o uchaos [-D_USE_GET_RTSC]
@@ -256,24 +256,31 @@ static inline uint16_t mm3ns16(uint16_t ns, uint16_t p) {
 
 #define pmdly2ns ( ( ( (uint64_t)dmn * pmdly ) + 127 ) >> 8 )
 
-static inline uint8_t minmix8(uint8_t b) {
-    uint8_t n = primes64[ b & 2 ];
-    b = (b << n) | (b >> (8-n));
+#ifdef _USE_STOCHASTIC_BRANCHES
+#define STOCHASTIC_BRANCHES 1
+static inline uint8_t  minmix8(uint8_t b) {
     b *= (b & 1) ? 0x4d : 0x65;
-    return b ^ (b >> 3);
+    return b ^ ((b >> 3) | (b << 5));
 }
-
 static inline uint64_t knuthmx(uint64_t w) {
     w  = rotl64(w, primes64[(w & 0x07) + 1]);
     w *= (w & 1) ? 0x9E3779B9 : 0x45d9f3b;
-    return w ^ (w >> 13);
+    return w ^ ((w >> 17) | (w << 47));
 }
+#else
+#define STOCHASTIC_BRANCHES 0
+#define minmix8
+#define knuthmx
+#endif
+
+#define GETVAL (const uint8_t *)(-1)
 
 static uint64_t djb2tum(const uint8_t *str, uint8_t maxn, uint64_t seed,
     const uint32_t nsdly, const uint32_t pmdly, const uint8_t nbtls)
 {
     static uint64_t ncl = 0, dmn = E9, nexp = 0, avg = 0, dmx = 0;
 
+    if( pmdly && str == GETVAL ) return pmdly2ns;
     if( !str ) {
         if( ncl ) {
             double mean = (double)avg / ncl;
@@ -345,10 +352,10 @@ hashotloop:                          // a loop made by ASM jumps
         avg += dlt; ncl++;
         // dmn calculation is mandatory for stochastics biforkation turns
         if( dlt < dmn ) {
-            uint64_t dff = dmn - dlt; dmn = dlt; dlt = dff; minmix8(ns);
+            uint64_t dff = dmn - dlt; dmn = dlt; dlt = dff; ns = minmix8(ns);
         } else
         // dmx calculation can be omited but doing ns*=0x4d anyway
-        if( dlt > dmx ) { dmx = dlt; minmix8(ns); }
+        if( dlt > dmx ) { dmx = dlt; ns = minmix8(ns); }
         // for the execption manager activation
         excp = dlt < nsdly + (pmdly ? pmdly2ns : 1);
     }
@@ -381,8 +388,8 @@ reschedule:
 #endif
         str--;                       // apply changes but repeat the action
         nexp++;
-        knuthmx(hsh);                // Knuth, based on gold section
         sched_yield();
+        hsh = knuthmx(hsh);          // Knuth, based on gold section
         goto hashotloop;             // continue made by an ASM jump
     }
 
@@ -394,7 +401,11 @@ reschedule:
     }
 
     // 9. finalising w/ a 32+1 bit mix /////////////////////////////////////////
+#if STOCHASTIC_BRANCHES
     ohs = (hsh * 0xFF51AFD7ED558CCD) ^ (hsh >> 31);
+#else
+    ohs = (hsh * 0x00000000045d9f3b) ^ (hsh >> 31);
+#endif
     return ohs;
 }
 
@@ -637,10 +648,15 @@ int main(int argc, char *argv[]) {
     uint64_t bic = 0, max = 0, min = 256, avg = 0, mt = 0;
     uint64_t nk = 0, nt = 0, nx = 0, nn = 0;
 
-    if(prsts) { //RAF, TODO: dealing with size one.
-        perr("\nuChaos: %s; repetitions: ", VERSION);
-        if(size < 2) { perr("too short input, try longer!\n\n"); prsts = 0; }
-    }
+    perr("\nuChaos: %s%s; ", VERSION, STOCHASTIC_BRANCHES ? " w/sb" : "");
+    if(prsts) {                      // RAF, TODO: dealing with size one.
+        perr("repetitions: ");
+        if(size < 2) {
+            perr("too short input, try longer!\n\n");
+            prsts = 0;
+        }
+    } else perr("s(%d), d(%dns), p(%d), r(%d), RTSC(%d)\n\n",
+        nbtls, nsdly, pmdly, nrdry, !USE_GET_TIME);
 
     for (uint32_t a = ntsts; a; a--) {
         // hashing
@@ -735,11 +751,10 @@ int main(int argc, char *argv[]) {
     perr("\n");
     perr("Times: running: %.3lf s, hashing: %.3lf s, speed: %.1lf Kh/s",
         (double)rt/E9, (double)mt/E9, (double)E6*nt/rt);
-    uint32_t pmns = (uint32_t)djb2tum(0, 0, 0, 0, pmdly, 0);
-    perr("Parameter settings: s(%d), d(%dns), p(%d:%dns), r(%d), RTSC(%d)\n",
-        nbtls, nsdly, pmdly, pmns, nrdry, !USE_GET_TIME);
 
-    perr("\n");
+    uint32_t pmns = (uint32_t)djb2tum(0, 0, 0, 0, pmdly, 0);
+    perr("Parameter settings: s(%d), d(%dns), p(%d:%dns), r(%d), RTSC(%d)\n\n",
+        nbtls, nsdly, pmdly, pmns, nrdry, !USE_GET_TIME);
 
     return 0; // exit() do free()
 }
