@@ -1,7 +1,7 @@
 /*
  * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2 license
  *
- * Version: v0.2.4.1
+ * Version: v0.2.4.2
  * Quick 2k test: cat uchaos.c  | ./chaos -T 2048 | ent
  * Boot log test: cat dmesg.txt | ./uchaos -i 16 -r64 | ent
  * Compile w/libc: gcc uchaos.c -O3 --fast-math -Wall -o uchaos [-D_USE_GET_RTSC]
@@ -298,81 +298,85 @@ static uint64_t djb2tum(const uint8_t *str, uint8_t maxn, uint64_t seed,
     static uint32_t cpuid, oid = -1;
 #endif
     uint32_t nstw;
-    uint64_t ts_tv_nsec, dlt, chr, ons = 0;
+    uint64_t ts_tv_nsec, dlt, ons = 0, chr = *str;
     uint8_t ns, b0, b1;
 
 hashotloop:                          // a loop made by ASM jumps
-    if( !( (chr = *str++) && maxn-- ) ) goto funcreturn;
 
+    // 1. time deltas management ///////////////////////////////////////////////
 #if USE_GET_TIME
-    ts_tv_nsec = getnstime(NULL);
-#else
-    ts_tv_nsec = getnstime(&cpuid);
-#endif
-    ns = 0xff & (ts_tv_nsec >> nbtls);
-    ns ^= (ns >> 3) ^ (0xff & ohs);
-    b1 = ns & 0x02;
-    b0 = ns & 0x01;
-    /*
-     * (16+1) (32-1 or 32+1) (64-1)
-     *   01     10      00     11
-     */
-    // 1. nacro-mix in djb2-style //////////////////////////////////////////////
-    hsh = ( ( hsh << (4 + (b0 ? b1 : 1)) ) + (b1 ? -hsh : hsh) );
-
-    // 2. char injection + rotation ////////////////////////////////////////////
-#if USE_PRIMES_2564
-    hsh ^= chr ^ rotl64(chr, primes64[ns%10]);
-#else
-    hsh ^= chr ^ rotl64(chr, 1 + (ns & 0x07));
-#endif
-    // 3. stochastics micro-mix ////////////////////////////////////////////////
-    hsh  = rotl64(hsh, 5 + ((ns >> 3) & 0x03)) + hsh;
-
-    // 4. time deltas management ///////////////////////////////////////////////
-    if( !ons ) goto proceeding;
-#if USE_GET_TIME
+    ts_tv_nsec = getnstime( NULL ) >> nbtls;
     dlt = ts_tv_nsec < ons ? 1E9 + ts_tv_nsec - ons : ts_tv_nsec - ons;
 #else
-    dlt = ts_tv_nsec - ons;          // overflow by uint64_t is 0xff..ff + 1 = 0
-#endif
-    if( dlt < dmn ) dmn = dlt;
-    if( dlt > dmx ) dmx += (dmx ? dmx/dlt : 1.0);
-#if USE_GET_TIME
-#else
+    ts_tv_nsec = getnstime(&cpuid) >> nbtls;
     if( cpuid != oid ) {
           oid = cpuid;
           ons = ts_tv_nsec;
           goto reschedule;
     }
+    oid = cpuid;
+    dlt = ts_tv_nsec - ons;          // overflow by uint64_t is 0xff..ff + 1 = 0
 #endif
-    nstw = dmn + nsdly + (pmdly ?  pmdly2ns : 0);
+    ns = 0xff & ts_tv_nsec;
+
+    // 2. internal stats update ////////////////////////////////////////////////
+    nstw = 0;
+    if( ons ) {
+        // dmn calculation is mandatory for stochastics biforkation turns
+        if( dlt < dmn ) { ns *= 0x4d; dmn = dlt; }
+        // dmx calculation can be simplified or omited but ns*=0x4d anyway
+        if( dlt > dmx ) { ns *= 0x4d; dmx += (dlt ? dmx/dlt : 0); }
+        nstw = dmn + nsdly + (pmdly ?  pmdly2ns : 0);
+        // avg calculation can be omitted
+        if( (dmn << 1) > dlt ) { avg += dlt; ncl++; }
+    }
+
+    // 3. entropy distillation /////////////////////////////////////////////////
+    b0  = ohs;
+    b1  = ons >> 3;
+    ns ^= (ns >> 3) ^ b0 ^ (b1 << 2);
+    b1  = ns & 0x02;
+    b0  = ns & 0x01;
+
+    // 4. nacro-mix in djb2-style //////////////////////////////////////////////
+    /*
+     * (16+1) (32-1 or 32+1) (64-1)
+     *   01     10      00     11
+     */
+    hsh  = ( ( hsh << (4 + (b0 ? b1 : 1)) ) + (b1 ? -hsh : hsh) );
+
+    // 5. entropy injection w/ rotation ////////////////////////////////////////
+#if USE_PRIMES_2564
+    hsh ^= chr ^ rotl64(chr, primes64[ns%10]);
+#else
+    hsh ^= chr ^ rotl64(chr, 1 + (ns & 0x07));
+#endif
+
+    // 6. stochastics micro-mix ////////////////////////////////////////////////
+    hsh  = rotl64(hsh, 5 + ((ns >> 3) & 0x03)) + hsh;
+
+    // 7. exceptions management ////////////////////////////////////////////////
     if( dlt < nstw || hsh == ohs ) { // copying with the VMs scheduler timings
 #if USE_GET_TIME
 #else
 reschedule:
 #endif
-        str--;                       // repeat the action even if it made changes
+        str--;                       // apply changes but repeat the action
         nexp++;
         sched_yield();
+        hsh *= 0x9E3779B9;           // Knuth, based on gold section
         goto hashotloop;             // continue made by an ASM jump
     }
-    if( (dmn << 1) > dlt ) {
-        avg += dlt;
-        ncl++;
-    }
-proceeding:
+
+    // 8. preparation for the next round ///////////////////////////////////////
     ohs = hsh;
     ons = ts_tv_nsec;
-#if USE_GET_TIME
-#else
-    oid = cpuid;
-#endif
-    sched_yield();
-    goto hashotloop;                 // a loop made by two ASM jumps
+    if( (chr = *++str) && maxn-- ) {
+        sched_yield();
+        goto hashotloop;             // a loop made by two ASM jumps
+    }
 
-funcreturn:
-    // 5. finalising w/ a 32+1 bit mix /////////////////////////////////////////
+    // 9. finalising w/ a 32+1 bit mix /////////////////////////////////////////
     return (hsh * 0x45d9f3b) ^ (hsh >> 31);
 }
 
