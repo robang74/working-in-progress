@@ -253,10 +253,9 @@ static inline uint16_t mm3ns16(uint16_t ns, uint16_t p) {
 #endif
 
 #include <sched.h>
-#define minmix8(b) { b *= b&1?0x4d:0x65; b ^= b>>3; }
+#define minmix8(b) { b *= b&1 ? 0x4d : 0x65; b ^= b >> 3; }
 #define pmdly2ns ( ( ( (uint64_t)dmn * pmdly ) + 127 ) >> 8 )
-#define knuthmx(w) { w *= w&1?0x9E3779B9:0x45d9f3b; w ^= w>>13; }
-
+#define knuthmx(w) { w *= w&1 ? 0x9E3779B9 : 0x45d9f3b; w ^= w >> 13; }
 
 static uint64_t djb2tum(const uint8_t *str, uint8_t maxn, uint64_t seed,
     const uint32_t nsdly, const uint32_t pmdly, const uint8_t nbtls)
@@ -570,7 +569,7 @@ int main(int argc, char *argv[]) {
 
     // Collect arguments from optional command line parameters
     while (1) {
-        int opt = getopt(argc, argv, "hT:s:d:p:r:k:i:q");
+        int opt = getopt(argc, argv, "hG:M:T:s:d:p:r:k:i:q");
         if(opt == 'q') {
             quiet = 1;
         } else
@@ -586,7 +585,9 @@ int main(int argc, char *argv[]) {
         long x = atoi(optarg);
         switch (opt) {
             // ABS sanitises the parametric inputs
-            case 'T': ntsts = ABS(x); prsts = 1; break;
+            case 'T': ntsts = ABS(x);       prsts = 1; break;
+            case 'M': ntsts = ABS(x) << 11; prsts = 1; break;
+            case 'G': ntsts = ABS(x) << 21; prsts = 1; break;
             case 's': nbtls = ABS(x); break;
             case 'd': nsdly = ABS(x); break;
             case 'r': nrdry = ABS(x); break;
@@ -610,7 +611,7 @@ int main(int argc, char *argv[]) {
     }
 
     uint32_t n = (nblks < 2) ? readbuf(STDIN_FILENO, str, BLOCK_SIZE, 0) \
-                           : readblocks(STDIN_FILENO, str, nblks);
+                             : readblocks(STDIN_FILENO, str, nblks);
     if(n < 1) return EXIT_FAILURE;
     if (nblks > 1) bin2str(str, n);   // necessary because djb2tum() born for text,
     str[n] = 0;                       // refactoring it for binary input, is the way.
