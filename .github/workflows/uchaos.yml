@@ -66,9 +66,6 @@ jobs:
         body: |
           ## uchaos PRNG Release ${{ github.ref_name }}
           
-          ### Statistical Validation (Summary):
-          - **Collision Rate:** 0.00% (Unique hashes from static input)
-          - **Entropy:** > 7.999 bits/byte
-          - **Environment:** GitHub Actions Runner (VM Jitter)
+          **Environment:** GitHub Actions Runner (VM Jitter)
           
           The attached results contain the full report.

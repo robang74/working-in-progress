@@ -1,8 +1,8 @@
 /*
  * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2 license
- *
- * Version: v0.2.4.3
- * Quick 2k test: cat uchaos.c  | ./chaos -T 2048 | ent
+ */
+#define VERSION "v0.2.5.1"
+/* Quick 2k test: cat uchaos.c  | ./chaos -T 2048 | ent
  * Boot log test: cat dmesg.txt | ./uchaos -i 16 -r64 | ent
  * Compile w/libc: gcc uchaos.c -O3 --fast-math -Wall -o uchaos [-D_USE_GET_RTSC]
  * Compile w/musl: musl-gcc uchaos.c -O3 --fast-math -Wall -static -s -o uchaos
@@ -253,7 +253,10 @@ static inline uint16_t mm3ns16(uint16_t ns, uint16_t p) {
 #endif
 
 #include <sched.h>
+#define minmix8(b) { b *= b&1?0x4d:0x65; b ^= b>>3; }
 #define pmdly2ns ( ( ( (uint64_t)dmn * pmdly ) + 127 ) >> 8 )
+#define knuthmx(w) { w *= w&1?0x9E3779B9:0x45d9f3b; w ^= w>>13; }
+
 
 static uint64_t djb2tum(const uint8_t *str, uint8_t maxn, uint64_t seed,
     const uint32_t nsdly, const uint32_t pmdly, const uint8_t nbtls)
@@ -297,7 +300,7 @@ static uint64_t djb2tum(const uint8_t *str, uint8_t maxn, uint64_t seed,
     static uint32_t cpuid, oid = -1;
 #endif
     uint64_t ts_tv_nsec, ons = 0, chr = *str;
-    uint8_t ns, b0, b1, excp;
+    uint16_t ns, b0, b1, excp;
 
 hashotloop:                          // a loop made by ASM jumps
 
@@ -313,7 +316,10 @@ hashotloop:                          // a loop made by ASM jumps
     }
     oid = cpuid;
 #endif
+
+    // 3. entropy distillation /////////////////////////////////////////////////
     ns = 0xff & ts_tv_nsec;
+    ns ^= (ns >> 3) ^ (0xff & ohs);
 
     // 2. internal stats update ////////////////////////////////////////////////
     excp = 0;
@@ -328,27 +334,22 @@ hashotloop:                          // a loop made by ASM jumps
         avg += dlt; ncl++;
         // dmn calculation is mandatory for stochastics biforkation turns
         if( dlt < dmn ) {
-            uint64_t dff = dmn - dlt; dmn = dlt; dlt = dff; ns *= 0x4d;
+            uint64_t dff = dmn - dlt; dmn = dlt; dlt = dff; minmix8(ns);
         } else
         // dmx calculation can be omited but doing ns*=0x4d anyway
-        if( dlt > dmx ) { dmx = dlt; ns *= 0x4d; }
+        if( dlt > dmx ) { dmx = dlt; minmix8(ns); }
         // for the execption manager activation
         excp = dlt < nsdly + (pmdly ? pmdly2ns : 1);
     }
-
-    // 3. entropy distillation /////////////////////////////////////////////////
-    b0  = ohs;
-    b1  = ons >> 3;
     ons = ts_tv_nsec;
-    ns ^= (ns >> 3) ^ b0 ^ (b1 << 2);
-    b1  = ns & 0x02;
-    b0  = ns & 0x01;
 
     // 4. nacro-mix in djb2-style //////////////////////////////////////////////
     /*
      * (16+1) (32-1 or 32+1) (64-1)
      *   01     10      00     11
      */
+    b1  = ns & 0x02;
+    b0  = ns & 0x01;
     hsh  = ( ( hsh << (4 + (b0 ? b1 : 1)) ) + (b1 ? -hsh : hsh) );
 
     // 5. entropy injection w/ rotation ////////////////////////////////////////
@@ -369,8 +370,8 @@ reschedule:
 #endif
         str--;                       // apply changes but repeat the action
         nexp++;
+        knuthmx(hsh);                // Knuth, based on gold section
         sched_yield();
-        hsh *= 0x9E3779B9;           // Knuth, based on gold section
         goto hashotloop;             // continue made by an ASM jump
     }
 
@@ -382,7 +383,7 @@ reschedule:
     }
 
     // 9. finalising w/ a 32+1 bit mix /////////////////////////////////////////
-    ohs = (hsh * 0x45d9f3b) ^ (hsh >> 31);
+    ohs = (hsh * 0xFF51AFD7ED558CCD) ^ (hsh >> 31);
     return ohs;
 }
 
@@ -623,7 +624,7 @@ int main(int argc, char *argv[]) {
     uint64_t bic = 0, max = 0, min = 256, avg = 0, mt = 0;
     uint64_t nk = 0, nt = 0, nx = 0, nn = 0;
 
-    if(prsts) perr("\nRepetitions: ");
+    if(prsts) perr("\nuChaos: %s; repetitions: ", VERSION);
     for (uint32_t a = ntsts; a; a--) {
         // hashing
         uint64_t st = get_nanos();
