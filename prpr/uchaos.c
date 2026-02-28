@@ -297,9 +297,8 @@ static uint64_t djb2tum(const uint8_t *str, uint8_t maxn, uint64_t seed,
 #else
     static uint32_t cpuid, oid = -1;
 #endif
-    uint32_t nstw;
     uint64_t ts_tv_nsec, dlt, ons = 0, chr = *str;
-    uint8_t ns, b0, b1;
+    uint8_t ns, b0, b1, excp;
 
 hashotloop:                          // a loop made by ASM jumps
 
@@ -320,15 +319,16 @@ hashotloop:                          // a loop made by ASM jumps
     ns = 0xff & ts_tv_nsec;
 
     // 2. internal stats update ////////////////////////////////////////////////
-    nstw = 0;
+    excp = 0;
     if( ons ) {
         // dmn calculation is mandatory for stochastics biforkation turns
-        if( dlt < dmn ) { ns *= 0x4d; dmn = dlt; }
+        if( dlt < dmn ) { ns *= 0x4d; dlt = dmn - dlt; dmn = dlt; }
         // dmx calculation can be simplified or omited but ns*=0x4d anyway
         if( dlt > dmx ) { ns *= 0x4d; dmx += (dlt ? dmx/dlt : 0); }
-        nstw = dmn + nsdly + (pmdly ?  pmdly2ns : 0);
         // avg calculation can be omitted
         if( (dmn << 1) > dlt ) { avg += dlt; ncl++; }
+        // for the execption manager activation
+        excp = dlt < nsdly + (pmdly ? pmdly2ns : 1);
     }
 
     // 3. entropy distillation /////////////////////////////////////////////////
@@ -356,7 +356,7 @@ hashotloop:                          // a loop made by ASM jumps
     hsh  = rotl64(hsh, 5 + ((ns >> 3) & 0x03)) + hsh;
 
     // 7. exceptions management ////////////////////////////////////////////////
-    if( dlt < nstw || hsh == ohs ) { // copying with the VMs scheduler timings
+    if( excp || hsh == ohs ) {       // copying with the VMs scheduler timings
 #if USE_GET_TIME
 #else
 reschedule:
