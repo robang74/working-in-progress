@@ -1,7 +1,7 @@
 /*
  * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2 license
  *
- * Version: v0.2.4.2
+ * Version: v0.2.4.3
  * Quick 2k test: cat uchaos.c  | ./chaos -T 2048 | ent
  * Boot log test: cat dmesg.txt | ./uchaos -i 16 -r64 | ent
  * Compile w/libc: gcc uchaos.c -O3 --fast-math -Wall -o uchaos [-D_USE_GET_RTSC]
@@ -292,12 +292,12 @@ static uint64_t djb2tum(const uint8_t *str, uint8_t maxn, uint64_t seed,
      */
     if( seed ) hsh = seed;
 
-    static uint64_t ohs = 5381;
+    static uint64_t ohs = 5381, ons = 0;
 #if USE_GET_TIME
 #else
     static uint32_t cpuid, oid = -1;
 #endif
-    uint64_t ts_tv_nsec, dlt, ons = 0, chr = *str;
+    uint64_t ts_tv_nsec, dlt, chr = *str;
     uint8_t ns, b0, b1, excp;
 
 hashotloop:                          // a loop made by ASM jumps
@@ -321,12 +321,14 @@ hashotloop:                          // a loop made by ASM jumps
     // 2. internal stats update ////////////////////////////////////////////////
     excp = 0;
     if( ons ) {
+        // avg calculation can be omitted
+        avg += dlt; ncl++;
         // dmn calculation is mandatory for stochastics biforkation turns
-        if( dlt < dmn ) { ns *= 0x4d; dlt = dmn - dlt; dmn = dlt; }
+        if( dlt < dmn ) {
+            uint64_t dff = dmn - dlt; dmn = dlt; dlt = dff;  ns *= 0x4d;
+        }
         // dmx calculation can be simplified or omited but ns*=0x4d anyway
         if( dlt > dmx ) { ns *= 0x4d; dmx += (dlt ? dmx/dlt : 0); }
-        // avg calculation can be omitted
-        if( (dmn << 1) > dlt ) { avg += dlt; ncl++; }
         // for the execption manager activation
         excp = dlt < nsdly + (pmdly ? pmdly2ns : 1);
     }
@@ -334,6 +336,7 @@ hashotloop:                          // a loop made by ASM jumps
     // 3. entropy distillation /////////////////////////////////////////////////
     b0  = ohs;
     b1  = ons >> 3;
+    ons = ts_tv_nsec;
     ns ^= (ns >> 3) ^ b0 ^ (b1 << 2);
     b1  = ns & 0x02;
     b0  = ns & 0x01;
@@ -369,15 +372,15 @@ reschedule:
     }
 
     // 8. preparation for the next round ///////////////////////////////////////
-    ohs = hsh;
-    ons = ts_tv_nsec;
     if( (chr = *++str) && maxn-- ) {
+        ohs = hsh;
         sched_yield();
         goto hashotloop;             // a loop made by two ASM jumps
     }
 
     // 9. finalising w/ a 32+1 bit mix /////////////////////////////////////////
-    return (hsh * 0x45d9f3b) ^ (hsh >> 31);
+    ohs = (hsh * 0x45d9f3b) ^ (hsh >> 31);
+    return ohs;
 }
 
 uint64_t *str2ht64(uint8_t *str, uint64_t **ph,  uint32_t *size,
