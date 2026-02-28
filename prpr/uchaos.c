@@ -694,8 +694,12 @@ int main(int argc, char *argv[]) {
     uint64_t rt = get_nanos();
     perr("%s\n", nk ? ", status KO" : "none found, status OK");
     perr("\n");
-    perr("Tests: %d w/ collisions %.0lf over %.1lf K hashes (%.2lf ppm)\n",
-        ntsts, (double)nk, (double)nt/E3, (double)E6*nk/nt);
+
+    perr("Tests: %d w/ duplicates %.0lf over ", ntsts, (double)nk);
+    if((nt >> 3) > E6)
+        perr("%.2lf M hashes (%.2lf ppm)\n", (double)nt/E6, (double)E6*nk/nt);
+    else
+        perr("%.1lf K hashes (%.2lf ppm)\n", (double)nt/E3, (double)E6*nk/nt);
 
     avgbc /= ntsts;
     double bic_nx_absl = (double)bic / nx;
