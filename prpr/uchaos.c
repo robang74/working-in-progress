@@ -113,9 +113,9 @@
 #include <fcntl.h>
 
 #define AVGV 127.5
-#define E3 1000L
-#define E6 1000000L
-#define E9 1000000000L
+#define E3 1000
+#define E6 1000000
+#define E9 1000000000
 #define MAX_READ_SIZE 4096
 #define MAX_COMP_SIZE (MAX_READ_SIZE << 1)
 #define ABS(a)    ( ( (a) < 0 )  ? -(a) : (a) )
@@ -258,14 +258,13 @@ static inline uint16_t mm3ns16(uint16_t ns, uint16_t p) {
 static uint64_t djb2tum(const uint8_t *str, uint8_t maxn, uint64_t seed,
     const uint32_t nsdly, const uint32_t pmdly, const uint8_t nbtls)
 {
-    static double dmx = 0;
-    static uint64_t ncl = 0, dmn = -1, nexp = 0, avg = 0;
+    static uint64_t ncl = 0, dmn = -1, nexp = 0, avg = 0, dmx = 0;
 
     if( !str ) {
         if( ncl ) {
             double mean = (double)avg / ncl;
             perr("\nTime deltas avg: %.0lf <%.1lf> %.0lf ns over %.0lfK (+%.0lf) values\n",
-                (double)dmn, mean, dmx, (double)ncl/E3, (double)nexp);
+                (double)dmn, mean, (double)dmx, (double)ncl/E3, (double)nexp);
             perr("Ratios over avg: %.2lf <1U> %.2lf, over min: 1U <%.2lf> %.2lf\n",
                 (double)dmn/mean, (double)dmx/mean, mean/dmn, (double)dmx/dmn);
         }
@@ -305,7 +304,7 @@ hashotloop:                          // a loop made by ASM jumps
     // 1. time deltas management ///////////////////////////////////////////////
 #if USE_GET_TIME
     ts_tv_nsec = getnstime( NULL ) >> nbtls;
-    dlt = ts_tv_nsec < ons ? 1E9 + ts_tv_nsec - ons : ts_tv_nsec - ons;
+    dlt = (ts_tv_nsec < ons) ? ts_tv_nsec + (E9 - ons): ts_tv_nsec - ons;
 #else
     ts_tv_nsec = getnstime(&cpuid) >> nbtls;
     if( cpuid != oid ) {
@@ -327,8 +326,8 @@ hashotloop:                          // a loop made by ASM jumps
         if( dlt < dmn ) {
             uint64_t dff = dmn - dlt; dmn = dlt; dlt = dff;  ns *= 0x4d;
         }
-        // dmx calculation can be simplified or omited but ns*=0x4d anyway
-        if( dlt > dmx ) { ns *= 0x4d; dmx += (dlt ? dmx/dlt : 0); }
+        // dmx calculation can be omited but doing ns*=0x4d anyway
+        if( dlt > dmx ) { ns *= 0x4d; dmx = dlt; }
         // for the execption manager activation
         excp = dlt < nsdly + (pmdly ? pmdly2ns : 1);
     }
