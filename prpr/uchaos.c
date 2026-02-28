@@ -191,12 +191,12 @@ struct rand_pool_info_buf {
 
 static inline uint64_t getnstime(uint32_t *pcpuid) {
 #if USE_GET_TIME
-#else
-    if(pcpuid) return get_rdtsc_clock(pcpuid);
-#endif
     struct timespec ts;                         // using sched_yield() to creates chaos,
     clock_gettime(CLOCK_MONOTONIC, &ts);        // getting ns in a hot loop is the limit
-    return ts.tv_nsec;                          // and we want to see this limit, in VMs
+    return 0x7FFFFFFF & ts.tv_nsec;             // and we want to see this limit, in VMs
+#else
+    return get_rdtsc_clock(pcpuid);
+#endif
 }
 
 #if 0
@@ -258,7 +258,7 @@ static inline uint16_t mm3ns16(uint16_t ns, uint16_t p) {
 static uint64_t djb2tum(const uint8_t *str, uint8_t maxn, uint64_t seed,
     const uint32_t nsdly, const uint32_t pmdly, const uint8_t nbtls)
 {
-    static uint64_t ncl = 0, dmn = -1, nexp = 0, avg = 0, dmx = 0;
+    static uint64_t ncl = 0, dmn = E9, nexp = 0, avg = 0, dmx = 0;
 
     if( !str ) {
         if( ncl ) {
@@ -291,12 +291,12 @@ static uint64_t djb2tum(const uint8_t *str, uint8_t maxn, uint64_t seed,
      */
     if( seed ) hsh = seed;
 
-    static uint64_t ohs = 5381, ons = 0;
+    static uint64_t ohs = 5381;
 #if USE_GET_TIME
 #else
     static uint32_t cpuid, oid = -1;
 #endif
-    uint64_t ts_tv_nsec, dlt, chr = *str;
+    uint64_t ts_tv_nsec, ons = 0, chr = *str;
     uint8_t ns, b0, b1, excp;
 
 hashotloop:                          // a loop made by ASM jumps
@@ -304,7 +304,6 @@ hashotloop:                          // a loop made by ASM jumps
     // 1. time deltas management ///////////////////////////////////////////////
 #if USE_GET_TIME
     ts_tv_nsec = getnstime( NULL ) >> nbtls;
-    dlt = (ts_tv_nsec < ons) ? ts_tv_nsec + (E9 - ons): ts_tv_nsec - ons;
 #else
     ts_tv_nsec = getnstime(&cpuid) >> nbtls;
     if( cpuid != oid ) {
@@ -313,21 +312,26 @@ hashotloop:                          // a loop made by ASM jumps
           goto reschedule;
     }
     oid = cpuid;
-    dlt = ts_tv_nsec - ons;          // overflow by uint64_t is 0xff..ff + 1 = 0
 #endif
     ns = 0xff & ts_tv_nsec;
 
     // 2. internal stats update ////////////////////////////////////////////////
     excp = 0;
     if( ons ) {
+        uint64_t dlt = ts_tv_nsec;
+#if USE_GET_TIME
+        dlt = (dlt < ons) ? E9 - ons + dlt : dlt - ons;
+#else
+        dlt = dlt - ons;             // overflow by uint64_t is 0xff..ff + 1 = 0
+#endif
         // avg calculation can be omitted
         avg += dlt; ncl++;
         // dmn calculation is mandatory for stochastics biforkation turns
         if( dlt < dmn ) {
-            uint64_t dff = dmn - dlt; dmn = dlt; dlt = dff;  ns *= 0x4d;
-        }
+            uint64_t dff = dmn - dlt; dmn = dlt; dlt = dff; ns *= 0x4d;
+        } else
         // dmx calculation can be omited but doing ns*=0x4d anyway
-        if( dlt > dmx ) { ns *= 0x4d; dmx = dlt; }
+        if( dlt > dmx ) { dmx = dlt; ns *= 0x4d; }
         // for the execption manager activation
         excp = dlt < nsdly + (pmdly ? pmdly2ns : 1);
     }
