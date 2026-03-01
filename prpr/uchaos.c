@@ -272,21 +272,34 @@ static inline uint16_t mm3ns16(uint16_t ns, uint16_t p) {
 
 #define pmdly2ns ( ( ( (uint64_t)dmn * pmdly ) + 127 ) >> 8 )
 
+#define STBRSTR "stochastics branches"
 #ifdef _USE_STOCHASTIC_BRANCHES
-#define STOCHASTIC_BRANCHES 1
-static inline uint8_t  minmix8(uint8_t b) {
-    b *= (b & 1) ? 0x4d : 0x65;
-    return b ^ ((b >> 3) | (b << 5));
-}
-static inline uint64_t knuthmx(uint64_t w) {
-    w  = rotl64(w, primes64[(w & 0x07) + 1]);
-    w *= (w & 1) ? 0x9E3779B9 : 0x45d9f3b;
-    return w ^ ((w >> 17) | (w << 47));
-}
+
+  #define STOCHASTIC_BRANCHES 1
+  #define FINAL_AVALANCHE_MLT 0xFF51AFD7ED558CCD
+  #define perr_app_info() { perr("\n%s %s w/sb", APPNAME, VERSION); }
+  #define entropy(sz) ((sz << 2) - sz) // eq. to 3x (4-1)
+  static inline uint8_t  minmix8(uint8_t b) {
+      b *= (b & 1) ? 0x4d : 0x65;
+      return b ^ ((b >> 3) | (b << 5));
+  }
+  static inline uint64_t knuthmx(uint64_t w) {
+      w  = rotl64(w, primes64[(w & 0x07) + 1]);
+      w *= (w & 1) ? 0x9E3779B9 : 0x45d9f3b;
+      return w ^ ((w >> 17) | (w << 47));
+  }
+  #define perrwrn()
+
 #else
-#define STOCHASTIC_BRANCHES 0
-#define minmix8
-#define knuthmx
+
+  #define STOCHASTIC_BRANCHES 0
+  #define FINAL_AVALANCHE_MLT 0x00000000045d9f3b
+  #define perrwrn() perr("\nWARNING: "APPNAME" isn't compiled with "STBRSTR"\n\n")
+  #define perr_app_info() { perr("\n%s %s", APPNAME, VERSION); }
+  #define entropy(sz) ((sz << 3) - sz) // eq. to 8x (8-1)
+  #define minmix8
+  #define knuthmx
+
 #endif
 
 #define GETVAL (const uint8_t *)(-1)
@@ -417,11 +430,7 @@ reschedule:
     }
 
     // 9. finalising w/ a 32+1 bit mix /////////////////////////////////////////
-#if STOCHASTIC_BRANCHES
-    ohs = (hsh * 0xFF51AFD7ED558CCD) ^ (hsh >> 31);
-#else
-    ohs = (hsh * 0x00000000045d9f3b) ^ (hsh >> 31);
-#endif
+    ohs = (hsh * FINAL_AVALANCHE_MLT) ^ (hsh >> 31);
     return ohs;
 }
 
@@ -606,7 +615,7 @@ static inline void usage(const char *name, const char *cmdn, const uint8_t qlvl)
 
 #define APPNAME "uChaos"
 #define STCX STOCHASTIC_BRANCHES
-#define perr_app_info() { perr("\n%s %s%s", APPNAME, VERSION, STCX ? " w/sb" : ""); }
+
 
 int main(int argc, char *argv[]) {
     struct rand_pool_info_buf entrnd;
@@ -619,11 +628,8 @@ int main(int argc, char *argv[]) {
     while (1) {
         int opt = getopt(argc, argv, "hvSG:M:K:T:s:d:p:r:k:i:q");
         if(opt == 'S') {
-#if STOCHASTIC_BRANCHES
-#else
-            perr("\nWARNING: "APPNAME" isn't compiled with stochastics branches\n\n");
-#endif
             nsdly=3; nblks=16; nrdry=31; ntsts=(4<<1); quiet=2;
+            perrwrn();
         } else
         if(opt == 'v') {
             perr_app_info();
@@ -715,12 +721,7 @@ int main(int argc, char *argv[]) {
         uint32_t sz = size << 3;
         if(devfd) {
             entrnd.buf_size = sz;
-#if STOCHASTIC_BRANCHES
-            // cautelatively 7 bits per byte or 3 when VMs specific
-            entrnd.entropy_count = (sz << 2) - sz; // eq. to 7x (8-1)
-#else
-            entrnd.entropy_count = (sz << 3) - sz; // eq. to 3x (4-1)
-#endif
+            entrnd.entropy_count = entropy(sz);
             memcpy((uint8_t *)entrnd.buf, (uint8_t *)h, sz);
             #define OPTNK "option -k is designed for /dev/[u]random only"
             if (ioctl(devfd, RNDADDENTROPY, &entrnd) < 0 && errno != EINTR) {
