@@ -104,10 +104,11 @@
  * TODO LIST
  *
  * Before and after writing in the /dev/random, read avail. entropy from proc
+ *
  * Create a set of "bit of entropy per byte" polices, and use #if to compile:
- * - optimistic 7hw 3vm,
- * - flipcoin   4hw 2vm,
- * - minimal    2hw 1vm.
+ *   - optimistic 7hw 3vm; or flipcoin 4hw 2vm; or minimal 2hw 1vm.
+ *
+ * Create the option -v version, -h help, -K = -T, -V for VMs best settings
  *
  **************************************************************************** */
 
