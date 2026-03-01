@@ -6,7 +6,7 @@ uCHAOS is going to be tested against a strongly deterministic virtual machine wh
 
 - `gcc -D_USE_STOCHASTIC_BRANCHES`
 - `dmesg | uchaos -i 16 -d 3 -qG 256 -r 32 | RNG_test-musl-static stdin64`
--  [bare minimal linux system](https://github.com/robang74/bare-minimal-linux-system/blob/main/README.md)
+-  [bare minimal linux system](https://github.com/robang74/bare-minimal-linux-system/blob/main/README.md) &nbsp;v0.2.2 and, in particular, &nbsp;[v0.2.3](https://github.com/robang74/bare-minimal-linux-system/releases/tag/bmls-v0.2.3)
 
 Testing previews are quite encouraging and after a few adjustments uChaos compiled with the support for stochastics branching and running with very reasonable optionals parameters passed flawlessly the 4GB practrand test.
 
@@ -14,7 +14,7 @@ Parametric settings explanation: -i16 is for reading the first 8Kb from dmesg; -
 
 The main objection could be -r1 (default) with stochastics branching that might create a sort of initial transient (it doesn't) and testing on 5.15.201 which is the LTS version with the .config available (test repeatability). Guess what? Testing "preview", here __preview__ is the keyword.
 
-- [uChaos v0.2.4](https://github.com/robang74/working-in-progress/releases/tag/uchaos-v0.2.4) &nbsp; (from the next session, text is about v0.2.5)
+- [uChaos v0.2.4](https://github.com/robang74/working-in-progress/releases/tag/uchaos-v0.2.4) &nbsp;and starting from the next session tests pass are for the &nbsp;**v0.2.5.2 w/sb**.
 
 In the meantime the v0.2.4 (tagged) managed to pass flawlessly the 256GB practrand test on a i5-8635 bare-metal CPU. That's why testing with strongly deterministic virtual machine commenced.
 
@@ -30,7 +30,7 @@ Aspe' un momento. Questo "coso" è gira su una VM che è un metronomono (poi la 
 
 Quindi uchaos è l'unico processo attivo, perché non ha servizi, e non ha accesso I/O disk perché è tutto in RAM anche la initramfs. In termini di temperatura questo è un frezeer.  Eppure uchaos regge per 1GB, e i più cattivi (come le AI) diranno che però ad ogni boot vomita sempre lo stesso identico 1GB (se anche fosse, ho compresso un GB di dati incompressibili in 50Kb e quindi baciate il suolo dove cammino!) ma anyway, siamo seri... LOL
 
-La parte "succosa" è che le versioni 0.25.x ha i stocastics branching, e quelli sono imprevedibili finché le statistiche non si stabilizzano e quando si stabilizzano è gelo a 4GB (con -d7 ma con -d63 ? 😊 ).
+La parte "succosa" è che le versioni 0.25.x ha i stocastics branching, e quelli sono imprevedibili finché le statistiche non si stabilizzano e quando si stabilizzano è il gelo a 4GB (con `-d7` che è risultato uno dei valori migliori in questi tests).
 
 ```sh
 Run /init as init process
@@ -56,8 +56,6 @@ uChaos: v0.2.5.2 w/sb; s(0), d(3ns), p(0), r(7), RTSC(0)
 RNG_test-musl-static using PractRand version 0.96
 RNG = RNG_stdin64, seed = unknown
 test set = core, folding = standard (64 bit)
-
-...
 
 length= 1 gigabyte (2^30 bytes), time= 270 seconds
  no anomalies in 227 test result(s)
@@ -270,6 +268,8 @@ length= 4 gigabytes (2^32 bytes), time= 13114 seconds
 ---
 
 ## uChaos works even at the vm deterministic limit
+
+- [LinkedIn post #5](https://www.linkedin.com/posts/robertofoglietta_uchaos-vs-0k-qemu-linux-4gb-test-pass-activity-7433820449668587520-bo-f)
 
 Producing 4GB of high-quality randomness on a strongly deterministic software virtualized machine is a challenge that uChaos passed flawlessly but there was a "detail" in HOW that test was done: PractRand was running piped to uChaos and this calculating concurrently with uChaos.
 
