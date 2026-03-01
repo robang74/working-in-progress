@@ -163,14 +163,25 @@ Con le opzioni -accel tcg -nodefault, l'emulazione è ridotta ai mini termini ma
 
 In particolare -icount serve per intercettare la syscall del tempo in nanosecondi e iniettare in uchaos il numero di istruzioni eseguite dal tempo t=0 di inizio boot. Quindi determinismo assoluto anche sul clock, motivo per il quale si è dovuto rinunciare all'accelarazione KVM perché ora non solo lo scheduler gira in un ambiente virtuale ma pure la CPU è software!
 
-Il nulla in termini di dispositivi emulati a parte la console seriale, comunque anch'essa virtualizzata, senza la quale non si potrebbero nemmeno digitare ne leggere gli output. Eppur, si muove ed sebbene lo faccia tipo a 4 volte più lentamente, uchaos ha comunque avuto il tosto ardire
+Il nulla in termini di dispositivi emulati a parte la console seriale, comunque anch'essa virtualizzata, senza la quale non si potrebbero nemmeno digitare ne leggere gli output. Eppur, si muove ed sebbene lo faccia tipo a 14 volte più lentamente, uchaos ha comunque avuto il tosto ardire
 
 ```text
 length= 256 megabytes (2^28 bytes), time= 859 seconds
   no anomalies in 199 test result(s)
 ```
 
-di cavare 256 MB di numeri casuali da una macchina virtuale estrema in termini di essenzialità e determinismo. Sono pochi, ma sono senza alcuna macchia e alimentando /dev/random con questo seed anche considerando per prudenza che contenga un bit di entropia per ogni byte sono un milione di volte oltre al necessario per il boot seed.
+di cavare 256 MB di numeri casuali da una macchina virtuale estrema in termini di essenzialità e determinismo. Sono pochi, ma sono senza alcuna macchia e alimentando /dev/random con questo seed anche considerando per prudenza che contenga un bit di entropia per ogni byte sono un milione di volte oltre al necessario per il boot seed. Una produzione, restart dopo restart, che non appare mostrare alcuna struttura.
+
+```text
+length= 1 gigabyte (2^30 bytes), time= 3269 seconds
+  no anomalies in 227 test result(s)
+
+length= 2 gigabytes (2^31 bytes), time= 6498 seconds
+  no anomalies in 242 test result(s)
+
+length= 4 gigabytes (2^32 bytes), time= 13114 seconds
+  no anomalies in 256 test result(s)
+```
 
 Un'immensa quantità di "boh non strutturato" specialmente se si considerano le performance di una macchina viratuale interamente sw e prodotta in un millesimo del tempo necessario ad una macchina dotata di un minimo di scopo pratico di fare un milione di boot.
 
