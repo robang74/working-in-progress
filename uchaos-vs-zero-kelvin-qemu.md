@@ -14,7 +14,7 @@ Parametric settings explanation: -i16 is for reading the first 8Kb from dmesg; -
 
 The main objection could be -r1 (default) with stochastics branching that might create a sort of initial transient (it doesn't) and testing on 5.15.201 which is the LTS version with the .config available (test repeatability). Guess what? Testing "preview", here __preview__ is the keyword.
 
-- [uChaos v0.2.4](https://github.com/robang74/working-in-progress/releases/tag/uchaos-v0.2.4) &nbsp;and starting from the next session tests pass are for the &nbsp;**v0.2.5.2 w/sb**.
+- [uChaos v0.2.4](https://github.com/robang74/working-in-progress/releases/tag/uchaos-v0.2.4) &nbsp;and starting from the next session tests pass are for the &nbsp;[v0.2.5.2 w/sb](https://github.com/robang74/working-in-progress/releases/tag/uchaos-v0.2.5.2).
 
 In the meantime the v0.2.4 (tagged) managed to pass flawlessly the 256GB practrand test on a i5-8635 bare-metal CPU. That's why testing with strongly deterministic virtual machine commenced.
 
@@ -30,7 +30,7 @@ Aspe' un momento. Questo "coso" è gira su una VM che è un metronomono (poi la 
 
 Quindi uchaos è l'unico processo attivo, perché non ha servizi, e non ha accesso I/O disk perché è tutto in RAM anche la initramfs. In termini di temperatura questo è un frezeer.  Eppure uchaos regge per 1GB, e i più cattivi (come le AI) diranno che però ad ogni boot vomita sempre lo stesso identico 1GB (se anche fosse, ho compresso un GB di dati incompressibili in 50Kb e quindi baciate il suolo dove cammino!) ma anyway, siamo seri... LOL
 
-La parte "succosa" è che le versioni 0.25.x ha i stocastics branching, e quelli sono imprevedibili finché le statistiche non si stabilizzano e quando si stabilizzano è il gelo a 4GB (con `-d7` che è risultato uno dei valori migliori in questi tests).
+La parte "succosa" è che le versioni 0.25.x ha i stochastics branching, e quelli sono imprevedibili finché le statistiche non si stabilizzano. Infatti, quando si stabilizzano, è il gelo a 4GB (con `-d7` che è risultato uno dei valori migliori in questi tests).
 
 ```sh
 Run /init as init process
