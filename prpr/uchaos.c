@@ -3,9 +3,11 @@
  */
 #define VERSION "v0.2.5.2"
 /* Quick 2k test: cat uchaos.c  | ./chaos -T 2048 | ent
- * Boot log test: cat dmesg.txt | ./uchaos -i 16 -r64 | ent
+ * Boot log test: cat dmesg.txt | ./uchaos -i 16 -r31 -d3 | ent
+ *
  * Compile w/libc: gcc uchaos.c -O3 --fast-math -Wall -o uchaos [-D_USE_GET_RTSC]
  * Compile w/musl: musl-gcc uchaos.c -O3 --fast-math -Wall -static -s -o uchaos
+ *
  * Test with: ent, dieharder, PractRand RNG_test (compiled for Ubuntu 22.04 x64)
  *      drive.google.com/file/d/17ymBcxfO2pA8ET7T4ZxiiO2EYW6_F8Lu/view
  * Data production: uctest.sh (shell script for faster production)
@@ -93,6 +95,16 @@
  * Arithmetic mean value of data bytes is 127.5076 (127.5 = random).
  * Monte Carlo value for Pi is 3.140672935 (error 0.03 percent).
  * Serial correlation coefficient is 0.000300 (totally uncorrelated = 0.0).
+ *
+ * *****************************************************************************
+ *
+ * TODO LIST
+ *
+ * Before and after writing in the /dev/random, read avail. entropy from proc
+ * Create a set of "bit of entropy per byte" polices, and use #if to compile:
+ * - optimistic 7hw 3vm,
+ * - flipcoin   4hw 2vm,
+ * - minimal    2hw 1vm.
  *
  **************************************************************************** */
 
