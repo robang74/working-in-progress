@@ -11,6 +11,8 @@
  *
  * Test with: ent, dieharder, PractRand RNG_test (compiled for Ubuntu 22.04 x64)
  *      drive.google.com/file/d/17ymBcxfO2pA8ET7T4ZxiiO2EYW6_F8Lu/view
+ * Qemu test: cd bare-minimal-linux-system; sh start.sh "" bzImage.515x
+ *      cp -arf prpr/bin update/common/usr (to add missing binaries)
  * Data production: uctest.sh (shell script for faster production)
  *
  * *****************************************************************************
