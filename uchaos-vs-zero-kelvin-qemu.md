@@ -1,4 +1,4 @@
-## EXTREME DETERMINISTIC VIRTUAL MACHINE UCHAOS TESTING
+## Extreme deterministic virtual machine uchaos testing
 
 - [LinkedIn post #1](https://www.linkedin.com/posts/robertofoglietta_extreme-deterministic-virtual-machine-uchaos-activity-7433603537630052352-JIj_)
 
@@ -20,7 +20,7 @@ In the meantime the v0.2.4 (tagged) managed to pass flawlessly the 256GB practra
 
 ---
 
-## QUI ABBIAMO UNA COSA DAVVERO INTERESSANTE!
+## Qui abbiamo una cosa davvero interessante!
 
 - [LinkedIn post #2](https://www.linkedin.com/posts/robertofoglietta_extreme-deterministic-virtual-machine-uchaos-activity-7433621676963098624-sIha)
 
@@ -32,7 +32,7 @@ Quindi uchaos è l'unico processo attivo, perché non ha servizi, e non ha acces
 
 La parte "succosa" è che le versioni 0.25.x ha i stocastics branching, e quelli sono imprevedibili finché le statistiche non si stabilizzano e quando si stabilizzano è gelo a 4GB (con -d7 ma con -d63 ? 😊 ).
 
-```text
+```sh
 Run /init as init process
 MemTotal:    1025432 kB
 MemAvailable:  1008044 kB
@@ -75,7 +75,7 @@ length= 4 gigabytes (2^32 bytes), time= 1031 seconds
 ```
 ---
 
-## USARE RAMI STOCASTICI SULLA CPU REALE
+## Usare rami stocastici sulla cpu reale
 
 - [LinkedIn post #3](https://www.linkedin.com/posts/robertofoglietta_extreme-deterministic-virtual-machine-uchaos-activity-7433638270531424256-5LOw)
 
@@ -109,7 +109,7 @@ Ma questo è normale, sarebbe magia altrimenti e la magia non convincerebbe ness
 
 ---
 
-## NON È POCA COSA, E NON È TANTO PER DIRE
+## Non è poca cosa, e non è tanto per dire
 
 - [LinkedIn post #4](https://www.linkedin.com/posts/robertofoglietta_extreme-deterministic-virtual-machine-uchaos-activity-7433659456749690881-nwTV)
 
@@ -140,7 +140,7 @@ for i in $(seq 1 32); do dmesg | uchaos -i 16 -d 3 -qM 128 -r 31;
 
 anche senza multi-threading (che poi dicono che baro) e se funziona in sequenza allora non c'è trucco e non c'è inganno!
 
-```text
+```sh
 length= 4 gigabytes (2^32 bytes), time= 1012 seconds
   no anomalies in 256 test result(s)
 ```
@@ -149,7 +149,7 @@ In fact, the 4GB test passed flawlessy and at nearly 4MB/s because the quiet opt
 
 ---
 
-## O' TU LETTORE CHE GIUNGESTI SIN QUA
+## O' tu lettore che giungesti sin qua
 
 Valutate quello che è stato scritto in questa catena di post e in particolare da questa prospettiva: l'entropia ha molto più a che fare con l'informazione che con la realtà materiale.
 
@@ -165,14 +165,14 @@ In particolare -icount serve per intercettare la syscall del tempo in nanosecond
 
 Il nulla in termini di dispositivi emulati a parte la console seriale, comunque anch'essa virtualizzata, senza la quale non si potrebbero nemmeno digitare ne leggere gli output. Eppur, si muove ed sebbene lo faccia tipo a 14 volte più lentamente, uchaos ha comunque avuto il tosto ardire
 
-```text
+```sh
 length= 256 megabytes (2^28 bytes), time= 859 seconds
   no anomalies in 199 test result(s)
 ```
 
 di cavare 256 MB di numeri casuali da una macchina virtuale estrema in termini di essenzialità e determinismo. Sono pochi, ma sono senza alcuna macchia e alimentando /dev/random con questo seed anche considerando per prudenza che contenga un bit di entropia per ogni byte sono un milione di volte oltre al necessario per il boot seed. Una produzione, restart dopo restart, che non appare mostrare alcuna struttura.
 
-```text
+```sh
 length= 1 gigabyte (2^30 bytes), time= 3269 seconds
   no anomalies in 227 test result(s)
 
@@ -191,11 +191,11 @@ Se penso che con un hash non crittografico inventato prima della teoria stessa e
 
 ---
 
-## uCHAOS vs 0°K QEMU LINUX: 4GB TEST PASS
+## uChaos vs 0°K QEMU Linux: 4GB test pass
 
 - [LinkedIn post #4](https://www.linkedin.com/posts/robertofoglietta_uchaos-vs-0k-qemu-linux-4gb-test-pass-activity-7433798440767279105-HyFM)
 
-```text
+```sh
 random: get_random_bytes called from 0xffffffff802dcb52 with crng_init=0
 MemTotal:        1025432 kB
 MemAvailable:    1008044 kB
@@ -285,7 +285,7 @@ length= 4 gigabytes (2^32 bytes), time= 13114 seconds
 ```
 ---
 
-## uCHAOS WORKS EVEN AT THE VM DETERMINISTIC LIMIT
+## uChaos works even at the vm deterministic limit
 
 Producing 4GB of high-quality randomness on a strongly deterministic software virtualised machine is a challenge that uChaos passed flawlessy but there was a "detail" in HOW that test was done: PractRand was running piped to uChaos and this calculating concurrently with uChaos.
 
@@ -306,7 +306,7 @@ uChaos works at VMs deterministic limit, that's all folk.
 
 Data 512MB will be delivered in half hour (waiting... ☺️ )
 
-### UPDATE: 0.5GB TEST PASS FLAWLESSY
+### Update: 0.5GB test pass flawlessy
 
 ```sh
 / # RNG_test-musl-static stdin64 < data.out 
@@ -334,7 +334,7 @@ length= 512 megabytes (2^29 bytes), time= 106 seconds
  no anomalies in 213 test result(s)
 ```
 
-Finally, I do not report this answer by x/Grok because an AI said that so it is right. Grok wrote something that I would write if English were my mother-language. And using Grok as a "smart" translator and/or text generative tool, is exactly WHAT these tools have been designed and developed for. Like gcc compiles the C-language code into assembler for a specific target to translate and generate stuff.
+Finally, I do not report this answer by x/Grok because an AI said that so it is right. Grok wrote something that I would write if English were my mother-language. And using Grok as a "smart" translator and/or text generative tool, is exactly WHAT these tools have been designed and developed for. Like gcc compiles the C-language code into assembler for a specific target by translating and generating stuff.
 
 > **Grok's answer**
 > 
