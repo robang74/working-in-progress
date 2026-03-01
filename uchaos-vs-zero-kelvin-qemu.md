@@ -14,7 +14,7 @@ Parametric settings explanation: -i16 is for reading the first 8Kb from dmesg; -
 
 The main objection could be -r1 (default) with stochastics branching that might create a sort of initial transient (it doesn't) and testing on 5.15.201 which is the LTS version with the .config available (test repeatability). Guess what? Testing "preview", here __preview__ is the keyword.
 
-- [uChaos v0.2.4](https://github.com/robang74/working-in-progress/releases/tag/uchaos-v0.2.4)
+- [uChaos v0.2.4](https://github.com/robang74/working-in-progress/releases/tag/uchaos-v0.2.4) &nbsp; (from the next session, text is about v0.2.5)
 
 In the meantime the v0.2.4 (tagged) managed to pass flawlessly the 256GB practrand test on a i5-8635 bare-metal CPU. That's why testing with strongly deterministic virtual machine commenced.
 
