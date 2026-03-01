@@ -1,7 +1,7 @@
 /*
  * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2 license
  */
-#define VERSION "v0.2.5.2"
+#define VERSION "v0.2.5.3"
 /* Quick 2k test: cat uchaos.c  | ./chaos -T 2048 | ent
  * Boot log test: cat dmesg.txt | ./uchaos -i 16 -r31 -d3 | ent
  *
@@ -53,7 +53,7 @@
  *
  * PORPOSE
  *
- * .config - Linux/x86 6.12.71 Kernel Configuration → Kernel hacking 
+ * .config - Linux/x86 6.12.71 Kernel Configuration → Kernel hacking
  *
  * CONFIG_WARN_ALL_UNSEEDED_RANDOM:
  *
@@ -62,7 +62,7 @@
  * securely. This setting ensures that these flaws don't go unnoticed, by enabling
  * a message, should this ever occur. This will allow people with obscure setups
  * to know when things are going wrong, so that they might contact developers
- * about fixing it.                               
+ * about fixing it.
  *
  * Unfortunately, on some models of some architectures getting a fully seeded CRNG
  * is extremely difficult, and so this can result in dmesg getting spammed for a
@@ -75,7 +75,7 @@
  * This will be of use primarily for those developers interested in improving the
  * security of Linux kernels running on their architecture (or subarchitecture).
  *
- * *****************************************************************************      
+ * *****************************************************************************
  *
  * OUTPUT TESTS
  *
@@ -549,11 +549,7 @@ static inline uint32_t readblocks(int fd, uint8_t *buf, uint32_t nblks) {
         for (uint32_t a = 0; a < n; a++) {
             buf[a] ^= inp[a];
             buf[a] ^= (buf[a] << 3) | (buf[a] >> 5);
-//          buf[a] ^= (inp[a] << (8-(a&7))) | (inp[a] >> (a&7));
-//          buf[a] ^= (a & 0x01) ? inp[a] : (inp[a] << 4) | (inp[a] >> 4);
-//          buf[a] ^= inp[a]; // very simple alternative, to consider
-//          buf[a] += inp[a]; // it creates a subtle mod5x3 at 2GB -> fails at 4GB
-        }   
+        }
     }
     return maxn;
 }
@@ -583,21 +579,34 @@ uint64_t get_nanos() {
     return ((uint64_t)ts.tv_sec * 1000000000L + ts.tv_nsec) - start;
 }
 
-static inline void usage(const char *name) {
+static inline void usage(const char *name, const char *cmdn, const uint8_t qlvl) {
     perr("\n"\
-"%s read on stdin, stats on stderr, and data on stdout\n"\
-"\n"\
-"Usage: %s [-h] [-tN] [-dN] [-pN] [-sN] [-rN]\n"\
-"   -T: number of collision tests on the same input\n"\
-"   -d: number of ns above min as the minimum delay\n"\
-"   -p: number of parts as min/256 ns above the min\n"\
-"   -s: number of bits to left shift on ns timings\n"\
-"   -r: number of preliminary runs (default: 1)\n"\
-"   -k: randomness injection in kernel by ioctl\n"\
-"   -i: number of blocks to read from stdin\n"\
-"\nWith -pN is suggested -r32+ for stats pre-evaluation\n\n", name, name);
-    exit(0);
+"%s "VERSION" reads from stdin, stats on stderr, and rand on stdout.\n"\
+"|\n"\
+"\\_ Usage: %s [-h,q%s,V] [-T/K/M/G N] [-d,p,s,r N] [-k /dev/rnd]\n"\
+" |\n"\
+" |    -q: quiet run for the scripts automation (-qqk)\n"\
+" |    -K/-M/-G: kilo/mega/giga bytes of data w/ stats on\n"\
+" |    -S: low-entropy VMs seeding settings (r31,d3,I16,qqK4)\n"\
+" |    -T: number of collision tests x2 on the same input\n"\
+" |    -d: number of ns above min as the minimum delay\n"\
+" |    -p: number of parts as min/256 ns above the min\n"\
+" |    -s: number of bits to left shift on ns timings\n"\
+" |    -r: number of preliminary runs (default: 1)\n"\
+" |    -k: randomness injection in kernel by ioctl\n"\
+" |    -i: number of 512B-blocks to read from stdin\n"\
+" |    -h/-v: shows this help / appname and version\n"\
+" |\n "\
+"\\_ With -pN is suggested -r31 or -r63 for stats pre-evaluation.\n"\
+" |\n"\
+" \\_ Typeical: [sudo] %s -Sk /dev/random (at /init time)\n\n",
+        name, cmdn, (qlvl > 1) ? "^" : "", cmdn);
+    return;
 }
+
+#define APPNAME "uChaos"
+#define STCX STOCHASTIC_BRANCHES
+#define perr_app_info() { perr("\n%s %s%s", APPNAME, VERSION, STCX ? " w/sb" : ""); }
 
 int main(int argc, char *argv[]) {
     struct rand_pool_info_buf entrnd;
@@ -608,12 +617,26 @@ int main(int argc, char *argv[]) {
 
     // Collect arguments from optional command line parameters
     while (1) {
-        int opt = getopt(argc, argv, "hG:M:T:s:d:p:r:k:i:q");
+        int opt = getopt(argc, argv, "hvSG:M:K:T:s:d:p:r:k:i:q");
+        if(opt == 'S') {
+#if STOCHASTIC_BRANCHES
+#else
+            perr("\nWARNING: "APPNAME" isn't compiled with stochastics branches\n\n");
+#endif
+            nsdly=3; nblks=16; nrdry=31; ntsts=(4<<1); quiet=2;
+        } else
+        if(opt == 'v') {
+            perr_app_info();
+            return 0;
+        } else
         if(opt == 'q') {
-            quiet = 1;
+            quiet = (++quiet) ? quiet : 2;
         } else
         if(opt == '?' || opt == 'h') {
-            usage("uchaos");
+            char *p, *q = argv[0];
+            if(q) for(p = q; *p; p++) if(*p == '/') q = p+1;
+            usage(APPNAME, q ? q : "uchaos", quiet);
+            return 0;
         } else
         if(opt == -1) {
             break;
@@ -629,10 +652,11 @@ int main(int argc, char *argv[]) {
             case 'r': nrdry = ABS(x); break;
             case 'p': pmdly = ABS(x); break;
             case 'i': nblks = ABS(x); break;
-            case 'T': ntsts = ABS(x); ntsts <<=  1 ; prsts = 1; break;
-            case 'M': ntsts = ABS(x); ntsts <<= 11 ; prsts = 1; break;
+            case 'k': devfd = open(optarg,O_WRONLY); break;
             case 'G': ntsts = ABS(x); ntsts <<= 21 ; prsts = 1; break;
-            case 'k': devfd = open( optarg , O_WRONLY)        ; break;
+            case 'M': ntsts = ABS(x); ntsts <<= 11 ; prsts = 1; break;
+            case 'K': ntsts = ABS(x); ntsts <<=  1 ; prsts = 1; break;
+            case 'T': ntsts = ABS(x); ntsts <<=  1 ; prsts = 1; break;
         }
     }
     if (devfd < 0) {
@@ -664,15 +688,20 @@ int main(int argc, char *argv[]) {
     uint64_t bic = 0, max = 0, min = 256, avg = 0, mt = 0;
     uint64_t nk = 0, nt = 0, nx = 0, nn = 0;
 
-    perr("\nuChaos: %s%s; ", VERSION, STOCHASTIC_BRANCHES ? " w/sb" : "");
-    if(prsts) {                      // RAF, TODO: dealing with size one.
-        perr("repetitions: ");
-        if(size < 2) {
-            perr("too short input, try longer!\n\n");
-            prsts = 0;
+    if(quiet < 2) {
+        perr_app_info();
+        if(prsts) { // RAF, TODO: dealing with size one.
+
+            perr("; repetitions: ");
+            if(size < 2) {
+                perr("too short input, try longer!\n\n");
+                prsts = 0;
+            }
+        } else {
+            perr(": s(%d), q(%d), p(%d), d(%dns), r(%d), I(%d), RTSC(%d)\n\n",
+                nbtls, quiet, pmdly, nsdly, nrdry, nblks, !USE_GET_TIME);
         }
-    } else perr("s(%d), d(%dns), p(%d), r(%d), RTSC(%d)\n\n",
-        nbtls, nsdly, pmdly, nrdry, !USE_GET_TIME);
+    }
 
     for (uint32_t a = ntsts; a; a--) {
         // hashing
@@ -686,15 +715,23 @@ int main(int argc, char *argv[]) {
         uint32_t sz = size << 3;
         if(devfd) {
             entrnd.buf_size = sz;
-            // cautelatively 7 bits per byte
-            entrnd.entropy_count = (sz << 3) - sz;
+#if STOCHASTIC_BRANCHES
+            // cautelatively 7 bits per byte or 3 when VMs specific
+            entrnd.entropy_count = (sz << 2) - sz; // eq. to 7x (8-1)
+#else
+            entrnd.entropy_count = (sz << 3) - sz; // eq. to 3x (4-1)
+#endif
             memcpy((uint8_t *)entrnd.buf, (uint8_t *)h, sz);
-            if (ioctl(devfd, RNDADDENTROPY, &entrnd) < 0) {
-                perror("ioctl entrnd");
+            #define OPTNK "option -k is designed for /dev/[u]random only"
+            if (ioctl(devfd, RNDADDENTROPY, &entrnd) < 0 && errno != EINTR) {
+                if(errno == ENOTTY) {
+                  perr("\nERROR: "APPNAME" "OPTNK"\n\n");
+                } else perror("ioctl entrnd");
                 return EXIT_FAILURE;
-            }         // WARNING!!
-        } /* else  */ // skip else expose the data but it is useful for debuging
-        writebuf(STDOUT_FILENO, (uint8_t *)h, sz);
+            }
+            if (quiet < 2) // avoid the need of >/dev/null
+                writebuf(STDOUT_FILENO, (uint8_t *)h, sz);
+        } else  writebuf(STDOUT_FILENO, (uint8_t *)h, sz);
 
         // single run
         if(ntsts < 2) return 0;

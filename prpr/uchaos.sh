@@ -8,9 +8,9 @@ echo "uchaos.sh is appending to file: $nfle"
 
 testfunc() {
     fn=${1:-uchaos.c }
-    printf "\n|\/ Testing with $tcmd $fn _/\\_" | tee -a $nfle.$i
+    printf "\n|\/ Testing with $tcmd $fn _/\\__" | tee -a $nfle.$i
     {
-        printf "_%.0s" {1..32}; printf "\n|";
+        printf "_%.0s" {1..16}; printf "\n|";
         cat $fn | { $tcmd 2>&3; printf "\n|\n" >&3; } | entgr
     } 3>&1 | grep . >> $nfle.$i
 }
@@ -40,7 +40,7 @@ if false; then
     h() { date +%N | sha512sum | cut -f1 -d' '; sleep 0.01; }
 
     reseeding_test() {
-        printf "\n### uschaos x8 using -T 1600\n" >> $nfle;
+        printf "\n### uschaos x8 using -T 1024\n" >> $nfle;
         for j in $(seq 1); do
             for i in $(seq 8); do
                 ./mtrd -t4 "$hgstr" | ./uchaos -T 1600 | dd bs=1 status=none &
