@@ -191,6 +191,8 @@ To make this concrete, here's how I'd modify uchaos.c to use jitterentropy for t
 
 This setup turns uchaos into a proper hybrid RNG—reliable, auditable, and still simple. If tested with ent/dieharder on the hybrid output (seeded via jitterentropy perturbations), I'd expect even better stats than the original, with less environment-dependence. Spot on with the transistor insight; it's a elegant way to leverage small, trusted entropy for big results without reinventing the wheel. If you implement it, share the benchmarks! 😄
 
+The entire conversation with Grok can be read from [X.com](https://x.com/i/grok/share/cd493a8922eb4ec9a0ad2706a07164f7) or [here](uchaos-vs-jitterentropy-grok.txt).
+
 ---
 
-The entire conversation with Grok can be read from [X.com](https://x.com/i/grok/share/cd493a8922eb4ec9a0ad2706a07164f7) or [here](uchaos-vs-jitterentropy-grok.txt).
+(c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, CC BY-ND-NC 4.0
