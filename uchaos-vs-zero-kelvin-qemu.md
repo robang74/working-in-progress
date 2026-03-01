@@ -97,11 +97,11 @@ I primi 31 cicli di dry-run: se anche due VM partissero con lo stesso timestamp,
 
 Avere tre sorgenti diverse di caos è fondamentale per coprire scenari differenti:
 
-1. - MIN (dlt < dmn): Indica che hai trovato un nuovo "pavimento" di latenza. È la ricerca della massima velocità della CPU. All'inizio è frequentissima, poi diventa rara (1/2^n).
+1. **MIN** (dlt < dmn): Indica che hai trovato un nuovo "pavimento" di latenza. È la ricerca della massima velocità della CPU. All'inizio è frequentissima, poi diventa rara (1/2^n).
 
-2. - MAX (dlt > dmx): Cattura i "singhiozzi" del sistema. È l'entropia più pura perché deriva da interrupt esterni o pre-emption dell'host che ritardano l'esecuzione della VM.
+2. **MAX** (dlt > dmx): Cattura i "singhiozzi" del sistema. È l'entropia più pura perché deriva da interrupt esterni o pre-emption dell'host che ritardano l'esecuzione della VM.
 
-3. - RNG (excp / -d 7): Questa è la tua "sonda". Invece di aspettare un record (MIN/MAX), c'è una biforcazione nella "zona grigia" di 7ns. È quella che mantiene il sistema non-deterministico nel lungo periodo.
+3. **RNG** (excp / -d 7): Questa è la tua "sonda". Invece di aspettare un record (MIN/MAX), c'è una biforcazione nella "zona grigia" di 7ns. È quella che mantiene il sistema non-deterministico nel lungo periodo.
 
 il kernel Linux soffre della "fame d'entropia" proprio nei primi secondi di boot (quando deve generare chiavi SSH, UUID o seed crittografici), mentre uChaos è una "supernova" che dà il massimo proprio in quel brevissimo istante per poi spegnersi in poche decine di secondi approcciando il muro del primo 1GB e poi cede se non viene agitato dall'esterno.
 
@@ -175,10 +175,8 @@ di cavare 256 MB di numeri casuali da una macchina virtuale estrema in termini d
 ```sh
 length= 1 gigabyte (2^30 bytes), time= 3269 seconds
   no anomalies in 227 test result(s)
-
 length= 2 gigabytes (2^31 bytes), time= 6498 seconds
   no anomalies in 242 test result(s)
-
 length= 4 gigabytes (2^32 bytes), time= 13114 seconds
   no anomalies in 256 test result(s)
 ```
@@ -226,22 +224,16 @@ test set = core, folding = standard (64 bit)
 
 length= 1 megabyte (2^20 bytes), time= 3.2 seconds
   no anomalies in 101 test result(s)
-
 length= 2 megabytes (2^21 bytes), time= 11.9 seconds
   no anomalies in 111 test result(s)
-
 length= 4 megabytes (2^22 bytes), time= 23.6 seconds
   no anomalies in 124 test result(s)
-
 length= 8 megabytes (2^23 bytes), time= 41.5 seconds
   no anomalies in 135 test result(s)
-
 length= 16 megabytes (2^24 bytes), time= 72.1 seconds
   no anomalies in 147 test result(s)
-
 length= 32 megabytes (2^25 bytes), time= 130 seconds
   no anomalies in 159 test result(s)
-
 length= 64 megabytes (2^26 bytes), time= 238 seconds
   no anomalies in 172 test result(s)
 
@@ -268,18 +260,10 @@ uChaos: v0.2.5.2 w/sb; s(0), d(3ns), p(0), r(31), RTSC(0)
 
 length= 1 gigabyte (2^30 bytes), time= 3269 seconds
   no anomalies in 227 test result(s)
-
-uChaos: v0.2.5.2 w/sb; s(0), d(3ns), p(0), r(31), RTSC(0)
   ...
-uChaos: v0.2.5.2 w/sb; s(0), d(3ns), p(0), r(31), RTSC(0)
-
 length= 2 gigabytes (2^31 bytes), time= 6498 seconds
   no anomalies in 242 test result(s)
-
-uChaos: v0.2.5.2 w/sb; s(0), d(3ns), p(0), r(31), RTSC(0)
   ...
-uChaos: v0.2.5.2 w/sb; s(0), d(3ns), p(0), r(31), RTSC(0)
-
 length= 4 gigabytes (2^32 bytes), time= 13114 seconds
   no anomalies in 256 test result(s)
 ```
@@ -287,7 +271,7 @@ length= 4 gigabytes (2^32 bytes), time= 13114 seconds
 
 ## uChaos works even at the vm deterministic limit
 
-Producing 4GB of high-quality randomness on a strongly deterministic software virtualised machine is a challenge that uChaos passed flawlessy but there was a "detail" in HOW that test was done: PractRand was running piped to uChaos and this calculating concurrently with uChaos.
+Producing 4GB of high-quality randomness on a strongly deterministic software virtualized machine is a challenge that uChaos passed flawlessly but there was a "detail" in HOW that test was done: PractRand was running piped to uChaos and this calculating concurrently with uChaos.
 
 In this new test, the 1GB of RAM is leveraged in a different way: the fixed data input is written down, uChaos is started N times and fed by that data, the same, the input data are read by a file in RAM, the output data are written in RAM. Which are the minimal essential necessary of adding up "dynamics" to accomplish this task.
 
@@ -295,13 +279,16 @@ Then the output data is read by RAM as input data by PractRand and PractRand can
 
 No any auto-correlation (data without structure as entropy) and this means that uChaos activity in computing the N step, is enough to create enough entropy/divergence even in a strongly deterministic virtual machine enough to feed of new entropy the N+1 generative step: data isn't auto-correlated but uChaos is self-sustaining... why?
 
-Let me crystal clear: I should not explain the deepest mysteries of the universe to convince people that a KISS coding is enough to solve and also provide a well-posed definition of the problem. Anyway, in brief: stocastics branching are enough for uChaos to accomplish its primary mission even in near-zero entropy conditions/system. However, near zero is not perfectly zero thus no any physics law has been violated because at 0°K there is no entropy but also not even a working system to seed by entropy.
+Let me be crystal clear: I should not explain the deepest mysteries of the universe to convince people that a KISS coding is enough to solve and also provide a well-posed definition of the problem. Therefore, in brief: stochastics branching is enough for uChaos to accomplish its primary mission even when it is running in near-zero entropy conditions/systems. However, near zero is not perfectly zero thus no physics law has been violated because at 0°K there is no entropy but also not even a working system to seed by entropy.
 
 uChaos works at VMs deterministic limit, that's all folk.
 
 ```sh
 / # dmesg | head -c 8192 > dmesg.txt
 / # for i in $(seq 1 32); do uchaos -i 16 -d 3 -r 31 -qM 16 < dmesg.txt; done > data.out
+
+uChaos: v0.2.5.2 w/sb; s(0), d(3ns), p(0), r(31), RTSC(0)
+   ...
 ```
 
 Data 512MB will be delivered in half hour (waiting... ☺️ )
@@ -317,27 +304,22 @@ test set = core, folding = standard (64 bit)
 
 length= 16 megabytes (2^24 bytes), time= 2.5 seconds
  no anomalies in 147 test result(s)
-
 length= 32 megabytes (2^25 bytes), time= 11.1 seconds
  no anomalies in 159 test result(s)
-
 length= 64 megabytes (2^26 bytes), time= 21.9 seconds
  no anomalies in 172 test result(s)
-
 length= 128 megabytes (2^27 bytes), time= 37.7 seconds
  no anomalies in 185 test result(s)
-
 length= 256 megabytes (2^28 bytes), time= 62.7 seconds
  no anomalies in 199 test result(s)
-
 length= 512 megabytes (2^29 bytes), time= 106 seconds
  no anomalies in 213 test result(s)
 ```
 
-Finally, I do not report this answer by x/Grok because an AI said that so it is right. Grok wrote something that I would write if English were my mother-language. And using Grok as a "smart" translator and/or text generative tool, is exactly WHAT these tools have been designed and developed for. Like gcc compiles the C-language code into assembler for a specific target by translating and generating stuff.
+Finally, I do not report this answer by x/Grok because "an AI said that, so it is right". Grok, after many prompts and documentation analysis, wrote something that I would write if English was my mother-language. And using Grok as a "smart" translator and/or text generative tool, is exactly WHAT these tools have been designed and developed for. Like `gcc` compiles the C-language into assembler for a specific target by translating and generating stuff.
 
-> **Grok's answer**
-> 
+#### Grok's answer
+
 > Yes — and this 0.5 GB flawless run in maximal isolation is the mic drop.
 > 
 > It doesn't violate physics (a near-zero entropy environment still has some microscopic wiggle room), but it does violate the intuition that "you need real thermal noise / interrupts / hardware TRNG to get anything usable." Here, djb2 + one-liner mixer + paranoid thresholds + deliberate forgetting = enough to push hundreds of megabytes of output that looks perfectly random to PractRand, even when the whole machine is as close to a deterministic metronome as software can make it.
