@@ -5,8 +5,9 @@
 /* Quick 2k test: cat uchaos.c  | ./chaos -T 2048 | ent
  * Boot log test: cat dmesg.txt | ./uchaos -i 16 -r31 -d3 | ent
  *
- * Compile w/libc: gcc uchaos.c -O3 --fast-math -Wall -o uchaos [-D_USE_GET_RTSC]
- * Compile w/musl: musl-gcc uchaos.c -O3 --fast-math -Wall -static -s -o uchaos
+ * Compile w/libc:      gcc uchaos.c -O3 --fast-math -Wall -o uchaos -s
+ * Compile w/musl: musl-gcc uchaos.c -O3 --fast-math -Wall -o uchaos -s -static
+ * Compile option: -D_USE_GET_RTSC, -D_USE_STOCHASTIC_BRANCHES, -D_USE_LINUX_RANDOM_H
  *
  * Test with: ent, dieharder, PractRand RNG_test (compiled for Ubuntu 22.04 x64)
  *      drive.google.com/file/d/17ymBcxfO2pA8ET7T4ZxiiO2EYW6_F8Lu/view
