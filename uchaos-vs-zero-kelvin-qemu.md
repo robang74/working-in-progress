@@ -1,14 +1,12 @@
 ## EXTREME DETERMINISTIC VIRTUAL MACHINE UCHAOS TESTING
 
-- https://www.linkedin.com/posts/robertofoglietta_extreme-deterministic-virtual-machine-uchaos-activity-7433603537630052352-JIj_
+- [LinkedIn post #1](https://www.linkedin.com/posts/robertofoglietta_extreme-deterministic-virtual-machine-uchaos-activity-7433603537630052352-JIj_)
 
 uCHAOS is going to be tested against a strongly deterministic virtual machine which runs with a single virtualized CPU and the kernel is compiled with nearly "allnoconfig" without pre-emption (server) in single CPU mode only, and no support for random even for memory addressing.
 
 - `gcc -D_USE_STOCHASTIC_BRANCHES`
-
 - `dmesg | uchaos -i 16 -d 3 -qG 256 -r 32 | RNG_test-musl-static stdin64`
-
--  [bare minimal linux system](https://lnkd.in/d28CH98b)
+-  [bare minimal linux system](https://github.com/robang74/bare-minimal-linux-system/blob/main/README.md)
 
 Testing previews are quite encouraging and after a few adjustments uChaos compiled with the support for stochastics branching and running with very reasonable optionals parameters passed flawlessly the 4GB practrand test.
 
@@ -16,13 +14,15 @@ Parametric settings explanation: -i16 is for reading the first 8Kb from dmesg; -
 
 The main objection could be -r1 (default) with stochastics branching that might create a sort of initial transient (it doesn't) and testing on 5.15.201 which is the LTS version with the .config available (test repeatability). Guess what? Testing "preview", here __preview__ is the keyword.
 
-- [uChaos v0.2.4](https://lnkd.in/dEgpyxqm)
+- [uChaos v0.2.4](https://github.com/robang74/working-in-progress/releases/tag/uchaos-v0.2.4)
 
 In the meantime the v0.2.4 (tagged) managed to pass flawlessly the 256GB practrand test on a i5-8635 bare-metal CPU. That's why testing with strongly deterministic virtual machine commenced.
 
 ---
 
 ## QUI ABBIAMO UNA COSA DAVVERO INTERESSANTE!
+
+- [LinkedIn post #2](https://www.linkedin.com/posts/robertofoglietta_extreme-deterministic-virtual-machine-uchaos-activity-7433621676963098624-sIha)
 
 Guardiamo il log qui sotto, fino a 1GB tutto bene, poi comincia a franare e a 4GB ha proprio fallito strutturalmente e con un "birthday" cioè una tragedia, significa che questo "coso" che dovrebbe creare numeri casuali si ripete con un ciclo di 4GB. 
 
@@ -77,6 +77,8 @@ length= 4 gigabytes (2^32 bytes), time= 1031 seconds
 
 ## USARE RAMI STOCASTICI SULLA CPU REALE
 
+- [LinkedIn post #3](https://www.linkedin.com/posts/robertofoglietta_extreme-deterministic-virtual-machine-uchaos-activity-7433638270531424256-5LOw)
+
 La cosa interessante è che testando la configurazione ottimale per una VM a metronomo su una CPU reale, PractRand talora si lamenta di deboli anomalie "unusual" nel primo GB di dati ma non fallisce. Il che indica che tale configurazione è "eccessiva" dove lo jitter è reale.
 
 Ad intuito direi che -d7 -r31 è la scelta azzeccata, 31 cicli di preriscaldamento prima di create output e +/- 7ns di range intorno al minimo. 
@@ -109,6 +111,8 @@ Ma questo è normale, sarebbe magia altrimenti e la magia non convincerebbe ness
 
 ## NON È POCA COSA, E NON È TANTO PER DIRE
 
+- [LinkedIn post #4](https://www.linkedin.com/posts/robertofoglietta_extreme-deterministic-virtual-machine-uchaos-activity-7433659456749690881-nwTV)
+
 Un'altra cosa: è interessante notare la questione della sicurezza. Un attacante che controlla la VM dovrebbe gestire i suoi jitter a risoluzione sub-nanosecond, e visto che uchaos fallisce a 5 o 6 ordini di grandezza non sarebbe strano che dovesse poterla controllare con una risoluzione di almeno la metà degli ordini di grandezza, il picosecondo.
 
 Ma a quel punto anche tutte le altre sorgenti di entropia del kernel che sono molto meno sensibili collassrebbero. Infatti è così, il kernel 5.15.201 strilla in printk dell'assenza di entropia. 
@@ -123,7 +127,7 @@ Quindi si è anche trovata la soluzione per andare avanti all'infinito (in teori
 
 Se poi si usa il comando mtrd che ho scritto in tempi non sospetti e permette di lanciare N thread il cui output viene miscelato in un solo output
 
-- [mtdr.c, il N-mixer](https://lnkd.in/dZQ96uB3)
+- [mtdr.c, il N-mixer](https://raw.githubusercontent.com/robang74/working-in-progress/refs/heads/main/prpr/mtrd.c)
 
 Allora posso far girare in concorrenza 4 istanze di uchaos che dovendo spartirsi una sola CPU saranno costrette ad interferire anche con mtrd che nel frattempo fa il mixing dei flussi. Insomma, c'è una buona possibilità di trasformare la più deterministica delle VM isolate in un potenziale micro-server di numeri casuali: hai bisogno di random? eccoti servito! LOL
 
@@ -172,7 +176,7 @@ Un'immensa quantità di "boh non strutturato" specialmente se si considerano le 
 
 Se penso che con un hash non crittografico inventato prima della teoria stessa e specializzato per il solo testo, operazioni di base come moltiplicazioni di avalanche, xor e rotazioni di registri, whitening finale 1/3 di murmur3, ho estratto 1GB di randomness ad 1MB/s da una macchina virtuale 100% software e meccanicistica anche sul clock di sistema, mi viene da ridere. Letteralmente, però resto umile e mi limito a sorridere.
 
-- [0°K qemu linux, il commit]( https://lnkd.in/dHw_ffsf)
+- [0°K qemu linux, il commit](https://github.com/robang74/working-in-progress/commit/d37c7548d01d3dc0800f0e41120fedc9e7789193)
 
 ---
 
