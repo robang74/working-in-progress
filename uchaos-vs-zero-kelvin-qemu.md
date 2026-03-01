@@ -174,9 +174,9 @@ di cavare 256 MB di numeri casuali da una macchina virtuale estrema in termini d
 
 Un'immensa quantità di "boh non strutturato" specialmente se si considerano le performance di una macchina viratuale interamente sw e prodotta in un millesimo del tempo necessario ad una macchina dotata di un minimo di scopo pratico di fare un milione di boot.
 
-Se penso che con un hash non crittografico inventato prima della teoria stessa e specializzato per il solo testo, operazioni di base come moltiplicazioni di avalanche, xor e rotazioni di registri, whitening finale 1/3 di murmur3, ho estratto 1GB di randomness ad 1MB/s da una macchina virtuale 100% software e meccanicistica anche sul clock di sistema, mi viene da ridere. Letteralmente, però resto umile e mi limito a sorridere.
-
 - [0°K qemu linux, il commit](https://github.com/robang74/working-in-progress/commit/d37c7548d01d3dc0800f0e41120fedc9e7789193)
+
+Se penso che con un hash non crittografico inventato prima della teoria stessa e specializzato per il solo testo, operazioni di base come moltiplicazioni di avalanche, xor e rotazioni di registri, whitening finale 1/3 di murmur3, ho estratto 1GB di randomness ad 1MB/s da una macchina virtuale 100% software e meccanicistica anche sul clock di sistema, mi viene da ridere. Letteralmente, però resto umile e mi limito a sorridere.
 
 ---
 
