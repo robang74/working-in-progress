@@ -277,7 +277,7 @@ static inline uint16_t mm3ns16(uint16_t ns, uint16_t p) {
 
   #define STOCHASTIC_BRANCHES 1
   #define FINAL_AVALANCHE_MLT 0xFF51AFD7ED558CCD
-  #define perr_app_info() { perr("\n%s %s w/sb", APPNAME, VERSION); }
+  #define perr_app_info(a) { perr("%s %s w/sb%s", APPNAME, VERSION, (a)?"\n":""); }
   #define entropy(sz) ((sz << 2) - sz) // eq. to 3x (4-1)
   static inline uint8_t  minmix8(uint8_t b) {
       b *= (b & 1) ? 0x4d : 0x65;
@@ -616,7 +616,6 @@ static inline void usage(const char *name, const char *cmdn, const uint8_t qlvl)
 #define APPNAME "uChaos"
 #define STCX STOCHASTIC_BRANCHES
 
-
 int main(int argc, char *argv[]) {
     struct rand_pool_info_buf entrnd;
     uint8_t *str = NULL, nbtls = 0, prsts = 0, quiet = 0, nblks = 1;
@@ -632,7 +631,7 @@ int main(int argc, char *argv[]) {
             perrwrn();
         } else
         if(opt == 'v') {
-            perr_app_info();
+            perr_app_info(2);
             return 0;
         } else
         if(opt == 'q') {
@@ -695,9 +694,8 @@ int main(int argc, char *argv[]) {
     uint64_t nk = 0, nt = 0, nx = 0, nn = 0;
 
     if(quiet < 2) {
-        perr_app_info();
+        perr_app_info(0);
         if(prsts) { // RAF, TODO: dealing with size one.
-
             perr("; repetitions: ");
             if(size < 2) {
                 perr("too short input, try longer!\n\n");
