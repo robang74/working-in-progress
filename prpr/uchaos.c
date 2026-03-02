@@ -1,7 +1,7 @@
 /*
  * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2 license
  */
-#define VERSION "v0.2.6"
+#define VERSION "v0.2.6.2"
 /* Quick 2k test: cat uchaos.c  | ./chaos -T 2048 | ent
  * Boot log test: cat dmesg.txt | ./uchaos -i 16 -r31 -d3 | ent
  *
@@ -283,8 +283,8 @@ static inline uint16_t mm3ns16(uint16_t ns, uint16_t p) {
   }
   static inline uint64_t mm3ns32(uint64_t ks, uint64_t p) {
       register uint64_t z = ks;
-      z = (p ^ (z >> 31)) * 0xff51afd7ed558ccdULL;
-      z = (z ^ (z >> 32)) * 0xc4ceb9fe1a85ec53ULL;
+      z = (p ^ (z >> 33)) * 0xff51afd7ed558ccdULL;
+      z = (z ^ (z >> 33)) * 0xc4ceb9fe1a85ec53ULL;
       z = (z ^ (z >> 33));
       return z;
   }
@@ -293,9 +293,9 @@ static inline uint16_t mm3ns16(uint16_t ns, uint16_t p) {
 #else
 
   #define STBX 0
-  #define FINAL_AVALANCHE_MLT 0x00000000045d9f3b
+  #define FINAL_AVALANCHE_MLT 0xc4ceb9fe1a85ec53ULL
   #define perrwrn() perr("\nWARNING: "APPNAME" isn't compiled with "STBRSTR"\n\n")
-  #define mm3ns32(o,h) ((o * FINAL_AVALANCHE_MLT) ^ (h >> 31))
+  #define mm3ns32(o,h) ((h * FINAL_AVALANCHE_MLT) ^ (h >> 33))
   #define entropy(sz) ((sz << 3) - sz) // eq. to 8x (8-1)
   #define minmix8
   #define knuthmx
