@@ -1,7 +1,7 @@
 /*
  * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2 license
  */
-#define VERSION "v0.2.5.3"
+#define VERSION "v0.2.5.4"
 /* Quick 2k test: cat uchaos.c  | ./chaos -T 2048 | ent
  * Boot log test: cat dmesg.txt | ./uchaos -i 16 -r31 -d3 | ent
  *
@@ -627,7 +627,7 @@ int main(int argc, char *argv[]) {
     while (1) {
         int opt = getopt(argc, argv, "hvSG:M:K:T:s:d:p:r:k:i:q");
         if(opt == 'S') {
-            nsdly=3; nblks=16; nrdry=31; ntsts=(4<<1); quiet=2;
+            nsdly=3; nblks=16; nrdry=31; ntsts=(4<<1); quiet++;
             perrwrn();
         } else
         if(opt == 'v') {
@@ -702,7 +702,7 @@ int main(int argc, char *argv[]) {
                 prsts = 0;
             }
         } else {
-            perr(": s(%d), q(%d), p(%d), d(%dns), r(%d), I(%d), RTSC(%d)\n\n",
+            perr(": s(%d), q(%d), p(%d), d(%dns), r(%d), i(%d), RTSC(%d)\n\n",
                 nbtls, quiet, pmdly, nsdly, nrdry, nblks, !USE_GET_TIME);
         }
     }
