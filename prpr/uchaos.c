@@ -1,7 +1,7 @@
 /*
  * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2 license
  */
-#define VERSION "v0.2.6.2"
+#define VERSION "v0.2.6.5"
 /* Quick 2k test: cat uchaos.c  | ./chaos -T 2048 | ent
  * Boot log test: cat dmesg.txt | ./uchaos -i 16 -r31 -d3 | ent
  *
@@ -171,14 +171,30 @@ static inline uint64_t get_rdtsc_clock(uint32_t *pcpuid) {
 #define USE_GET_TIME 1
 #endif
 
-#define USE_PRIMES_2564 1
+#define USE_PRIMES_2564 0
 #if     USE_PRIMES_2564
 /*
  * This sequence of primes has a peculiar structure: x, y where x + y = 64.
  * Both members of each pair is a prime number, and by rotl64 are like x, -x.
  * They are only five pair of these numbers summing up 64, thus 10 = 3.32 bits.
  */
-static const uint8_t primes64[10] = { 3, 61, 5, 59, 11, 53, 17, 47, 23, 41 };
+static const uint8_t primes64[20] = {  3, 61,  5, 59, 11, 53, 17, 47, 23, 41,
+                                      19, 45, 29, 35, 31, 33, 13, 51,  7, 57 };
+
+static inline uint32_t getprmx10(uint32_t x) {
+    return primes64[x - ((x * 0xcccccccdULL) >> 35) * 10];
+}
+
+static inline uint32_t getprmx16(uint32_t x) {
+    return primes64[ 2 + (x & 0x0f) ];
+}
+
+static inline uint32_t getprmx20(uint32_t x) {
+    x -= ((x * 0xcccccccdULL) >> 35) * 10
+    x +=  (x & 0x10) ? 10 : 0;
+    return primes64[x];
+}
+
 #endif
 
 static inline uint64_t rotl64(uint64_t n, uint8_t c) {
@@ -269,16 +285,21 @@ static inline uint16_t mm3ns16(uint16_t ns, uint16_t p) {
 #ifdef _USE_STOCHASTIC_BRANCHES
 
   #define STBX 1
+  #define perrwrn()
   #define FINAL_AVALANCHE_MLT 0xFF51AFD7ED558CCD
-
   #define entropy(sz) ((sz << 2) - sz) // eq. to 3x (4-1)
   static inline uint8_t  minmix8(uint8_t b) {
       b *= (b & 1) ? 0x4d : 0x65;
       return b ^ ((b >> 3) | (b << 5));
   }
   static inline uint64_t knuthmx(uint64_t w) {
-      w  = rotl64(w, primes64[(w & 0x07) + 1]);
+  #if USE_PRIMES_2564
+      w  = rotl64(w, getprmx16(w));
+  #else
+      w  = rotl64(w, 5 + ((w & 0x1f) << 1));
+  #endif
       w *= (w & 1) ? 0x9E3779B9 : 0x45d9f3b;
+
       return w ^ ((w >> 17) | (w << 47));
   }
   static inline uint64_t mm3ns32(uint64_t ks, uint64_t p) {
@@ -288,14 +309,13 @@ static inline uint16_t mm3ns16(uint16_t ns, uint16_t p) {
       z = (z ^ (z >> 33));
       return z;
   }
-  #define perrwrn()
 
 #else
 
   #define STBX 0
   #define FINAL_AVALANCHE_MLT 0xc4ceb9fe1a85ec53ULL
   #define perrwrn() perr("\nWARNING: "APPNAME" isn't compiled with "STBRSTR"\n\n")
-  #define mm3ns32(o,h) ((h * FINAL_AVALANCHE_MLT) ^ (h >> 33))
+  #define mm3ns32(o,h) rotl64((h * FINAL_AVALANCHE_MLT) ^ (h >> 33), 7 + ((o & 0x1f) << 1))
   #define entropy(sz) ((sz << 3) - sz) // eq. to 8x (8-1)
   #define minmix8
   #define knuthmx
@@ -406,13 +426,13 @@ hashotloop:                          // a loop made by ASM jumps
 
     // 5. entropy injection w/ rotation ////////////////////////////////////////
 #if USE_PRIMES_2564
-    hsh ^= chr ^ rotl64(chr, primes64[ns%10]); //RAF, EVAL: 1 + ns & 7
+    hsh ^= chr ^ rotl64(chr, getprmx16(ns & 0x0f));
 #else
-    hsh ^= chr ^ rotl64(chr, 1 + (ns & 0x07));
+    hsh ^= chr ^ rotl64(chr,      3 + (ns & 0x1f));
 #endif
 
     // 6. stochastics micro-mix ////////////////////////////////////////////////
-    hsh  = rotl64(hsh, 5 + ((ns >> 3) & 0x03)) + hsh;
+    //hsh  = rotl64(hsh, 5 + ((ns >> 3) & 0x03)) + hsh;
 
     // 7. exceptions management ////////////////////////////////////////////////
     if( excp || hsh == ohs ) {       // copying with the VMs scheduler timings
