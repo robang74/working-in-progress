@@ -1,7 +1,7 @@
 /*
  * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2 license
  */
-#define VERSION "v0.2.5.4"
+#define VERSION "v0.2.6"
 /* Quick 2k test: cat uchaos.c  | ./chaos -T 2048 | ent
  * Boot log test: cat dmesg.txt | ./uchaos -i 16 -r31 -d3 | ent
  *
@@ -251,14 +251,6 @@ static inline uint64_t murmur3(uint64_t hs) {
     return z;
 }
 
-static inline uint64_t mm3ns32(uint64_t ks, uint64_t p) {
-    register uint64_t z = ks;
-    z = (p ^ (z >> 31)) * 0xff51afd7ed558ccdULL;
-    z = (z ^ (z >> 32)) * 0xc4ceb9fe1a85ec53ULL;
-    z = (z ^ (z >> 33));
-    return z;
-}
-
 static inline uint16_t mm3ns16(uint16_t ns, uint16_t p) {
     register uint32_t z = ns;
     z = (p ^ (z >> 7)) * 0x45d9f3b;
@@ -273,11 +265,12 @@ static inline uint16_t mm3ns16(uint16_t ns, uint16_t p) {
 #define pmdly2ns ( ( ( (uint64_t)dmn * pmdly ) + 127 ) >> 8 )
 
 #define STBRSTR "stochastics branches"
+
 #ifdef _USE_STOCHASTIC_BRANCHES
 
-  #define STOCHASTIC_BRANCHES 1
+  #define STBX 1
   #define FINAL_AVALANCHE_MLT 0xFF51AFD7ED558CCD
-  #define perr_app_info(a) { perr("%s %s w/sb%s", APPNAME, VERSION, (a)?"\n":""); }
+
   #define entropy(sz) ((sz << 2) - sz) // eq. to 3x (4-1)
   static inline uint8_t  minmix8(uint8_t b) {
       b *= (b & 1) ? 0x4d : 0x65;
@@ -288,19 +281,31 @@ static inline uint16_t mm3ns16(uint16_t ns, uint16_t p) {
       w *= (w & 1) ? 0x9E3779B9 : 0x45d9f3b;
       return w ^ ((w >> 17) | (w << 47));
   }
+  static inline uint64_t mm3ns32(uint64_t ks, uint64_t p) {
+      register uint64_t z = ks;
+      z = (p ^ (z >> 31)) * 0xff51afd7ed558ccdULL;
+      z = (z ^ (z >> 32)) * 0xc4ceb9fe1a85ec53ULL;
+      z = (z ^ (z >> 33));
+      return z;
+  }
   #define perrwrn()
 
 #else
 
-  #define STOCHASTIC_BRANCHES 0
+  #define STBX 0
   #define FINAL_AVALANCHE_MLT 0x00000000045d9f3b
   #define perrwrn() perr("\nWARNING: "APPNAME" isn't compiled with "STBRSTR"\n\n")
-  #define perr_app_info(a) { perr("\n%s %s%s", APPNAME, VERSION, (a)?"\n":""); }
+  #define mm3ns32(o,h) ((o * FINAL_AVALANCHE_MLT) ^ (h >> 31))
   #define entropy(sz) ((sz << 3) - sz) // eq. to 8x (8-1)
   #define minmix8
   #define knuthmx
 
 #endif
+
+#define PRMX USE_PRIMES_2564
+#define STOCHASTIC_BRANCHES STBX
+#define perr_app_info(a) { perr("%s %s%s%s%s", APPNAME, VERSION,\
+    STBX ? " w/sb" : "", PRMX ? "" : " !/pr", (a) ? "\n" : ""); }
 
 #define GETVAL (const uint8_t *)(-1)
 
@@ -401,7 +406,7 @@ hashotloop:                          // a loop made by ASM jumps
 
     // 5. entropy injection w/ rotation ////////////////////////////////////////
 #if USE_PRIMES_2564
-    hsh ^= chr ^ rotl64(chr, primes64[ns%10]);
+    hsh ^= chr ^ rotl64(chr, primes64[ns%10]); //RAF, EVAL: 1 + ns & 7
 #else
     hsh ^= chr ^ rotl64(chr, 1 + (ns & 0x07));
 #endif
@@ -430,8 +435,7 @@ reschedule:
     }
 
     // 9. finalising w/ a 32+1 bit mix /////////////////////////////////////////
-    ohs = (hsh * FINAL_AVALANCHE_MLT) ^ (hsh >> 31);
-    return ohs;
+    return mm3ns32(hsh, ohs);
 }
 
 uint64_t *str2ht64(uint8_t *str, uint64_t **ph,  uint32_t *size,
