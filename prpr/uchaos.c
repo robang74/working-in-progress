@@ -295,7 +295,7 @@ static inline uint16_t mm3ns16(uint16_t ns, uint16_t p) {
   #define STOCHASTIC_BRANCHES 0
   #define FINAL_AVALANCHE_MLT 0x00000000045d9f3b
   #define perrwrn() perr("\nWARNING: "APPNAME" isn't compiled with "STBRSTR"\n\n")
-  #define perr_app_info() { perr("\n%s %s", APPNAME, VERSION); }
+  #define perr_app_info(a) { perr("\n%s %s%s", APPNAME, VERSION, (a)?"\n":""); }
   #define entropy(sz) ((sz << 3) - sz) // eq. to 8x (8-1)
   #define minmix8
   #define knuthmx
