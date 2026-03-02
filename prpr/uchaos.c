@@ -1,7 +1,7 @@
 /*
  * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2 license
  */
-#define VERSION "v0.2.6.5"
+#define VERSION "v0.2.7"
 /* Quick 2k test: cat uchaos.c  | ./chaos -T 2048 | ent
  * Boot log test: cat dmesg.txt | ./uchaos -i 16 -r31 -d3 | ent
  *
@@ -282,7 +282,8 @@ static inline uint16_t mm3ns16(uint16_t ns, uint16_t p) {
 
 #define STBRSTR "stochastics branches"
 
-#ifdef _USE_STOCHASTIC_BRANCHES
+#define USE_STOCHASTIC_BRANCHES   // RAF: unification by new rotations approach
+#ifdef  USE_STOCHASTIC_BRANCHES
 
   #define STBX 1
   #define perrwrn()
