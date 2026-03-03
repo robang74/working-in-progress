@@ -1,7 +1,7 @@
 /*
  * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2 license
  */
-#define VERSION "v0.2.7"
+#define VERSION "v0.2.7.1"
 /* Quick 2k test: cat uchaos.c  | ./chaos -T 2048 | ent
  * Boot log test: cat dmesg.txt | ./uchaos -i 16 -r31 -d3 | ent
  *
@@ -107,8 +107,6 @@
  *
  * Create a set of "bit of entropy per byte" polices, and use #if to compile:
  *   - optimistic 7hw 3vm; or flipcoin 4hw 2vm; or minimal 2hw 1vm.
- *
- * Create the option -v version, -h help, -K = -T, -V for VMs best settings
  *
  **************************************************************************** */
 
@@ -316,7 +314,7 @@ static inline uint16_t mm3ns16(uint16_t ns, uint16_t p) {
   #define STBX 0
   #define FINAL_AVALANCHE_MLT 0xc4ceb9fe1a85ec53ULL
   #define perrwrn() perr("\nWARNING: "APPNAME" isn't compiled with "STBRSTR"\n\n")
-  #define mm3ns32(o,h) rotl64((h * FINAL_AVALANCHE_MLT) ^ (h >> 33), 7 + ((o & 0x1f) << 1))
+  #define mm3ns32(o,h) rotl64((h * FINAL_AVALANCHE_MLT) ^ (h >> 33), 13 + ((o & 0x1f) << 1))
   #define entropy(sz) ((sz << 3) - sz) // eq. to 8x (8-1)
   #define minmix8
   #define knuthmx
@@ -727,7 +725,7 @@ int main(int argc, char *argv[]) {
                 prsts = 0;
             }
         } else {
-            perr(": s(%d), q(%d), p(%d), d(%dns), r(%d), i(%d), RTSC(%d)\n\n",
+            perr(": s(%d), q(%d), p(%d), d(%d), r(%d), i(%d), RTSC(%d)\n\n",
                 nbtls, quiet, pmdly, nsdly, nrdry, nblks, !USE_GET_TIME);
         }
     }
