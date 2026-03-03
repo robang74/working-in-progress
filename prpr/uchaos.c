@@ -1,7 +1,7 @@
 /*
  * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2 license
  */
-#define VERSION "v0.2.8.0"
+#define VERSION "v0.2.8.1"
 /* Quick 2k test: cat uchaos.c  | ./chaos -T 2048 | ent
  * Boot log test: cat dmesg.txt | ./uchaos -i 16 -r31 -d3 | ent
  *
@@ -759,10 +759,10 @@ int main(int argc, char *argv[]) {
         } else {
             static uint32_t ncnt = 0, nfld = 0;
             for (uint32_t i = 0; i < size; i++) {
-                output ^= h[i];
+                output ^= rotl64(h[i], i);
                 if( ++ncnt >> (nfld >> 8) ) {
                     writebuf(STDOUT_FILENO, (uint8_t *)&output, 8);
-                    output = 0;
+                    output *= 0xFF51AFD7ED558CCD;
                     nfld++;
                 }
              }
@@ -811,7 +811,7 @@ int main(int argc, char *argv[]) {
                          // a predictable delay which sched_yield() can jeopardise.
                          // Stats makes the large size output slower 1.7x than -q.
     }
-    if(output) writebuf(STDOUT_FILENO, (uint8_t *)&output, 8);
+    //if(output) writebuf(STDOUT_FILENO, (uint8_t *)&output, 8);
     if(!prsts) return 0;
 
     uint64_t rt = get_nanos();
