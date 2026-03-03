@@ -1,7 +1,7 @@
 /*
  * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2 license
  */
-#define VERSION "v0.2.8.1"
+#define VERSION "v0.2.8.2"
 /* Quick 2k test: cat uchaos.c  | ./chaos -T 2048 | ent
  * Boot log test: cat dmesg.txt | ./uchaos -i 16 -r31 -d3 | ent
  *
@@ -305,7 +305,7 @@ static inline uint16_t mm3ns16(uint16_t ns, uint16_t p) {
       register uint64_t z = ks;
       z = (p ^ (z >> 29)) * 0xff51afd7ed558ccdULL;
       z = (z ^ (z >> 31)) * 0xc4ceb9fe1a85ec53ULL;
-      z = (z ^ (z >> 33));
+      z = (z ^ (z >> 33)) ^ p << 33;
       return z;
   }
 
@@ -456,7 +456,6 @@ reschedule:
 
     // 9. finalising w/ a 32+1 bit mix /////////////////////////////////////////
     hsh = mm3ns32(hsh, ohs);
-    hsh = (hsh * 0x45d9f3b) ^ (hsh >> 31);
 
     return hsh;
 }
@@ -698,6 +697,8 @@ int main(int argc, char *argv[]) {
         return EXIT_FAILURE;
     }
     if(quiet) prsts = 0;
+    if(quiet < 2)
+        perr("\n>>> WARNING!! <<< this "VERSION" is for tests only, use v0.2.7.1\n\n");
 
     // Counting time of running starts here, after parameters
     (void) get_nanos();
@@ -720,7 +721,7 @@ int main(int argc, char *argv[]) {
 
     double avgbc = 0, avgmx = 0, avgmn = 256;
     uint64_t bic = 0, max = 0, min = 256, avg = 0, mt = 0;
-    uint64_t nk = 0, nt = 0, nx = 0, nn = 0, output = 0;
+    uint64_t nk = 0, nt = 0, nx = 0, nn = 0;
 
     if(quiet < 2) {
         perr_app_info(0);
@@ -733,14 +734,13 @@ int main(int argc, char *argv[]) {
         } else perrprms("", -1);
     }
 
+    register uint64_t output = 0;
     for (uint32_t a = ntsts; a; a--) {
         // hashing
-        uint64_t st = get_nanos();
+        uint64_t stns = get_nanos();
         h = str2ht64(str, &h, &size, nsdly, pmdly, nbtls);
-        mt += get_nanos() - st;
-
-        // output
         if(!h) return EXIT_FAILURE;
+        mt += get_nanos() - stns;
 
         uint32_t sz = size << 3;
         if(devfd) {
@@ -761,8 +761,8 @@ int main(int argc, char *argv[]) {
             for (uint32_t i = 0; i < size; i++) {
                 output ^= rotl64(h[i], i);
                 if( ++ncnt >> (nfld >> 8) ) {
-                    writebuf(STDOUT_FILENO, (uint8_t *)&output, 8);
-                    output *= 0xFF51AFD7ED558CCD;
+                    stns = mm3ns32(output, output);
+                    writebuf(STDOUT_FILENO, (const uint8_t *)&stns, 8);
                     nfld++;
                 }
              }
@@ -811,7 +811,10 @@ int main(int argc, char *argv[]) {
                          // a predictable delay which sched_yield() can jeopardise.
                          // Stats makes the large size output slower 1.7x than -q.
     }
-    //if(output) writebuf(STDOUT_FILENO, (uint8_t *)&output, 8);
+    for(uint64_t o = output; output;) {
+        writebuf(STDOUT_FILENO, (uint8_t *)&o, 8); break;
+    }
+
     if(!prsts) return 0;
 
     uint64_t rt = get_nanos();
