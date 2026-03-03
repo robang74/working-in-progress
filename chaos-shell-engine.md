@@ -82,6 +82,7 @@ WEAK results in run.681.all confirms that the imposed symmetry constraints are n
 cosmetic, but functional: when relaxed, residual structure becomes detectable,
 yet the system as a whole remains statistically stable.
 
+---
 
 ### Presentation
 
@@ -100,6 +101,28 @@ In this framework, “entropy” as a mystical or intrinsic property leaves the 
 Complete isolation is not strictly necessary for the chaos clockwork to function, but it can improve security. Unpredictability is not only a matter of physical complexity (as in billiard systems or the three-body problem), but also of perspective and attacker capability. An attacker with root access can tamper with `/dev/random`, but in that scenario privilege escalation has already occurred, which dominates the threat model. At the microcode or CPU level the same reasoning applies: an actor able to observe or manipulate at that layer has no need to exploit lower-level mechanisms.
 
 From this point of view, unpredictability is distinct from uncertainty. The procedure that produces the numbers is deterministic, but the overall process is not, due to jitter in execution latencies. The core concept is the deterministic mixing of deterministic information, driven by the system’s own timing variability. The unpredictability emerges not from indeterminism, but from the interaction between deterministic computation and irreducible execution jitter.
+
+---
+
+### Operative limits
+
+uChaos, in order to support also the "extreme deterministic VMs" -- not because supporting these VMs is essential, that are corner-cases pushed to the limit by a combinations of parameters that have no practical use -- testing against extreme condition is a best practice for being able to claim something like this:
+
+uChaos limits of functioning are "bla-bla" and out of this domain we know how and how much it fails. Obviously, everyone would be happy to say "no limits, totally good" but that's marketing. In fact, EVERY tool that is sold as a reliable professional tool has its own laboratory check that establishes condition of use: optimal, acceptable, failing and out-of-domain.
+
+The opposite would be an optic that can work as a telescope and as a microscope from atoms on the desk to black holes on the other side of the universe. The same tool, the same precision, overl all that scale. Unreasonable, right? Therefore microscopes and telescopes are sold with specifications that indicate in which domain of observation they work and how much they are precise. The limits, because "no limits" is mere marketing while "show me the code" is the WYSIWYG anti-marketing approach.
+
+Obviously, like any tool also uChaos has plenty of options that allow arguments and thus is fine-grained configurable but configurability contrasts with simplicity of use because simplicity would be "one size fits all" which is not possible but a compromise can be found. That compromise is built upon few facts and considerations:
+
+1. stochastics branching is essential to cope with 0°K VMs;
+2. this mode affect too much the output on bare-metal CPU;
+3. a rotations approach change can lead to unification of 2;
+4. the -S option added for simplicity in VMs (1size, good 4all);
+5. the -S option still "too harsh" in CPUs, therefore -Sd1 works
+
+At this point why -Sd1 as standard for bare-metal CPU machines (or KVM as emulation pass-trough for VMs) instead of -S and let VMs use -Sd7 is a good question. It is just a case of the universal contrast between UX/UI vs Security.
+
+The options -Sd1 is easy to remember because it is not N that we might wish to try to change, it is exactly 1 (or zero). Like -Sd7 suggests to the users that they can "play" with that number (and they will do without reading the specs/man aka RTFM). Finally -S works good enough in bare-metal CPU machines, and in VMs. Thus, -S is the safe choice and the rest is cosmetics.
 
 ---
 
