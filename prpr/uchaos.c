@@ -1,7 +1,7 @@
 /*
  * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2 license
  */
-#define VERSION "v0.2.7.1"
+#define VERSION "v0.2.8.0"
 /* Quick 2k test: cat uchaos.c  | ./chaos -T 2048 | ent
  * Boot log test: cat dmesg.txt | ./uchaos -i 16 -r31 -d3 | ent
  *
@@ -303,8 +303,8 @@ static inline uint16_t mm3ns16(uint16_t ns, uint16_t p) {
   }
   static inline uint64_t mm3ns32(uint64_t ks, uint64_t p) {
       register uint64_t z = ks;
-      z = (p ^ (z >> 33)) * 0xff51afd7ed558ccdULL;
-      z = (z ^ (z >> 33)) * 0xc4ceb9fe1a85ec53ULL;
+      z = (p ^ (z >> 29)) * 0xff51afd7ed558ccdULL;
+      z = (z ^ (z >> 31)) * 0xc4ceb9fe1a85ec53ULL;
       z = (z ^ (z >> 33));
       return z;
   }
@@ -405,13 +405,14 @@ hashotloop:                          // a loop made by ASM jumps
         avg += dlt; ncl++;
         // dmn calculation is mandatory for stochastics biforkation turns
         if( dlt < dmn ) {
-            uint64_t dff = dmn - dlt; dmn = dlt; dlt = dff; ns = minmix8(ns);
+            uint64_t dff = dmn - dlt; dmn = dlt; dlt = dff; ns = minmix8(ns); nexp++;
         } else
         // dmx calculation can be omited but doing ns*=0x4d anyway
-        if( dlt > dmx ) { dmx = dlt; ns = minmix8(ns); }
+        if( dlt > dmx ) { dmx = dlt; ns = minmix8(ns); nexp++; }
         // for the execption manager activation
-        excp = dlt < nsdly + (pmdly ? pmdly2ns : 1);
-    }
+        if( dlt < nsdly + (pmdly ? pmdly2ns : 1) ) excp = 1;
+        // perr("%u: %ld vs %ld \n", excp, dlt, nsdly + (pmdly ? pmdly2ns : 1));
+    } else excp = 1;
     ons = ts_tv_nsec;
 
     // 4. nacro-mix in djb2-style //////////////////////////////////////////////
@@ -454,7 +455,10 @@ reschedule:
     }
 
     // 9. finalising w/ a 32+1 bit mix /////////////////////////////////////////
-    return mm3ns32(hsh, ohs);
+    hsh = mm3ns32(hsh, ohs);
+    hsh = (hsh * 0x45d9f3b) ^ (hsh >> 31);
+
+    return hsh;
 }
 
 uint64_t *str2ht64(uint8_t *str, uint64_t **ph,  uint32_t *size,
@@ -638,6 +642,8 @@ static inline void usage(const char *name, const char *cmdn, const uint8_t qlvl)
 
 #define APPNAME "uChaos"
 #define STCX STOCHASTIC_BRANCHES
+#define perrprms(s,p) perr("%s: s(%d), q(%d), p(%d:%d), d(%d), r(%d), i(%d), RTSC(%d)\n\n",\
+                      s, nbtls, quiet, pmdly, nsdly, nrdry, nblks, !USE_GET_TIME, p)
 
 int main(int argc, char *argv[]) {
     struct rand_pool_info_buf entrnd;
@@ -714,7 +720,7 @@ int main(int argc, char *argv[]) {
 
     double avgbc = 0, avgmx = 0, avgmn = 256;
     uint64_t bic = 0, max = 0, min = 256, avg = 0, mt = 0;
-    uint64_t nk = 0, nt = 0, nx = 0, nn = 0;
+    uint64_t nk = 0, nt = 0, nx = 0, nn = 0, output = 0;
 
     if(quiet < 2) {
         perr_app_info(0);
@@ -724,10 +730,7 @@ int main(int argc, char *argv[]) {
                 perr("too short input, try longer!\n\n");
                 prsts = 0;
             }
-        } else {
-            perr(": s(%d), q(%d), p(%d), d(%d), r(%d), i(%d), RTSC(%d)\n\n",
-                nbtls, quiet, pmdly, nsdly, nrdry, nblks, !USE_GET_TIME);
-        }
+        } else perrprms("", -1);
     }
 
     for (uint32_t a = ntsts; a; a--) {
@@ -753,7 +756,17 @@ int main(int argc, char *argv[]) {
             }
             if (quiet < 2) // avoid the need of >/dev/null
                 writebuf(STDOUT_FILENO, (uint8_t *)h, sz);
-        } else  writebuf(STDOUT_FILENO, (uint8_t *)h, sz);
+        } else {
+            static uint32_t ncnt = 0, nfld = 0;
+            for (uint32_t i = 0; i < size; i++) {
+                output ^= h[i];
+                if( ++ncnt >> (nfld >> 8) ) {
+                    writebuf(STDOUT_FILENO, (uint8_t *)&output, 8);
+                    output = 0;
+                    nfld++;
+                }
+             }
+        }
 
         // single run
         if(ntsts < 2) return 0;
@@ -798,7 +811,7 @@ int main(int argc, char *argv[]) {
                          // a predictable delay which sched_yield() can jeopardise.
                          // Stats makes the large size output slower 1.7x than -q.
     }
-
+    if(output) writebuf(STDOUT_FILENO, (uint8_t *)&output, 8);
     if(!prsts) return 0;
 
     uint64_t rt = get_nanos();
@@ -828,8 +841,7 @@ int main(int argc, char *argv[]) {
         (double)rt/E9, (double)mt/E9, (double)E6*nt/rt);
 
     uint32_t pmns = (uint32_t)djb2tum(0, 0, 0, 0, pmdly, 0);
-    perr("Parameter settings: s(%d), d(%dns), p(%d:%dns), r(%d), RTSC(%d)\n\n",
-        nbtls, nsdly, pmdly, pmns, nrdry, !USE_GET_TIME);
+    perrprms("Parameter settings", pmns);
 
     return 0; // exit() do free()
 }
