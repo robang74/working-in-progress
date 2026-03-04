@@ -1,7 +1,7 @@
 /*
  * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2 license
  */
-#define VERSION "v0.2.9.2"
+#define VERSION "v0.2.9.3"
 /* Quick 2k test: cat uchaos.c  | ./chaos -T 2048 | ent
  * Boot log test: cat dmesg.txt | ./uchaos -i 16 -r31 -d3 | ent
  *
@@ -446,13 +446,14 @@ hashotloop:                          // a loop made by ASM jumps
 #endif
 
     // 7. exceptions management ////////////////////////////////////////////////
-
+    #define pidx(p) ((uint32_t)(uintptr_t)(p))
     if( excp || hsh == ohs ) {       // copying with the VMs scheduler timings
 reschedule:
         str--;                       // apply changes but repeat the action
         nexp++;
         sched_yield();
-        hsh = mm3ns32(hsh, hsh);     // Knuth, based on gold section
+        // Knuth, based on gold section seeded by 1E-3 ~ 1E-4 event idx
+        hsh = mm3ns32(hsh, pidx(&chr));
         goto hashotloop;             // continue made by an ASM jump
     }
 
