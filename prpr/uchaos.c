@@ -1,7 +1,7 @@
 /*
  * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2 license
  */
-#define VERSION "v0.2.8.4"
+#define VERSION "v0.2.9"
 /* Quick 2k test: cat uchaos.c  | ./chaos -T 2048 | ent
  * Boot log test: cat dmesg.txt | ./uchaos -i 16 -r31 -d3 | ent
  *
@@ -289,7 +289,8 @@ static inline uint16_t mm3ns16(uint16_t ns, uint16_t p) {
   #define entropy(sz) ((sz << 2) - sz) // eq. to 3x (4-1)
   static inline uint8_t  minmix8(uint8_t b) {
       b *= (b & 1) ? 0x4d : 0x65;
-      return b ^ ((b >> 3) | (b << 5));
+      b ^= ((b >> 3) | (b << 5));
+      return b;
   }
   static inline uint64_t knuthmx(uint64_t w) {
   #if USE_PRIMES_2564
@@ -298,8 +299,7 @@ static inline uint16_t mm3ns16(uint16_t ns, uint16_t p) {
       w  = rotl64(w, 5 + ((w & 0x1f) << 1));
   #endif
       w *= (w & 1) ? 0x9E3779B9 : 0x45d9f3b;
-
-      return w ^ ((w >> 17) | (w << 47));
+      return w ^ ( (w >> 17) | (w << 47) ) ;
   }
   static inline uint64_t mm3ns32(uint64_t ks, uint64_t p) {
       register uint64_t z = ks;
@@ -370,84 +370,94 @@ static uint64_t djb2tum(const uint8_t *str, uint8_t maxn, uint64_t seed,
 #else
     static uint32_t cpuid, oid = -1;
 #endif
-    uint64_t ts_tv_nsec, ons = 0, chr = *str;
-    uint16_t ns, b0, b1, excp;
+    #define bit(v,n) ( ( (v) >> (n) ) & 1 )
+    uint32_t excp = 0, evnt = 0;
+    uint64_t ts_tv_nsec, dff, dlt = 0, ons = 0, ent = 0, chr = *str;
 
 hashotloop:                          // a loop made by ASM jumps
 
-    // 1. time deltas management ///////////////////////////////////////////////
+    // 1. ns latency time retriviement /////////////////////////////////////////
 #if USE_GET_TIME
     ts_tv_nsec = getnstime( NULL ) >> nbtls;
 #else
     ts_tv_nsec = getnstime(&cpuid) >> nbtls;
     if( cpuid != oid ) {
           oid  = cpuid;
-          ons  = ts_tv_nsec;
-          goto reschedule;
+          ons  = 0;                  // reschedule in the following !ons branch
     }
     oid = cpuid;
 #endif
+    if( !ons ) {
+        ons  = ts_tv_nsec;
+        // RAF, TODO: inject entropy here
+        goto reschedule;
+    }
 
-    // 3. entropy distillation /////////////////////////////////////////////////
-    ns  = 0xff & ts_tv_nsec;
-    ns ^= (ns >> 3) ^ (0xff & ohs);
+    // 2. jitter calculation ///////////////////////////////////////////////////
 
-    // 2. internal stats update ////////////////////////////////////////////////
-    excp = 0;
-    if( ons ) {
-        uint64_t dlt = ts_tv_nsec;
+    dlt = ts_tv_nsec;
 #if USE_GET_TIME
-        dlt = (dlt < ons) ? E9 - ons + dlt : dlt - ons;
+    dlt = (dlt < ons) ? E9 - ons + dlt : dlt - ons;
 #else
-        dlt =  dlt - ons;            // overflow by uint64_t is 0xff..ff + 1 = 0
+    dlt =  dlt - ons;                // overflow by uint64_t is 0xff..ff + 1 = 0
 #endif
-        // avg calculation can be omitted
-        avg += dlt; ncl++;
-        // dmn calculation is mandatory for stochastics biforkation turns
-        if( dlt < dmn ) {
-            uint64_t dff = dmn - dlt; dmn = dlt; dlt = dff; ns = minmix8(ns); nexp++;
-        } else
-        // dmx calculation can be omited but doing ns*=0x4d anyway
-        if( dlt > dmx ) { dmx = dlt; ns = minmix8(ns); nexp++; }
-        // for the execption manager activation
-        if( dlt < nsdly + (pmdly ? pmdly2ns : 1) ) excp = 1;
-        // perr("%u: %ld vs %ld \n", excp, dlt, nsdly + (pmdly ? pmdly2ns : 1));
-    } else excp = 1;
     ons = ts_tv_nsec;
 
-    // 4. nacro-mix in djb2-style //////////////////////////////////////////////
+    // 3. internal state update ////////////////////////////////////////////////
+
+    excp = 0;
+    // avg calculation can be omitted
+    avg += dlt; ncl++;
+    // dmn calculation is mandatory for stochastics bi-forkation turns
+    if( dlt < dmn ) {
+        dff = dmn - dlt; dmn = dlt; dlt = dff;
+        ent = ent - minmix8(dlt); evnt++;
+    } else
+    // dmx calculation can be omited but doing ns*=0x4d anyway
+    if( dlt > dmx ) {
+        dmx = dlt;
+        ent = ent + minmix8(dlt); evnt++;
+    }
+    // for the exeption manager activation
+    if( dlt < nsdly + (pmdly ? pmdly2ns : 1) )
+        excp = 1;
+
+    // 4. entropy distillation /////////////////////////////////////////////////
+
+    ent ^= (ent << 6) ^ ts_tv_nsec;
+    ent ^= (ent << 3) ^ dlt;
+    ent  = knuthmx(ent);
+
+    // 5. macro-mix in djb2-style //////////////////////////////////////////////
     /*
      * (16+1) (32-1 or 32+1) (64-1)
      *   01     10      00     11
      */
-    b1  = ns & 0x02;
-    b0  = ns & 0x01;
-    hsh = ( ( hsh << (5 + (b0 ? b1 : 1)) ) + (b1 ? -hsh : hsh) );
+    // consumed entropy, do rotations and forgot the state
+    uint8_t b0 = ent & 0x01, b1  = ent & 0x02; ent = ent >> 2;
+    hsh = ( hsh << (4 + (b0 ? b1 : 1)) ) + (b1 ? -hsh : hsh);
 
-    // 5. entropy injection w/ rotation ////////////////////////////////////////
+    // 6. entropy injection in hsh /////////////////////////////////////////////
+
 #if USE_PRIMES_2564
-    hsh ^= chr ^ rotl64(chr, getprmx16(ns & 0x1f);
+    hsh ^= (ent << 2) ^ rotl64(chr,   getprmx16(ent));
 #else
-    hsh ^= chr ^ rotl64(chr,      3 + (ns & 0x1f));
+    hsh ^= (ent << 2) ^ rotl64(chr, 3 + (0x1f & ent));
 #endif
-
-    // 6. stochastics micro-mix ////////////////////////////////////////////////
-    //hsh  = rotl64(hsh, 5 + ((ns >> 3) & 0x03)) + hsh;
 
     // 7. exceptions management ////////////////////////////////////////////////
+
     if( excp || hsh == ohs ) {       // copying with the VMs scheduler timings
-#if USE_GET_TIME
-#else
 reschedule:
-#endif
         str--;                       // apply changes but repeat the action
         nexp++;
         sched_yield();
-        hsh = knuthmx(hsh);          // Knuth, based on gold section
+        hsh = mm3ns32(hsh, hsh);     // Knuth, based on gold section
         goto hashotloop;             // continue made by an ASM jump
     }
 
     // 8. preparation for the next round ///////////////////////////////////////
+
     if( (chr = *++str) && maxn-- ) {
         ohs = hsh;
         sched_yield();
@@ -455,12 +465,19 @@ reschedule:
     }
 
     // 9. finalising w/ a 32+1 bit mix /////////////////////////////////////////
-    uint64_t prv = hsh;
+
+    dff = hsh;
     hsh = mm3ns32(hsh, ohs);
-    ohs = prv;
+    ohs = dff;
 
     return hsh;
 }
+
+#ifdef _USE_EXP_COMPR
+#define USE_EXP_COMPR 1
+#else
+#define USE_EXP_COMPR 0
+#endif
 
 uint64_t *str2ht64(uint8_t *str, uint64_t **ph,  uint32_t *size,
     const uint32_t nsdly, const uint32_t pmdly, const uint8_t nbtls)
@@ -759,7 +776,7 @@ int main(int argc, char *argv[]) {
             if (quiet < 2) // avoid the need of >/dev/null
                 writebuf(STDOUT_FILENO, (uint8_t *)h, sz);
         } else {
-#if 0
+#if ! USE_EXP_COMPR
                 writebuf(STDOUT_FILENO, (uint8_t *)h, sz);
 #else
             static uint32_t ncnt = 0, nfld = 0;
