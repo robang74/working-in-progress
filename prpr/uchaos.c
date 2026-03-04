@@ -1,7 +1,7 @@
 /*
  * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2 license
  */
-#define VERSION "v0.2.8.2"
+#define VERSION "v0.2.8.4"
 /* Quick 2k test: cat uchaos.c  | ./chaos -T 2048 | ent
  * Boot log test: cat dmesg.txt | ./uchaos -i 16 -r31 -d3 | ent
  *
@@ -389,7 +389,7 @@ hashotloop:                          // a loop made by ASM jumps
 #endif
 
     // 3. entropy distillation /////////////////////////////////////////////////
-    ns = 0xff & ts_tv_nsec;
+    ns  = 0xff & ts_tv_nsec;
     ns ^= (ns >> 3) ^ (0xff & ohs);
 
     // 2. internal stats update ////////////////////////////////////////////////
@@ -422,11 +422,11 @@ hashotloop:                          // a loop made by ASM jumps
      */
     b1  = ns & 0x02;
     b0  = ns & 0x01;
-    hsh  = ( ( hsh << (4 + (b0 ? b1 : 1)) ) + (b1 ? -hsh : hsh) );
+    hsh = ( ( hsh << (5 + (b0 ? b1 : 1)) ) + (b1 ? -hsh : hsh) );
 
     // 5. entropy injection w/ rotation ////////////////////////////////////////
 #if USE_PRIMES_2564
-    hsh ^= chr ^ rotl64(chr, getprmx16(ns & 0x0f));
+    hsh ^= chr ^ rotl64(chr, getprmx16(ns & 0x1f);
 #else
     hsh ^= chr ^ rotl64(chr,      3 + (ns & 0x1f));
 #endif
@@ -455,7 +455,9 @@ reschedule:
     }
 
     // 9. finalising w/ a 32+1 bit mix /////////////////////////////////////////
+    uint64_t prv = hsh;
     hsh = mm3ns32(hsh, ohs);
+    ohs = prv;
 
     return hsh;
 }
@@ -757,6 +759,9 @@ int main(int argc, char *argv[]) {
             if (quiet < 2) // avoid the need of >/dev/null
                 writebuf(STDOUT_FILENO, (uint8_t *)h, sz);
         } else {
+#if 0
+                writebuf(STDOUT_FILENO, (uint8_t *)h, sz);
+#else
             static uint32_t ncnt = 0, nfld = 0;
             for (uint32_t i = 0; i < size; i++) {
                 output ^= rotl64(h[i], i);
@@ -766,6 +771,7 @@ int main(int argc, char *argv[]) {
                     nfld++;
                 }
              }
+#endif
         }
 
         // single run
@@ -807,9 +813,9 @@ int main(int argc, char *argv[]) {
 #if 0                      // Just for test
         free(h); h = NULL; // passing to str2ht64 a valid (h, size) should reused it
 #endif
-        sched_yield();   // Statistics are a block of CPU data-crunching but also
-                         // a predictable delay which sched_yield() can jeopardise.
-                         // Stats makes the large size output slower 1.7x than -q.
+        sched_yield();     // Statistics are a block of CPU data-crunching but also
+                           // a predictable delay which sched_yield() can jeopardise.
+                           // Stats makes the large size output slower 1.7x than -q.
     }
     for(uint64_t o = output; output;) {
         writebuf(STDOUT_FILENO, (uint8_t *)&o, 8); break;
