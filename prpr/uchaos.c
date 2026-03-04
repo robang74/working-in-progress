@@ -1,7 +1,7 @@
 /*
  * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2 license
  */
-#define VERSION "v0.2.9"
+#define VERSION "v0.2.9.2"
 /* Quick 2k test: cat uchaos.c  | ./chaos -T 2048 | ent
  * Boot log test: cat dmesg.txt | ./uchaos -i 16 -r31 -d3 | ent
  *
@@ -136,6 +136,7 @@
 #define MIN(a,b)  ( ( (a) < (b) ) ? (a) : (b) )
 #define MAX(a,b)  ( ( (a) > (b) ) ? (a) : (b) )
 #define ALGN64(n) ( ( ( (n) + 63) >> 6 ) << 6 )
+#define BIT(v,n)  ( ( (v) >> (n) ) & 1 )
 #define perr(x...) fprintf(stderr, x)
 
 #define ALPH64 "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz0123456789@\n"
@@ -331,14 +332,14 @@ static inline uint16_t mm3ns16(uint16_t ns, uint16_t p) {
 static uint64_t djb2tum(const uint8_t *str, uint8_t maxn, uint64_t seed,
     const uint32_t nsdly, const uint32_t pmdly, const uint8_t nbtls)
 {
-    static uint64_t ncl = 0, dmn = E9, nexp = 0, avg = 0, dmx = 0;
+    static uint64_t ncl = 0, dmn = E9, nexp = 0, evnt = 0, avg = 0, dmx = 0;
 
     if( pmdly && str == GETVAL ) return pmdly2ns;
     if( !str ) {
         if( ncl ) {
             double mean = (double)avg / ncl;
-            perr("\nTime deltas avg: %.0lf <%.1lf> %.0lf ns over %.0lfK (+%.0lf) values\n",
-                (double)dmn, mean, (double)dmx, (double)ncl/E3, (double)nexp);
+            perr("\nTime deltas avg: %.0lf <%.1lf> %.0lf ns over %.0lfK (w/ %.0lf + %.0lf)\n",
+                (double)dmn, mean, (double)dmx, (double)ncl/E3, (double)evnt, (double)nexp);
             perr("Ratios over avg: %.2lf <1U> %.2lf, over min: 1U <%.2lf> %.2lf\n",
                 (double)dmn/mean, (double)dmx/mean, mean/dmn, (double)dmx/dmn);
         }
@@ -370,9 +371,8 @@ static uint64_t djb2tum(const uint8_t *str, uint8_t maxn, uint64_t seed,
 #else
     static uint32_t cpuid, oid = -1;
 #endif
-    #define bit(v,n) ( ( (v) >> (n) ) & 1 )
-    uint32_t excp = 0, evnt = 0;
     uint64_t ts_tv_nsec, dff, dlt = 0, ons = 0, ent = 0, chr = *str;
+    uint8_t excp = 0;
 
 hashotloop:                          // a loop made by ASM jumps
 
@@ -836,9 +836,11 @@ int main(int argc, char *argv[]) {
                            // a predictable delay which sched_yield() can jeopardise.
                            // Stats makes the large size output slower 1.7x than -q.
     }
+#if USE_EXP_COMPR
     for(uint64_t o = output; output;) {
         writebuf(STDOUT_FILENO, (uint8_t *)&o, 8); break;
     }
+#endif
 
     if(!prsts) return 0;
 
