@@ -10,7 +10,7 @@ testfunc() {
     fn=${1:-uchaos.c }
     printf "\n|\/ Testing with $tcmd $fn _/\\__" | tee -a $nfle.$i
     {
-        printf "_%.0s" {1..16}; printf "\n|";
+        printf "_%.0s" {1..16}; printf "\n|\n";
         cat $fn | { $tcmd 2>&3; printf "\n|\n" >&3; } | entgr
     } 3>&1 | grep . >> $nfle.$i
 }
