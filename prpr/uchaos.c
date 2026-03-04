@@ -716,8 +716,10 @@ int main(int argc, char *argv[]) {
         return EXIT_FAILURE;
     }
     if(quiet) prsts = 0;
+#if USE_EXP_COMPR
     if(quiet < 2)
-        perr("\n>>> WARNING!! <<< this "VERSION" is for tests only, use v0.2.7.1\n\n");
+        perr("\n>>> WARNING!! <<< "APPNAME" is compiled with USE_EXP_COMPR\n\n");
+#endif
 
     // Counting time of running starts here, after parameters
     (void) get_nanos();
