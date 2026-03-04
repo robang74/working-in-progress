@@ -1,9 +1,9 @@
 /*
  * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2 license
  */
-#define VERSION "v0.2.9.3"
+#define VERSION "v0.2.9.4"
 /* Quick 2k test: cat uchaos.c  | ./chaos -T 2048 | ent
- * Boot log test: cat dmesg.txt | ./uchaos -i 16 -r31 -d3 | ent
+ * Boot log test: cat dmesg.txt | ./uchaos -i16 -r31 -d3 | ent
  *
  * Compile w/libc:      gcc uchaos.c -O3 --fast-math -Wall -o uchaos -s
  * Compile w/musl: musl-gcc uchaos.c -O3 --fast-math -Wall -o uchaos -s -static
@@ -475,8 +475,8 @@ reschedule:
 }
 
 #ifdef _USE_EXP_COMPR
-#define USE_EXP_COMPR 1
-#else
+#define USE_EXP_COMPR 1 // RAF: since v0.2.9.3 this mode is not yet useful w/0°K
+#else                   //      qemu VMs and good randomnes is produced also w/o
 #define USE_EXP_COMPR 0
 #endif
 
@@ -756,7 +756,9 @@ int main(int argc, char *argv[]) {
         } else perrprms("", -1);
     }
 
+#if USE_EXP_COMPR
     register uint64_t output = 0;
+#endif
     for (uint32_t a = ntsts; a; a--) {
         // hashing
         uint64_t stns = get_nanos();
