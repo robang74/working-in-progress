@@ -1,7 +1,7 @@
 /*
  * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2 license
  */
-#define VERSION "v0.2.9.5"
+#define VERSION "v0.2.9.6"
 /* Quick 2k test: cat uchaos.c  | ./chaos -T 2048 | ent
  * Boot log test: cat dmesg.txt | ./uchaos -S -M2 | ent
  *
@@ -193,7 +193,6 @@ static inline uint32_t getprmx20(uint32_t x) {
     x +=  (x & 0x10) ? 10 : 0;
     return primes64[x];
 }
-
 #endif
 
 static inline uint64_t rotl64(uint64_t n, uint8_t c) {
@@ -324,8 +323,8 @@ static inline uint16_t mm3ns16(uint16_t ns, uint16_t p) {
 
 #define PRMX USE_PRIMES_2564
 #define STOCHASTIC_BRANCHES STBX
-#define perr_app_info(a) { perr("%s %s%s%s%s", APPNAME, VERSION,\
-    STBX ? " w/sb" : "", PRMX ? "" : " !/pr", (a) ? "\n" : ""); }
+#define perr_app_info(a) { perr("%s %s%s%s%s%s", APPNAME, VERSION,\
+    STBX ? " w/sb" : "", PRMX ? "" : " !/pr", USE_GET_TIME?" rtcs":"", (a) ? "\n" : ""); }
 
 #define GETVAL (const uint8_t *)(-1)
 
@@ -474,11 +473,8 @@ reschedule:
     return hsh;
 }
 
-#ifdef _USE_EXP_COMPR
-#define USE_EXP_COMPR 1 // RAF: since v0.2.9.3 this mode is not yet useful w/0°K
-#else                   //      qemu VMs and good randomnes is produced also w/o
-#define USE_EXP_COMPR 0
-#endif
+#define USE_EXP_COMPR 0 // RAF: since v0.2.9.3 this mode is not yet useful w/0°K
+                        //      qemu VMs and good randomnes is produced also w/o
 
 uint64_t *str2ht64(uint8_t *str, uint64_t **ph,  uint32_t *size,
     const uint32_t nsdly, const uint32_t pmdly, const uint8_t nbtls)
@@ -661,8 +657,8 @@ static inline void usage(const char *name, const char *cmdn, const uint8_t qlvl)
 
 #define APPNAME "uChaos"
 #define STCX STOCHASTIC_BRANCHES
-#define perrprms(s,p) perr("%s: s(%d), q(%d), p(%d:%d), d(%d), r(%d), i(%d), RTSC(%d)\n\n",\
-                      s, nbtls, quiet, pmdly, p, nsdly, nrdry, nblks, !USE_GET_TIME)
+#define perrprms(s,p) perr("%s: s(%d), q(%d), p(%d:%d), d(%d), r(%d), i(%d)\n\n",\
+                      s, nbtls, quiet, pmdly, p, nsdly, nrdry, nblks)
 
 int main(int argc, char *argv[]) {
     struct rand_pool_info_buf entrnd;
@@ -848,7 +844,7 @@ int main(int argc, char *argv[]) {
     if(!prsts) return 0;
 
     uint64_t rt = get_nanos();
-    perr("%s\n", nk ? ", status KO" : "none found, status OK");
+    perr("%s\n", nk ? ", status KO" : "0, status OK");
     perr("\n");
 
     perr("Tests: %d w/ duplicates %.0lf over ", ntsts, (double)nk);
