@@ -337,9 +337,9 @@ static uint64_t djb2tum(const uint8_t *str, uint8_t maxn, uint64_t seed,
     if( !str ) {
         if( ncl ) {
             double mean = (double)avg / ncl;
-            perr("\nTime deltas avg: %.0lf <%.1lf> %.0lf ns over %.0lfK (w/ %.0lf + %.0lf)\n",
+            perr("\nLatency: %.0lf <%.1lf> %.0lf ns over %.0lf K (w/ %.0lf + %.0lf)\n",
                 (double)dmn, mean, (double)dmx, (double)ncl/E3, (double)evnt, (double)nexp);
-            perr("Ratios over avg: %.2lf <1U> %.2lf, over min: 1U <%.2lf> %.2lf\n",
+            perr(  "Ratios : on avg %.2lf <1U> %.2lf, on min 1U <%.2lf> %.2lf\n",
                 (double)dmn/mean, (double)dmx/mean, mean/dmn, (double)dmx/dmn);
         }
         if( pmdly && !seed && !maxn && !nsdly && !nbtls )
@@ -866,8 +866,8 @@ int main(int argc, char *argv[]) {
         avgmn/bic_nx_absl, devppm(bic_nx_absl, 32), avgmx/bic_nx_absl);
 
     perr("\n");
-    perr("Times: running: %.3lf s, hashing: %.3lf s, speed: %.1lf Kh/s",
-        (double)rt/E9, (double)mt/E9, (double)E6*nt/rt);
+    perr("Times: running %.3lfs, %.2lf MB/s; hashing %.3lfs, %.1lf KH/s",
+        (double)rt/E9, (double)E6*nt/(rt<<7), (double)mt/E9, (double)E6*nt/mt);
 
     uint32_t pmns = (uint32_t)djb2tum(0, 0, 0, 0, pmdly, 0);
     perrprms("Parameter settings", pmns);
