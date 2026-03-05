@@ -675,8 +675,7 @@ int main(int argc, char *argv[]) {
     while (1) {
         int opt = getopt(argc, argv, "hvSG:M:K:T:s:d:p:r:k:i:q");
         if(opt == 'S') {
-            nsdly=7; nblks=16; nrdry=31; ntsts=(4<<1);
-            if(!quiet) quiet=1;
+            nsdly=7; nblks=16; nrdry=31; ntsts=(4<<1); quiet++;
             perrwrn();
         } else
         if(opt == 'v') {
