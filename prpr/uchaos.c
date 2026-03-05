@@ -1,9 +1,9 @@
 /*
  * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2 license
  */
-#define VERSION "v0.2.9.4"
+#define VERSION "v0.2.9.5"
 /* Quick 2k test: cat uchaos.c  | ./chaos -T 2048 | ent
- * Boot log test: cat dmesg.txt | ./uchaos -i16 -r31 -d3 | ent
+ * Boot log test: cat dmesg.txt | ./uchaos -S -M2 | ent
  *
  * Compile w/libc:      gcc uchaos.c -O3 --fast-math -Wall -o uchaos -s
  * Compile w/musl: musl-gcc uchaos.c -O3 --fast-math -Wall -o uchaos -s -static
@@ -662,7 +662,7 @@ static inline void usage(const char *name, const char *cmdn, const uint8_t qlvl)
 #define APPNAME "uChaos"
 #define STCX STOCHASTIC_BRANCHES
 #define perrprms(s,p) perr("%s: s(%d), q(%d), p(%d:%d), d(%d), r(%d), i(%d), RTSC(%d)\n\n",\
-                      s, nbtls, quiet, pmdly, nsdly, nrdry, nblks, !USE_GET_TIME, p)
+                      s, nbtls, quiet, pmdly, p, nsdly, nrdry, nblks, !USE_GET_TIME)
 
 int main(int argc, char *argv[]) {
     struct rand_pool_info_buf entrnd;
@@ -675,7 +675,8 @@ int main(int argc, char *argv[]) {
     while (1) {
         int opt = getopt(argc, argv, "hvSG:M:K:T:s:d:p:r:k:i:q");
         if(opt == 'S') {
-            nsdly=3; nblks=16; nrdry=31; ntsts=(4<<1); quiet++;
+            nsdly=7; nblks=16; nrdry=31; ntsts=(4<<1);
+            if(!quiet) quiet=1;
             perrwrn();
         } else
         if(opt == 'v') {

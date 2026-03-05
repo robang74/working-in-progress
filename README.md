@@ -4,11 +4,11 @@ Working in progress and other stuff that I prefer to share here to give them a c
 
 ### Index
 
-* **Chaos Shell Engine** documentation: 1. [presentation](chaos-shell-engine.md), &nbsp; 2. [lab notes](random.txt) &nbsp; 3. [thesys on jitters](2007-07-30-Tesi_Foglietta-051a.pdf)
-* **Micro Chaos Engine** documentation: 1. [presentation](uchaos-vs-jitterentropy.md), &nbsp; 2. [uchaos.c](prpr/uchaos.c), 3. [vs jitterentropy](uchaos-vs-jitterentropy-grok.txt) w/Grok
-* **uChaos vs kernel** documentation: 1. [presentation](uchaos-vs-kernel-ring.md), &nbsp; 2. [datalogs](https://github.com/robang74/working-in-progress/raw/refs/heads/main/data/uchaos-256GB-test.log.gz) of PractRnd 256GB test passed
-* **uChaos vs 0°K VMs** documentation: 1. [presentation](uchaos-vs-zero-kelvin-qemu.md), &nbsp; 2. a QEMU peculiar configuration `QZERO=1` by [start.sh](https://github.com/robang74/bare-minimal-linux-system/releases/tag/bmls-v0.2.3)
-* **uChaos vs Thermodynamics** documentation: 1. [presentation](uchaos-vs-thermodynamics.md), &nbsp; 2. release [v0.2.9.4](https://github.com/robang74/working-in-progress/releases/tag/uchaos-v0.2.9.4) as reference for uChaos testing
+* **Chaos Shell Engine**: 1. [presentation](chaos-shell-engine.md), &nbsp; 2. [lab notes](random.txt) &nbsp; 3. [thesys on jitters](2007-07-30-Tesi_Foglietta-051a.pdf)
+* **Micro Chaos Engine**: 1. [presentation](uchaos-vs-jitterentropy.md), &nbsp; 2. [uchaos.c](prpr/uchaos.c), 3. [vs jitterentropy](uchaos-vs-jitterentropy-grok.txt) w/Grok
+* **uChaos vs kernel**: 1. [presentation](uchaos-vs-kernel-ring.md), &nbsp; 2. [datalogs](https://github.com/robang74/working-in-progress/raw/refs/heads/main/data/uchaos-256GB-test.log.gz) of PractRnd 256GB test passed
+* **uChaos vs 0°K VMs**: 1. [presentation](uchaos-vs-zero-kelvin-qemu.md), &nbsp; 2. a QEMU peculiar configuration `QZERO=1` by [start.sh](https://github.com/robang74/bare-minimal-linux-system/releases/tag/bmls-v0.2.3)
+* **uChaos vs Thermodynamics**: 1. [presentation](uchaos-vs-thermodynamics.md), &nbsp; 2. release [v0.2.9.5](https://github.com/robang74/working-in-progress/releases/tag/uchaos-v0.2.9.5) as reference for uChaos testing
 * **uChaos static x86 64** available: 1. [prpr/bin](prpr/bin) folder, &nbsp; 2. self-extracting executable by [gzcmd.sh](https://github.com/robang74/bare-minimal-linux-system/blob/main/gzcmd.sh)
 
 Because exceptions, do not need to be common but just exist. In particular, about Chaos Shell Engine:
