@@ -220,13 +220,12 @@ struct rand_pool_info_buf {
  */
 
 static inline uint64_t getnstime(uint32_t *pcpuid) {
-#if USE_GET_TIME
-    struct timespec ts;                         // using sched_yield() to creates chaos,
-    clock_gettime(CLOCK_MONOTONIC, &ts);        // getting ns in a hot loop is the limit
-    return 0x7FFFFFFF & ts.tv_nsec;             // and we want to see this limit, in VMs
-#else
-    return get_rdtsc_clock(pcpuid);
+#if ! USE_GET_TIME
+    if(pcpuid) return get_rdtsc_clock(pcpuid);
 #endif
+    struct timespec ts;                  // using sched_yield() to creates chaos,
+    clock_gettime(CLOCK_MONOTONIC, &ts); // getting ns in a hot loop is the limit
+    return 0x7FFFFFFF & ts.tv_nsec;      // and we want to see this limit, in VMs
 }
 
 #if 0
@@ -323,8 +322,8 @@ static inline uint16_t mm3ns16(uint16_t ns, uint16_t p) {
 
 #define PRMX USE_PRIMES_2564
 #define STOCHASTIC_BRANCHES STBX
-#define perr_app_info(a) { perr("%s %s%s%s%s%s", APPNAME, VERSION,\
-    STBX ? " w/sb" : "", PRMX ? "" : " !/pr", USE_GET_TIME?" rtcs":"", (a) ? "\n" : ""); }
+#define perr_app_info(a) { perr("%s %s%s%s%s%s", APPNAME, VERSION, STBX ? " w/sb"\
+      : "", PRMX ? "" : " !/pr", USE_GET_TIME ? "" : " rtcs", (a) ? "\n" : ""); }
 
 #define GETVAL (const uint8_t *)(-1)
 
