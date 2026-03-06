@@ -1,7 +1,7 @@
 /*
  * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2 license
  */
-#define VERSION "v0.4.0"
+#define VERSION "v0.4.1"
 /* Quick 2k test: cat uchaos.c  | ./chaos -T 2048 | ent
  * Boot log test: cat dmesg.txt | ./uchaos -S -M2 | ent
  *
@@ -279,7 +279,7 @@ static inline uint16_t mm3ns16(uint16_t ns, uint16_t p) {
 
 #define STBRSTR "stochastics branches"
 
-#define USE_STOCHASTIC_BRANCHES   // RAF: unification by new rotations approach
+#define USE_STOCHASTIC_BRANCHES    // RAF: unification by new rotations approach
 #ifdef  USE_STOCHASTIC_BRANCHES
 
   #define STBX 1
@@ -337,7 +337,7 @@ static uint64_t djb2tum(const uint8_t *str, uint8_t maxn, uint64_t seed,
     if( str == DJB2VGET && (ncl || tncl) ) {
         DJB2UPDT
         double mean = (double)avg / tncl;
-        perr("\nLatency: %zu <%.4lg> %.4lgK ns, %.4lgK w/ ev:%zu, ex:%.3lg%% \n",
+        perr("\nLatency: %zu <%.4lg> %.4lgK ns, %.4lgK w/ ev:%zu, ex:%4.2lf%% \n",
             tdmn, mean, (double)tdmx/E3, (double)tncl/E3, evnt, (double)100*nexp/tncl);
         perr(  "Ratios : %.4lg <avg=1U> %.4lg, min=1U <%.4lg> %.4lg\n",
             (double)tdmn/mean, (double)tdmx/mean, mean/tdmn, (double)tdmx/tdmn);
@@ -372,9 +372,12 @@ static uint64_t djb2tum(const uint8_t *str, uint8_t maxn, uint64_t seed,
 #else
     static uint32_t cpuid, oid = -1;
 #endif
-    const uint64_t *pchr = (const uint64_t *)str;
     uint64_t ts_tv_nsec, dff, dlt, ons = 0, ent = 0;
     uint8_t excp = 0;                // excp++ as uint8_t grants for convergence
+
+    const uint64_t *pchr = (const uint64_t *)str;
+          uint64_t   chr = pidx(pchr);
+    dff = maxn; while(dff) chr ^= rotl64(*pchr++, getprmx16(dff--));
 
 hashotloop:
 /** HASHING LOOP START  *******************************************************/
@@ -387,14 +390,14 @@ hashotloop:
     ts_tv_nsec = getnstime(&cpuid) >> nbtls;
     if( cpuid != oid && oid != -1 ) {
         // Knuth, based on gold section seeded by CPU ids event idx
-        hsh  = mm3ns32(hsh, pidx(pchr) ^ ((uint64_t)cpuid << 16 | oid));
+        hsh  = mm3ns32(hsh, ((uint64_t)cpuid << 16) | oid);
         // reschedule in the following !ons branch
         ons  = 0;
     }
     oid = cpuid;
 #endif
     if( !ons ) {
-        ons  = ts_tv_nsec;
+        ons = ts_tv_nsec;
         goto reschedule;
     }
 
@@ -415,16 +418,17 @@ hashotloop:
     // dmn calculation is mandatory for stochastics bi-forkation turns
     if( dlt < dmn ) {
         dff = dmn - dlt; dmn = dlt;
-        ent ^= (pidx64(pchr) << 31);
+        ent ^= -dff ^ dmn;
         evnt++;
     } else
     // dmx calculation can be omited but doing ns*=0x4d anyway
     if( dlt > dmx ) {
         dff = dlt - dmn; dmx = dlt;
-        ent ^= (pidx64(pchr) << 29);
+        ent ^= dff ^ -dmx;
         evnt++;
     } else {
         dff = dlt - dmn;
+        ent ^= ~dff ^ dmx;
     }
     // dff is jittering for the exeption manager activation
     if( dff < nsdly + (pmdly ? PMDLY2NS : 1) + excp ) {
@@ -438,8 +442,7 @@ hashotloop:
 
     ent ^= ts_tv_nsec << 13;
     ent ^= dlt        <<  7;
-    ent ^= dff        <<  3;
-    ent  = knuthmx(ent ^ *pchr);
+    ent  = knuthmx(ent^chr);
 
     // 5. macro-mix in djb2-style //////////////////////////////////////////////
     /*
@@ -459,7 +462,7 @@ hashotloop:
 
     if( excp || hsh == ohs ) {       // copying with the VMs scheduler timings
         // Knuth, based on gold section seeded by 1E-3 ~ 1E-4 event idx
-        hsh = mm3ns32(hsh, pidx(pchr));
+        hsh = mm3ns32(hsh, ons);
 reschedule:
         sched_yield();
         goto hashotloop;             // continue made by an ASM jump
@@ -468,9 +471,7 @@ reschedule:
     // 8. preparation for the next round ///////////////////////////////////////
 
     ons = ts_tv_nsec;
-    if( maxn > 8 ) {
-        pchr++;
-        maxn -= 8;
+    if( maxn-- ) {
         ohs = hsh;
         sched_yield();
         goto hashotloop;             // a loop made by two ASM jumps
@@ -505,7 +506,7 @@ uint64_t *str2ht64(uint8_t *str, uint64_t **ph,  uint32_t *size,
     // We need enough 64-bit blocks to cover n bytes.
     uint64_t *h = NULL;
     uint32_t nwords = (n + 7) >> 3;
-    uint32_t total_bytes = nwords << 3;
+    uint32_t nbytes =  nwords << 3;
     if(ph) {
         if(*size > 0 && nwords != *size) {
             perror("*size != expected");
@@ -516,7 +517,7 @@ uint64_t *str2ht64(uint8_t *str, uint64_t **ph,  uint32_t *size,
 
     // Allocate aligned memory for the processed string
     uint8_t *rotated_str = NULL;
-    if(posix_memalign((void **)&rotated_str, 64, total_bytes)) {
+    if(posix_memalign((void **)&rotated_str, 64, nbytes)) {
         perror("posix_memalign");
         return NULL;
     }
@@ -529,7 +530,7 @@ uint64_t *str2ht64(uint8_t *str, uint64_t **ph,  uint32_t *size,
         memcpy(rotated_str + (n - k), str, k);
     }
     // Padding with zeros
-    for(uint32_t i = n; i < total_bytes; i++)
+    for(uint32_t i = n; i < nbytes; i++)
         rotated_str[i] = 0;
 
     // 4. Generate the uint64_t array
@@ -547,9 +548,11 @@ uint64_t *str2ht64(uint8_t *str, uint64_t **ph,  uint32_t *size,
     // 5. Producing the hashing sequence
     for (uint64_t i = 0, n = 8; i < nwords; i++, n += 8) {
         // Process each 8-byte chunk of the rotated/padded string
-        h[i] = djb2tum(rotated_str + (i << 3), 8, 0, nsdly, pmdly, nbtls, 0);
+        h[i] = djb2tum(&rotated_str[i<<3], 2, 0, nsdly, pmdly, nbtls, 0);
         if ( rset && n >= ((uint64_t)1 << rset) ) {
-            djb2tum(0, 0, 0, 0, 0, 0, 1); n = 0; perr("rst: %d\n", rset);
+            n = 0; 
+            djb2tum(0, 0, 0, 0, 0, 0, 1);
+            perr("rst: %d\n", rset);
         }
     }
     free(rotated_str);
@@ -806,11 +809,8 @@ int main(int argc, char *argv[]) {
 
         // skip stats
         if(!prsts) continue;
-
-        // testing
-        // expected zero collisions and the nested-for can be verified by:
-        // xxd -p -c 8 data.test | sort | uniq -c | awk '$1 >1' | wc -l
-
+ 
+        // self-evaluation of the output including the check for repetitions
         avg = 0, nn = 0;
         for (uint32_t n = 0; n < size; n++) {
             for (uint32_t i = n + 1; i < size; i++) {
@@ -837,9 +837,9 @@ int main(int argc, char *argv[]) {
         avgbc += curavg;
         nt += size;
 
-        sched_yield();     // Statistics are a block of CPU data-crunching but also
-                           // a predictable delay which sched_yield() can jeopardise.
-                           // Stats makes the large size output slower 1.7x than -q.
+        sched_yield();  // Statistics are a block of CPU data-crunching but also
+                        // a predictable delay which sched_yield() can jeopardise.
+                        // Stats makes the large size output slower 1.7x than -q.
     }
 
     if(!prsts) return 0;
