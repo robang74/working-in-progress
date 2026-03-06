@@ -398,7 +398,7 @@ hashotloop:
         goto reschedule;
     }
 
-    // 2. jitter calculation ///////////////////////////////////////////////////
+    // 2. latency calculation //////////////////////////////////////////////////
 
     dlt = ts_tv_nsec;
 #if USE_GET_TIME
@@ -424,7 +424,7 @@ hashotloop:
     } else {
         dff = dlt - dmn;
     }
-    // for the exeption manager activation
+    // dff is jittering for the exeption manager activation
     if( dff < nsdly + (pmdly ? PMDLY2NS : 1) + excp ) {
         nexp += 4; excp++;             // increasing excp and accounting for dff
     } else {
@@ -455,6 +455,7 @@ hashotloop:
 #endif
 
     // 7. exceptions management ////////////////////////////////////////////////
+
     if( excp || hsh == ohs ) {       // copying with the VMs scheduler timings
         // Knuth, based on gold section seeded by 1E-3 ~ 1E-4 event idx
         hsh = mm3ns32(hsh, pidx(&chr));
@@ -462,10 +463,10 @@ reschedule:
         sched_yield();
         goto hashotloop;             // continue made by an ASM jump
     }
-    ons = ts_tv_nsec;
 
     // 8. preparation for the next round ///////////////////////////////////////
 
+    ons = ts_tv_nsec;
     if( (chr = *++str) && maxn-- ) {
         ohs = hsh;
         sched_yield();
