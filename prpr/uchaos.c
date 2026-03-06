@@ -537,8 +537,8 @@ uint64_t *str2ht64(uint8_t *str, uint64_t **ph,  uint32_t *size,
             free(rotated_str);
             return NULL;
         }
-        *size = num_blocks;
     }
+    *size = num_blocks;
 
     // 5. Producing the hashing sequence
     for (uint64_t i = 0, n = 8; i < num_blocks; i++, n += 8) {
