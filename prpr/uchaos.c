@@ -320,6 +320,7 @@ static inline uint16_t mm3ns16(uint16_t ns, uint16_t p) {
 
 #define PRMX USE_PRIMES_2564
 #define STOCHASTIC_BRANCHES STBX
+#define pidx64(p) (uint64_t)pidx(p)
 #define pidx(p) ((uint32_t)(uintptr_t)(p))
 #define perr_app_info(a) { perr("%s %s%s%s%s%s", APPNAME, VERSION, STBX ? " w/sb"\
       : "", PRMX ? "" : " !/pr", USE_GET_TIME ? "" : " rtcs", (a) ? "\n" : ""); }
@@ -338,7 +339,7 @@ static uint64_t djb2tum(const uint8_t *str, uint8_t maxn, uint64_t seed,
     if( str == DJB2VGET && (ncl || tncl) ) {
         DJB2UPDT
         double mean = (double)avg / tncl;
-        perr("\nLatency: %zu <%.4lg> %.4lgK ns, %.4lgK w/ e:%zu, x:%.3lg%% \n",
+        perr("\nLatency: %zu <%.4lg> %.4lgK ns, %.4lgK w/ ev:%zu, ex:%.3lg%% \n",
             tdmn, mean, (double)tdmx/E3, (double)tncl/E3, evnt, (double)100*nexp/tncl);
         perr(  "Ratios : %.4lg <avg=1U> %.4lg, min=1U <%.4lg> %.4lg\n",
             (double)tdmn/mean, (double)tdmx/mean, mean/tdmn, (double)tdmx/tdmn);
@@ -387,7 +388,7 @@ hashotloop:
     ts_tv_nsec = getnstime(&cpuid) >> nbtls;
     if( cpuid != oid && oid != -1 ) {
         // Knuth, based on gold section seeded by CPU ids event idx
-        hsh  = mm3ns32(hsh, pidx(&chr) ^ (cpuid << 16 | oid));
+        hsh  = mm3ns32(hsh, pidx(&chr) ^ ((uint64_t)cpuid << 16 | oid));
         // reschedule in the following !ons branch
         ons  = 0;
     }
@@ -415,26 +416,30 @@ hashotloop:
     // dmn calculation is mandatory for stochastics bi-forkation turns
     if( dlt < dmn ) {
         dff = dmn - dlt; dmn = dlt;
-        ent = ent - minmix8(dff); evnt++;
+        ent ^= (pidx64(&chr) << 31);
+        evnt++;
     } else
     // dmx calculation can be omited but doing ns*=0x4d anyway
     if( dlt > dmx ) {
         dff = dlt - dmn; dmx = dlt;
-        ent = ent + minmix8(dff); evnt++;
+        ent ^= (pidx64(&chr) << 29);
+        evnt++;
     } else {
         dff = dlt - dmn;
     }
     // dff is jittering for the exeption manager activation
     if( dff < nsdly + (pmdly ? PMDLY2NS : 1) + excp ) {
-        excp += 4; nexp++;             // increasing excp and accounting for dff
+        excp += 4;                   // increasing excp and accounting for dff
+        nexp++;
     } else {
         excp = 0;
     }
 
     // 4. entropy distillation /////////////////////////////////////////////////
 
-    ent ^= (ent << 6) ^ ts_tv_nsec;
-    ent ^= (ent << 3) ^ dlt;
+    ent  ^= ts_tv_nsec << 13;
+    ent  ^= dlt        <<  7;
+    ent  ^= dff        <<  3;
     ent  = knuthmx(ent);
 
     // 5. macro-mix in djb2-style //////////////////////////////////////////////
@@ -442,8 +447,8 @@ hashotloop:
      * (16+1) (32-1 or 32+1) (64-1)
      *   01     10      00     11
      */
-    // consumed entropy, do rotations and forgot the state
-    uint8_t b0 = ent & 0x01, b1  = ent & 0x02; ent = ent >> 2;
+    // it consumes entropy, do rotations and forgot the state
+    uint8_t b0 = ent & 0x01, b1 = ent & 0x02; ent = ent >> 2;
     hsh = ( hsh << (4 + (b0 ? b1 : 1)) ) + (b1 ? -hsh : hsh);
 
     // 6. entropy injection in hsh /////////////////////////////////////////////
