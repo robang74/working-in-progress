@@ -612,13 +612,11 @@ static inline uint32_t readblocks(int fd, uint8_t *buf, uint32_t nblks) {
             if(n == BLOCK_SIZE)
                 memcpy(fst, inp, BLOCK_SIZE);
         }
-        // mixing the input by 32-bit words
-        n = (n + 3) >> 2;
-        uint32_t *ip = (uint32_t *)inp, *bp = (uint32_t *)buf;
-        for (uint32_t a = 0; a < n; a++, ip++, bp++) {
-            uint32_t c = a & 0x1f;
-            *bp ^= (*ip << c) | (*ip >> (32-c));
-        }
+        // mixing the input by 64-bit words
+        n = (n + 7) >> 3;
+        uint64_t *ip = (uint64_t *)inp, *bp = (uint64_t *)buf;
+        for (uint32_t a = 0; a < n; a++)
+            bp[a] =  ip[a] ^ rotl64(bp[a], a);
     }
     return maxn;
 }
