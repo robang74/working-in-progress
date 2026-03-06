@@ -338,9 +338,9 @@ static uint64_t djb2tum(const uint8_t *str, uint8_t maxn, uint64_t seed,
     if( str == DJB2VGET && (ncl || tncl) ) {
         DJB2UPDT
         double mean = (double)avg / tncl;
-        perr("\nLatency: %.0lf <%.1lf> %.0lf ns over %.0lf K w/ e:%zu, x:%zu\n",
-            (double)tdmn, mean, (double)tdmx, (double)tncl/E3, evnt, nexp);
-        perr(  "Ratios : %.2lf <avg=1U> %.2lf, min=1U <%.2lf> %.2lf\n",
+        perr("\nLatency: %zu <%.4lg> %.4lgK ns, %.4lgK w/ e:%zu, x:%.3lg%% \n",
+            tdmn, mean, (double)tdmx/E3, (double)tncl/E3, evnt, (double)100*nexp/tncl);
+        perr(  "Ratios : %.4lg <avg=1U> %.4lg, min=1U <%.4lg> %.4lg\n",
             (double)tdmn/mean, (double)tdmx/mean, mean/tdmn, (double)tdmx/tdmn);
     }
 
@@ -426,7 +426,7 @@ hashotloop:
     }
     // dff is jittering for the exeption manager activation
     if( dff < nsdly + (pmdly ? PMDLY2NS : 1) + excp ) {
-        nexp += 4; excp++;             // increasing excp and accounting for dff
+        excp += 4; nexp++;             // increasing excp and accounting for dff
     } else {
         excp = 0;
     }
@@ -845,26 +845,26 @@ int main(int argc, char *argv[]) {
     perr("%s\n", nk ? ", status KO" : "0, status OK");
     perr("\n");
 
-    perr("Tests: %d w/ duplicates %.0lf over ", ntsts, (double)nk);
+    perr("Tests: %u w/ duplicates %zu over ", ntsts, nk);
     if((nt >> 3) > E6)
-        perr("%.2lf M hashes (%.2lf ppm)\n", (double)nt/E6, (double)E6*nk/nt);
+        perr("%.2lfM hashes (%.4lg ppm)\n", (double)nt/E6, (double)E6*nk/nt);
     else
-        perr("%.1lf K hashes (%.2lf ppm)\n", (double)nt/E3, (double)E6*nk/nt);
+        perr("%.1lfK hashes (%.4lg ppm)\n", (double)nt/E3, (double)E6*nk/nt);
 
     avgbc /= ntsts;
     double bic_nx_absl = (double)bic / nx;
     double bic_nx = (double)100 / 64 * bic_nx_absl;
-    #define devppm(v,a) ( (v-a) * E6 / a )
+    #define devppm(v,a) ( ((double)v-a) * E6 / a )
 
-    perr("Hamming weight, avg is %.4lf %% ~ 50 %% by (%+.1lf ppm)\n",
+    perr("Hamming <weight>: %.4lf%% ~ 50%% by (%+.4lg ppm)\n",
         bic_nx, devppm(bic_nx, 50));
-    perr("Hamming distance: %.0lf <%.5lf> %.0lf over %.4lg K XORs\n",
+    perr("Hamming distance: %.0lf <%.6lf> %.0lf over %.4lgK XORs\n",
         (double)min, bic_nx_absl, (double)max, (double)nx/E3);
-    perr("Hamming dist/avg: %.5lf < 1U:32 %+.1lf ppm > %.5lf\n",
+    perr("Hamming dist/avg: %.4lf < 1U:32 %+.4lg ppm > %.4lf\n",
         avgmn/bic_nx_absl, devppm(bic_nx_absl, 32), avgmx/bic_nx_absl);
 
     perr("\n");
-    perr("Perform: exec %.3lfs, %.2lf MB/s; hash %.3lfs, %.1lf KH/s",
+    perr("Perform: exec %.3lgs, %.3lg MB/s; hash %.3lgs, %.4lg KH/s",
         (double)rt/E9, (double)E6*nt/(rt<<7), (double)mt/E9, (double)E6*nt/mt);
 
     uint32_t pmns = (uint32_t)djb2tum(DJB2VGET, 0, 0, 0, pmdly, 0, 0);
