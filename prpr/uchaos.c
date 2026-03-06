@@ -1,7 +1,7 @@
 /*
  * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2 license
  */
-#define VERSION "v0.4.1"
+#define VERSION "v0.4.2"
 /* Quick 2k test: cat uchaos.c  | ./chaos -T 2048 | ent
  * Boot log test: cat dmesg.txt | ./uchaos -S -M2 | ent
  *
@@ -325,16 +325,16 @@ static inline uint16_t mm3ns16(uint16_t ns, uint16_t p) {
 #define DJB2UPDT { tncl += ncl; tdmx = MAX(dmx, tdmx); tdmn = MIN(dmn, tdmn); }
 #define DJB2RSET { DJB2UPDT; dmn = E9, dmx = 0, ncl = 0; }
 #define PMDLY2NS ( ( ( dmn * pmdly ) + 127 ) >> 8 )
-#define DJB2VGET ( (const uint8_t *)(-1) )
+#define DJB2VGET ( (uint64_t)-1 )
 
-static uint64_t djb2tum(const uint8_t *str, uint8_t maxn, uint64_t seed,
-    uint32_t nsdly, uint32_t pmdly, uint8_t nbtls, uint8_t rset)
+static uint64_t djb2tum(uint64_t seed, uint8_t maxn, uint32_t nsdly,
+    uint32_t pmdly, uint8_t nbtls, uint8_t rset)
 {
     static uint64_t  ncl = 0,  dmn = E9,  dmx = 0;
     static uint64_t tncl = 0, tdmn = E9, tdmx = 0;
     static uint64_t nexp = 0, evnt = 0,   avg = 0;
 
-    if( str == DJB2VGET && (ncl || tncl) ) {
+    if( seed == DJB2VGET && (ncl || tncl) ) {
         DJB2UPDT
         double mean = (double)avg / tncl;
         perr("\nLatency: %zu <%.4lg> %.4lgK ns, %.4lgK w/ ev:%zu, ex:%4.2lf%% \n",
@@ -345,9 +345,9 @@ static uint64_t djb2tum(const uint8_t *str, uint8_t maxn, uint64_t seed,
 
     if( rset ) DJB2RSET;
 
-    if( str == DJB2VGET ) return PMDLY2NS;
+    if( seed == DJB2VGET ) return PMDLY2NS;
 
-    if( !str || !*str || !maxn ) return 0;
+    if( !maxn ) return 0;
 
     // 0. hashing loop preparation /////////////////////////////////////////////
 
@@ -375,10 +375,6 @@ static uint64_t djb2tum(const uint8_t *str, uint8_t maxn, uint64_t seed,
     uint64_t ts_tv_nsec, dff, dlt, ons = 0, ent = 0;
     uint8_t excp = 0;                // excp++ as uint8_t grants for convergence
 
-    const uint64_t *pchr = (const uint64_t *)str;
-          uint64_t   chr = pidx(pchr);
-    dff = maxn; while(dff) chr ^= rotl64(*pchr++, getprmx16(dff--));
-
 hashotloop:
 /** HASHING LOOP START  *******************************************************/
 
@@ -390,9 +386,9 @@ hashotloop:
     ts_tv_nsec = getnstime(&cpuid) >> nbtls;
     if( cpuid != oid && oid != -1 ) {
         // Knuth, based on gold section seeded by CPU ids event idx
-        hsh  = mm3ns32(hsh, ((uint64_t)cpuid << 16) | oid);
+        hsh = mm3ns32(hsh, ((uint64_t)cpuid << 16) | oid);
         // reschedule in the following !ons branch
-        ons  = 0;
+        ons = 0;
     }
     oid = cpuid;
 #endif
@@ -442,7 +438,7 @@ hashotloop:
 
     ent ^= ts_tv_nsec << 13;
     ent ^= dlt        <<  7;
-    ent  = knuthmx(ent^chr);
+    ent  = knuthmx(ent^avg);
 
     // 5. macro-mix in djb2-style //////////////////////////////////////////////
     /*
@@ -488,25 +484,31 @@ reschedule:
     return hsh;
 }
 
-#define USE_EXP_COMPR 0 // RAF: since v0.2.9.3 this mode is not yet useful w/0°K
-                        //      qemu VMs and good randomnes is produced also w/o
+static inline uint8_t trndbyte() {
+    sched_yield(); return 0xFF & getnstime(NULL);
+}
 
-uint64_t *str2ht64(uint8_t *str, uint64_t **ph,  uint32_t *size,
+static inline uint8_t *bin2str(uint8_t *buf, uint32_t nmax) {
+    for(register uint32_t i = 0; i < nmax; i++)
+        if(!buf[i]) buf[i--] = trndbyte();
+    return buf;
+}
+
+uint64_t *str2ht64(const uint8_t *str, uint64_t **ph,  uint32_t *size,
     uint32_t nsdly, uint32_t pmdly, uint8_t nbtls, uint8_t rset)
 {
     if (!str || !size) return NULL;
 
-    uint32_t n = strlen((char *)str);
-    if (n == 0) return NULL;
+    // 0. Calculate the string lenght
+    uint32_t len;
+    len = strlen((char *)str);
+    if (len == 0) return NULL;
 
-    // 1. Determine rotation offset using monotonic time
-    uint32_t k = getnstime(NULL) % n;
-
-    // 2. Calculate padding and allocation
+    // 1. Calculate padding and allocation
     // We need enough 64-bit blocks to cover n bytes.
     uint64_t *h = NULL;
-    uint32_t nwords = (n + 7) >> 3;
-    uint32_t nbytes =  nwords << 3;
+    uint32_t nwords = (len + 7) >> 3;
+    uint32_t nbytes = nwords << 3;
     if(ph) {
         if(*size > 0 && nwords != *size) {
             perror("*size != expected");
@@ -515,48 +517,46 @@ uint64_t *str2ht64(uint8_t *str, uint64_t **ph,  uint32_t *size,
         h = *ph;
     }
 
-    // Allocate aligned memory for the processed string
-    uint8_t *rotated_str = NULL;
-    if(posix_memalign((void **)&rotated_str, 64, nbytes)) {
+    // 2. Allocate aligned memory for the processed string
+    uint8_t *str64 = NULL;
+    if(posix_memalign((void **)&str64, 64, nbytes)) {
         perror("posix_memalign");
         return NULL;
     }
+    
+    // 3. Determine rotation offset using monotonic time
+    uint32_t k = trndbyte() % len;
 
-    // 3. Perform rotation into the new buffer
+    // 4. Perform rotation into the new buffer
     // Copy from k to end
-    memcpy(rotated_str, str + k, n - k);
+    memcpy(str64, str + k, len - k);
     // Copy from beginning to k
-    if (k > 0) {
-        memcpy(rotated_str + (n - k), str, k);
-    }
+    if (k) memcpy(str64 + (len - k), str, k);
     // Padding with zeros
-    for(uint32_t i = n; i < nbytes; i++)
-        rotated_str[i] = 0;
+    memset(&str64[len], 0, nbytes - len);
 
-    // 4. Generate the uint64_t array
+    // 5. Generate the uint64_t array
     // We allocate a separate array for hashes if that was the intent, or we cast
     // the rotated string. Based on your code, you want a hash per 8-byte block.
-    if(!h) {
-        if(posix_memalign((void **)&h, 64, nwords << 3)) {
-            perror("posix_memalign");
-            free(rotated_str);
-            return NULL;
-        }
+    if(!h && posix_memalign((void **)&h, 64, nwords << 3)) {
+        perror("posix_memalign");
+        free(str64);
+        return NULL;
     }
     *size = nwords;
 
-    // 5. Producing the hashing sequence
+    // 6. Producing the hashing sequence
+    uint64_t *p = (uint64_t *)str64;
     for (uint64_t i = 0, n = 8; i < nwords; i++, n += 8) {
-        // Process each 8-byte chunk of the rotated/padded string
-        h[i] = djb2tum(&rotated_str[i<<3], 2, 0, nsdly, pmdly, nbtls, 0);
+        // Processing each 8-byte chunk of the rotated/padded string
+        h[i] = djb2tum(p[i], 2, nsdly, pmdly, nbtls, 0);
         if ( rset && n >= ((uint64_t)1 << rset) ) {
-            n = 0; 
-            djb2tum(0, 0, 0, 0, 0, 0, 1);
-            perr("rst: %d\n", rset);
+            n = 0; djb2tum(0, 0, 0, 0, 0, 1);
         }
     }
-    free(rotated_str);
 
+    // 7. free the string memory and return the hash
+    free(str64);
     return h;
 }
 
@@ -625,16 +625,6 @@ static inline uint32_t readblocks(int fd, uint8_t *buf, uint32_t nblks) {
             bp[a] =  ip[a] ^ rotl64(bp[a], a);
     }
     return maxn;
-}
-
-static inline uint8_t trndbyte() {
-    sched_yield(); return 0xFF & getnstime(NULL);
-}
-
-static inline uint8_t *bin2str(uint8_t *buf, uint32_t nmax) {
-    for(register uint32_t i = 0; i < nmax; i++)
-        if(!buf[i]) buf[i--] = trndbyte();
-    return buf;
 }
 
 /* ** main & its supporters ************************************************* */
@@ -738,10 +728,6 @@ int main(int argc, char *argv[]) {
         return EXIT_FAILURE;
     }
     if(quiet) prsts = 0;
-#if USE_EXP_COMPR
-    if(quiet < 2)
-        perr("\n>>> WARNING!! <<< "APPNAME" is compiled with USE_EXP_COMPR\n\n");
-#endif
 
     // Counting time of running starts here, after parameters
     (void) get_nanos();
@@ -870,7 +856,7 @@ int main(int argc, char *argv[]) {
     perr("Perform: exec %.3lgs, %.3lg MB/s; hash %.3lgs, %.4lg KH/s",
         (double)rt/E9, (double)E6*nt/(rt<<7), (double)mt/E9, (double)E6*nt/mt);
 
-    uint32_t pmns = (uint32_t)djb2tum(DJB2VGET, 0, 0, 0, pmdly, 0, 0);
+    uint32_t pmns = (uint32_t)djb2tum(DJB2VGET, 0, 0, pmdly, 0, 0);
     perrprms("Setting:", pmns);
 
     return 0; // exit() do free()
