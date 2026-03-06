@@ -1,7 +1,7 @@
 /*
  * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2 license
  */
-#define VERSION "v0.3.1"
+#define VERSION "v0.3.2"
 /* Quick 2k test: cat uchaos.c  | ./chaos -T 2048 | ent
  * Boot log test: cat dmesg.txt | ./uchaos -S -M2 | ent
  *
@@ -338,9 +338,8 @@ static uint64_t djb2tum(const uint8_t *str, uint8_t maxn, uint64_t seed,
     if( str == DJB2VGET && (ncl || tncl) ) {
         DJB2UPDT
         double mean = (double)avg / tncl;
-        perr("\nLatency: %.0lf <%.1lf> %.0lf ns over %.0lf K (w/ %.0lf + %.0lf)\n",
-            (double)tdmn, mean, (double)tdmx, (double)tncl/E3,
-            (double)evnt, (double)nexp);
+        perr("\nLatency: %.0lf <%.1lf> %.0lf ns over %.0lf K w/ e:%zu, x:%zu\n",
+            (double)tdmn, mean, (double)tdmx, (double)tncl/E3, evnt, nexp);
         perr(  "Ratios : %.2lf <avg=1U> %.2lf, min=1U <%.2lf> %.2lf\n",
             (double)tdmn/mean, (double)tdmx/mean, mean/tdmn, (double)tdmx/tdmn);
     }
@@ -375,7 +374,7 @@ static uint64_t djb2tum(const uint8_t *str, uint8_t maxn, uint64_t seed,
     static uint32_t cpuid, oid = -1;
 #endif
     uint64_t ts_tv_nsec, dff, dlt, ons = 0, ent = 0, chr = *str;
-    uint8_t excp = 0;
+    uint8_t excp = 0;                // excp++ as uint8_t grants for convergence
 
 hashotloop:
 /** HASHING LOOP START  *******************************************************/
@@ -407,12 +406,10 @@ hashotloop:
 #else
     dlt =  dlt - ons;                // overflow by uint64_t is 0xff..ff + 1 = 0
 #endif
-    ons = ts_tv_nsec;
     if( !dlt ) goto reschedule;
 
     // 3. internal state update ////////////////////////////////////////////////
 
-    excp = 0;
     // avg calculation can be omitted
     avg += dlt; ncl++;
     // dmn calculation is mandatory for stochastics bi-forkation turns
@@ -428,8 +425,10 @@ hashotloop:
         dff = dlt - dmn;
     }
     // for the exeption manager activation
-    if( dff < nsdly + (pmdly ? PMDLY2NS : 1) ) {
-        excp = 1; nexp++;
+    if( dff < nsdly + (pmdly ? PMDLY2NS : 1) + excp ) {
+        nexp++; excp++;              // increasing excp and accounting for dff
+    } else {
+        excp = 0;
     }
 
     // 4. entropy distillation /////////////////////////////////////////////////
@@ -463,6 +462,7 @@ reschedule:
         sched_yield();
         goto hashotloop;             // continue made by an ASM jump
     }
+    ons = ts_tv_nsec;
 
     // 8. preparation for the next round ///////////////////////////////////////
 
@@ -863,11 +863,11 @@ int main(int argc, char *argv[]) {
         avgmn/bic_nx_absl, devppm(bic_nx_absl, 32), avgmx/bic_nx_absl);
 
     perr("\n");
-    perr("Times: exec %.3lfs, %.2lf MB/s; hash %.3lfs, %.1lf KH/s",
+    perr("Perform: exec %.3lfs, %.2lf MB/s; hash %.3lfs, %.1lf KH/s",
         (double)rt/E9, (double)E6*nt/(rt<<7), (double)mt/E9, (double)E6*nt/mt);
 
     uint32_t pmns = (uint32_t)djb2tum(DJB2VGET, 0, 0, 0, pmdly, 0, 0);
-    perrprms("Settings", pmns);
+    perrprms("Setting:", pmns);
 
     return 0; // exit() do free()
 }
