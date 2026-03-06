@@ -103,4 +103,62 @@ While the hashing speed (on the 0°K VM) is 46.3 Kh/s w/1Mb production
 
 ---
 
+### uCHAOS: WHAT'S NEW IN THE v0.3.3 ?
+
+- [LinkedIn post #4](https://www.linkedin.com/posts/robertofoglietta_uchaos-whats-new-in-the-v033-looking-activity-7435689736264077313-WPQX)
+
+Looking at the source code from v0.2.9.6 to v0.3.3, it seems that the engine function has been completely rewritten. It is not in that way, changes impacted in many lines but the changes are easier to exaplain.
+
+First of all, the command lines options/arguments have been refactored for a more user-friendly approach (UI/UX impovement by clarity in mind) and also the stats presentation has been improved for clarity and shortness.
+
+The option -Z has been added to be the sibiling of -S but with the internal statistics (the engine functional part only) which resets every 512KB. It can be useful to quickly make a comparison instead of restarting the application.
+
+The engine function has several parts enumerated from 0. to 9. and each parts have several steps. Every step of each part has been reviewed for being KISS and theoretically easier to support (with clairty in mind). In particular, reducing as much as possible every arbitrary choice and when necessary made it in such a way that is one of the most reasonable.
+
+Moreover, clarity in mind for being KISS to explain and support, refers also for the internal stats. In such a way the numbers printed out are as simply straighforward referable to the internal "gears" as much as possible. In this case clarity goes with transparency. And all of these changes are supporting a faster or easier adoption.
+
+Now the cycle is very rational: 0. prepare; 1. get nanoseconds; 2. check the latency and jitter; 3. updates stats and deal with events these data, 4. deal with an internal 64-bit pool of entropy; 5.+6. inkect the entropy into the hashing process; 7. the execption manager activation by 3. is the sensitive part for stochastics bi-forkations by jittering; 8. preparation for the next round or finalising the output of the function.
+
+The changes are not just reorganising the code, are also changing how the engine is working and potentially we should be surprised that such changes did not makes such a difference in the output quality. In short, the fundamentals remained the same and how the entropy is mixed into output changed and obviously the output changed but not in its fundamental nature.
+
+Because its fundamental nature is to have not any structure every change is potentially undectable because by the nature of the output only flebile watermarks (if any) are allowed. Because "unpredictability" requires "no structure" while "no structure" implies that is not self-explanatory enough for being leveraged by an __external__ attacker. While insiders might have a little of chance because PractRand can "certify" only the "quality of no-structure" by an external perspective. In absence of an internal certification or QA, we can assume that an internal attacker might have a chance.
+
+Now with the v0.3.3 every single line of each part is "self-explanatory" because also the relationships among parts have been minimised, and those few remenaining are for speeding in execution.
+
+---
+
+### uCHAOS COMPARISON v0.2.9x vs v0.3.x IN THEORY
+
+- [LinkedIn post #5](https://www.linkedin.com/posts/robertofoglietta_uchaos-whats-new-in-the-v033-looking-activity-7435704061435305985-xD9O)
+
+The v0.3.x introduced the -Z option which is the sibling of -S but with an internal stats reset for every 512KB of output. Apparently there is no difference between the -Z and -S outputs from the PractRand point of view and it is hard to see also for a few MB of data in output. Moreover, it seems that -S is a little more stable / flat in terms of white noise than -Z which is nice to see because as we have seen with v2.8.x more sensitive is a "thermometer" more keen to be affected by tiny local "turbulence".
+
+Moreover, the -Z option should do a reset at 16KB instead of 512KB and -d7 might be mandatory instead of -d3. Thus the -Z is not fine-tuned yet because it has been designed for the next level of low-entropy systems like real-time micro-kernels and among them Neutrino. In fact, the Linux kernel shows a latency range that extends within 640ns to 5740 ns, which is a 8.92 range extension.
+
+```text
+uChaos v0.3.3 w/sb !/pr; repetitions: 0, status OK
+
+Tests: 256 w/ duplicates 0 over 16.4 K hashes (0.00 ppm)
+2 Hamming weight, avg is 50.0001 % 50% by (+2.0 ppm)
+Hamming distance: 14 < 32.00006 > 50 over 516.1 K XORS
+Hamming dist/avg: 0.99160 < 10:32 +2.0 ppm > 1.00686
+
+Perform: exec 0.380s, 0.34 MB/s; hash 0.122s, 133.9 KH/s
+Latency: 643 <785.4> 5736 ns over 183 K w/ e:9, x:73460
+Ratios : 0.82 <avg=1U> 7.3theta , min=1U <1.22> 8.92
+Setting: s:0, q:0, p:0%:0ns, d:7, г:31, 1:16, 2:0
+```
+
+While the average is 22% above the minimum and in a symmetric range (more typical in the real-time system) this means that latency will be around 20% more or less the average, collapsing the range from 9.8 to 1.5 times. Although real-time is not related to low-response time but latency constrained (deterministic predictability) usually als the response time tends to be shorter. There are 140ns between the minimum and the average, which are seven bits span (when absolute values are involved).
+
+Instead, a hard real time system might offer just three bit range. Below, the uchaos might start to accuse the lack of entropy density and its output might fail to pass the tests. This would be the proper scenario for fine tuning the -Z option in combination with -d7.
+
+Comparing the two -S and -Z, the theory and conclusions that can be inferred are not changing with respect to the past claims. Despite the -S and -Z seem providing the same quality output, this happens because in the meantime the ability of uChaos engine to extract entropy from the scheduler have been drastically increased at the point to make the stats reset as meaningless.
+
+Well, it is meaningless in macroscopic terms. When we move our focus from the particles to the billiard balls the fundamental laws of physics remain the same and statistically speaking is the same system but the huge N (or an abundance of entropy) makes some aspects irrelevant. A massive billiard ball has a well-defined temperature and its mass is not able to be influenced by vortexes at microscopic scale.
+
+In conclusion, what was real for uChaos v0.2.8.x and v0.2.9.x, still be relatable to the v0.3.x as well but the code changed and uChaos ability to extract entropy is increased at such point for which we cannot see anymore some borderline phenomenon.
+
+---
+
 (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, CC BY-ND-NC 4.0

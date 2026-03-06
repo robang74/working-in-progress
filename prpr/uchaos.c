@@ -858,7 +858,7 @@ int main(int argc, char *argv[]) {
 
     perr("Hamming weight, avg is %.4lf %% ~ 50 %% by (%+.1lf ppm)\n",
         bic_nx, devppm(bic_nx, 50));
-    perr("Hamming distance: %.0lf < %.5lf > %.0lf over %.4lg K XORs\n",
+    perr("Hamming distance: %.0lf <%.5lf> %.0lf over %.4lg K XORs\n",
         (double)min, bic_nx_absl, (double)max, (double)nx/E3);
     perr("Hamming dist/avg: %.5lf < 1U:32 %+.1lf ppm > %.5lf\n",
         avgmn/bic_nx_absl, devppm(bic_nx_absl, 32), avgmx/bic_nx_absl);
