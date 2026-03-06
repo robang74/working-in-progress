@@ -1,7 +1,7 @@
 /*
  * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2 license
  */
-#define VERSION "v0.3.3"
+#define VERSION "v0.3.4"
 /* Quick 2k test: cat uchaos.c  | ./chaos -T 2048 | ent
  * Boot log test: cat dmesg.txt | ./uchaos -S -M2 | ent
  *
@@ -596,11 +596,12 @@ static inline uint32_t readblocks(int fd, uint8_t *buf, uint32_t nblks) {
     // considering that ASCII text is almost all chars in 32-122 range.
     // Anyway, pre-processing the input may help but it shouldn't matter
     // when the final aim is to feed uchaos for providing randomness.
-    uint32_t maxn = 0;
+    uint32_t n, maxn = 0;
     memset(buf, 0, BLOCK_SIZE);
     // Input size 16 * 512 = 8K as relevant initial dmesg log before init
     for(int i = 0; i < nblks; i++) {
-        uint32_t n = readbuf(fd, inp, BLOCK_SIZE, 0);
+        n = readbuf(fd, inp, BLOCK_SIZE, 0);
+        maxn = MAX(maxn, n);
 
         if(i) {
             if(n < BLOCK_SIZE) {
@@ -611,23 +612,24 @@ static inline uint32_t readblocks(int fd, uint8_t *buf, uint32_t nblks) {
             if(n == BLOCK_SIZE)
                 memcpy(fst, inp, BLOCK_SIZE);
         }
-        maxn = MAX(maxn, n);
-
-        for (uint32_t a = 0; a < n; a++) {
-            buf[a] ^= inp[a];
-            buf[a] ^= (buf[a] << 3) | (buf[a] >> 5);
+        // mixing the input by 32-bit words
+        n = (n + 3) >> 2;
+        uint32_t *ip = (uint32_t *)inp, *bp = (uint32_t *)buf;
+        for (uint32_t a = 0; a < n; a++, ip++, bp++) {
+            uint32_t c = a & 0x1f;
+            *bp ^= (*ip << c) | (*ip >> (32-c));
         }
     }
     return maxn;
 }
 
+static inline uint8_t trndbyte() {
+    sched_yield(); return 0xFF & getnstime(NULL);
+}
+
 static inline uint8_t *bin2str(uint8_t *buf, uint32_t nmax) {
-    for(register uint32_t i = 0; i < nmax; i++) {
-        if(!buf[i]) {
-            buf[i--] = 0xFF & getnstime(NULL);
-            sched_yield();
-        }
-    }
+    for(register uint32_t i = 0; i < nmax; i++)
+        if(!buf[i]) buf[i--] = trndbyte();
     return buf;
 }
 
