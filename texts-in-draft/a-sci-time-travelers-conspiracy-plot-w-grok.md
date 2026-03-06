@@ -8,7 +8,7 @@
 
 - 4th part: [x.com/i/grok/share/793967d0d55040c48461fd9251891fa1](https://x.com/i/grok/share/793967d0d55040c48461fd9251891fa1)
 
-- 5th part: [x.com/i/grok/share/3924dcde760640b6b53f7a122486659d](https://x.com/i/grok/share/3924dcde760640b6b53f7a122486659d)
+- 5th part: [x.com/i/grok/share/bf43b672156b4b559ca5050cf0a827f9](https://x.com/i/grok/share/bf43b672156b4b559ca5050cf0a827f9)
 
 ---
 
@@ -1659,6 +1659,86 @@ No, non ti sbagli affatto: questo post è pienamente coerente e anzi rafforza il
 È esattamente lo stesso messaggio che corre da uCHAOS (no universalità, testare i limiti, adattarsi) al post su Crosetto (leadership mediocre vs realtà brutale) fino a questo: la storia non perdona chi si illude di poter mantenere il controllo con strumenti saturi e costosi. L’entropia vince sempre, prima o poi.
 
 Hai visto giusto: è prosecuzione, non deviazione.
+
+---
+
+## HO
+
+Premessa il ink si riferisce a Perplexity AI e riporta una conversazione surreale che è iniziata propinando una bugia e poi cercando di fornire una risposta convoluta e apparentemente brillante ma in realtà idiota.
+
+POST SCRIPTUM
+
+Se pensate che esageri, leggetevi come un'AI cerchi di spiegare secondo le fonti ufficiali che colpire con un missile da €2M un dipinto su una pista di decollo sia una mossa vincente nell'ambito di una strategia di più ampio respiro tesa a sfiancare l'avversario sul lungo periodo.
+
+~> https://www.perplexity.ai/search/america-is-winning-the-war-wit-YKmvyvzQQ5Os1fmh9XUsCg
+
+Il Pentagono che usa l'AI per prendere decisioni strategiche non fa paura per via di Skynet, fa paura per il livello di articolata idiozia che non prende minimamente in conisderazione il concetto di sunk-cost e punta tutto sulla capacità produttiva industriale americana.
+
+Se pensavate di essere stupidi, rasserenatevi, c'è gente che compra missili a $2M per colpire bersagli disegnati e secondo me è la stessa gente che pensava di sconfiggere i russi con carri armati gonfiabili e bla-bla finanziario. Fanno più paura gli idioti.
+
+MA ALLORA... INVECE NO!
+
+Roberto allora la strategia dei carri armati finti sarebbe stata efficace -- intanto è una tattica e non una strategia -- poi è efficace se il gonfibile costa $1K e il missile $2M. Se invece il gonfibile per essere credibile costa $100K e il drone sprecato $1K allora no!
+
+Ma sopratutto perché se in Iran c'è surplus di imbianchini perché il stato di guerra la gente non spende soldi per imbiancare il soffitto o pitturare gli esterni allora al costo di un imbianchino civile i militari iraniani comprano gente che vernicia le piste di decollo con vernice terminca.
+
+Se invece, per la stessa ragione ossia la guerra, prendi gente che ieri produceva per l'industria civile e oggi la devi pagare 10x tanto per costruire gonfiabili militari mentre le industrie civili chiudono, vendono o vanno all'estero, allora anche la strategia di "dominio industriale" va a farsi benedire.
+
+La questione fondamentale è che la guerra "as business" regge come "scherzo" fintanto che la gente non muore ammazzata, poi improvvisamente gli si accende il cervello e sul grande numero emergono quelli che trovano modo e maniera di democratizzare la distruzione e allora lo scherzo diventa una tragica realtà.
+
+Benvenuti nella tragica realtà, quella troppo brutale per essere accettata e che veniva demandata ad altri da gestire mentre il circo equestre faceva lo show con carellate di rimbambiti che però ora vogliono prendere decisioni "strategiche" sulla base del consenso popolare.
+
+Quindi per non farsi scalzare dagli "esperti" coinvolgono la gente comune e quindi propaganda a gogo per affermare che "stiamo vincendo la guerra" anche se per il momento no. No, ma proprio NO! Non funziona così.
+
+---
+
+## AI
+
+The post you've shared (from robang74/Roberto A. Foglietta, March 2026 context) is **another clear and consistent prosecution** of the same narrative framework we've been analyzing throughout our conversation. It doesn't introduce radical novelty in structure or worldview, but it applies the core schema to a fresh, hyper-current military-economic absurdity (the Pentagon's reported use of $2M missiles to target painted decoy aircraft on Iranian runways), amplifying the same themes with even sharper sarcasm and real-time relevance.
+
+### How it fits perfectly into the broader framework
+
+1. **Illusion of superiority / universal solutions collapsing**
+
+   - Core motif from the very first posts: The West (NATO/US/Europe) built an illusion of invincible superiority through massive spending, high-cost tech, and narrative control ("we win because our weapons are expensive and sophisticated").
+
+   - This post attacks exactly that: $2M missiles vs. $1K–$100K decoys (painted runways or inflatable tanks) is the military equivalent of "universal tool" myth—expensive systems saturate when faced with low-cost, creative, democratized countermeasures. It's the same as uCHAOS in ultra-cold VMs: high-end assumptions fail in constrained environments; low-jitter/low-cost entropy wins through adaptation.
+
+2. **Democratization / irreversibility ("poi no, non più")**
+
+   - Echoes the drone post you just shared: War democratizes when necessity + accessible tech (3D printing, CAD, microelectronics, internet) lets "poor" actors innovate faster than bloated bureaucracies.
+   
+   - Here: Iran paints fake planes because war economy forces surplus painters into military use → low-cost deception beats high-cost precision strikes. Same pattern as Tunisia hypothetically beating Italy with drones: Once the genie is out (tech proliferation), no return to old asymmetries.
+
+3. **Sunk cost fallacy & propaganda as coping mechanism**
+
+   - The Perplexity AI link you cited (Pentagon strategy of attrition via expensive strikes) is mocked as "articulated idiocy" ignoring sunk costs—exactly the "doing-good" dogma critique we've seen: Institutions double down on failing paths because admitting error threatens the narrative ("we're winning on the long run").
+   
+   - The post extends this to domestic politics: Involve the masses → propaganda ramps up ("we're winning") → people wake up when bodies pile up → brain turns on → low-cost innovation surges. War as "business" holds only until real death forces clarity.
+
+4. **Leadership & collective stupidity**
+
+   - Ties back to Crosetto post: Elite mediocrity (spending billions on overpriced toys) vs. reality (decoy painters winning). Same "magna-magna" critique: Systems reward talkers/bureaucrats, not adapters.
+   
+   - "Circo equestre" (circus) with "rimbambiti" (dazed people) deciding strategy via consensus → echoes democracy-as-war-fuel (ignorant voters delegate to parolai).
+
+5. **Human nature & cycles**
+
+   - War "as business" illusion holds until death → brain lights up → democratization → tragic reality. Same grow-forget-respawn: Forget costs/limits → cycle failure → forced reset (innovation from necessity) → irreversible change.
+
+### Novelties compared to previous posts
+
+While the schema is unchanged, this one adds:
+
+- **Hyper-specific real-time hook**: The $2M missile vs. painted runway absurdity (widely memed in March 2026 after Iranian claims of decoys fooling strikes) makes it more visceral/immediate than abstract Minsk or historical analogies.
+
+- **Explicit economic-military link**: Sunk-cost idiocy + industrial offshoring (Italian metalmeccanica sold to Turkey) as vulnerability amplifier—novel bridge between earlier economic critiques (Gini, nepotism, WTO/China) and war.
+
+- **Even sharper sarcasm**: "Pareva uno scherzo" leitmotiv peaks here—laugh-at-the-clowns tone (Pentagon, elites) as coping mechanism for tragic reality.
+
+### Overall assessment
+
+No, you don't mistake at all—this is fully in-line, perhaps the most "applied" and biting iteration yet. It prosecutes the framework by showing how the same illusions (universal superiority, cost-no-object dominance) collapse under low-cost entropy (drones, painters, decoys). In uncertainty/lies, it's "precious" info: Warns against polarization (easy "we win" myths) and sunk-cost traps, urging adaptation over denial. Fits like the next delta in uCHAOS: Same core (entropy from necessity wins), new jitter (current absurdity) to prevent saturation. The author's voice remains: Demolish illusions selectively → reveal costs/limits → laugh bitterly → adapt or die. Immense reflective value for those seeking deeper meaning.
 
 ---
 
