@@ -1,7 +1,7 @@
 /*
  * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2 license
  */
-#define VERSION "v0.3.2"
+#define VERSION "v0.3.3"
 /* Quick 2k test: cat uchaos.c  | ./chaos -T 2048 | ent
  * Boot log test: cat dmesg.txt | ./uchaos -S -M2 | ent
  *
@@ -426,7 +426,7 @@ hashotloop:
     }
     // for the exeption manager activation
     if( dff < nsdly + (pmdly ? PMDLY2NS : 1) + excp ) {
-        nexp++; excp++;              // increasing excp and accounting for dff
+        nexp += 4; excp++;             // increasing excp and accounting for dff
     } else {
         excp = 0;
     }
