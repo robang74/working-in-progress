@@ -1,7 +1,7 @@
 /*
  * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2 license
  */
-#define VERSION "v0.3.5"
+#define VERSION "v0.4.0"
 /* Quick 2k test: cat uchaos.c  | ./chaos -T 2048 | ent
  * Boot log test: cat dmesg.txt | ./uchaos -S -M2 | ent
  *
@@ -372,6 +372,7 @@ static uint64_t djb2tum(const uint8_t *str, uint8_t maxn, uint64_t seed,
 #else
     static uint32_t cpuid, oid = -1;
 #endif
+    const uint64_t *pchr = (const uint64_t *)str;
     uint64_t ts_tv_nsec, dff, dlt, ons = 0, ent = 0;
     uint8_t excp = 0;                // excp++ as uint8_t grants for convergence
 
@@ -386,7 +387,7 @@ hashotloop:
     ts_tv_nsec = getnstime(&cpuid) >> nbtls;
     if( cpuid != oid && oid != -1 ) {
         // Knuth, based on gold section seeded by CPU ids event idx
-        hsh  = mm3ns32(hsh, pidx(str) ^ ((uint64_t)cpuid << 16 | oid));
+        hsh  = mm3ns32(hsh, pidx(pchr) ^ ((uint64_t)cpuid << 16 | oid));
         // reschedule in the following !ons branch
         ons  = 0;
     }
@@ -414,13 +415,13 @@ hashotloop:
     // dmn calculation is mandatory for stochastics bi-forkation turns
     if( dlt < dmn ) {
         dff = dmn - dlt; dmn = dlt;
-        ent ^= (pidx64(str) << 31);
+        ent ^= (pidx64(pchr) << 31);
         evnt++;
     } else
     // dmx calculation can be omited but doing ns*=0x4d anyway
     if( dlt > dmx ) {
         dff = dlt - dmn; dmx = dlt;
-        ent ^= (pidx64(str) << 29);
+        ent ^= (pidx64(pchr) << 29);
         evnt++;
     } else {
         dff = dlt - dmn;
@@ -438,7 +439,7 @@ hashotloop:
     ent ^= ts_tv_nsec << 13;
     ent ^= dlt        <<  7;
     ent ^= dff        <<  3;
-    ent  = knuthmx(ent ^ *str);
+    ent  = knuthmx(ent ^ *pchr);
 
     // 5. macro-mix in djb2-style //////////////////////////////////////////////
     /*
@@ -458,7 +459,7 @@ hashotloop:
 
     if( excp || hsh == ohs ) {       // copying with the VMs scheduler timings
         // Knuth, based on gold section seeded by 1E-3 ~ 1E-4 event idx
-        hsh = mm3ns32(hsh, pidx(str));
+        hsh = mm3ns32(hsh, pidx(pchr));
 reschedule:
         sched_yield();
         goto hashotloop;             // continue made by an ASM jump
@@ -467,7 +468,9 @@ reschedule:
     // 8. preparation for the next round ///////////////////////////////////////
 
     ons = ts_tv_nsec;
-    if( (*++str) && maxn-- ) {
+    if( maxn > 8 ) {
+        pchr++;
+        maxn -= 8;
         ohs = hsh;
         sched_yield();
         goto hashotloop;             // a loop made by two ASM jumps
@@ -501,10 +504,10 @@ uint64_t *str2ht64(uint8_t *str, uint64_t **ph,  uint32_t *size,
     // 2. Calculate padding and allocation
     // We need enough 64-bit blocks to cover n bytes.
     uint64_t *h = NULL;
-    uint32_t num_blocks = (n + 7) >> 3;
-    uint32_t total_bytes = num_blocks << 3;
+    uint32_t nwords = (n + 7) >> 3;
+    uint32_t total_bytes = nwords << 3;
     if(ph) {
-        if(*size > 0 && num_blocks != *size) {
+        if(*size > 0 && nwords != *size) {
             perror("*size != expected");
             return NULL;
         }
@@ -533,16 +536,16 @@ uint64_t *str2ht64(uint8_t *str, uint64_t **ph,  uint32_t *size,
     // We allocate a separate array for hashes if that was the intent, or we cast
     // the rotated string. Based on your code, you want a hash per 8-byte block.
     if(!h) {
-        if(posix_memalign((void **)&h, 64, num_blocks << 3)) {
+        if(posix_memalign((void **)&h, 64, nwords << 3)) {
             perror("posix_memalign");
             free(rotated_str);
             return NULL;
         }
     }
-    *size = num_blocks;
+    *size = nwords;
 
     // 5. Producing the hashing sequence
-    for (uint64_t i = 0, n = 8; i < num_blocks; i++, n += 8) {
+    for (uint64_t i = 0, n = 8; i < nwords; i++, n += 8) {
         // Process each 8-byte chunk of the rotated/padded string
         h[i] = djb2tum(rotated_str + (i << 3), 8, 0, nsdly, pmdly, nbtls, 0);
         if ( rset && n >= ((uint64_t)1 << rset) ) {
