@@ -1,7 +1,7 @@
 /*
  * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2 license
  */
-#define VERSION "v0.3.4"
+#define VERSION "v0.3.5"
 /* Quick 2k test: cat uchaos.c  | ./chaos -T 2048 | ent
  * Boot log test: cat dmesg.txt | ./uchaos -S -M2 | ent
  *
@@ -193,6 +193,8 @@ static inline uint32_t getprmx20(uint32_t x) {
     x +=  (x & 0x10) ? 10 : 0;
     return primes64[x];
 }
+#else
+#define getprmx16(w) (5 + (((w) & 0x1f) << 1))
 #endif
 
 static inline uint64_t rotl64(uint64_t n, uint8_t c) {
@@ -289,12 +291,8 @@ static inline uint16_t mm3ns16(uint16_t ns, uint16_t p) {
       b ^= ((b >> 3) | (b << 5));
       return b;
   }
-  static inline uint64_t knuthmx(uint64_t w) {
-  #if USE_PRIMES_2564
+  static inline uint64_t knuthmx(uint64_t w) {  
       w  = rotl64(w, getprmx16(w));
-  #else
-      w  = rotl64(w, 5 + ((w & 0x1f) << 1));
-  #endif
       w *= (w & 1) ? 0x9E3779B9 : 0x45d9f3b;
       return w ^ ( (w >> 17) | (w << 47) ) ;
   }
@@ -374,7 +372,7 @@ static uint64_t djb2tum(const uint8_t *str, uint8_t maxn, uint64_t seed,
 #else
     static uint32_t cpuid, oid = -1;
 #endif
-    uint64_t ts_tv_nsec, dff, dlt, ons = 0, ent = 0, chr = *str;
+    uint64_t ts_tv_nsec, dff, dlt, ons = 0, ent = 0;
     uint8_t excp = 0;                // excp++ as uint8_t grants for convergence
 
 hashotloop:
@@ -388,7 +386,7 @@ hashotloop:
     ts_tv_nsec = getnstime(&cpuid) >> nbtls;
     if( cpuid != oid && oid != -1 ) {
         // Knuth, based on gold section seeded by CPU ids event idx
-        hsh  = mm3ns32(hsh, pidx(&chr) ^ ((uint64_t)cpuid << 16 | oid));
+        hsh  = mm3ns32(hsh, pidx(str) ^ ((uint64_t)cpuid << 16 | oid));
         // reschedule in the following !ons branch
         ons  = 0;
     }
@@ -416,13 +414,13 @@ hashotloop:
     // dmn calculation is mandatory for stochastics bi-forkation turns
     if( dlt < dmn ) {
         dff = dmn - dlt; dmn = dlt;
-        ent ^= (pidx64(&chr) << 31);
+        ent ^= (pidx64(str) << 31);
         evnt++;
     } else
     // dmx calculation can be omited but doing ns*=0x4d anyway
     if( dlt > dmx ) {
         dff = dlt - dmn; dmx = dlt;
-        ent ^= (pidx64(&chr) << 29);
+        ent ^= (pidx64(str) << 29);
         evnt++;
     } else {
         dff = dlt - dmn;
@@ -437,33 +435,30 @@ hashotloop:
 
     // 4. entropy distillation /////////////////////////////////////////////////
 
-    ent  ^= ts_tv_nsec << 13;
-    ent  ^= dlt        <<  7;
-    ent  ^= dff        <<  3;
-    ent  = knuthmx(ent);
+    ent ^= ts_tv_nsec << 13;
+    ent ^= dlt        <<  7;
+    ent ^= dff        <<  3;
+    ent  = knuthmx(ent ^ *str);
 
     // 5. macro-mix in djb2-style //////////////////////////////////////////////
     /*
      * (16+1) (32-1 or 32+1) (64-1)
      *   01     10      00     11
      */
-    // it consumes entropy, do rotations and forgot the state
+    // it consumes entropy, does rotations and forgets the state
     uint8_t b0 = ent & 0x01, b1 = ent & 0x02; ent = ent >> 2;
     hsh = ( hsh << (4 + (b0 ? b1 : 1)) ) + (b1 ? -hsh : hsh);
 
     // 6. entropy injection in hsh /////////////////////////////////////////////
 
-#if USE_PRIMES_2564
-    hsh ^= (ent << 2) ^ rotl64(chr,   getprmx16(ent));
-#else
-    hsh ^= (ent << 2) ^ rotl64(chr, 3 + (0x1f & ent));
-#endif
+    // it consumes entropy, and does hash the another rotation
+    hsh = rotl64(hsh ^ ((ent >> 5) << 3), getprmx16(ent));
 
     // 7. exceptions management ////////////////////////////////////////////////
 
     if( excp || hsh == ohs ) {       // copying with the VMs scheduler timings
         // Knuth, based on gold section seeded by 1E-3 ~ 1E-4 event idx
-        hsh = mm3ns32(hsh, pidx(&chr));
+        hsh = mm3ns32(hsh, pidx(str));
 reschedule:
         sched_yield();
         goto hashotloop;             // continue made by an ASM jump
@@ -472,7 +467,7 @@ reschedule:
     // 8. preparation for the next round ///////////////////////////////////////
 
     ons = ts_tv_nsec;
-    if( (chr = *++str) && maxn-- ) {
+    if( (*++str) && maxn-- ) {
         ohs = hsh;
         sched_yield();
         goto hashotloop;             // a loop made by two ASM jumps
