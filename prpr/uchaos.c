@@ -1,7 +1,7 @@
 /*
  * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2 license
  */
-#define VERSION "v0.4.3"
+#define VERSION "v0.4.4"
 /* Quick 2k test: cat uchaos.c  | ./chaos -T 2048 | ent
  * Boot log test: cat dmesg.txt | ./uchaos -S -M2 | ent
  *
@@ -742,8 +742,8 @@ int main(int argc, char *argv[]) {
 
     uint32_t n = (nblks < 2) ? readbuf(STDIN_FILENO, str, BLOCK_SIZE, 0) \
                              : readblocks(STDIN_FILENO, str, nblks);
-    if(n < 1) return EXIT_FAILURE;
-    if (nblks > 1) bin2str(str, n);  // necessary because djb2tum() born for text,
+    if(n < 1) return EXIT_FAILURE;     // djb2tum(9 code refactored thus not anymore
+    //if (nblks > 1) bin2str(str, n); // necessary because djb2tum() born for text,
     str[n] = 0;                      // refactoring it for binary input, is the way.
 
     for(uint32_t a = nrdry; a; a--) {
