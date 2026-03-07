@@ -291,7 +291,7 @@ static inline uint16_t mm3ns16(uint16_t ns, uint16_t p) {
       b ^= ((b >> 3) | (b << 5));
       return b;
   }
-  static inline uint64_t knuthmx(uint64_t w) {  
+  static inline uint64_t knuthmx(uint64_t w) {
       w  = rotl64(w, getprmx16(w));
       w *= (w & 1) ? 0x9E3779B9 : 0x45d9f3b;
       return w ^ ( (w >> 17) | (w << 47) ) ;
@@ -467,7 +467,7 @@ reschedule:
     // 8. preparation for the next round ///////////////////////////////////////
 
     ons = ts_tv_nsec;
-    if( maxn-- ) {
+    if( --maxn ) {
         ohs = hsh;
         sched_yield();
         goto hashotloop;             // a loop made by two ASM jumps
@@ -494,43 +494,37 @@ static inline uint8_t *bin2str(uint8_t *buf, uint32_t nmax) {
     return buf;
 }
 
-uint64_t *str2ht64(const uint8_t *str, uint64_t **ph,  uint32_t *size,
-    uint32_t nsdly, uint32_t pmdly, uint8_t nbtls, uint8_t rset)
+uint64_t *str2ht64(const uint8_t *str, uint32_t *size, uint32_t nsdly,
+    uint32_t pmdly, uint8_t nbtls, uint8_t rset)
 {
     if (!str || !size) return NULL;
 
     // 0. Calculate the string lenght
-    uint32_t len;
-    len = strlen((char *)str);
-    if (len == 0) return NULL;
+    uint32_t len = *size;
+    if(!len) {
+        len = strlen((char *)str);
+        if (len == 0) return NULL;
+    }
 
     // 1. Calculate padding and allocation
     // We need enough 64-bit blocks to cover n bytes.
-    uint64_t *h = NULL;
     uint32_t nwords = (len + 7) >> 3;
     uint32_t nbytes = nwords << 3;
-    if(ph) {
-        if(*size > 0 && nwords != *size) {
-            perror("*size != expected");
-            return NULL;
-        }
-        h = *ph;
-    }
 
     // 2. Allocate aligned memory for the processed string
     uint8_t *str64 = NULL;
-    if(posix_memalign((void **)&str64, 64, nbytes)) {
+    if(posix_memalign((void **)&str64, 64, nbytes) || !str64) {
         perror("posix_memalign");
         return NULL;
     }
-    
+
     // 3. Determine rotation offset using monotonic time
     uint32_t k = trndbyte() % len;
-
     // 4. Perform rotation into the new buffer
     // Copy from k to end
     memcpy(str64, str + k, len - k);
     // Copy from beginning to k
+    //perr("k = %d, len = %ld \n", k, len);
     if (k) memcpy(str64 + (len - k), str, k);
     // Padding with zeros
     memset(&str64[len], 0, nbytes - len);
@@ -538,18 +532,20 @@ uint64_t *str2ht64(const uint8_t *str, uint64_t **ph,  uint32_t *size,
     // 5. Generate the uint64_t array
     // We allocate a separate array for hashes if that was the intent, or we cast
     // the rotated string. Based on your code, you want a hash per 8-byte block.
-    if(!h && posix_memalign((void **)&h, 64, nwords << 3)) {
+    uint64_t *h = NULL;
+    if(posix_memalign((void **)&h, 64, nwords << 3) || !h) {
         perror("posix_memalign");
         free(str64);
         return NULL;
     }
     *size = nwords;
+    //perr("len: %ld, wd: %ld\n", len, nwords);
 
     // 6. Producing the hashing sequence
     uint64_t *p = (uint64_t *)str64;
     for (uint64_t i = 0, n = 8; i < nwords; i++, n += 8) {
         // Processing each 8-byte chunk of the rotated/padded string
-        h[i] = djb2tum(p[i], 2, nsdly, pmdly, nbtls, 0);
+        h[i] = djb2tum(p[i], 1, nsdly, pmdly, nbtls, 0);
         if ( rset && n >= ((uint64_t)1 << rset) ) {
             n = 0; djb2tum(0, 0, 0, 0, 0, 1);
         }
@@ -732,7 +728,7 @@ int main(int argc, char *argv[]) {
     // Counting time of running starts here, after parameters
     (void) get_nanos();
 
-    if (posix_memalign((void **)&str, 64, BLOCK_SIZE + 8)) {
+    if (posix_memalign((void **)&str, 64, BLOCK_SIZE + 8) || !str) {
         perror("posix_memalign");
         return EXIT_FAILURE;
     }
@@ -740,25 +736,25 @@ int main(int argc, char *argv[]) {
     uint32_t n = (nblks < 2) ? readbuf(STDIN_FILENO, str, BLOCK_SIZE, 0) \
                              : readblocks(STDIN_FILENO, str, nblks);
     if(n < 1) return EXIT_FAILURE;
-    if (nblks > 1) bin2str(str, n);   // necessary because djb2tum() born for text,
-    str[n] = 0;                       // refactoring it for binary input, is the way.
+    if (nblks > 1) bin2str(str, n);  // necessary because djb2tum() born for text,
+    str[n] = 0;                      // refactoring it for binary input, is the way.
 
-    uint32_t size = 0;
-    uint64_t *h = NULL;
-    for(uint32_t a = 0; a < nrdry; a++) {
-        h = str2ht64(str, &h, &size, nsdly, pmdly, nbtls, 0);
-        free(h); h = NULL;
+    for(uint32_t a = nrdry; a; a--) {
+        uint32_t size = n;
+        uint64_t *hsh = str2ht64(str, &size, nsdly, pmdly, nbtls, 0);
+        if(!hsh) { return EXIT_FAILURE; }
+        else { free(hsh); } hsh = NULL;
     }
 
     double avgbc = 0, avgmx = 0, avgmn = 256;
-    uint64_t bic = 0, max = 0, min = 256, avg = 0, mt = 0;
-    uint64_t nk = 0, nt = 0, nx = 0, nn = 0;
+    uint64_t bic = 0, max = 0, min = 256, avg = 0;
+    uint64_t nk = 0, nt = 0, nx = 0, nn = 0, mt = 0;
 
     if(quiet < 2) {
         perr_app_info(0);
         if(prsts) { // RAF, TODO: dealing with size one.
             perr("; repetitions: ");
-            if(size < 2) {
+            if(nblks < 2) {
                 perr("too short input, try longer!\n\n");
                 prsts = 0;
             }
@@ -767,16 +763,17 @@ int main(int argc, char *argv[]) {
 
     for (uint32_t a = ntsts; a; a--) {
         // hashing
+        uint32_t size = n;
         uint64_t stns = get_nanos();
-        h = str2ht64(str, &h, &size, nsdly, pmdly, nbtls, rset);
-        if(!h) return EXIT_FAILURE;
+        uint64_t *hsh = str2ht64(str, &size, nsdly, pmdly, nbtls, rset);
+        if(!hsh) return EXIT_FAILURE;
         mt += get_nanos() - stns;
 
         uint32_t sz = size << 3;
         if(devfd) {
             entrnd.buf_size = sz;
             entrnd.entropy_count = entropy(sz);
-            memcpy((uint8_t *)entrnd.buf, (uint8_t *)h, sz);
+            memcpy((uint8_t *)entrnd.buf, (uint8_t *)hsh, sz);
             #define OPTNK "option -k is designed for /dev/[u]random only"
             if (ioctl(devfd, RNDADDENTROPY, &entrnd) < 0 && errno != EINTR) {
                 if(errno == ENOTTY) {
@@ -785,9 +782,9 @@ int main(int argc, char *argv[]) {
                 return EXIT_FAILURE;
             }
             if (quiet < 2) // avoid the need of >/dev/null
-                writebuf(STDOUT_FILENO, (uint8_t *)h, sz);
+                writebuf(STDOUT_FILENO, (uint8_t *)hsh, sz);
         } else {
-                writebuf(STDOUT_FILENO, (uint8_t *)h, sz);
+                writebuf(STDOUT_FILENO, (uint8_t *)hsh, sz);
         }
 
         // single run
@@ -795,16 +792,16 @@ int main(int argc, char *argv[]) {
 
         // skip stats
         if(!prsts) continue;
- 
+
         // self-evaluation of the output including the check for repetitions
         avg = 0, nn = 0;
         for (uint32_t n = 0; n < size; n++) {
             for (uint32_t i = n + 1; i < size; i++) {
-                if (h[i] == h[n]) {
+                if (hsh[i] == hsh[n]) {
                     if(prsts) perr("%d:%d ", n, i);
                     nk++; continue;
                 }
-                uint64_t cb = h[i] ^ h[n];
+                uint64_t cb = hsh[i] ^ hsh[n];
                 int ham = 0;
                 for (int a = 0; a < 64; a++)
                     ham += (cb >> a) & 0x01;
@@ -823,6 +820,7 @@ int main(int argc, char *argv[]) {
         avgbc += curavg;
         nt += size;
 
+        free(hsh); hsh = NULL;
         sched_yield();  // Statistics are a block of CPU data-crunching but also
                         // a predictable delay which sched_yield() can jeopardise.
                         // Stats makes the large size output slower 1.7x than -q.
