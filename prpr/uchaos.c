@@ -1,7 +1,7 @@
 /*
  * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2 license
  */
-#define VERSION "v0.4.6"
+#define VERSION "v0.4.7"
 /* Quick 2k test: cat uchaos.c  | ./chaos -T 2048 | ent
  * Boot log test: cat dmesg.txt | ./uchaos -S -M2 | ent
  *
@@ -333,6 +333,8 @@ static inline int nsleep(uint32_t ns) {
     return ret;
 }
 
+typedef double df;
+
 static uint64_t djb2tum(uint64_t seed, uint8_t maxn, uint32_t nsdly,
     uint32_t pmdly, uint8_t nbtls, uint8_t rset)
 {
@@ -347,14 +349,12 @@ static uint64_t djb2tum(uint64_t seed, uint8_t maxn, uint32_t nsdly,
         DJB2UPDT
         double mean = (double)avg  / tncl;
         double jean = (double)javg / tncl;
-        perr("\nLatency: %zu <%.1lf> %.1lfK ns, %.3lgK w/ ev:%zu, ex:%5.2lf%%\n",
-            tdmn, mean, (double)tdmx/E3, (double)tncl/E3, evnt,
-            ((double)100 * nexp)/ctot);
+        perr("\nLatency: %.0f <%.1lf> %.1lfK ns, %.3lgK w/ ev:%.0f, ex:%5.2lf%%\n",
+            (df)tdmn, mean, (df)tdmx/E3, (df)tncl/E3, (df)evnt, 100*(df)nexp/ctot);
         perr( "\\Ratios: %.2lf <avg=1U> %.2lf, min=1U <%.2lf> %.2lf, %.03lf\n",
-            (double)tdmn/mean, (double)tdmx/mean, mean/tdmn, (double)tdmx/tdmn,
-            (double)(mean-tdmn)/jean);
-        perr(  "Jitters: %zu <%.1lf> %zu ns w/ r:%.03lg, %.3lgK r:%.03lg\n",
-            jmn, jean, jmx, (double)jmx/jean, (double)ctot/E3, (double)ctot/tncl);
+            (df)tdmn/mean, (df)tdmx/mean, mean/tdmn, (df)tdmx/tdmn, (df)(mean-tdmn)/jean);
+        perr(  "Jitters: %.0f <%.1lf> %.0f ns w/ r:%.03lg, %.3lgK r:%.03lg\n",
+            (df)jmn, jean, (df)jmx, (df)jmx/jean, (df)ctot/E3, (df)ctot/tncl);
     }
 
     if( rset ) DJB2RSET;
@@ -779,10 +779,10 @@ int main(int argc, char *argv[]) {
     for (uint32_t a = ntsts; a; a--) {
         // hashing
         uint32_t size = n;
-        uint64_t stns = get_nanos();
+        uint64_t stns = get_nanos(); /**** hashing time accounting start ******/
         uint64_t *hsh = str2ht64(str, &size, nsdly, pmdly, nbtls, rset);
+        mt += get_nanos() - stns; /******* hashing time accounting stop *******/
         if(!hsh) return EXIT_FAILURE;
-        mt += get_nanos() - stns;
 
         uint32_t sz = size << 3;
         if(devfd) {
@@ -847,7 +847,7 @@ int main(int argc, char *argv[]) {
     perr("%s\n", nk ? ", status KO" : "0, status OK");
     perr("\n");
 
-    perr("Tests: %u w/ duplicates %zu over ", ntsts, nk);
+    perr("Tests: %u w/ duplicates %.0lf over ", ntsts, (df)nk);
     if((nt >> 3) > E6)
         perr("%.2lfM hashes (%.4lg ppm)\n", (double)nt/E6, (double)E6*nk/nt);
     else
