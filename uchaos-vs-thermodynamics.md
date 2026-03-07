@@ -161,4 +161,60 @@ In conclusion, what was real for uChaos v0.2.8.x and v0.2.9.x, still be relatabl
 
 ---
 
+### uCHAOS: STATISTICHE DEL JITTERING NELLA v0.4.6 / devel
+
+- [LinkedIn post #6](https://www.linkedin.com/posts/robertofoglietta_uchaos-statistiche-del-jittering-nella-v046-activity-7436099937454436352-oMPr)
+
+La serie 0.4.x introduce diverse novità fra cui la gestione dell'input binario che prima era mitigato per evitare crash ora è nativa anche se l'algoritmo è pensato per essere foraggiato con i log di boot del kernel (dmesg output).
+
+In effetti, quello di fornire i log di boot con i timings relativi (dmesg -r) è un modo per partire con un po' di entropia giacché per quanto possa essere deterministica una macchina con kernel Linux, i timestamps in nanosecondi non potranno mai essere identici e qualche fluttuazione nel testo ci sarà.
+
+Pochi bit di entropia ma meglio di niente. Comunque è evidente che uChaos dovrà essere in grado di funzionare anche senza input ed in effetti c'è la possibilità di "azionarlo" con echo | uchaos. Quindi il prpblema di gestire lo stdin obbligatoriamente non ha un impatto per l'utilizzatore.
+
+Gli altri due aspetti essenziali che sono andati a cambiare sono: la misura del tempo che ora viene presa a 32bit completi (4 miliardi di nanosecondi) ed evitano lo skew del secondo unitario che anche se non frequente rappresentava un problema quando da .9999 secondi si passava a 1.0001 perché la sottrazione era fra .0001 - .9999 ma la distanza temporale è 2 unità alla 4° cifra decinale. Ora il problema si pone solo se la latenza supera i 4 secondi ma in tal caso sarebbe un ENORME problema di sistema non di uChaos.
+
+L'altro aspetto riguarda le stastistiche del jittering e si può notare che la media dello jitter è quasi esattamente la distanza fra la latenza minima e quella media. Non è un risultato sorprendente ma atteso. Quello che potrebbe trarre in inganno è che il range di jittering sulla VM porterebbe 9.5 bit di variabilità mentre su quella reale solo 7.5 bit.
+
+Attenzione però perché la macchina reale potrebbe avere granularità del clock inferiore al nanosecondo mentre la VM a scaglioni (pattern ricorrenti) di 100ns in tal caso la VM porterebbe 3 bit (circa) per misura che sono appunto quelli che mi prefiggo di avere sull'output finale.
+
+Con l'opzione -S, l'hash viene calcolato in un singolo ciclo mentre con l'opzione -Z su due passaggi. La differenza è sostanziale quando il sistema è particolarmente deterministico e limitato in variabilità (o granularità) oppure quando l'ouput di uChaos è pensato per rifocillare il kernel Linux di entropia fresca. In entrambi i casi la densità di entropia (x2) è molto preferibile alla dimensione dei dati in uscita (1/2) a parità di tempo di elaborazione.
+
+#### Collected stats, examples
+
+Linux 6.8.x low latency kernel on bare metal laptop:
+
+```text
+uChaos v0.4.6 w/sb !/pr; repetitions: 0, status OK
+
+Tests: 256 w/ duplicates 0 over 16.4K hashes (0 ppm)
+Hamming <weight>: 50.0002% ~ 50% by (+4.965 ppm)
+Hamming distance: 14 <32.000159> 52 over 516.1K XORs
+Hamming dist/avg: 0.9902 < 1U:32 +4.965 ppm > 1.0070
+
+Perform: exec 0.0618s, 2.07 MB/s; hash 0.0122s, 1338 KH/s
+Latency: 428 <642.2> 8.5K ns, 18.4K w/ ev:12, ex: 0.37%
+\Ratios: 0.67 <avg=1U> 13.18, min=1U <1.50> 19.77, 1.002
+Jitters: 4 <213.7> 8033 ns w/ r:37.6, 18.4K r:1
+Setting: s:0, q:0, p:0%:0ns, d:3, r:31, i:16, Z:0
+```
+
+Linux 5.15.x server load kernel on a VM w/ -icount,tgc:
+
+```text
+uChaos v0.4.7 w/sb !/pr; repetitions: 0, status OK
+
+Tests: 1024 w/ duplicates 0 over 65.5K hashes (0 ppm)
+Hamming <weight>: 50.0045% ~ 50% by (+90.71 ppm)
+Hamming distance: 12 <32.002903> 51 over 2064K XORs
+Hamming dist/avg: 0.9904 < 1U:32 +90.71 ppm > 1.0074
+
+Perform: exec 1.08s, 0.472 MB/s; hash 0.11s, 595.6 KH/s
+Latency: 666 <1385.3> 30.5K ns, 67.5K w/ ev:4, ex:49.74%
+\Ratios: 0.48 <avg=1U> 22.05, min=1U <2.08> 45.86, 1.000
+Jitters: 6 <719.3> 29878 ns w/ r:41.5, 134K r:1.99
+Setting: s:0, q:0, p:0%:0ns, d:3, r:31, i:16, Z:0
+```
+
+---
+
 (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, CC BY-ND-NC 4.0
