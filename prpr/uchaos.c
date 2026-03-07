@@ -1,7 +1,7 @@
 /*
  * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2 license
  */
-#define VERSION "v0.4.5"
+#define VERSION "v0.4.6"
 /* Quick 2k test: cat uchaos.c  | ./chaos -T 2048 | ent
  * Boot log test: cat dmesg.txt | ./uchaos -S -M2 | ent
  *
@@ -225,9 +225,14 @@ static inline uint64_t getnstime(uint32_t *pcpuid) {
 #if ! USE_GET_TIME
     if(pcpuid) return get_rdtsc_clock(pcpuid);
 #endif
+    uint64_t ns;
     struct timespec ts;                  // using sched_yield() to creates chaos,
     clock_gettime(CLOCK_MONOTONIC, &ts); // getting ns in a hot loop is the limit
-    return 0x7FFFFFFF & ts.tv_nsec;      // and we want to see this limit, in VMs
+                                         // and we want to see this limit, in VMs
+    ns  =  ts.tv_nsec;
+    ns += (ts.tv_sec & 1) ?  E9       : 0;
+    ns += (ts.tv_sec & 2) ? (E9 << 1) : 0;
+    return ns;
 }
 
 #if 0
@@ -332,19 +337,24 @@ static uint64_t djb2tum(uint64_t seed, uint8_t maxn, uint32_t nsdly,
     uint32_t pmdly, uint8_t nbtls, uint8_t rset)
 {
     // This is the internal state of the engine
-    static uint64_t  ncl = 0,  dmn = E9,  dmx = 0;
-    static uint64_t tncl = 0, tdmn = E9, tdmx = 0;
-    static uint64_t nexp = 0, evnt = 0,   avg = 0;
-//  static uint64_t  jmn = E9, jmx = 0,  javg = 0;
+    static uint64_t  ncl = 0,  dmn = -1,  dmx = 0;
+    static uint64_t tncl = 0, tdmn = -1, tdmx = 0;
+    static uint64_t ctot = 0,  jmn = -1,  jmx = 0;
+    static uint64_t evnt = 0, nexp = -1;
+    static uint64_t javg = 0,  avg =  0;
 
     if( seed == DJB2VGET && (ncl || tncl) ) {
         DJB2UPDT
-        double mean = (double)avg / tncl;
-        perr("\nLatency: %zu <%.4lg> %.4lgK ns, %.4lgK w/ ev:%zu, ex:%5.2lf%%\n",
+        double mean = (double)avg  / tncl;
+        double jean = (double)javg / tncl;
+        perr("\nLatency: %zu <%.1lf> %.1lfK ns, %.3lgK w/ ev:%zu, ex:%5.2lf%%\n",
             tdmn, mean, (double)tdmx/E3, (double)tncl/E3, evnt,
-            ((double)100 * nexp)/(tncl + nexp));
-        perr(  "Ratios : %.4lg <avg=1U> %.4lg, min=1U <%.4lg> %.4lg\n",
-            (double)tdmn/mean, (double)tdmx/mean, mean/tdmn, (double)tdmx/tdmn);
+            ((double)100 * nexp)/ctot);
+        perr( "\\Ratios: %.2lf <avg=1U> %.2lf, min=1U <%.2lf> %.2lf, %.03lf\n",
+            (double)tdmn/mean, (double)tdmx/mean, mean/tdmn, (double)tdmx/tdmn,
+            (double)(mean-tdmn)/jean);
+        perr(  "Jitters: %zu <%.1lf> %zu ns w/ r:%.03lg, %.3lgK r:%.03lg\n",
+            jmn, jean, jmx, (double)jmx/jean, (double)ctot/E3, (double)ctot/tncl);
     }
 
     if( rset ) DJB2RSET;
@@ -404,18 +414,12 @@ hashotloop:
 
     // 2. latency calculation //////////////////////////////////////////////////
 
-    dlt = ts_tv_nsec;
-#if USE_GET_TIME
-    dlt = (dlt < ons) ? E9 - ons + dlt : dlt - ons;
-#else
-    dlt =  dlt - ons;                // overflow by uint64_t is 0xff..ff + 1 = 0
-#endif
+    dlt = ts_tv_nsec - ons;       // within 4s is fine, with RTCS is always fine
     if( !dlt ) goto reschedule;
+    if( dmn == -1 ) dmn = dlt;
 
     // 3. internal state update ////////////////////////////////////////////////
 
-    // avg calculation can be omitted
-    avg += dlt; ncl++;
     // dmn calculation is mandatory for stochastics bi-forkation turns
     if( dlt < dmn ) {
         dff = dmn - dlt; dmn = dlt;
@@ -431,25 +435,34 @@ hashotloop:
         dff = dlt - dmn;
         ent ^= ~dff ^ dmx;
     }
+    ctot++;
+
+    // 4. jittering calculation ////////////////////////////////////////////////
+
     // dff is jittering for the exeption manager activation
     if( dff < nsdly + (pmdly ? PMDLY2NS : 1) + excp ) {
         excp += 4;                   // increasing excp and accounting for dff
         nexp++;
     } else {
-        // avg calculation can be omitted
-        avg += dlt; ncl++;
+        // min,max jittering can be ommited
+        if( jmn == -1 ) jmn = dff;
+        else
+        if( dff < jmn ) jmn = dff;
+        if( dff > jmx ) jmx = dff;
+        // avg calculation can be ommitted
+        avg += dlt; javg += dff; ncl++;
         // Knuth, based on gold section seeded by 1E-3 ~ 1E-4 event idx
         if(excp) hsh = mm3ns32(hsh, ons);
         excp = 0;
     }
 
-    // 4. entropy distillation /////////////////////////////////////////////////
+    // 5. entropy distillation /////////////////////////////////////////////////
 
-    ent ^= ts_tv_nsec << 13;
-    ent ^= dlt        <<  7;
-    ent  = knuthmx(ent^avg);
+    ent ^= rotl64 (ts_tv_nsec, 13);
+    ent ^= rotl64 (dlt       ,  7);
+    ent  = knuthmx(ent       ^avg);
 
-    // 5. macro-mix in djb2-style //////////////////////////////////////////////
+    // 6. macro-mix in djb2-style //////////////////////////////////////////////
     /*
      * (16+1) (32-1 or 32+1) (64-1)
      *   01     10      00     11
@@ -458,17 +471,17 @@ hashotloop:
     uint8_t b0 = ent & 0x01, b1 = ent & 0x02; ent = ent >> 2;
     hsh = ( hsh << (4 + (b0 ? b1 : 1)) ) + (b1 ? -hsh : hsh);
 
-    // 6. entropy injection in hsh /////////////////////////////////////////////
+    // 7. entropy injection in hsh /////////////////////////////////////////////
 
     // it consumes entropy, and does hash the another rotation
     hsh = rotl64(hsh ^ ((ent >> 5) << 3), getprmx16(ent));
 
-    // 7. exceptions management ////////////////////////////////////////////////
+    // 8. exceptions management ////////////////////////////////////////////////
 
     // copying with the VMs scheduler timings: continue made by an ASM jump
     if( excp ) goto reschedule;
 
-    // 8. preparation for the next round ///////////////////////////////////////
+    // 9. preparation for the next round ///////////////////////////////////////
 
     if( --maxn ) {
         ons = ts_tv_nsec;
@@ -479,7 +492,7 @@ reschedule:
 
 /** HASHING LOOP CLOSE  *******************************************************/
 
-    // 9. finalising w/ a 32+1 bit mix /////////////////////////////////////////
+    // X. finalising w/ a 32+1 bit mix /////////////////////////////////////////
 
     ohs = mm3ns32(hsh, ohs);
 
