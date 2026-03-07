@@ -1,7 +1,7 @@
 /*
  * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2 license
  */
-#define VERSION "v0.4.2"
+#define VERSION "v0.4.3"
 /* Quick 2k test: cat uchaos.c  | ./chaos -T 2048 | ent
  * Boot log test: cat dmesg.txt | ./uchaos -S -M2 | ent
  *
@@ -327,6 +327,12 @@ static inline uint16_t mm3ns16(uint16_t ns, uint16_t p) {
 #define PMDLY2NS ( ( ( dmn * pmdly ) + 127 ) >> 8 )
 #define DJB2VGET ( (uint64_t)-1 )
 
+static inline int nsleep(uint32_t ns) {
+    struct timespec remaining, request = { 0, ns };
+    int ret = nanosleep(&request, &remaining);
+    return ret;
+}
+
 static uint64_t djb2tum(uint64_t seed, uint8_t maxn, uint32_t nsdly,
     uint32_t pmdly, uint8_t nbtls, uint8_t rset)
 {
@@ -337,8 +343,9 @@ static uint64_t djb2tum(uint64_t seed, uint8_t maxn, uint32_t nsdly,
     if( seed == DJB2VGET && (ncl || tncl) ) {
         DJB2UPDT
         double mean = (double)avg / tncl;
-        perr("\nLatency: %zu <%.4lg> %.4lgK ns, %.4lgK w/ ev:%zu, ex:%4.2lf%% \n",
-            tdmn, mean, (double)tdmx/E3, (double)tncl/E3, evnt, (double)100*nexp/tncl);
+        perr("\nLatency: %zu <%.4lg> %.4lgK ns, %.4lgK w/ ev:%zu, ex:%5.2lf%%\n",
+            tdmn, mean, (double)tdmx/E3, (double)tncl/E3, evnt,
+            ((double)100 * nexp)/(tncl + nexp));
         perr(  "Ratios : %.4lg <avg=1U> %.4lg, min=1U <%.4lg> %.4lg\n",
             (double)tdmn/mean, (double)tdmx/mean, mean/tdmn, (double)tdmx/tdmn);
     }
@@ -431,6 +438,10 @@ hashotloop:
         excp += 4;                   // increasing excp and accounting for dff
         nexp++;
     } else {
+        // avg calculation can be omitted
+        avg += dlt; ncl++;
+        // Knuth, based on gold section seeded by 1E-3 ~ 1E-4 event idx
+        if(excp) hsh = mm3ns32(hsh, ons);
         excp = 0;
     }
 
@@ -456,19 +467,15 @@ hashotloop:
 
     // 7. exceptions management ////////////////////////////////////////////////
 
-    if( excp || hsh == ohs ) {       // copying with the VMs scheduler timings
-        // Knuth, based on gold section seeded by 1E-3 ~ 1E-4 event idx
-        hsh = mm3ns32(hsh, ons);
-reschedule:
-        sched_yield();
-        goto hashotloop;             // continue made by an ASM jump
-    }
+    // copying with the VMs scheduler timings: continue made by an ASM jump
+    if( excp || hsh == ohs ) goto reschedule;
 
     // 8. preparation for the next round ///////////////////////////////////////
 
-    ons = ts_tv_nsec;
     if( --maxn ) {
         ohs = hsh;
+        ons = ts_tv_nsec;
+reschedule:
         sched_yield();
         goto hashotloop;             // a loop made by two ASM jumps
     }
@@ -545,7 +552,7 @@ uint64_t *str2ht64(const uint8_t *str, uint32_t *size, uint32_t nsdly,
     uint64_t *p = (uint64_t *)str64;
     for (uint64_t i = 0, n = 8; i < nwords; i++, n += 8) {
         // Processing each 8-byte chunk of the rotated/padded string
-        h[i] = djb2tum(p[i], 1, nsdly, pmdly, nbtls, 0);
+        h[i] = djb2tum(p[i], 1 + !!rset, nsdly, pmdly, nbtls, 0);
         if ( rset && n >= ((uint64_t)1 << rset) ) {
             n = 0; djb2tum(0, 0, 0, 0, 0, 1);
         }
@@ -632,10 +639,10 @@ uint64_t get_nanos() {
 
     clock_gettime(CLOCK_MONOTONIC, &ts);
     if (!start) {
-        start = (uint64_t)ts.tv_sec * 1000000000L + ts.tv_nsec;
+        start = (uint64_t)ts.tv_sec * E9 + ts.tv_nsec;
         return start;
     }
-    return ((uint64_t)ts.tv_sec * 1000000000L + ts.tv_nsec) - start;
+    return ((uint64_t)ts.tv_sec * E9 + ts.tv_nsec) - start;
 }
 
 static inline void usage(const char *name, const char *cmdn, const uint8_t qlvl) {
@@ -680,7 +687,7 @@ int main(int argc, char *argv[]) {
     while (1) {
         int opt = getopt(argc, argv, "hvSZG:M:K:T:s:d:p:r:k:i:q");
         if(opt == 'S' || opt == 'Z') {
-            nsdly = 7; nblks = 16; nrdry = 31; ntsts = 8;
+            nsdly = 3; nblks = 16; nrdry = 31; ntsts = 8;
             rset = (opt == 'Z') ? 19 : 0;
             perrwrn();
         } else
