@@ -1,7 +1,7 @@
 /*
  * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2 license
  */
-#define VERSION "v0.4.4"
+#define VERSION "v0.4.5"
 /* Quick 2k test: cat uchaos.c  | ./chaos -T 2048 | ent
  * Boot log test: cat dmesg.txt | ./uchaos -S -M2 | ent
  *
@@ -336,9 +336,11 @@ static inline int nsleep(uint32_t ns) {
 static uint64_t djb2tum(uint64_t seed, uint8_t maxn, uint32_t nsdly,
     uint32_t pmdly, uint8_t nbtls, uint8_t rset)
 {
+    // This is the internal state of the engine
     static uint64_t  ncl = 0,  dmn = E9,  dmx = 0;
     static uint64_t tncl = 0, tdmn = E9, tdmx = 0;
     static uint64_t nexp = 0, evnt = 0,   avg = 0;
+    static uint64_t  jmn = E9, jmx = 0,  javg = 0;
 
     if( seed == DJB2VGET && (ncl || tncl) ) {
         DJB2UPDT
@@ -372,15 +374,15 @@ static uint64_t djb2tum(uint64_t seed, uint8_t maxn, uint32_t nsdly,
      */
 #define HSHSEED 5381
     static   uint64_t ohs = HSHSEED;
-    register uint64_t hsh = HSHSEED;
-    if( seed )        hsh = seed;
-
+    register uint64_t hsh = ohs;
 #if USE_GET_TIME
 #else
     static uint32_t cpuid, oid = -1;
 #endif
     uint64_t ts_tv_nsec, dff, dlt, ons = 0, ent = 0;
     uint8_t excp = 0;                // excp++ as uint8_t grants for convergence
+
+    if( seed ) hsh ^= seed;
 
 hashotloop:
 /** HASHING LOOP START  *******************************************************/
@@ -396,11 +398,13 @@ hashotloop:
         hsh = mm3ns32(hsh, ((uint64_t)cpuid << 16) | oid);
         // reschedule in the following !ons branch
         ons = 0;
+        nexp++;
     }
     oid = cpuid;
 #endif
     if( !ons ) {
         ons = ts_tv_nsec;
+        hsh = knuthmx(hsh^ons);
         goto reschedule;
     }
 
@@ -468,12 +472,11 @@ hashotloop:
     // 7. exceptions management ////////////////////////////////////////////////
 
     // copying with the VMs scheduler timings: continue made by an ASM jump
-    if( excp || hsh == ohs ) goto reschedule;
+    if( excp ) goto reschedule;
 
     // 8. preparation for the next round ///////////////////////////////////////
 
     if( --maxn ) {
-        ohs = hsh;
         ons = ts_tv_nsec;
 reschedule:
         sched_yield();
@@ -484,11 +487,9 @@ reschedule:
 
     // 9. finalising w/ a 32+1 bit mix /////////////////////////////////////////
 
-    dff = hsh;
-    hsh = mm3ns32(hsh, ohs);
-    ohs = dff;
+    ohs = mm3ns32(hsh, ohs);
 
-    return hsh;
+    return ohs;
 }
 
 static inline uint8_t trndbyte() {
