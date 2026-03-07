@@ -7,7 +7,7 @@
  *
  * Compile w/libc:      gcc uchaos.c -O3 --fast-math -Wall -o uchaos -s
  * Compile w/musl: musl-gcc uchaos.c -O3 --fast-math -Wall -o uchaos -s -static
- * Compile option: -D_USE_GET_RTSC, -D_USE_STOCHASTIC_BRANCHES, -D_USE_LINUX_RANDOM_H
+ * Compile option: -D_USE_GET_RTSC, -D_USE_LINUX_RANDOM_H
  *
  * Test with: ent, dieharder, PractRand RNG_test (compiled for Ubuntu 22.04 x64)
  *      drive.google.com/file/d/17ymBcxfO2pA8ET7T4ZxiiO2EYW6_F8Lu/view
@@ -277,47 +277,42 @@ static inline uint16_t mm3ns16(uint16_t ns, uint16_t p) {
 
 #include <sched.h>
 
+#if 0   /* RAF: unification by new rotations approach *********************** */
+#define STBX 0
 #define STBRSTR "stochastics branches"
-
-#define USE_STOCHASTIC_BRANCHES    // RAF: unification by new rotations approach
-#ifdef  USE_STOCHASTIC_BRANCHES
-
-  #define STBX 1
-  #define perrwrn()
-  #define FINAL_AVALANCHE_MLT 0xFF51AFD7ED558CCD
-  #define entropy(sz) ((sz << 2) - sz) // eq. to 3x (4-1)
-  static inline uint8_t  minmix8(uint8_t b) {
-      b *= (b & 1) ? 0x4d : 0x65;
-      b ^= ((b >> 3) | (b << 5));
-      return b;
-  }
-  static inline uint64_t knuthmx(uint64_t w) {
-      w  = rotl64(w, getprmx16(w));
-      w *= (w & 1) ? 0x9E3779B9 : 0x45d9f3b;
-      return w ^ ( (w >> 17) | (w << 47) ) ;
-  }
-  static inline uint64_t mm3ns32(uint64_t ks, uint64_t p) {
-      register uint64_t z = ks;
-      z = (p ^ (z >> 29)) * 0xff51afd7ed558ccdULL;
-      z = (z ^ (z >> 31)) * 0xc4ceb9fe1a85ec53ULL;
-      z = (z ^ (z >> 33)) ^ p << 33;
-      return z;
-  }
-
-#else
-
-  #define STBX 0
-  #define FINAL_AVALANCHE_MLT 0xc4ceb9fe1a85ec53ULL
-  #define perrwrn() perr("\nWARNING: "APPNAME" isn't compiled with "STBRSTR"\n\n")
-  #define mm3ns32(o,h) rotl64((h * FINAL_AVALANCHE_MLT) ^ (h >> 33), 13 + ((o & 0x1f) << 1))
-  #define entropy(sz) ((sz << 3) - sz) // eq. to 8x (8-1)
-  #define minmix8
-  #define knuthmx
-
-#endif
+#define FINAL_AVALANCHE_MLT 0xc4ceb9fe1a85ec53ULL
+#define perrwrn() perr("\nWARNING: "APPNAME" isn't compiled with "STBRSTR"\n\n")
+#define mm3ns32(o,h) rotl64((h * FINAL_AVALANCHE_MLT) ^ (h >> 33), 13 + ((o & 0x1f) << 1))
+#define entropy(sz) ((sz << 3) - sz) // eq. to 8x (8-1)
+#define minmix8
+#define knuthmx
+#else /* ******************************************************************** */
+#define STBX 1
+#define perrwrn()
+#define FINAL_AVALANCHE_MLT 0xFF51AFD7ED558CCD
+#define entropy(sz) ((sz << 2) - sz) // eq. to 3x (4-1)
+static inline uint8_t  minmix8(uint8_t b) {
+    b *= (b & 1) ? 0x4d : 0x65;
+    b ^= ((b >> 3) | (b << 5));
+    return b;
+}
+static inline uint64_t knuthmx(uint64_t iw) {
+    register uint64_t w = iw;
+    w  = rotl64(w, getprmx16(w));
+    w *= (w & 1) ? 0x9E3779B9 : 0x45d9f3b;
+    w ^= rotl64(w, (w & 2) ? 47 : 17);
+    return w;
+}
+static inline uint64_t mm3ns32(uint64_t ks, uint64_t p) {
+    register uint64_t z = ks;
+    z = (p ^ (z >> 29)) * 0xff51afd7ed558ccdULL;
+    z = (z ^ (z >> 31)) * 0xc4ceb9fe1a85ec53ULL;
+    z = (z ^ (z >> 33)) ^ (p << 33);
+    return z;
+}
+#endif /* ******************************************************************* */
 
 #define PRMX USE_PRIMES_2564
-#define STOCHASTIC_BRANCHES STBX
 #define pidx64(p) (uint64_t)pidx(p)
 #define pidx(p) ((uint32_t)(uintptr_t)(p))
 #define perr_app_info(a) { perr("%s %s%s%s%s%s", APPNAME, VERSION, STBX ? " w/sb"\
@@ -340,7 +335,7 @@ static uint64_t djb2tum(uint64_t seed, uint8_t maxn, uint32_t nsdly,
     static uint64_t  ncl = 0,  dmn = E9,  dmx = 0;
     static uint64_t tncl = 0, tdmn = E9, tdmx = 0;
     static uint64_t nexp = 0, evnt = 0,   avg = 0;
-    static uint64_t  jmn = E9, jmx = 0,  javg = 0;
+//  static uint64_t  jmn = E9, jmx = 0,  javg = 0;
 
     if( seed == DJB2VGET && (ncl || tncl) ) {
         DJB2UPDT
@@ -359,7 +354,6 @@ static uint64_t djb2tum(uint64_t seed, uint8_t maxn, uint32_t nsdly,
     if( !maxn ) return 0;
 
     // 0. hashing loop preparation /////////////////////////////////////////////
-
     /*
      * One of the most popular and efficient hash functions for strings in C is
      * the djb2 algorithm created by Dan Bernstein. It strikes a great balance
