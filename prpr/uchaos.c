@@ -615,64 +615,31 @@ archul_t *str2hsh(const uint8_t *str, uint32_t *size, uint32_t nsdly,
 {
     if (!str || !size) return NULL;
 
-    // 0. Calculate the string lenght
-    uint32_t len = *size;
-    if(!len) {
-        len = strlen((char *)str);
-        if (len == 0) return NULL;
-    }
-
-    // 1. Calculate padding and allocation
+    // 1. Calculate allocation
     // We need enough 64-bit blocks to cover n bytes.
-    uint32_t nwords = (len + ABz) >> ABL;
-#if 0
-    uint32_t nbytes = nwords << ABL;
+    uint32_t i, n = 0, nwords = (*size + ABz) >> ABL;
 
-    // 2. Allocate aligned memory for the processed string
-    uint8_t *strng = NULL;
-    if(posix_memalign((void **)&strng, ALGN, nbytes) || !strng) {
-        perror("posix_memalign");
-        return NULL;
-    }
-
-    // 3. Determine rotation offset using monotonic time
-    uint32_t k = trndbyte() % len;
-    // 4. Perform rotation into the new buffer
-    // Copy from k to end
-    memcpy(strng, str + k, len - k);
-    // Copy from beginning to k
-    //perr("k = %d, len = %ld \n", k, len);
-    if (k) memcpy(strng + (len - k), str, k);
-    // Padding with zeros
-    memset(&strng[len], 0, nbytes - len);
-#endif
-    // 5. Generate the words-sized array
+    // 2. Generate the words-sized array
     // We allocate a separate array for hashes if that was the intent, or we cast
     // the rotated string. Based on your code, you want a hash per 8-byte block.
     archul_t *h = NULL;
     if(posix_memalign((void **)&h, ALGN, nwords << ABL) || !h) {
         perror("posix_memalign");
-#if 0
-        free(strng);
-#endif
         return NULL;
     }
     *size = nwords;
-    //perr("len: %ld, wd: %ld\n", len, nwords);
 
-    // 6. Producing the hashing sequence
+    // 3. Producing the hashing sequence
     archul_t *p = (archul_t *)str;
-    for (archul_t i = 0, n = ABz+1; i < nwords; i++, n += ABz+1) {
+    for (i = 0; i < nwords; i++) {
+        n += ABz+1;
         // Processing each n-bytes chunk of the rotated/padded string
         h[i] = djb2tum(p[i], 1 + !!rset, nsdly, pmdly, nbtls, 0);
         if ( rset && n >= ((archul_t)1 << rset) ) {
             n = 0; djb2tum(0, 0, 0, 0, 0, 1);
         }
     }
-#if 0
-    // 7. free the string memory and return the hash
-    free(strng);
-#endif
+
     return h;
 }
 
