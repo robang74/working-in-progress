@@ -153,10 +153,10 @@ static inline uint8_t *bin2s64(uint8_t *buf, uint32_t nmax) {
 
 #ifdef __x86_64__
 #pragma message("Compiling for the 64-bit arch")
-#define ALGN 64
+#define ALGN 128         // host's CPU can have AVX or AVX2 instructions
 #else
 #pragma message("Compiling for the 32-bit arch")
-#define ALGN 64          // host can be a 64bit machine with pie32 elf
+#define ALGN  64         // host can be a 64bit machine with pie32 elf
 #endif
 
 #ifdef _USE_FUNCS_32
@@ -686,10 +686,20 @@ static inline uint32_t readbuf(int fd, uint8_t *buffer, uint32_t size, bool intr
     return tot;
 }
 
+#include <immintrin.h>
+
 static inline uint32_t readblocks(int fd, uint8_t *buf, uint32_t *nblks) {
     if(!nblks) return 0;
 
-    uint8_t inp[BLOCK_SIZE], fst[BLOCK_SIZE];
+    union block512_t {
+#if ALGN > 64
+            unsigned __int128  u4[ 4];
+#endif
+            uint64_t           u2[ 8];
+            uint32_t           u1[16];
+            uint8_t             u[BLOCK_SIZE];
+    } __attribute__((aligned(16))) inp, fst;
+
     // Reading max 8 blocks to limit the overflow at min 5 LSB bits,
     // considering that ASCII text is almost all chars in 32-122 range.
     // Anyway, pre-processing the input may help but it shouldn't matter
@@ -699,22 +709,22 @@ static inline uint32_t readblocks(int fd, uint8_t *buf, uint32_t *nblks) {
 
     // Input size 16 * 512 = 8K as relevant initial dmesg log before init
     for(i = 0; i < *nblks; i++) {
-        n = readbuf(fd, inp, BLOCK_SIZE, 0);
-        if(!n) break;
-        maxn = MAX(maxn, n);
+        n = readbuf(fd, inp.u, BLOCK_SIZE, 0);
+        if(!n) break; else maxn = MAX(maxn, n);
 
         if(i) {
             if(n < BLOCK_SIZE) {
-                memcpy(&inp[n], fst, BLOCK_SIZE-n);
+                memcpy(&inp.u[n], fst.u, BLOCK_SIZE-n);
                 n = BLOCK_SIZE;
             }
         } else {
             if(n == BLOCK_SIZE)
-                memcpy(fst, inp, BLOCK_SIZE);
+                memcpy(fst.u, inp.u, BLOCK_SIZE);
         }
+
         // mixing the input by 64-bit words
         n = (n + ABz) >> ABL;
-        archul_t *ip = (archul_t *)inp, *bp = (archul_t *)buf;
+        archul_t *ip = (archul_t *)inp.u, *bp = (archul_t *)buf;
         for (uint32_t a = 0; a < n; a++)
             bp[a] =  ip[a] ^ rotlbit(bp[a], a);
     }
