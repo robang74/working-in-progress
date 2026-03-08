@@ -1,7 +1,7 @@
 /*
  * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2 license
  */
-#define VERSION "v0.5.5.1"
+#define VERSION "v0.5.5.2"
 /* Quick 2k test: cat uchaos.c  | ./chaos -T 2048 | ent
  * Boot log test: cat dmesg.txt | ./uchaos -S -M2 | ent
  *
@@ -153,20 +153,27 @@ static inline uint8_t *bin2s64(uint8_t *buf, uint32_t nmax) {
 
 #ifdef __x86_64__
 #pragma message("Compiling for the 64-bit arch")
+#define ALGN 64
 #else
 #pragma message("Compiling for the 32-bit arch")
+#define ALGN 64          // host can be a 64bit machine with pie32 elf
 #endif
 
+#ifdef _USE_FUNCS_32
+#define USE_FUNCS_32 1
+#else
 #define USE_FUNCS_32 0
+#endif
 
 #if USE_FUNCS_32
+#pragma message("Using the 32-bit functions set")
 typedef uint32_t archul_t;
 typedef float    archdf_t;
 #define AB     5         //  5 -> 32
 #else
+#pragma message("Using the 64-bit functions set")
 typedef uint64_t archul_t;
 typedef double   archdf_t;
-#pragma message("Using the 64-bit functions set")
 #define AB     6         //  6 -> 64
 #endif
 
@@ -600,7 +607,7 @@ archul_t *str2hsh(const uint8_t *str, uint32_t *size, uint32_t nsdly,
 
     // 2. Allocate aligned memory for the processed string
     uint8_t *strng = NULL;
-    if(posix_memalign((void **)&strng, 64, nbytes) || !strng) {
+    if(posix_memalign((void **)&strng, ALGN, nbytes) || !strng) {
         perror("posix_memalign");
         return NULL;
     }
@@ -620,7 +627,7 @@ archul_t *str2hsh(const uint8_t *str, uint32_t *size, uint32_t nsdly,
     // We allocate a separate array for hashes if that was the intent, or we cast
     // the rotated string. Based on your code, you want a hash per 8-byte block.
     archul_t *h = NULL;
-    if(posix_memalign((void **)&h, 64, nwords << ABL) || !h) {
+    if(posix_memalign((void **)&h, ALGN, nwords << ABL) || !h) {
         perror("posix_memalign");
         free(strng);
         return NULL;
@@ -822,7 +829,7 @@ int main(int argc, char *argv[]) {
     // Counting time of running starts here, after parameters
     (void) get_nanos();
 
-    if (posix_memalign((void **)&str, 64, BLOCK_SIZE + ABz+1) || !str) {
+    if (posix_memalign((void **)&str, ALGN, BLOCK_SIZE + ABz+1) || !str) {
         perror("posix_memalign");
         return EXIT_FAILURE;
     }
