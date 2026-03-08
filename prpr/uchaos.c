@@ -1,13 +1,13 @@
 /*
  * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2 license
  */
-#define VERSION "v0.4.7"
+#define VERSION "v0.5.3"
 /* Quick 2k test: cat uchaos.c  | ./chaos -T 2048 | ent
  * Boot log test: cat dmesg.txt | ./uchaos -S -M2 | ent
  *
  * Compile w/libc:      gcc uchaos.c -O3 --fast-math -Wall -o uchaos -s
  * Compile w/musl: musl-gcc uchaos.c -O3 --fast-math -Wall -o uchaos -s -static
- * Compile option: -D_USE_GET_RTSC, -D_USE_LINUX_RANDOM_H
+ * Compile option: -D_USE_GET_RTSC (i686: -m32 -msse2), -D_USE_LINUX_RANDOM_H
  *
  * Test with: ent, dieharder, PractRand RNG_test (compiled for Ubuntu 22.04 x64)
  *      drive.google.com/file/d/17ymBcxfO2pA8ET7T4ZxiiO2EYW6_F8Lu/view
@@ -139,16 +139,19 @@
 #define BIT(v,n)  ( ( (v) >> (n) ) & 1 )
 #define perr(x...) fprintf(stderr, x)
 
+#if 0 // RAF: this code is not used anymore but remains for educational purpose
+      //      functionally is converted into a commentary section about uchaos.c
+      //
 #define ALPH64 "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz0123456789@\n"
-
 static inline uint8_t *bin2s64(uint8_t *buf, uint32_t nmax) {
     static const uint8_t c[] = ALPH64;
     for(register uint32_t i = 0; i < nmax; i++)
         buf[i] = c[ 0x3F & buf[i] ];
     return buf;
 }
+#endif
 
-#ifdef _USE_GET_RTSC
+#ifdef _USE_GET_RTSC /* ****************************************************** */
 #define USE_GET_TIME 0
 /*
  * Available only on x86 architecture, thus not portable
@@ -163,15 +166,43 @@ static inline uint8_t *bin2s64(uint8_t *buf, uint32_t nmax) {
  * in /init esecution at 0.1s which suggest that TSC isn't suitable, anyway.
  */
 #include <x86intrin.h>
-static inline uint64_t get_rdtsc_clock(uint32_t *pcpuid) {
-    _mm_lfence(); return __rdtscp(pcpuid);
+#ifndef __SSE2__
+#warning "SSE2 not detected (-msse2). Falling back to skew risky CPUID fence."
+static inline uint32_t __cpuid__slfence(void) {
+    uint32_t eax, ebx, ecx, edx;             // cpuid is a heavy-duty serializer
+    __asm__ __volatile__ ("cpuid" : "=a"(eax), "=b"(ebx),
+                                    "=c"(ecx), "=d"(edx)
+                                   : "a"(1)  : "memory");
+    return (ebx >> 24);
 }
-#else
-#define USE_GET_TIME 1
 #endif
+static inline uint64_t get_rdtsc_clock(uint32_t *pcpuid) {
+    __asm__ __volatile__ ("" ::: "memory");  // Compiler barrier: avoid reording
+#ifdef __SSE2__
+    _mm_lfence(); return __rdtscp(pcpuid);
+#else
+#warning "Instruction __rdtscp() not available. Falling back to __asm__ rdtsc."
+    uint32_t lsb, msb;
+    *pcpuid = __cpuid__slfence();
+    // non-atomic: scheduler can switch CPU here, it needs sched_setaffinity()
+    __asm__ __volatile__ ("rdtsc" : "=a" (lsb), "=d" (msb));
+    return ((uint64_t)msb << 32 | lsb);
+#endif
+}
+#else /* ******************************************************************** */
+#define USE_GET_TIME 1
+#endif /* ******************************************************************* */
 
-#define USE_PRIMES_2564 0
-#if     USE_PRIMES_2564
+#if 0 // RAF: this code is not used anymore but remains for educational purpose
+      //      functionally is converted into a commentary section about uchaos.c
+      //
+#define PRMX 0
+#define IDIV10(x) ((0xcccccccdULL * x) >> 35)
+static inline uint32_t imod10(uint32_t x) {
+    uint32_t a = IDIV10(x);
+    x -= (a << 3) + (a << 1);        // mult.: 10x = 8x + 2x
+    return x;
+}
 /*
  * This sequence of primes has a peculiar structure: x, y where x + y = 64.
  * Both members of each pair is a prime number, and by rotl64 are like x, -x.
@@ -179,21 +210,18 @@ static inline uint64_t get_rdtsc_clock(uint32_t *pcpuid) {
  */
 static const uint8_t primes64[20] = {  3, 61,  5, 59, 11, 53, 17, 47, 23, 41,
                                       19, 45, 29, 35, 31, 33, 13, 51,  7, 57 };
-
 static inline uint32_t getprmx10(uint32_t x) {
-    return primes64[x - ((x * 0xcccccccdULL) >> 35) * 10];
+    return primes64[imod10(x)];
 }
-
-static inline uint32_t getprmx16(uint32_t x) {
-    return primes64[ 2 + (x & 0x0f) ];
-}
-
 static inline uint32_t getprmx20(uint32_t x) {
-    x -= ((x * 0xcccccccdULL) >> 35) * 10
-    x +=  (x & 0x10) ? 10 : 0;
+    x = imod10(x) + (x & 0x10) ? 10 : 0;
     return primes64[x];
 }
+static inline uint32_t getprmx16(uint32_t x) {
+    return primes64[ 2 + (x & 0x1f) ];
+}
 #else
+#define PRMX 0
 #define getprmx16(w) (5 + (((w) & 0x1f) << 1))
 #endif
 
@@ -235,7 +263,9 @@ static inline uint64_t getnstime(uint32_t *pcpuid) {
     return ns;
 }
 
-#if 0
+#if 0 // RAF: this code is not used anymore but remains for educational purpose
+      //      functionally is converted into a commentary section about uchaos.c
+      //
 /*
  * This function isn't 32bit fast but a variant of the original Park-Miller
  * which has a 2^31-2 period. It is useful to introduce in the uchaos output
@@ -282,7 +312,10 @@ static inline uint16_t mm3ns16(uint16_t ns, uint16_t p) {
 
 #include <sched.h>
 
-#if 0   /* RAF: unification by new rotations approach *********************** */
+#if 0 // RAF: this code is not used anymore but remains for educational purpose
+      //      functionally is converted into a commentary section about uchaos.c
+      //
+      /* RAF: unificated by new rotations approach ************************** */
 #define STBX 0
 #define STBRSTR "stochastics branches"
 #define FINAL_AVALANCHE_MLT 0xc4ceb9fe1a85ec53ULL
@@ -312,19 +345,17 @@ static inline uint64_t mm3ns32(uint64_t ks, uint64_t p) {
     register uint64_t z = ks;
     z = (p ^ (z >> 29)) * 0xff51afd7ed558ccdULL;
     z = (z ^ (z >> 31)) * 0xc4ceb9fe1a85ec53ULL;
+    if( p != ks )
     z = (z ^ (z >> 33)) ^ (p << 33);
     return z;
 }
 #endif /* ******************************************************************* */
 
-#define PRMX USE_PRIMES_2564
 #define pidx64(p) (uint64_t)pidx(p)
 #define pidx(p) ((uint32_t)(uintptr_t)(p))
-#define perr_app_info(a) { perr("%s %s%s%s%s%s", APPNAME, VERSION, STBX ? " w/sb"\
-      : "", PRMX ? "" : " !/pr", USE_GET_TIME ? "" : " rtcs", (a) ? "\n" : ""); }
-#define DJB2UPDT { tncl += ncl; tdmx = MAX(dmx, tdmx); tdmn = MIN(dmn, tdmn); }
-#define DJB2RSET { DJB2UPDT; dmn = E9, dmx = 0, ncl = 0; }
-#define PMDLY2NS ( ( ( dmn * pmdly ) + 127 ) >> 8 )
+#define perr_app_info(a) { perr("%s%s %s%s%s%s%s", (a)?"":"\n", APPNAME, VERSION,\
+        STBX?" w/sb":"", PRMX?"":" !/pr", USE_GET_TIME?"":" rtcs", (a)?"\n":""); }
+#define PMDLY2NS(x) ( ( ( x * pmdly ) + 127 ) >> 8 )
 #define DJB2VGET ( (uint64_t)-1 )
 
 static inline int nsleep(uint32_t ns) {
@@ -333,134 +364,137 @@ static inline int nsleep(uint32_t ns) {
     return ret;
 }
 
-typedef double df;
+typedef struct djb2tum_status {
+    uint64_t  ncl,  dmn,  dmx;
+    uint64_t tncl, tdmn, tdmx;
+    uint64_t ctot,  jmn,  jmx;
+    uint64_t evnt, nexp, javg;
+    uint64_t  avg,  oid, pmns, ohs;
+} djb2_t;
+
+/*
+ * One of the most popular and efficient hash functions for strings in C is
+ * the djb2 algorithm created by Dan Bernstein. It strikes a great balance
+ * between speed and low collision rates. Great for text.
+ *
+ * 5381              Prime number choosen by Dan Bernstein, as 1010100000101
+ *                   empirically is one of the best for English words text.
+ * Alternatives:
+ *
+ * 16777619               The FNV-1 offset basis (32-bit).
+ * 14695981039346656037	  The FNV-1 offset basis (64-bit).
+ */
+#define HSHSEED 5381
+
+#define CPUSKEW (1<<29)   // the biggest 2^n before 1E9
+
+#define djb2tum_status_init { 0,-1,0, 0,-1,0, 0,-1,0, 0,-1,0, 0,-1,0, HSHSEED }
 
 static uint64_t djb2tum(uint64_t seed, uint8_t maxn, uint32_t nsdly,
     uint32_t pmdly, uint8_t nbtls, uint8_t rset)
 {
     // This is the internal state of the engine
-    static uint64_t  ncl = 0,  dmn = -1,  dmx = 0;
-    static uint64_t tncl = 0, tdmn = -1, tdmx = 0;
-    static uint64_t ctot = 0,  jmn = -1,  jmx = 0;
-    static uint64_t evnt = 0, nexp = -1;
-    static uint64_t javg = 0,  avg =  0;
+    static djb2_t s = djb2tum_status_init;
 
-    if( seed == DJB2VGET && (ncl || tncl) ) {
-        DJB2UPDT
-        double mean = (double)avg  / tncl;
-        double jean = (double)javg / tncl;
-        perr("\nLatency: %.0f <%.1lf> %.1lfK ns, %.3lgK w/ ev:%.0f, ex:%5.2lf%%\n",
-            (df)tdmn, mean, (df)tdmx/E3, (df)tncl/E3, (df)evnt, 100*(df)nexp/ctot);
-        perr( "\\Ratios: %.2lf <avg=1U> %.2lf, min=1U <%.2lf> %.2lf, %.03lf\n",
-            (df)tdmn/mean, (df)tdmx/mean, mean/tdmn, (df)tdmx/tdmn, (df)(mean-tdmn)/jean);
-        perr(  "Jitters: %.0f <%.1lf> %.0f ns w/ r:%.03lg, %.3lgK r:%.03lg\n",
-            (df)jmn, jean, (df)jmx, (df)jmx/jean, (df)ctot/E3, (df)ctot/tncl);
+    if( s.ncl || s.tncl || rset || seed == DJB2VGET ) {
+        s.tncl += s.ncl; s.ncl = 0;
+        s.tdmx  = MAX(s.dmx, s.tdmx);
+        s.tdmn  = MIN(s.dmn, s.tdmn);
+        s.pmns  = PMDLY2NS  (s.tdmn);
     }
 
-    if( rset ) DJB2RSET;
+    if( rset ) { s.dmn = -1, s.dmx = 0, s.ncl = 0; };
 
-    if( seed == DJB2VGET ) return PMDLY2NS;
+    // The best practice is to share a copy not the internal state
+    if( seed == DJB2VGET ) return (uintptr_t)&s;
 
     if( !maxn ) return 0;
 
-    // 0. hashing loop preparation /////////////////////////////////////////////
-    /*
-     * One of the most popular and efficient hash functions for strings in C is
-     * the djb2 algorithm created by Dan Bernstein. It strikes a great balance
-     * between speed and low collision rates. Great for text.
-     *
-     * 5381              Prime number choosen by Dan Bernstein, as 1010100000101
-     *                   empirically is one of the best for English words text.
-     * Alternatives:
-     *
-     * 16777619               The FNV-1 offset basis (32-bit).
-     * 14695981039346656037	  The FNV-1 offset basis (64-bit).
-     */
-#define HSHSEED 5381
-    static   uint64_t ohs = HSHSEED;
-    register uint64_t hsh = ohs;
-#if USE_GET_TIME
-#else
-    static uint32_t cpuid, oid = -1;
-#endif
-    uint64_t ts_tv_nsec, dff, dlt, ons = 0, ent = 0;
+    // 0. hashing loop preparation, p.1 ////////////////////////////////////////
+
+    uint64_t tm_4s_nsec, dff, dlt, ons = 0, ent = 0;
+    register uint64_t hsh = s.ohs;
     uint8_t excp = 0;                // excp++ as uint8_t grants for convergence
 
     if( seed ) hsh ^= seed;
 
 hashotloop:
 /** HASHING LOOP START  *******************************************************/
+    // 0. hashing loop preparation, p.2 ////////////////////////////////////////
+
+    if(ent) ent ^= rotl64(ent, getprmx16(hsh));
 
     // 1. ns latency time retrievement /////////////////////////////////////////
 
 #if USE_GET_TIME
-    ts_tv_nsec = getnstime( NULL ) >> nbtls;
+    tm_4s_nsec = getnstime( NULL ) >> nbtls;
 #else
-    ts_tv_nsec = getnstime(&cpuid) >> nbtls;
-    if( cpuid != oid && oid != -1 ) {
+    uint32_t cpuid;
+    tm_4s_nsec = getnstime(&cpuid) >> nbtls;
+    if( cpuid != s.oid && s.oid != -1 ) {
         // Knuth, based on gold section seeded by CPU ids event idx
-        hsh = mm3ns32(hsh, ((uint64_t)cpuid << 16) | oid);
+        hsh = mm3ns32(hsh, ((uint64_t)cpuid << 16) | s.oid);
         // reschedule in the following !ons branch
         ons = 0;
-        nexp++;
+        s.nexp++;
     }
-    oid = cpuid;
+    s.oid = cpuid;
 #endif
     if( !ons ) {
-        ons = ts_tv_nsec;
+        ons = tm_4s_nsec;
         hsh = knuthmx(hsh^ons);
         goto reschedule;
     }
 
     // 2. latency calculation //////////////////////////////////////////////////
 
-    dlt = ts_tv_nsec - ons;       // within 4s is fine, with RTCS is always fine
-    if( !dlt ) goto reschedule;
-    if( dmn == -1 ) dmn = dlt;
+    dlt = tm_4s_nsec - ons;       // within 4s is fine, with RTCS is always fine
+    if( !dlt || dlt > CPUSKEW ) goto reschedule;
+    if( s.dmn == -1 ) { s.dmn = dlt; goto reschedule; }
 
     // 3. internal state update ////////////////////////////////////////////////
 
     // dmn calculation is mandatory for stochastics bi-forkation turns
-    if( dlt < dmn ) {
-        dff = dmn - dlt; dmn = dlt;
-        ent ^= -dff ^ dmn;
-        evnt++;
+    if( dlt < s.dmn ) {
+        dff = s.dmn - dlt; s.dmn = dlt;
+        ent ^= -dff ^ s.dmn;
+        s.evnt++;
     } else
     // dmx calculation can be omited but doing ns*=0x4d anyway
-    if( dlt > dmx ) {
-        dff = dlt - dmn; dmx = dlt;
-        ent ^= dff ^ -dmx;
-        evnt++;
+    if( dlt > s.dmx ) {
+        dff = dlt - s.dmn; s.dmx = dlt;
+        ent ^= dff ^ -s.dmx;
+        s.evnt++;
     } else {
-        dff = dlt - dmn;
-        ent ^= ~dff ^ dmx;
+        dff = dlt - s.dmn;
+        ent ^= ~dff ^ s.dmx;
     }
-    ctot++;
+    if( !dff ) { hsh = knuthmx(hsh); goto reschedule; }
 
     // 4. jittering calculation ////////////////////////////////////////////////
 
     // dff is jittering for the exeption manager activation
-    if( dff < nsdly + (pmdly ? PMDLY2NS : 1) + excp ) {
+    if( dff < nsdly + (pmdly ? PMDLY2NS(s.dmn) : 1) + excp ) {
         excp += 4;                   // increasing excp and accounting for dff
-        nexp++;
+        s.nexp++;
     } else {
         // min,max jittering can be ommited
-        if( jmn == -1 ) jmn = dff;
+        if( s.jmn == -1 ) s.jmn = dff;
         else
-        if( dff < jmn ) jmn = dff;
-        if( dff > jmx ) jmx = dff;
+        if( dff < s.jmn ) s.jmn = dff;
+        if( dff > s.jmx ) s.jmx = dff;
         // avg calculation can be ommitted
-        avg += dlt; javg += dff; ncl++;
+        s.avg += dlt; s.javg += dff; s.ncl++;
         // Knuth, based on gold section seeded by 1E-3 ~ 1E-4 event idx
-        if(excp) hsh = mm3ns32(hsh, ons);
+        if( excp ) hsh = mm3ns32(hsh, ons);
         excp = 0;
     }
 
     // 5. entropy distillation /////////////////////////////////////////////////
 
-    ent ^= rotl64 (ts_tv_nsec, 13);
-    ent ^= rotl64 (dlt       ,  7);
-    ent  = knuthmx(ent       ^avg);
+    ent ^= dlt        <<   7 ;       // 1st derivative of time
+    ent ^= tm_4s_nsec <<  13 ;       // current monotonic time
+    ent  = knuthmx(ent ^ dff);       // 2nd derivative of time
 
     // 6. macro-mix in djb2-style //////////////////////////////////////////////
     /*
@@ -474,29 +508,30 @@ hashotloop:
     // 7. entropy injection in hsh /////////////////////////////////////////////
 
     // it consumes entropy, and does hash the another rotation
-    hsh = rotl64(hsh ^ ((ent >> 5) << 3), getprmx16(ent));
+    hsh ^= rotl64(hsh, getprmx16(ent));
 
     // 8. exceptions management ////////////////////////////////////////////////
 
     // copying with the VMs scheduler timings: continue made by an ASM jump
-    if( excp ) goto reschedule;
+    s.ctot++; if( excp ) goto reschedule;
 
     // 9. preparation for the next round ///////////////////////////////////////
 
     if( --maxn ) {
-        ons = ts_tv_nsec;
+        ons  = tm_4s_nsec;
 reschedule:
         sched_yield();
         goto hashotloop;             // a loop made by two ASM jumps
     }
 
 /** HASHING LOOP CLOSE  *******************************************************/
-
     // X. finalising w/ a 32+1 bit mix /////////////////////////////////////////
 
-    ohs = mm3ns32(hsh, ohs);
+    ent = hsh;                       // forget the entropy mixed in hash
+    hsh = mm3ns32(hsh, s.ohs);       // whitening the hash before deliver
+    s.ohs = ent;                     // keep the hashing internal state
 
-    return ohs;
+    return hsh;
 }
 
 static inline uint8_t trndbyte() {
@@ -681,8 +716,8 @@ static inline void usage(const char *name, const char *cmdn, const uint8_t qlvl)
 
 #define APPNAME "uChaos"
 #define STCX STOCHASTIC_BRANCHES
-#define perrprms(s,p) perr("%s s:%d, q:%d, p:%d%%:%dns, d:%d, r:%d, i:%d, Z:%d\n\n",\
-                      s, nbtls, quiet, pmdly, p, nsdly, nrdry, nblks, rset)
+#define perrprms(s,p) perr("%s s:%u, q:%u, d+p(%u):%u+%u ns, r:%u, i:%u, Z:%u\n\n",\
+                      s, nbtls, quiet, pmdly, nsdly, p?p:1, nrdry, nblks, rset)
 
 int main(int argc, char *argv[]) {
     struct rand_pool_info_buf entrnd;
@@ -761,18 +796,17 @@ int main(int argc, char *argv[]) {
         else { free(hsh); } hsh = NULL;
     }
 
-    double avgbc = 0, avgmx = 0, avgmn = 256;
+    double   avgbc = 0, avgmx = 0, avgmn = 256;
     uint64_t bic = 0, max = 0, min = 256, avg = 0;
     uint64_t nk = 0, nt = 0, nx = 0, nn = 0, mt = 0;
 
     if(quiet < 2) {
         perr_app_info(0);
         if(prsts) { // RAF, TODO: dealing with size one.
-            perr("; repetitions: ");
             if(nblks < 2) {
                 perr("too short input, try longer!\n\n");
                 prsts = 0;
-            }
+            } else perr("; collision: ");
         } else perrprms("", -1);
     }
 
@@ -844,33 +878,53 @@ int main(int argc, char *argv[]) {
     if(!prsts) return 0;
 
     uint64_t rt = get_nanos();
-    perr("%s\n", nk ? ", status KO" : "0, status OK");
-    perr("\n");
+    perr("%s\n", nk ? ", status: KO" : "no, status: OK");
 
-    perr("Tests: %u w/ duplicates %.0lf over ", ntsts, (df)nk);
+    // print statistics ////////////////////////////////////////////////////////
+
+    typedef double df;
+
+    djb2_t *s = (djb2_t *)(uintptr_t)djb2tum(DJB2VGET, 0, 0, pmdly, 0, 0);
+    perrprms("Setting:", (uint32_t)(s ? s->pmns : 0));
+
+    perr("Running %u: ", ntsts);
     if((nt >> 3) > E6)
-        perr("%.2lfM hashes (%.4lg ppm)\n", (double)nt/E6, (double)E6*nk/nt);
+        perr("%.2lfMH (%.2lfGB)",  (df)nt/(1ULL<<20), (df)nt/(1ULL<<27));
     else
-        perr("%.1lfK hashes (%.4lg ppm)\n", (double)nt/E3, (double)E6*nk/nt);
+        perr("%.1lfKH (%.1lfMB)",  (df)nt/(1ULL<<10), (df)nt/(1ULL<<17));
+    perr(" w/ %.0lf duplicates\n", (df)nk);
 
     avgbc /= ntsts;
-    double bic_nx_absl = (double)bic / nx;
-    double bic_nx = (double)100 / 64 * bic_nx_absl;
-    #define devppm(v,a) ( ((double)v-a) * E6 / a )
+    df bic_nx_absl = (df)bic / nx;
+    df bic_nx = (df)100 / 64 * bic_nx_absl;
+
+    #define devppm(v,a) ( ((df)v-a) * E6 / a )
 
     perr("Hamming <weight>: %.4lf%% ~ 50%% by (%+.4lg ppm)\n",
         bic_nx, devppm(bic_nx, 50));
     perr("Hamming distance: %.0lf <%.6lf> %.0lf over %.4lgK XORs\n",
-        (double)min, bic_nx_absl, (double)max, (double)nx/E3);
+        (df)min, bic_nx_absl, (df)max, (df)nx/E3);
     perr("Hamming dist/avg: %.4lf < 1U:32 %+.4lg ppm > %.4lf\n",
         avgmn/bic_nx_absl, devppm(bic_nx_absl, 32), avgmx/bic_nx_absl);
 
-    perr("\n");
-    perr("Perform: exec %.3lgs, %.3lg MB/s; hash %.3lgs, %.4lg KH/s",
-        (double)rt/E9, (double)E6*nt/(rt<<7), (double)mt/E9, (double)E6*nt/mt);
+    perr("\nPerform: exec %.3lgs, %.3lg MB/s; hash %.3lgs, %.4lg KH/s",
+        (df)rt/E9, (df)E6*nt/(rt<<7), (df)mt/E9, (df)E6*nt/mt);
 
-    uint32_t pmns = (uint32_t)djb2tum(DJB2VGET, 0, 0, pmdly, 0, 0);
-    perrprms("Setting:", pmns);
+    df mean = (df)s->avg  / s->tncl;
+    df jean = (df)s->javg / s->tncl;
+
+    #define dk(a,b,c) ( (1.0 - (df)(a-b)/c) * E3 )
+
+    perr("\nLatency: %.0f <%.01lf> %.01lfK ns, %.3lgK w/ ev:%.0f, ex:%5.02lf%%\n",
+        (df)s->tdmn, mean, (df)s->tdmx/E3, (df)s->tncl/E3, (df)s->evnt,
+            100.0*(df)s->nexp/s->ctot);
+    perr( "`Ratios: %.02lf <avg=1U> %.02lf, min=1U <%.02lf> %.01lf, %.01lfb\n",
+        (df)s->tdmn/mean, (df)s->tdmx/mean, mean/s->tdmn, (df)s->tdmx/s->tdmn,
+            log2(mean - s->tdmn));
+    perr(  "Jitters: %.0f <%.01lf> %.0f ns w/ %.03lgx, %.0lf:1K, %+.01lf‰\n",
+        (df)s->jmn, jean, (df)s->jmx, (df)s->jmx/jean, dk(s->ctot, s->tncl, s->ctot),
+            dk(mean, s->tdmn, jean));
+    perr("\n");
 
     return 0; // exit() do free()
 }
