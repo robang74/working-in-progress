@@ -456,7 +456,7 @@ static archul_t djb2tum(archul_t seed, uint8_t maxn, uint32_t nsdly,
 
     // 0. hashing loop preparation, p.1 ////////////////////////////////////////
 
-    archul_t tm_4s_nsec, dff, dlt, ons = 0, ent = 0;
+    archul_t __attribute__((aligned(8))) tm_4s_nsec, dff, dlt, ons = 0, ent = 0;
     register archul_t hsh = s.ohs;
     uint8_t excp = 0;                // excp++ as uint8_t grants for convergence
 
@@ -687,8 +687,9 @@ static inline uint32_t readbuf(int fd, uint8_t *buffer, uint32_t size, bool intr
 }
 
 #include <immintrin.h>
-
+#if ALGN > 64
 typedef unsigned __int128 uint128_t;
+#endif
 typedef union {
 #if ALGN > 64
     uint128_t uh[ 32];
@@ -731,7 +732,7 @@ static inline uint32_t readblocks(int fd, uint8_t *buf, uint32_t *nblks) {
 #else
         // mixing the input by  64-bit words
         n = (n + ABz) >> ABL;
-        archul_t *ip = (archul_t *)inp.u, *bp = (archul_t *)buf;
+        archul_t *ip = (archul_t *)inp.uc, *bp = (archul_t *)buf;
         for (a = 0; a < n; a++)
             bp[a] =  ip[a] ^ rotlbit(bp[a], a);
 #endif
@@ -787,7 +788,7 @@ static inline void usage(const char *name, const char *cmdn, const uint8_t qlvl)
 #define perrprms(s,p) perr("%s s:%u, q:%u, d+p(%u):%u+%u ns, r:%u, i:%u, Z:%u\n\n",\
                       s, nbtls, quiet, pmdly, nsdly, p?p:1, nrdry, nblks, rset)
 
-typedef double df;
+typedef double __attribute__((aligned(8))) df;
 
 int main(int argc, char *argv[]) {
     struct rand_pool_info_buf entrnd;
