@@ -691,9 +691,9 @@ static inline uint32_t readbuf(int fd, uint8_t *buffer, uint32_t size, bool intr
 typedef unsigned __int128 uint128_t;
 #endif
 typedef union {
-#if ALGN > 64
+    #if ALGN > 64
     uint128_t uh[ 32];
-#endif
+    #endif
     uint64_t  u8[ 64];
     uint32_t  u4[128];
     uint8_t   uc[BLOCK_SIZE];
@@ -723,18 +723,21 @@ static inline uint32_t readblocks(int fd, uint8_t *buf, uint32_t *nblks) {
             if(n == BLOCK_SIZE)
                 memcpy(fst.uc, inp.uc, BLOCK_SIZE);
         }
+        block512_t *bp = (block512_t *)buf;
 #if ALGN > 64
         // mixing the input by 128-bit words
         n = (n + 15) >> 4;
-        block512_t *bp = (block512_t *)buf;
         for (a = 0; a < n; a++)
             bp->uh[a] ^= inp.uh[a];
 #else
         // mixing the input by  64-bit words
         n = (n + ABz) >> ABL;
-        archul_t *ip = (archul_t *)inp.uc, *bp = (archul_t *)buf;
         for (a = 0; a < n; a++)
-            bp[a] =  ip[a] ^ rotlbit(bp[a], a);
+        #if USE_FUNCS_32
+            bp->u4[a] ^= inp.u4[a];
+        #else
+            bp->u8[a] ^= inp.u8[a];
+        #endif
 #endif
     }
     *nblks = i;
