@@ -899,7 +899,7 @@ int main(int argc, char *argv[]) {
     perr( "`Ratios: %.02lf <avg=1U> %.02lf, min=1U <%.02lf> %.01lf, %.01lfb\n",
         (df)s->tdmn/mean, (df)s->tdmx/mean, mean/s->tdmn, (df)s->tdmx/s->tdmn,
             log2(mean - s->tdmn));
-    perr(  "Jitters: %.0f <%.01lf> %.0f ns w/ %.04lgx, %.0lf:1K, %+.01lf‰\n",
+    perr(  "Jitters: %.0f <%.01lf> %.0f ns w/ %.03lgx, %.0lf:1K, %+.01lf‰\n",
         (df)s->jmn, jean, (df)s->jmx, (df)s->jmx/jean, dk(s->ctot, s->tncl, s->ctot),
             dk(mean, s->tdmn, jean));
     perr("\n");
