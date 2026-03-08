@@ -891,7 +891,7 @@ int main(int argc, char *argv[]) {
     df mean = (df)s->avg  / s->tncl;
     df jean = (df)s->javg / s->tncl;
 
-    #define dk(a,b,c) ( (df)1 - ((df)(a-b)/c)*E3 )
+    #define dk(a,b,c) ( (1.0 - (df)(a-b)/c) * E3 )
 
     perr("\nLatency: %.0f <%.01lf> %.01lfK ns, %.3lgK w/ ev:%.0f, ex:%5.02lf%%\n",
         (df)s->tdmn, mean, (df)s->tdmx/E3, (df)s->tncl/E3, (df)s->evnt,
