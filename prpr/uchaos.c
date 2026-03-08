@@ -1,13 +1,13 @@
 /*
  * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2 license
  */
-#define VERSION "v0.5.2"
+#define VERSION "v0.5.3"
 /* Quick 2k test: cat uchaos.c  | ./chaos -T 2048 | ent
  * Boot log test: cat dmesg.txt | ./uchaos -S -M2 | ent
  *
  * Compile w/libc:      gcc uchaos.c -O3 --fast-math -Wall -o uchaos -s
  * Compile w/musl: musl-gcc uchaos.c -O3 --fast-math -Wall -o uchaos -s -static
- * Compile option: -D_USE_GET_RTSC, -D_USE_LINUX_RANDOM_H
+ * Compile option: -D_USE_GET_RTSC (i686: -m32 -msse2), -D_USE_LINUX_RANDOM_H
  *
  * Test with: ent, dieharder, PractRand RNG_test (compiled for Ubuntu 22.04 x64)
  *      drive.google.com/file/d/17ymBcxfO2pA8ET7T4ZxiiO2EYW6_F8Lu/view
@@ -151,7 +151,7 @@ static inline uint8_t *bin2s64(uint8_t *buf, uint32_t nmax) {
 }
 #endif
 
-#ifdef _USE_GET_RTSC
+#ifdef _USE_GET_RTSC /* ****************************************************** */
 #define USE_GET_TIME 0
 /*
  * Available only on x86 architecture, thus not portable
@@ -166,12 +166,32 @@ static inline uint8_t *bin2s64(uint8_t *buf, uint32_t nmax) {
  * in /init esecution at 0.1s which suggest that TSC isn't suitable, anyway.
  */
 #include <x86intrin.h>
-static inline uint64_t get_rdtsc_clock(uint32_t *pcpuid) {
-    _mm_lfence(); return __rdtscp(pcpuid);
+#ifndef __SSE2__
+#warning "SSE2 not detected (-msse2). Falling back to skew risky CPUID fence."
+static inline uint32_t __cpuid__slfence(void) {
+    uint32_t eax, ebx, ecx, edx;             // cpuid is a heavy-duty serializer
+    __asm__ __volatile__ ("cpuid" : "=a"(eax), "=b"(ebx),
+                                    "=c"(ecx), "=d"(edx)
+                                   : "a"(1)  : "memory");
+    return (ebx >> 24);
 }
-#else
-#define USE_GET_TIME 1
 #endif
+static inline uint64_t get_rdtsc_clock(uint32_t *pcpuid) {
+    __asm__ __volatile__ ("" ::: "memory");  // Compiler barrier: avoid reording
+#ifdef __SSE2__
+    _mm_lfence(); return __rdtscp(pcpuid);
+#else
+#warning "Instruction __rdtscp() not available. Falling back to __asm__ rdtsc."
+    uint32_t lsb, msb;
+    *pcpuid = __cpuid__slfence();
+    // non-atomic: scheduler can switch CPU here, it needs sched_setaffinity()
+    __asm__ __volatile__ ("rdtsc" : "=a" (lsb), "=d" (msb));
+    return ((uint64_t)msb << 32 | lsb);
+#endif
+}
+#else /* ******************************************************************** */
+#define USE_GET_TIME 1
+#endif /* ******************************************************************* */
 
 #if 0 // RAF: this code is not used anymore but remains for educational purpose
       //      functionally is converted into a commentary section about uchaos.c
@@ -366,6 +386,8 @@ typedef struct djb2tum_status {
  */
 #define HSHSEED 5381
 
+#define CPUSKEW (1<<29)   // the biggest 2^n before 1E9
+
 #define djb2tum_status_init { 0,-1,0, 0,-1,0, 0,-1,0, 0,-1,0, 0,-1,0, HSHSEED }
 
 static uint64_t djb2tum(uint64_t seed, uint8_t maxn, uint32_t nsdly,
@@ -416,7 +438,7 @@ hashotloop:
         ons = 0;
         s.nexp++;
     }
-    oid = cpuid;
+    s.oid = cpuid;
 #endif
     if( !ons ) {
         ons = tm_4s_nsec;
@@ -427,7 +449,7 @@ hashotloop:
     // 2. latency calculation //////////////////////////////////////////////////
 
     dlt = tm_4s_nsec - ons;       // within 4s is fine, with RTCS is always fine
-    if( !dlt ) goto reschedule;
+    if( !dlt || dlt > CPUSKEW ) goto reschedule;
     if( s.dmn == -1 ) { s.dmn = dlt; goto reschedule; }
 
     // 3. internal state update ////////////////////////////////////////////////
