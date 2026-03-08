@@ -1,7 +1,7 @@
 /*
  * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2 license
  */
-#define VERSION "v0.5.5.3"
+#define VERSION "v0.5.6"
 /* Quick 2k test: cat uchaos.c  | ./chaos -T 2048 | ent
  * Boot log test: cat dmesg.txt | ./uchaos -S -M2 | ent
  *
@@ -360,38 +360,60 @@ static inline uint16_t mm3ns16(uint16_t ns, uint16_t p) {
 #else /* ******************************************************************** */
 #define STBX 1
 #define perrwrn()
-#define FINAL_AVALANCHE_MLT 0xFF51AFD7ED558CCD
 #define entropy(sz) ((sz << 2) - sz) // eq. to 3x (4-1)
 static inline uint8_t  minmix8(uint8_t b) {
     b *= (b & 1) ? 0x4d : 0x65;
     b ^= ((b >> 3) | (b << 5));
     return b;
 }
+/*
+ * RAF, interesting sequence by a recursive function
+ *
+static inline archul_t rfv(archul_t x) { x >>= USE_FUNCS_32; x += !(x&1); return x; }
+#define rfc(x) ((x >> USE_FUNCS_32) + !((x >> USE_FUNCS_32)&1))
+#define ABT 47
+// rf(ABT) 47,23
+// rf(rf(ABT)) 23,13
+// rf(rf(rf(ABT))) 13,7
+// rf(rf(rf(rf(ABT)))) 7,3
+// rf(rf(rf(rf(rf(ABT))))) 3,1
+ */
+#if USE_FUNCS_32
+#define murmul1 0x85ebca6b
+#define murmul2 0xc2b2ae35
+#define murmul3 0x045d9f3b
+#define rot1    23
+#define rot2    17
+#define rot3     7
+#else
+#define murmul1 0xff51afd7ed558ccdULL
+#define murmul2 0xc4ceb9fe1a85ec53ULL
+#define murmul3 0x9E3779B9045d9f3bULL
+#define rot1    47
+#define rot2    17
+#define rot3    13
+#endif
 static inline archul_t knuthmx(archul_t iw) {
     register archul_t w = iw;
     w  = rotlbit(w, getprmx16(w));
-    w *= (w & 1) ? 0x9E3779B9 : 0x45d9f3b;
-#if USE_FUNCS_32
-    w ^= rotlbit(w, (w & 2) ? 23 : 17);
-#else
-    w ^= rotlbit(w, (w & 2) ? 47 : 17);
-#endif
+    w *= (w & 1) ? 0x9E3779B9 : 0x045d9f3b;
+    w ^= rotlbit(w, (w & 2) ? (47 >> USE_FUNCS_32) : 17);
     return w;
 }
 static inline archul_t murmux3(archul_t ks, archul_t p) {
-    register archul_t z = ks;
-#if USE_FUNCS_32
-    z = (p ^ (z >> 13)) * 0x85ebca6b;
-    z = (z ^ (z >> 15)) * 0xc2b2ae35;
-    if ( p != ks )
-    z = (z ^ (z >> 17)) ^ (p << 13);
+#if 0
+    register archul_t z = knuthmx(~ks);
+    z = (p  ^ (z >> (ABx-2))) * murmul1;
+    z = (ks ^ (z <<  ABx   )) * murmul2;
+    z = (z  ^ (z >> (ABx+2))) * murmul3;
+    return rotlbit(z, getprmx16(p>>2));
 #else
-    z = (p ^ (z >> 29)) * 0xff51afd7ed558ccdULL;
-    z = (z ^ (z >> 31)) * 0xc4ceb9fe1a85ec53ULL;
-    if ( p != ks )
-    z = (z ^ (z >> 33)) ^ (p << 29);
-#endif
+    register archul_t z = ks;
+    z =  p ^ ((z >> (ABx-2)) * murmul1);
+    z = (z ^ ( z <<  ABx  )) * murmul2;
+    z =  z ^ ( z >> (ABx+2));
     return z;
+#endif
 }
 
 #endif /* ******************************************************************* */
@@ -536,8 +558,8 @@ hashotloop:
 
     // 5. entropy distillation /////////////////////////////////////////////////
 
-    ent ^= dlt        <<   7 ;       // 1st derivative of time
-    ent ^= tm_4s_nsec <<  13 ;       // current monotonic time
+    ent ^= dlt        << ABz ;       // 1st derivative of time
+    ent ^= tm_4s_nsec << rot3;       // current monotonic time
     ent  = knuthmx(ent ^ dff);       // 2nd derivative of time
 
     // 6. macro-mix in djb2-style //////////////////////////////////////////////
@@ -796,7 +818,7 @@ typedef double __attribute__((aligned(8))) df;
 int main(int argc, char *argv[]) {
     struct rand_pool_info_buf entrnd;
     uint8_t *str = NULL, nbtls = 0, prsts = 0, quiet = 0, rset = 0;
-    uint32_t ntsts = 1, nsdly = 0, nrdry = 1, pmdly = 0, nblks = 1;
+    uint32_t ntsts = 1, nsdly = 0, nrdry = 1, nblks = 1, pmdly = 0;
     int devfd = 0;
 
     // Collect arguments from optional command line parameters
@@ -879,7 +901,7 @@ int main(int argc, char *argv[]) {
                 perr("; too short input %u, no stats/check!\n\n", ntsts);
                 prsts = 0;
             } else perr("; collision: ");
-        } else perrprms("", -1);
+        } else perrprms("", 0);
     }
 
     for (uint32_t a = ntsts; a; a--) {
