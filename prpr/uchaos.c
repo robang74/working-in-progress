@@ -625,6 +625,7 @@ archul_t *str2hsh(const uint8_t *str, uint32_t *size, uint32_t nsdly,
     // 1. Calculate padding and allocation
     // We need enough 64-bit blocks to cover n bytes.
     uint32_t nwords = (len + ABz) >> ABL;
+#if 0
     uint32_t nbytes = nwords << ABL;
 
     // 2. Allocate aligned memory for the processed string
@@ -644,21 +645,23 @@ archul_t *str2hsh(const uint8_t *str, uint32_t *size, uint32_t nsdly,
     if (k) memcpy(strng + (len - k), str, k);
     // Padding with zeros
     memset(&strng[len], 0, nbytes - len);
-
+#endif
     // 5. Generate the words-sized array
     // We allocate a separate array for hashes if that was the intent, or we cast
     // the rotated string. Based on your code, you want a hash per 8-byte block.
     archul_t *h = NULL;
     if(posix_memalign((void **)&h, ALGN, nwords << ABL) || !h) {
         perror("posix_memalign");
+#if 0
         free(strng);
+#endif
         return NULL;
     }
     *size = nwords;
     //perr("len: %ld, wd: %ld\n", len, nwords);
 
     // 6. Producing the hashing sequence
-    archul_t *p = (archul_t *)strng;
+    archul_t *p = (archul_t *)str;
     for (archul_t i = 0, n = ABz+1; i < nwords; i++, n += ABz+1) {
         // Processing each n-bytes chunk of the rotated/padded string
         h[i] = djb2tum(p[i], 1 + !!rset, nsdly, pmdly, nbtls, 0);
@@ -666,9 +669,10 @@ archul_t *str2hsh(const uint8_t *str, uint32_t *size, uint32_t nsdly,
             n = 0; djb2tum(0, 0, 0, 0, 0, 1);
         }
     }
-
+#if 0
     // 7. free the string memory and return the hash
     free(strng);
+#endif
     return h;
 }
 
