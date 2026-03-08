@@ -5,7 +5,7 @@
 /* Quick 2k test: cat uchaos.c  | ./chaos -T 2048 | ent
  * Boot log test: cat dmesg.txt | ./uchaos -S -M2 | ent
  *
- * Compile w/libc:      gcc uchaos.c -O3 --fast-math -Wall -o uchaos -s
+ * Compile w/libc:      gcc uchaos.c -O3 --fast-math -Wall -o uchaos -s -lm
  * Compile w/musl: musl-gcc uchaos.c -O3 --fast-math -Wall -o uchaos -s -static
  * Compile option: -D_USE_GET_RTSC (i686: -m32 -msse2), -D_USE_LINUX_RANDOM_H
  *
@@ -918,9 +918,9 @@ int main(int argc, char *argv[]) {
     perr("\nLatency: %.0f <%.01lf> %.01lfK ns, %.3lgK w/ ev:%.0f, ex:%5.02lf%%\n",
         (df)s->tdmn, mean, (df)s->tdmx/E3, (df)s->tncl/E3, (df)s->evnt,
             100.0*(df)s->nexp/s->ctot);
-    perr( "`Ratios: %.02lf <avg=1U> %.02lf, min=1U <%.02lf> %.01lf, %.01lfb\n",
+    perr( "`Ratios: %.02lf <avg=1U> %.02lf, min=1U <%.02lf> %.01lf, %.01fb\n",
         (df)s->tdmn/mean, (df)s->tdmx/mean, mean/s->tdmn, (df)s->tdmx/s->tdmn,
-            log2(mean - s->tdmn));
+            __builtin_log2f(mean - s->tdmn));
     perr(  "Jitters: %.0f <%.01lf> %.0f ns w/ %.03lgx, %.0lf:1K, %+.01lf‰\n",
         (df)s->jmn, jean, (df)s->jmx, (df)s->jmx/jean, dk(s->ctot, s->tncl, s->ctot),
             dk(mean, s->tdmn, jean));
