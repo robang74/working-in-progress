@@ -11,7 +11,7 @@ Working in progress and other stuff that I prefer to share here to give them a c
 * **uChaos vs Thermodynamics**: 1. [presentation](uchaos-vs-thermodynamics.md), &nbsp; 2. release [v0.3.2](https://github.com/robang74/working-in-progress/releases/tag/uchaos-v0.3.2) as reference for uChaos testing
 * **uChaos static x86 64** available: 1. [prpr/bin](prpr/bin) folder, &nbsp; 2. self-extracting executable by [gzcmd.sh](https://github.com/robang74/bare-minimal-linux-system/blob/main/gzcmd.sh)
 * **uChaos testing in 0°K VM** in: 1. [blms-v0.2.6](https://github.com/robang74/bare-minimal-linux-system/releases/tag/bmls-v0.2.6), &nbsp; 2. run `sh start.sh -Z` or `-z` for manual
-* **uChaos supports i686 32bit** in: 1. [v0.5.3](https://github.com/robang74/working-in-progress/releases/tag/uchaos-v0.5.3), &nbsp; 2. qemu testing requires `uchaos` recompilation.
+* **uChaos supports i686 32bit** in: 1. [v0.5.3.2](https://github.com/robang74/working-in-progress/releases/tag/uchaos-v0.5.3.2), &nbsp; 2. qemu testing requires `uchaos` recompilation.
 
 Because exceptions, do not need to be common but just exist. In particular, about Chaos Shell Engine:
 
