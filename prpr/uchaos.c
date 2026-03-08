@@ -879,7 +879,7 @@ int main(int argc, char *argv[]) {
                 perr("; too short input %u, no stats/check!\n\n", ntsts);
                 prsts = 0;
             } else perr("; collision: ");
-        } else perrprms("", -1);
+        } else perrprms("", 0);
     }
 
     for (uint32_t a = ntsts; a; a--) {
