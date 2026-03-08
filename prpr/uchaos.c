@@ -1,7 +1,7 @@
 /*
  * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2 license
  */
-#define VERSION "v0.5.4"
+#define VERSION "v0.5.5"
 /* Quick 2k test: cat uchaos.c  | ./chaos -T 2048 | ent
  * Boot log test: cat dmesg.txt | ./uchaos -S -M2 | ent
  *
@@ -151,6 +151,30 @@ static inline uint8_t *bin2s64(uint8_t *buf, uint32_t nmax) {
 }
 #endif
 
+#ifdef __x86_64__
+#pragma message("Compiling for the 64-bit arch")
+#else
+#pragma message("Compiling for the 32-bit arch")
+#endif
+
+#define ABL (AB-3)       //  2 or  3
+#define ABN (1<<AB)      // 32 or 64
+#define ABX (ABN-1)      // 31 or 63
+#define ABx ((ABN>>1)-1) // 15 or 31
+#define ABy ((ABN>>2)-1) //  7 or 15
+#define ABz ((ABN>>3)-1) //  3 or  7
+
+#if 0
+typedef uint32_t archul_t;
+#define AB     5        //  6 -> 64
+#define rotbit rotl32
+#else
+typedef uint64_t archul_t;
+#pragma message("Using the 64-bit functions set")
+#define AB     6        //  6 -> 64
+#define rotbit rotl64
+#endif
+
 #ifdef _USE_GET_RTSC /* ****************************************************** */
 #define USE_GET_TIME 0
 /*
@@ -222,12 +246,18 @@ static inline uint32_t getprmx16(uint32_t x) {
 }
 #else
 #define PRMX 0
-#define getprmx16(w) (5 + (((w) & 0x1f) << 1))
+#define getprmx16(w) (5 + (((w) & ABy) << 1))
 #endif
 
-static inline uint64_t rotl64(uint64_t n, uint8_t c) {
-    c &= 63; return (n << c) | (n >> ((-c) & 63));
+#if 0
+static inline uint32_t rotl32(uint32_t n, uint8_t c) {
+    c &= ABX; return (n << c) | (n >> ((-c) & ABX));
 }
+#else
+static inline uint64_t rotl64(uint64_t n, uint8_t c) {
+    c &= ABX; return (n << c) | (n >> ((-c) & ABX));
+}
+#endif
 
 #define BLOCK_SIZE 512
 
@@ -238,7 +268,7 @@ static inline uint64_t rotl64(uint64_t n, uint8_t c) {
 struct rand_pool_info_buf {
     int entropy_count;
     int buf_size;
-    uint32_t buf[BLOCK_SIZE >> 2];
+    uint32_t buf[BLOCK_SIZE / sizeof(uint32_t)];
 } __attribute__((packed));
 #endif
 
@@ -320,7 +350,7 @@ static inline uint16_t mm3ns16(uint16_t ns, uint16_t p) {
 #define STBRSTR "stochastics branches"
 #define FINAL_AVALANCHE_MLT 0xc4ceb9fe1a85ec53ULL
 #define perrwrn() perr("\nWARNING: "APPNAME" isn't compiled with "STBRSTR"\n\n")
-#define mm3ns32(o,h) rotl64((h * FINAL_AVALANCHE_MLT) ^ (h >> 33), 13 + ((o & 0x1f) << 1))
+#define murmux3(o,h) rotl64((h * FINAL_AVALANCHE_MLT) ^ (h >> 33), 13 + ((o & 0x1f) << 1))
 #define entropy(sz) ((sz << 3) - sz) // eq. to 8x (8-1)
 #define minmix8
 #define knuthmx
@@ -334,29 +364,48 @@ static inline uint8_t  minmix8(uint8_t b) {
     b ^= ((b >> 3) | (b << 5));
     return b;
 }
-static inline uint64_t knuthmx(uint64_t iw) {
-    register uint64_t w = iw;
-    w  = rotl64(w, getprmx16(w));
+
+#if 0
+static inline uint32_t knuthmx(uint32_t iw) {
+    register uint32_t w = iw;
+    w  = rotl32(w, getprmx16(w));
     w *= (w & 1) ? 0x9E3779B9 : 0x45d9f3b;
-    w ^= rotl64(w, (w & 2) ? 47 : 17);
+    w ^= rotl32(w, (w & 2) ? 23 : 7);
     return w;
 }
-static inline uint64_t mm3ns32(uint64_t ks, uint64_t p) {
+static inline uint32_t murmux3(uint32_t ks, uint32_t p) {
+    register uint32_t z = ks;
+    z = (p ^ (z >> 13)) * 0x85ebca6b;
+    z = (z ^ (z >> 15)) * 0xc2b2ae35;
+    if ( p != ks )
+    z = (z ^ (z >> 17)) ^ (p << 13);
+    return z;
+}
+#else
+static inline uint64_t knuthmx(uint64_t iw) {
+    register uint64_t w = iw;
+    w  = rotbit(w, getprmx16(w));
+    w *= (w & 1) ? 0x9E3779B9 : 0x45d9f3b;
+    w ^= rotbit(w, (w & 2) ? 47 : 17);
+    return w;
+}
+static inline uint64_t murmux3(uint64_t ks, uint64_t p) {
     register uint64_t z = ks;
     z = (p ^ (z >> 29)) * 0xff51afd7ed558ccdULL;
     z = (z ^ (z >> 31)) * 0xc4ceb9fe1a85ec53ULL;
-    if( p != ks )
-    z = (z ^ (z >> 33)) ^ (p << 33);
+    if ( p != ks )
+    z = (z ^ (z >> 33)) ^ (p << 29);
     return z;
 }
+#endif
+
 #endif /* ******************************************************************* */
 
-#define pidx64(p) (uint64_t)pidx(p)
 #define pidx(p) ((uint32_t)(uintptr_t)(p))
-#define perr_app_info(a) { perr("%s%s %s%s%s%s%s", (a)?"":"\n", APPNAME, VERSION,\
+#define perr_app_info(a) { perr("%s%s%u %s%s%s%s%s", (a)?"":"\n", APPNAME, ABN, VERSION,\
         STBX?" w/sb":"", PRMX?"":" !/pr", USE_GET_TIME?"":" rtcs", (a)?"\n":""); }
 #define PMDLY2NS(x) ( ( ( x * pmdly ) + 127 ) >> 8 )
-#define DJB2VGET ( (uint64_t)-1 )
+#define DJB2VGET ( (archul_t)-1 )
 
 static inline int nsleep(uint32_t ns) {
     struct timespec remaining, request = { 0, ns };
@@ -422,7 +471,7 @@ hashotloop:
 /** HASHING LOOP START  *******************************************************/
     // 0. hashing loop preparation, p.2 ////////////////////////////////////////
 
-    if(ent) ent ^= rotl64(ent, getprmx16(hsh));
+    if(ent) ent ^= rotbit(ent, getprmx16(hsh));
 
     // 1. ns latency time retrievement /////////////////////////////////////////
 
@@ -433,7 +482,7 @@ hashotloop:
     tm_4s_nsec = getnstime(&cpuid) >> nbtls;
     if( cpuid != s.oid && s.oid != -1 ) {
         // Knuth, based on gold section seeded by CPU ids event idx
-        hsh = mm3ns32(hsh, ((uint64_t)cpuid << 16) | s.oid);
+        hsh = murmux3(hsh, ((uint64_t)cpuid << ABy) | s.oid);
         // reschedule in the following !ons branch
         ons = 0;
         s.nexp++;
@@ -486,7 +535,7 @@ hashotloop:
         // avg calculation can be ommitted
         s.avg += dlt; s.javg += dff; s.ncl++;
         // Knuth, based on gold section seeded by 1E-3 ~ 1E-4 event idx
-        if( excp ) hsh = mm3ns32(hsh, ons);
+        if( excp ) hsh = murmux3(hsh, ons);
         excp = 0;
     }
 
@@ -508,7 +557,7 @@ hashotloop:
     // 7. entropy injection in hsh /////////////////////////////////////////////
 
     // it consumes entropy, and does hash the another rotation
-    hsh ^= rotl64(hsh, getprmx16(ent));
+    hsh ^= rotbit(hsh, getprmx16(ent));
 
     // 8. exceptions management ////////////////////////////////////////////////
 
@@ -528,7 +577,7 @@ reschedule:
     // X. finalising w/ a 32+1 bit mix /////////////////////////////////////////
 
     ent = hsh;                       // forget the entropy mixed in hash
-    hsh = mm3ns32(hsh, s.ohs);       // whitening the hash before deliver
+    hsh = murmux3(hsh, s.ohs);       // whitening the hash before deliver
     s.ohs = ent;                     // keep the hashing internal state
 
     return hsh;
@@ -558,12 +607,12 @@ uint64_t *str2ht64(const uint8_t *str, uint32_t *size, uint32_t nsdly,
 
     // 1. Calculate padding and allocation
     // We need enough 64-bit blocks to cover n bytes.
-    uint32_t nwords = (len + 7) >> 3;
-    uint32_t nbytes = nwords << 3;
+    uint32_t nwords = (len + ABz) >> ABL;
+    uint32_t nbytes = nwords << ABL;
 
     // 2. Allocate aligned memory for the processed string
     uint8_t *str64 = NULL;
-    if(posix_memalign((void **)&str64, 64, nbytes) || !str64) {
+    if(posix_memalign((void **)&str64, ABN, nbytes) || !str64) {
         perror("posix_memalign");
         return NULL;
     }
@@ -579,11 +628,11 @@ uint64_t *str2ht64(const uint8_t *str, uint32_t *size, uint32_t nsdly,
     // Padding with zeros
     memset(&str64[len], 0, nbytes - len);
 
-    // 5. Generate the uint64_t array
+    // 5. Generate the words-sized array
     // We allocate a separate array for hashes if that was the intent, or we cast
     // the rotated string. Based on your code, you want a hash per 8-byte block.
     uint64_t *h = NULL;
-    if(posix_memalign((void **)&h, 64, nwords << 3) || !h) {
+    if(posix_memalign((void **)&h, ABN, nwords << ABL) || !h) {
         perror("posix_memalign");
         free(str64);
         return NULL;
@@ -593,8 +642,8 @@ uint64_t *str2ht64(const uint8_t *str, uint32_t *size, uint32_t nsdly,
 
     // 6. Producing the hashing sequence
     uint64_t *p = (uint64_t *)str64;
-    for (uint64_t i = 0, n = 8; i < nwords; i++, n += 8) {
-        // Processing each 8-byte chunk of the rotated/padded string
+    for (uint64_t i = 0, n = ABz+1; i < nwords; i++, n += ABz+1) {
+        // Processing each n-bytes chunk of the rotated/padded string
         h[i] = djb2tum(p[i], 1 + !!rset, nsdly, pmdly, nbtls, 0);
         if ( rset && n >= ((uint64_t)1 << rset) ) {
             n = 0; djb2tum(0, 0, 0, 0, 0, 1);
@@ -669,10 +718,10 @@ static inline uint32_t readblocks(int fd, uint8_t *buf, uint32_t *nblks) {
                 memcpy(fst, inp, BLOCK_SIZE);
         }
         // mixing the input by 64-bit words
-        n = (n + 7) >> 3;
+        n = (n + ABz) >> ABL;
         uint64_t *ip = (uint64_t *)inp, *bp = (uint64_t *)buf;
         for (uint32_t a = 0; a < n; a++)
-            bp[a] =  ip[a] ^ rotl64(bp[a], a);
+            bp[a] =  ip[a] ^ rotbit(bp[a], a);
     }
     *nblks = i;
 
@@ -783,7 +832,7 @@ int main(int argc, char *argv[]) {
     // Counting time of running starts here, after parameters
     (void) get_nanos();
 
-    if (posix_memalign((void **)&str, 64, BLOCK_SIZE + 8) || !str) {
+    if (posix_memalign((void **)&str, ABN, BLOCK_SIZE + ABz+1) || !str) {
         perror("posix_memalign");
         return EXIT_FAILURE;
     }
@@ -796,15 +845,18 @@ int main(int argc, char *argv[]) {
 
     for(uint32_t a = nrdry; a; a--) {
         uint32_t size = n;
-        uint64_t *hsh = str2ht64(str, &size, nsdly, pmdly, nbtls, 0);
-        if(!hsh) { return EXIT_FAILURE; }
-        else { free(hsh); } hsh = NULL;
+        if(!str2ht64(str, &size, nsdly, pmdly, nbtls, 0))
+            return EXIT_FAILURE;
     }
-
+#if 0
+    uint32_t max   = 0,   min = E9;
+    uint64_t bic   = 0,   avg = 0, nk = 0, nt = 0, nx = 0, nn = 0, mt = 0;
+    float    avgbc = 0, avgmx = 0, avgmn = 256;
+#else
+    uint64_t max   = 0,   min = E9;
+    uint64_t bic   = 0,   avg = 0, nk = 0, nt = 0, nx = 0, nn = 0, mt = 0;
     double   avgbc = 0, avgmx = 0, avgmn = 256;
-    uint64_t bic = 0, max = 0, min = 256, avg = 0;
-    uint64_t nk = 0, nt = 0, nx = 0, nn = 0, mt = 0;
-
+#endif
     if(quiet < 2) {
         perr_app_info(0);
         if(prsts) { // RAF, TODO: dealing with size one.
@@ -823,7 +875,7 @@ int main(int argc, char *argv[]) {
         mt += get_nanos() - stns; /******* hashing time accounting stop *******/
         if(!hsh) return EXIT_FAILURE;
 
-        uint32_t sz = size << 3;
+        uint32_t sz = size << ABL;
         if(devfd) {
             entrnd.buf_size = sz;
             entrnd.entropy_count = entropy(sz);
@@ -857,7 +909,7 @@ int main(int argc, char *argv[]) {
                 }
                 uint64_t cb = hsh[i] ^ hsh[n];
                 int ham = 0;
-                for (int a = 0; a < 64; a++)
+                for (int a = 0; a < ABN; a++)
                     ham += (cb >> a) & 0x01;
                 bic += ham;
                 avg += ham;
@@ -901,7 +953,7 @@ int main(int argc, char *argv[]) {
 
     avgbc /= ntsts;
     df bic_nx_absl = (df)bic / nx;
-    df bic_nx = (df)100 / 64 * bic_nx_absl;
+    df bic_nx = (df)100 / ABN * bic_nx_absl;
 
     #define devppm(v,a) ( ((df)v-a) * E6 / a )
 
@@ -909,11 +961,11 @@ int main(int argc, char *argv[]) {
         bic_nx, devppm(bic_nx, 50));
     perr("Hamming distance: %.0lf <%.6lf> %.0lf over %.4lgK XORs\n",
         (df)min, bic_nx_absl, (df)max, (df)nx/E3);
-    perr("Hamming dist/avg: %.4lf < 1U:32 %+.4lg ppm > %.4lf\n",
-        avgmn/bic_nx_absl, devppm(bic_nx_absl, 32), avgmx/bic_nx_absl);
+    perr("Hamming dist/avg: %.4lf < 1U:%u %+.4lg ppm > %.4lf\n",
+        avgmn/bic_nx_absl, ABN, devppm(bic_nx_absl, 32), avgmx/bic_nx_absl);
 
     perr("\nPerform: exec %.3lgs, %.3lg MB/s; hash %.3lgs, %.4lg KH/s",
-        (df)rt/E9, (df)E6*nt/(rt<<7), (df)mt/E9, (df)E6*nt/mt);
+        (df)rt/E9, (df)(E9>>(20-AB))*nt/rt, (df)mt/E9, (df)(E9>>10)*nt/mt);
 
     df mean = (df)s->avg  / s->tncl;
     df jean = (df)s->javg / s->tncl;
