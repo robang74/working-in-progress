@@ -1,7 +1,7 @@
 /*
  * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2 license
  */
-#define VERSION "v0.5.5"
+#define VERSION "v0.5.5.1"
 /* Quick 2k test: cat uchaos.c  | ./chaos -T 2048 | ent
  * Boot log test: cat dmesg.txt | ./uchaos -S -M2 | ent
  *
@@ -162,7 +162,7 @@ static inline uint8_t *bin2s64(uint8_t *buf, uint32_t nmax) {
 #if USE_FUNCS_32
 typedef uint32_t archul_t;
 typedef float    archdf_t;
-#define AB     5         //  6 -> 64
+#define AB     5         //  5 -> 32
 #else
 typedef uint64_t archul_t;
 typedef double   archdf_t;
@@ -600,7 +600,7 @@ archul_t *str2hsh(const uint8_t *str, uint32_t *size, uint32_t nsdly,
 
     // 2. Allocate aligned memory for the processed string
     uint8_t *strng = NULL;
-    if(posix_memalign((void **)&strng, ABN, nbytes) || !strng) {
+    if(posix_memalign((void **)&strng, 64, nbytes) || !strng) {
         perror("posix_memalign");
         return NULL;
     }
@@ -620,7 +620,7 @@ archul_t *str2hsh(const uint8_t *str, uint32_t *size, uint32_t nsdly,
     // We allocate a separate array for hashes if that was the intent, or we cast
     // the rotated string. Based on your code, you want a hash per 8-byte block.
     archul_t *h = NULL;
-    if(posix_memalign((void **)&h, ABN, nwords << ABL) || !h) {
+    if(posix_memalign((void **)&h, 64, nwords << ABL) || !h) {
         perror("posix_memalign");
         free(strng);
         return NULL;
@@ -822,7 +822,7 @@ int main(int argc, char *argv[]) {
     // Counting time of running starts here, after parameters
     (void) get_nanos();
 
-    if (posix_memalign((void **)&str, ABN, BLOCK_SIZE + ABz+1) || !str) {
+    if (posix_memalign((void **)&str, 64, BLOCK_SIZE + ABz+1) || !str) {
         perror("posix_memalign");
         return EXIT_FAILURE;
     }
@@ -949,7 +949,7 @@ int main(int argc, char *argv[]) {
         avgmn/bic_nx_absl, ABN, devppm(bic_nx_absl, 32), avgmx/bic_nx_absl);
 
     perr("\nPerform: exec %.3lgs, %.3lg MB/s; hash %.3lgs, %.4lg KH/s",
-        (df)rt/E9, (df)(E9>>(20-AB))*nt/rt, (df)mt/E9, (df)(E9>>10)*nt/mt);
+        (df)rt/E9, (df)(E9>>(20-ABL))*nt/rt, (df)mt/E9, (df)(E9>>10)*nt/mt);
 
     df mean = (df)s->avg  / s->tncl;
     df jean = (df)s->javg / s->tncl;
