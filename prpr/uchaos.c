@@ -1,7 +1,7 @@
 /*
  * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2 license
  */
-#define VERSION "v0.5.1"
+#define VERSION "v0.5.2"
 /* Quick 2k test: cat uchaos.c  | ./chaos -T 2048 | ent
  * Boot log test: cat dmesg.txt | ./uchaos -S -M2 | ent
  *
@@ -322,8 +322,7 @@ static inline uint64_t mm3ns32(uint64_t ks, uint64_t p) {
 #define pidx(p) ((uint32_t)(uintptr_t)(p))
 #define perr_app_info(a) { perr("%s%s %s%s%s%s%s", (a)?"":"\n", APPNAME, VERSION,\
         STBX?" w/sb":"", PRMX?"":" !/pr", USE_GET_TIME?"":" rtcs", (a)?"\n":""); }
-#define DJB2UPDT { tncl += ncl; tdmx = MAX(dmx, tdmx); tdmn = MIN(dmn, tdmn); }
-#define PMDLY2NS ( ( ( dmn * pmdly ) + 127 ) >> 8 )
+#define PMDLY2NS(x) ( ( ( x * pmdly ) + 127 ) >> 8 )
 #define DJB2VGET ( (uint64_t)-1 )
 
 static inline int nsleep(uint32_t ns) {
@@ -332,58 +331,54 @@ static inline int nsleep(uint32_t ns) {
     return ret;
 }
 
-typedef double df;
+typedef struct djb2tum_status {
+    uint64_t  ncl,  dmn,  dmx;
+    uint64_t tncl, tdmn, tdmx;
+    uint64_t ctot,  jmn,  jmx;
+    uint64_t evnt, nexp, javg;
+    uint64_t  avg,  oid, pmns, ohs;
+} djb2_t;
+
+/*
+ * One of the most popular and efficient hash functions for strings in C is
+ * the djb2 algorithm created by Dan Bernstein. It strikes a great balance
+ * between speed and low collision rates. Great for text.
+ *
+ * 5381              Prime number choosen by Dan Bernstein, as 1010100000101
+ *                   empirically is one of the best for English words text.
+ * Alternatives:
+ *
+ * 16777619               The FNV-1 offset basis (32-bit).
+ * 14695981039346656037	  The FNV-1 offset basis (64-bit).
+ */
+#define HSHSEED 5381
+
+#define djb2tum_status_init { 0,-1,0, 0,-1,0, 0,-1,0, 0,-1,0, 0,-1,0, HSHSEED }
 
 static uint64_t djb2tum(uint64_t seed, uint8_t maxn, uint32_t nsdly,
     uint32_t pmdly, uint8_t nbtls, uint8_t rset)
 {
     // This is the internal state of the engine
-    static uint64_t  ncl = 0,  dmn = -1,  dmx = 0;
-    static uint64_t tncl = 0, tdmn = -1, tdmx = 0;
-    static uint64_t ctot = 0,  jmn = -1,  jmx = 0;
-    static uint64_t evnt = 0, nexp = -1;
-    static uint64_t javg = 0,  avg =  0;
+    static djb2_t s = djb2tum_status_init;
 
-    #define dk(a,b,c) ((1.0 - (df)(a-b)/c)*E3)
-    if( seed == DJB2VGET && (ncl || tncl) ) {
-        DJB2UPDT
-        df mean = (df)avg  / tncl;
-        df jean = (df)javg / tncl;
-        perr("\nLatency: %.0f <%.01lf> %.01lfK ns, %.3lgK w/ ev:%.0f, ex:%5.02lf%%\n",
-            (df)tdmn, mean, (df)tdmx/E3, (df)tncl/E3, (df)evnt, 100.0*(df)nexp/ctot);
-        perr( "`Ratios: %.02lf <avg=1U> %.02lf, min=1U <%.02lf> %.01lf, %.01lfb\n",
-            (df)tdmn/mean, (df)tdmx/mean, mean/tdmn, (df)tdmx/tdmn, log2(mean-tdmn));
-        perr(  "Jitters: %.0f <%.01lf> %.0f ns w/ %.04lgx, %.0lf:1K, %+.01lf‰\n",
-            (df)jmn, jean, (df)jmx, (df)jmx/jean, dk(ctot,tncl,ctot), dk(mean,tdmn,jean));
+    if( s.ncl || s.tncl || rset || seed == DJB2VGET ) {
+        s.tncl += s.ncl; s.ncl = 0;
+        s.tdmx  = MAX(s.dmx, s.tdmx);
+        s.tdmn  = MIN(s.dmn, s.tdmn);
+        s.pmns  = PMDLY2NS  (s.tdmn);
     }
 
-    if( rset ) { DJB2UPDT; dmn = -1, dmx = 0, ncl = 0; };
+    if( rset ) { s.dmn = -1, s.dmx = 0, s.ncl = 0; };
 
-    if( seed == DJB2VGET ) return PMDLY2NS;
+    // The best practice is to share a copy not the internal state
+    if( seed == DJB2VGET ) return (uintptr_t)&s;
 
     if( !maxn ) return 0;
 
     // 0. hashing loop preparation, p.1 ////////////////////////////////////////
-    /*
-     * One of the most popular and efficient hash functions for strings in C is
-     * the djb2 algorithm created by Dan Bernstein. It strikes a great balance
-     * between speed and low collision rates. Great for text.
-     *
-     * 5381              Prime number choosen by Dan Bernstein, as 1010100000101
-     *                   empirically is one of the best for English words text.
-     * Alternatives:
-     *
-     * 16777619               The FNV-1 offset basis (32-bit).
-     * 14695981039346656037	  The FNV-1 offset basis (64-bit).
-     */
-#define HSHSEED 5381
-    static   uint64_t ohs = HSHSEED;
-    register uint64_t hsh = ohs;
-#if USE_GET_TIME
-#else
-    static uint32_t cpuid, oid = -1;
-#endif
-    uint64_t ts_tv_nsec, dff, dlt, ons = 0, ent = 0;
+
+    uint64_t tm_4s_nsec, dff, dlt, ons = 0, ent = 0;
+    register uint64_t hsh = s.ohs;
     uint8_t excp = 0;                // excp++ as uint8_t grants for convergence
 
     if( seed ) hsh ^= seed;
@@ -397,63 +392,64 @@ hashotloop:
     // 1. ns latency time retrievement /////////////////////////////////////////
 
 #if USE_GET_TIME
-    ts_tv_nsec = getnstime( NULL ) >> nbtls;
+    tm_4s_nsec = getnstime( NULL ) >> nbtls;
 #else
-    ts_tv_nsec = getnstime(&cpuid) >> nbtls;
-    if( cpuid != oid && oid != -1 ) {
+    uint32_t cpuid;
+    tm_4s_nsec = getnstime(&cpuid) >> nbtls;
+    if( cpuid != s.oid && s.oid != -1 ) {
         // Knuth, based on gold section seeded by CPU ids event idx
-        hsh = mm3ns32(hsh, ((uint64_t)cpuid << 16) | oid);
+        hsh = mm3ns32(hsh, ((uint64_t)cpuid << 16) | s.oid);
         // reschedule in the following !ons branch
         ons = 0;
-        nexp++;
+        s.nexp++;
     }
     oid = cpuid;
 #endif
     if( !ons ) {
-        ons = ts_tv_nsec;
+        ons = tm_4s_nsec;
         hsh = knuthmx(hsh^ons);
         goto reschedule;
     }
 
     // 2. latency calculation //////////////////////////////////////////////////
 
-    dlt = ts_tv_nsec - ons;       // within 4s is fine, with RTCS is always fine
+    dlt = tm_4s_nsec - ons;       // within 4s is fine, with RTCS is always fine
     if( !dlt ) goto reschedule;
-    if( dmn == -1 ) { dmn = dlt; goto reschedule; }
+    if( s.dmn == -1 ) { s.dmn = dlt; goto reschedule; }
 
     // 3. internal state update ////////////////////////////////////////////////
 
     // dmn calculation is mandatory for stochastics bi-forkation turns
-    if( dlt < dmn ) {
-        dff = dmn - dlt; dmn = dlt;
-        ent ^= -dff ^ dmn;
-        evnt++;
+    if( dlt < s.dmn ) {
+        dff = s.dmn - dlt; s.dmn = dlt;
+        ent ^= -dff ^ s.dmn;
+        s.evnt++;
     } else
     // dmx calculation can be omited but doing ns*=0x4d anyway
-    if( dlt > dmx ) {
-        dff = dlt - dmn; dmx = dlt;
-        ent ^= dff ^ -dmx;
-        evnt++;
+    if( dlt > s.dmx ) {
+        dff = dlt - s.dmn; s.dmx = dlt;
+        ent ^= dff ^ -s.dmx;
+        s.evnt++;
     } else {
-        dff = dlt - dmn;
-        ent ^= ~dff ^ dmx;
+        dff = dlt - s.dmn;
+        ent ^= ~dff ^ s.dmx;
     }
     if( !dff ) { hsh = knuthmx(hsh); goto reschedule; }
 
     // 4. jittering calculation ////////////////////////////////////////////////
 
     // dff is jittering for the exeption manager activation
-    if( dff < nsdly + (pmdly ? PMDLY2NS : 1) + excp ) {
+    if( dff < nsdly + (pmdly ? PMDLY2NS(s.dmn) : 1) + excp ) {
         excp += 4;                   // increasing excp and accounting for dff
-        nexp++;
+        s.nexp++;
     } else {
         // min,max jittering can be ommited
-        if( jmn == -1 ) jmn = dff;
+        if( s.jmn == -1 ) s.jmn = dff;
         else
-        if( dff < jmn ) jmn = dff;
-        if( dff > jmx ) jmx = dff;
+        if( dff < s.jmn ) s.jmn = dff;
+        if( dff > s.jmx ) s.jmx = dff;
         // avg calculation can be ommitted
-        avg += dlt; javg += dff; ncl++;
+        s.avg += dlt; s.javg += dff; s.ncl++;
         // Knuth, based on gold section seeded by 1E-3 ~ 1E-4 event idx
         if( excp ) hsh = mm3ns32(hsh, ons);
         excp = 0;
@@ -462,7 +458,7 @@ hashotloop:
     // 5. entropy distillation /////////////////////////////////////////////////
 
     ent ^= dlt        <<   7 ;       // 1st derivative of time
-    ent ^= ts_tv_nsec <<  13 ;       // current monotonic time
+    ent ^= tm_4s_nsec <<  13 ;       // current monotonic time
     ent  = knuthmx(ent ^ dff);       // 2nd derivative of time
 
     // 6. macro-mix in djb2-style //////////////////////////////////////////////
@@ -482,12 +478,12 @@ hashotloop:
     // 8. exceptions management ////////////////////////////////////////////////
 
     // copying with the VMs scheduler timings: continue made by an ASM jump
-    ctot++; if( excp ) goto reschedule;
+    s.ctot++; if( excp ) goto reschedule;
 
     // 9. preparation for the next round ///////////////////////////////////////
 
     if( --maxn ) {
-        ons  = ts_tv_nsec;
+        ons  = tm_4s_nsec;
 reschedule:
         sched_yield();
         goto hashotloop;             // a loop made by two ASM jumps
@@ -497,8 +493,8 @@ reschedule:
     // X. finalising w/ a 32+1 bit mix /////////////////////////////////////////
 
     ent = hsh;                       // forget the entropy mixed in hash
-    hsh = mm3ns32(hsh, ohs);         // whitening the hash before deliver
-    ohs = ent;                       // keep the hashing internal state
+    hsh = mm3ns32(hsh, s.ohs);       // whitening the hash before deliver
+    s.ohs = ent;                     // keep the hashing internal state
 
     return hsh;
 }
@@ -685,8 +681,8 @@ static inline void usage(const char *name, const char *cmdn, const uint8_t qlvl)
 
 #define APPNAME "uChaos"
 #define STCX STOCHASTIC_BRANCHES
-#define perrprms(s,p) perr("%s s:%d, q:%d, p:%d%%:%dns, d:%d, r:%d, i:%d, Z:%d\n\n",\
-                      s, nbtls, quiet, pmdly, p, nsdly, nrdry, nblks, rset)
+#define perrprms(s,p) perr("%s s:%u, q:%u, d+p(%u):%u+%u ns, r:%u, i:%u, Z:%u\n\n",\
+                      s, nbtls, quiet, pmdly, nsdly, p?p:1, nrdry, nblks, rset)
 
 int main(int argc, char *argv[]) {
     struct rand_pool_info_buf entrnd;
@@ -832,7 +828,7 @@ int main(int argc, char *argv[]) {
             }
         }
 
-        df curavg = (df)avg / nn;
+        double curavg = (double)avg / nn;
         if(avgmx < curavg) avgmx = curavg;
         if(avgmn > curavg) avgmn = curavg;
         avgbc += curavg;
@@ -847,20 +843,26 @@ int main(int argc, char *argv[]) {
     if(!prsts) return 0;
 
     uint64_t rt = get_nanos();
-    perr("%s\n", nk ? ", status KO" : "no, status OK");
-    perr("\n");
+    perr("%s\n", nk ? ", status: KO" : "no, status: OK");
 
-    perr("Running %u ", ntsts);
+    // print statistics ////////////////////////////////////////////////////////
+
+    typedef double df;
+
+    djb2_t *s = (djb2_t *)(uintptr_t)djb2tum(DJB2VGET, 0, 0, pmdly, 0, 0);
+    perrprms("Setting:", (uint32_t)(s ? s->pmns : 0));
+
+    perr("Running %u: ", ntsts);
     if((nt >> 3) > E6)
-        perr("-> %.2lfMH (%.2lfGB)", (df)nt/(1ULL<<20), (df)nt/(1ULL<<27));
+        perr("%.2lfMH (%.2lfGB)",  (df)nt/(1ULL<<20), (df)nt/(1ULL<<27));
     else
-        perr("-> %.1lfKH (%.1lfMB)", (df)nt/(1ULL<<10), (df)nt/(1ULL<<17));
+        perr("%.1lfKH (%.1lfMB)",  (df)nt/(1ULL<<10), (df)nt/(1ULL<<17));
     perr(" w/ %.0lf duplicates\n", (df)nk);
-
 
     avgbc /= ntsts;
     df bic_nx_absl = (df)bic / nx;
     df bic_nx = (df)100 / 64 * bic_nx_absl;
+
     #define devppm(v,a) ( ((df)v-a) * E6 / a )
 
     perr("Hamming <weight>: %.4lf%% ~ 50%% by (%+.4lg ppm)\n",
@@ -870,12 +872,24 @@ int main(int argc, char *argv[]) {
     perr("Hamming dist/avg: %.4lf < 1U:32 %+.4lg ppm > %.4lf\n",
         avgmn/bic_nx_absl, devppm(bic_nx_absl, 32), avgmx/bic_nx_absl);
 
-    perr("\n");
-    perr("Perform: exec %.3lgs, %.3lg MB/s; hash %.3lgs, %.4lg KH/s",
+    perr("\nPerform: exec %.3lgs, %.3lg MB/s; hash %.3lgs, %.4lg KH/s",
         (df)rt/E9, (df)E6*nt/(rt<<7), (df)mt/E9, (df)E6*nt/mt);
 
-    uint32_t pmns = (uint32_t)djb2tum(DJB2VGET, 0, 0, pmdly, 0, 0);
-    perrprms("\nSetting:", pmns);
+    df mean = (df)s->avg  / s->tncl;
+    df jean = (df)s->javg / s->tncl;
+
+    #define dk(a,b,c) ( (df)1 - ((df)(a-b)/c)*E3 )
+
+    perr("\nLatency: %.0f <%.01lf> %.01lfK ns, %.3lgK w/ ev:%.0f, ex:%5.02lf%%\n",
+        (df)s->tdmn, mean, (df)s->tdmx/E3, (df)s->tncl/E3, (df)s->evnt,
+            100.0*(df)s->nexp/s->ctot);
+    perr( "`Ratios: %.02lf <avg=1U> %.02lf, min=1U <%.02lf> %.01lf, %.01lfb\n",
+        (df)s->tdmn/mean, (df)s->tdmx/mean, mean/s->tdmn, (df)s->tdmx/s->tdmn,
+            log2(mean - s->tdmn));
+    perr(  "Jitters: %.0f <%.01lf> %.0f ns w/ %.04lgx, %.0lf:1K, %+.01lf‰\n",
+        (df)s->jmn, jean, (df)s->jmx, (df)s->jmx/jean, dk(s->ctot, s->tncl, s->ctot),
+            dk(mean, s->tdmn, jean));
+    perr("\n");
 
     return 0; // exit() do free()
 }
