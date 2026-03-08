@@ -1,7 +1,7 @@
 /*
  * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2 license
  */
-#define VERSION "v0.5.3"
+#define VERSION "v0.5.3.1"
 /* Quick 2k test: cat uchaos.c  | ./chaos -T 2048 | ent
  * Boot log test: cat dmesg.txt | ./uchaos -S -M2 | ent
  *
@@ -386,7 +386,7 @@ typedef struct djb2tum_status {
  */
 #define HSHSEED 5381
 
-#define CPUSKEW (1<<29)   // the biggest 2^n before 1E9
+#define dtskew(x) (!x || (x)>>28)    // 2^29 is the biggest 2^n before 1E9
 
 #define djb2tum_status_init { 0,-1,0, 0,-1,0, 0,-1,0, 0,-1,0, 0,-1,0, HSHSEED }
 
@@ -449,7 +449,7 @@ hashotloop:
     // 2. latency calculation //////////////////////////////////////////////////
 
     dlt = tm_4s_nsec - ons;       // within 4s is fine, with RTCS is always fine
-    if( !dlt || dlt > CPUSKEW ) goto reschedule;
+    if( dtskew(dlt) ) { ons = tm_4s_nsec; goto reschedule; }
     if( s.dmn == -1 ) { s.dmn = dlt; goto reschedule; }
 
     // 3. internal state update ////////////////////////////////////////////////
