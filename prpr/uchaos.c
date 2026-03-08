@@ -642,17 +642,21 @@ static inline uint32_t readbuf(int fd, uint8_t *buffer, uint32_t size, bool intr
     return tot;
 }
 
-static inline uint32_t readblocks(int fd, uint8_t *buf, uint32_t nblks) {
+static inline uint32_t readblocks(int fd, uint8_t *buf, uint32_t *nblks) {
+    if(!nblks) return 0;
+
     uint8_t inp[BLOCK_SIZE], fst[BLOCK_SIZE];
     // Reading max 8 blocks to limit the overflow at min 5 LSB bits,
     // considering that ASCII text is almost all chars in 32-122 range.
     // Anyway, pre-processing the input may help but it shouldn't matter
     // when the final aim is to feed uchaos for providing randomness.
-    uint32_t n, maxn = 0;
+    uint32_t i, n, maxn = 0;
     memset(buf, 0, BLOCK_SIZE);
+
     // Input size 16 * 512 = 8K as relevant initial dmesg log before init
-    for(int i = 0; i < nblks; i++) {
+    for(i = 0; i < *nblks; i++) {
         n = readbuf(fd, inp, BLOCK_SIZE, 0);
+        if(!n) break;
         maxn = MAX(maxn, n);
 
         if(i) {
@@ -670,6 +674,8 @@ static inline uint32_t readblocks(int fd, uint8_t *buf, uint32_t nblks) {
         for (uint32_t a = 0; a < n; a++)
             bp[a] =  ip[a] ^ rotl64(bp[a], a);
     }
+    *nblks = i;
+
     return maxn;
 }
 
@@ -721,9 +727,8 @@ static inline void usage(const char *name, const char *cmdn, const uint8_t qlvl)
 
 int main(int argc, char *argv[]) {
     struct rand_pool_info_buf entrnd;
-    uint8_t *str = NULL, nbtls = 0, prsts = 0, quiet = 0, nblks = 1, rset = 0;
-    uint32_t ntsts = 1, nsdly = 0;
-    uint32_t nrdry = 1, pmdly = 0;
+    uint8_t *str = NULL, nbtls = 0, prsts = 0, quiet = 0, rset = 0;
+    uint32_t ntsts = 1, nsdly = 0, nrdry = 1, pmdly = 0, nblks = 1;
     int devfd = 0;
 
     // Collect arguments from optional command line parameters
@@ -784,7 +789,7 @@ int main(int argc, char *argv[]) {
     }
 
     uint32_t n = (nblks < 2) ? readbuf(STDIN_FILENO, str, BLOCK_SIZE, 0) \
-                             : readblocks(STDIN_FILENO, str, nblks);
+                             : readblocks(STDIN_FILENO, str, &nblks);
     if(n < 1) return EXIT_FAILURE;     // djb2tum(9 code refactored thus not anymore
     //if (nblks > 1) bin2str(str, n); // necessary because djb2tum() born for text,
     str[n] = 0;                      // refactoring it for binary input, is the way.
@@ -804,7 +809,7 @@ int main(int argc, char *argv[]) {
         perr_app_info(0);
         if(prsts) { // RAF, TODO: dealing with size one.
             if(nblks < 2) {
-                perr("too short input, try longer!\n\n");
+                perr("; too short input %u, no stats/check!\n\n", ntsts);
                 prsts = 0;
             } else perr("; collision: ");
         } else perrprms("", -1);
