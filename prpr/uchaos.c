@@ -1,7 +1,7 @@
 /*
  * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2 license
  */
-#define VERSION "v0.4.7"
+#define VERSION "v0.5"
 /* Quick 2k test: cat uchaos.c  | ./chaos -T 2048 | ent
  * Boot log test: cat dmesg.txt | ./uchaos -S -M2 | ent
  *
@@ -323,7 +323,6 @@ static inline uint64_t mm3ns32(uint64_t ks, uint64_t p) {
 #define perr_app_info(a) { perr("%s %s%s%s%s%s", APPNAME, VERSION, STBX ? " w/sb"\
       : "", PRMX ? "" : " !/pr", USE_GET_TIME ? "" : " rtcs", (a) ? "\n" : ""); }
 #define DJB2UPDT { tncl += ncl; tdmx = MAX(dmx, tdmx); tdmn = MIN(dmn, tdmn); }
-#define DJB2RSET { DJB2UPDT; dmn = E9, dmx = 0, ncl = 0; }
 #define PMDLY2NS ( ( ( dmn * pmdly ) + 127 ) >> 8 )
 #define DJB2VGET ( (uint64_t)-1 )
 
@@ -345,25 +344,26 @@ static uint64_t djb2tum(uint64_t seed, uint8_t maxn, uint32_t nsdly,
     static uint64_t evnt = 0, nexp = -1;
     static uint64_t javg = 0,  avg =  0;
 
+    #define dk(a,b,c) ((1.0 - (df)(a-b)/c)*E3)
     if( seed == DJB2VGET && (ncl || tncl) ) {
         DJB2UPDT
-        double mean = (double)avg  / tncl;
-        double jean = (double)javg / tncl;
-        perr("\nLatency: %.0f <%.1lf> %.1lfK ns, %.3lgK w/ ev:%.0f, ex:%5.2lf%%\n",
-            (df)tdmn, mean, (df)tdmx/E3, (df)tncl/E3, (df)evnt, 100*(df)nexp/ctot);
-        perr( "\\Ratios: %.2lf <avg=1U> %.2lf, min=1U <%.2lf> %.2lf, %.03lf\n",
-            (df)tdmn/mean, (df)tdmx/mean, mean/tdmn, (df)tdmx/tdmn, (df)(mean-tdmn)/jean);
-        perr(  "Jitters: %.0f <%.1lf> %.0f ns w/ r:%.03lg, %.3lgK r:%.03lg\n",
-            (df)jmn, jean, (df)jmx, (df)jmx/jean, (df)ctot/E3, (df)ctot/tncl);
+        df mean = (df)avg  / tncl;
+        df jean = (df)javg / tncl;
+        perr("\nLatency: %.0f <%.01lf> %.01lfK ns, %.3lgK w/ ev:%.0f, ex:%5.02lf%%\n",
+            (df)tdmn, mean, (df)tdmx/E3, (df)tncl/E3, (df)evnt, 100.0*(df)nexp/ctot);
+        perr( "`Ratios: %.02lf <avg=1U> %.02lf, min=1U <%.02lf> %.02lf\n",
+            (df)tdmn/mean, (df)tdmx/mean, mean/tdmn, (df)tdmx/tdmn);
+        perr(  "Jitters: %.0f <%.01lf> %.0f ns w/ %.04lgx, %.0lf:1K, %+.01lf‰\n",
+            (df)jmn, jean, (df)jmx, (df)jmx/jean, dk(ctot,tncl,ctot), dk(mean,tdmn,jean));
     }
 
-    if( rset ) DJB2RSET;
+    if( rset ) { DJB2UPDT; dmn = -1, dmx = 0, ncl = 0; };
 
     if( seed == DJB2VGET ) return PMDLY2NS;
 
     if( !maxn ) return 0;
 
-    // 0. hashing loop preparation /////////////////////////////////////////////
+    // 0. hashing loop preparation, p.1 ////////////////////////////////////////
     /*
      * One of the most popular and efficient hash functions for strings in C is
      * the djb2 algorithm created by Dan Bernstein. It strikes a great balance
@@ -390,6 +390,9 @@ static uint64_t djb2tum(uint64_t seed, uint8_t maxn, uint32_t nsdly,
 
 hashotloop:
 /** HASHING LOOP START  *******************************************************/
+    // 0. hashing loop preparation, p.2 ////////////////////////////////////////
+
+    if(ent) ent ^= rotl64(ent, getprmx16(hsh));
 
     // 1. ns latency time retrievement /////////////////////////////////////////
 
@@ -416,7 +419,7 @@ hashotloop:
 
     dlt = ts_tv_nsec - ons;       // within 4s is fine, with RTCS is always fine
     if( !dlt ) goto reschedule;
-    if( dmn == -1 ) dmn = dlt;
+    if( dmn == -1 ) { dmn = dlt; goto reschedule; }
 
     // 3. internal state update ////////////////////////////////////////////////
 
@@ -435,7 +438,7 @@ hashotloop:
         dff = dlt - dmn;
         ent ^= ~dff ^ dmx;
     }
-    ctot++;
+    if( !dff ) { hsh = knuthmx(hsh); goto reschedule; }
 
     // 4. jittering calculation ////////////////////////////////////////////////
 
@@ -452,15 +455,15 @@ hashotloop:
         // avg calculation can be ommitted
         avg += dlt; javg += dff; ncl++;
         // Knuth, based on gold section seeded by 1E-3 ~ 1E-4 event idx
-        if(excp) hsh = mm3ns32(hsh, ons);
+        if( excp ) hsh = mm3ns32(hsh, ons);
         excp = 0;
     }
 
     // 5. entropy distillation /////////////////////////////////////////////////
 
-    ent ^= rotl64 (ts_tv_nsec, 13);
-    ent ^= rotl64 (dlt       ,  7);
-    ent  = knuthmx(ent       ^avg);
+    ent ^= dlt        <<   7 ;       // 1st derivative of time
+    ent ^= ts_tv_nsec <<  13 ;       // current monotonic time
+    ent  = knuthmx(ent ^ dff);       // 2nd derivative of time
 
     // 6. macro-mix in djb2-style //////////////////////////////////////////////
     /*
@@ -474,29 +477,30 @@ hashotloop:
     // 7. entropy injection in hsh /////////////////////////////////////////////
 
     // it consumes entropy, and does hash the another rotation
-    hsh = rotl64(hsh ^ ((ent >> 5) << 3), getprmx16(ent));
+    hsh ^= rotl64(hsh, getprmx16(ent));
 
     // 8. exceptions management ////////////////////////////////////////////////
 
     // copying with the VMs scheduler timings: continue made by an ASM jump
-    if( excp ) goto reschedule;
+    ctot++; if( excp ) goto reschedule;
 
     // 9. preparation for the next round ///////////////////////////////////////
 
     if( --maxn ) {
-        ons = ts_tv_nsec;
+        ons  = ts_tv_nsec;
 reschedule:
         sched_yield();
         goto hashotloop;             // a loop made by two ASM jumps
     }
 
 /** HASHING LOOP CLOSE  *******************************************************/
-
     // X. finalising w/ a 32+1 bit mix /////////////////////////////////////////
 
-    ohs = mm3ns32(hsh, ohs);
+    ent = hsh;                       // forget the entropy mixed in hash
+    hsh = mm3ns32(hsh, ohs);         // whitening the hash before deliver
+    ohs = ent;                       // keep the hashing internal state
 
-    return ohs;
+    return hsh;
 }
 
 static inline uint8_t trndbyte() {
@@ -849,9 +853,9 @@ int main(int argc, char *argv[]) {
 
     perr("Tests: %u w/ duplicates %.0lf over ", ntsts, (df)nk);
     if((nt >> 3) > E6)
-        perr("%.2lfM hashes (%.4lg ppm)\n", (double)nt/E6, (double)E6*nk/nt);
+        perr("%.2lfM hashes\n", (double)nt/E6);
     else
-        perr("%.1lfK hashes (%.4lg ppm)\n", (double)nt/E3, (double)E6*nk/nt);
+        perr("%.1lfK hashes\n", (double)nt/E3);
 
     avgbc /= ntsts;
     double bic_nx_absl = (double)bic / nx;
@@ -870,7 +874,7 @@ int main(int argc, char *argv[]) {
         (double)rt/E9, (double)E6*nt/(rt<<7), (double)mt/E9, (double)E6*nt/mt);
 
     uint32_t pmns = (uint32_t)djb2tum(DJB2VGET, 0, 0, pmdly, 0, 0);
-    perrprms("Setting:", pmns);
+    perrprms("\nSetting:", pmns);
 
     return 0; // exit() do free()
 }
