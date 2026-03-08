@@ -139,14 +139,17 @@
 #define BIT(v,n)  ( ( (v) >> (n) ) & 1 )
 #define perr(x...) fprintf(stderr, x)
 
+#if 0 // RAF: this code is not used anymore but remains for educational purpose
+      //      functionally is converted into a commentary section about uchaos.c
+      //
 #define ALPH64 "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz0123456789@\n"
-
 static inline uint8_t *bin2s64(uint8_t *buf, uint32_t nmax) {
     static const uint8_t c[] = ALPH64;
     for(register uint32_t i = 0; i < nmax; i++)
         buf[i] = c[ 0x3F & buf[i] ];
     return buf;
 }
+#endif
 
 #ifdef _USE_GET_RTSC
 #define USE_GET_TIME 0
@@ -170,8 +173,16 @@ static inline uint64_t get_rdtsc_clock(uint32_t *pcpuid) {
 #define USE_GET_TIME 1
 #endif
 
-#define USE_PRIMES_2564 0
-#if     USE_PRIMES_2564
+#if 0 // RAF: this code is not used anymore but remains for educational purpose
+      //      functionally is converted into a commentary section about uchaos.c
+      //
+#define PRMX 0
+#define IDIV10(x) ((0xcccccccdULL * x) >> 35)
+static inline uint32_t imod10(uint32_t x) {
+    uint32_t a = IDIV10(x);
+    x -= (a << 3) + (a << 1);        // mult.: 10x = 8x + 2x
+    return x;
+}
 /*
  * This sequence of primes has a peculiar structure: x, y where x + y = 64.
  * Both members of each pair is a prime number, and by rotl64 are like x, -x.
@@ -179,21 +190,18 @@ static inline uint64_t get_rdtsc_clock(uint32_t *pcpuid) {
  */
 static const uint8_t primes64[20] = {  3, 61,  5, 59, 11, 53, 17, 47, 23, 41,
                                       19, 45, 29, 35, 31, 33, 13, 51,  7, 57 };
-
 static inline uint32_t getprmx10(uint32_t x) {
-    return primes64[x - ((x * 0xcccccccdULL) >> 35) * 10];
+    return primes64[imod10(x)];
 }
-
-static inline uint32_t getprmx16(uint32_t x) {
-    return primes64[ 2 + (x & 0x0f) ];
-}
-
 static inline uint32_t getprmx20(uint32_t x) {
-    x -= ((x * 0xcccccccdULL) >> 35) * 10
-    x +=  (x & 0x10) ? 10 : 0;
+    x = imod10(x) + (x & 0x10) ? 10 : 0;
     return primes64[x];
 }
+static inline uint32_t getprmx16(uint32_t x) {
+    return primes64[ 2 + (x & 0x1f) ];
+}
 #else
+#define PRMX 0
 #define getprmx16(w) (5 + (((w) & 0x1f) << 1))
 #endif
 
@@ -235,7 +243,9 @@ static inline uint64_t getnstime(uint32_t *pcpuid) {
     return ns;
 }
 
-#if 0
+#if 0 // RAF: this code is not used anymore but remains for educational purpose
+      //      functionally is converted into a commentary section about uchaos.c
+      //
 /*
  * This function isn't 32bit fast but a variant of the original Park-Miller
  * which has a 2^31-2 period. It is useful to introduce in the uchaos output
@@ -282,7 +292,10 @@ static inline uint16_t mm3ns16(uint16_t ns, uint16_t p) {
 
 #include <sched.h>
 
-#if 0   /* RAF: unification by new rotations approach *********************** */
+#if 0 // RAF: this code is not used anymore but remains for educational purpose
+      //      functionally is converted into a commentary section about uchaos.c
+      //
+      /* RAF: unificated by new rotations approach ************************** */
 #define STBX 0
 #define STBRSTR "stochastics branches"
 #define FINAL_AVALANCHE_MLT 0xc4ceb9fe1a85ec53ULL
@@ -312,12 +325,12 @@ static inline uint64_t mm3ns32(uint64_t ks, uint64_t p) {
     register uint64_t z = ks;
     z = (p ^ (z >> 29)) * 0xff51afd7ed558ccdULL;
     z = (z ^ (z >> 31)) * 0xc4ceb9fe1a85ec53ULL;
+    if( p != ks )
     z = (z ^ (z >> 33)) ^ (p << 33);
     return z;
 }
 #endif /* ******************************************************************* */
 
-#define PRMX USE_PRIMES_2564
 #define pidx64(p) (uint64_t)pidx(p)
 #define pidx(p) ((uint32_t)(uintptr_t)(p))
 #define perr_app_info(a) { perr("%s%s %s%s%s%s%s", (a)?"":"\n", APPNAME, VERSION,\
