@@ -1,7 +1,7 @@
 /*
  * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2 license
  */
-#define VERSION "v0.5.3.2"
+#define VERSION "v0.5.4"
 /* Quick 2k test: cat uchaos.c  | ./chaos -T 2048 | ent
  * Boot log test: cat dmesg.txt | ./uchaos -S -M2 | ent
  *
@@ -176,7 +176,7 @@ static inline uint32_t __cpuid__slfence(void) {
     return (ebx >> 24);
 }
 #endif
-static inline uint64_t get_rdtsc_clock(uint32_t *pcpuid) {
+static inline uint32_t get_rdtsc_clock(uint32_t *pcpuid) {
     __asm__ __volatile__ ("" ::: "memory");  // Compiler barrier: avoid reording
 #ifdef __SSE2__
     _mm_lfence(); return __rdtscp(pcpuid);
@@ -186,7 +186,7 @@ static inline uint64_t get_rdtsc_clock(uint32_t *pcpuid) {
     *pcpuid = __cpuid__slfence();
     // non-atomic: scheduler can switch CPU here, it needs sched_setaffinity()
     __asm__ __volatile__ ("rdtsc" : "=a" (lsb), "=d" (msb));
-    return ((uint64_t)msb << 32 | lsb);
+    return lsb;
 #endif
 }
 #else /* ******************************************************************** */
@@ -249,11 +249,11 @@ struct rand_pool_info_buf {
  * it is impose a pragma, and if compiler cannot satisfy it, warning at least.
  */
 
-static inline uint64_t getnstime(uint32_t *pcpuid) {
+static inline uint32_t getnstime(uint32_t *pcpuid) {
 #if ! USE_GET_TIME
     if(pcpuid) return get_rdtsc_clock(pcpuid);
 #endif
-    uint64_t ns;
+    uint32_t ns;
     struct timespec ts;                  // using sched_yield() to creates chaos,
     clock_gettime(CLOCK_MONOTONIC, &ts); // getting ns in a hot loop is the limit
                                          // and we want to see this limit, in VMs
