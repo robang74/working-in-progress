@@ -1,7 +1,7 @@
 /*
  * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2 license
  */
-#define VERSION "v0.5"
+#define VERSION "v0.5.1"
 /* Quick 2k test: cat uchaos.c  | ./chaos -T 2048 | ent
  * Boot log test: cat dmesg.txt | ./uchaos -S -M2 | ent
  *
@@ -320,8 +320,8 @@ static inline uint64_t mm3ns32(uint64_t ks, uint64_t p) {
 #define PRMX USE_PRIMES_2564
 #define pidx64(p) (uint64_t)pidx(p)
 #define pidx(p) ((uint32_t)(uintptr_t)(p))
-#define perr_app_info(a) { perr("%s %s%s%s%s%s", APPNAME, VERSION, STBX ? " w/sb"\
-      : "", PRMX ? "" : " !/pr", USE_GET_TIME ? "" : " rtcs", (a) ? "\n" : ""); }
+#define perr_app_info(a) { perr("%s%s %s%s%s%s%s", (a)?"":"\n", APPNAME, VERSION,\
+        STBX?" w/sb":"", PRMX?"":" !/pr", USE_GET_TIME?"":" rtcs", (a)?"\n":""); }
 #define DJB2UPDT { tncl += ncl; tdmx = MAX(dmx, tdmx); tdmn = MIN(dmn, tdmn); }
 #define PMDLY2NS ( ( ( dmn * pmdly ) + 127 ) >> 8 )
 #define DJB2VGET ( (uint64_t)-1 )
@@ -351,8 +351,8 @@ static uint64_t djb2tum(uint64_t seed, uint8_t maxn, uint32_t nsdly,
         df jean = (df)javg / tncl;
         perr("\nLatency: %.0f <%.01lf> %.01lfK ns, %.3lgK w/ ev:%.0f, ex:%5.02lf%%\n",
             (df)tdmn, mean, (df)tdmx/E3, (df)tncl/E3, (df)evnt, 100.0*(df)nexp/ctot);
-        perr( "`Ratios: %.02lf <avg=1U> %.02lf, min=1U <%.02lf> %.02lf\n",
-            (df)tdmn/mean, (df)tdmx/mean, mean/tdmn, (df)tdmx/tdmn);
+        perr( "`Ratios: %.02lf <avg=1U> %.02lf, min=1U <%.02lf> %.01lf, %.01lfb\n",
+            (df)tdmn/mean, (df)tdmx/mean, mean/tdmn, (df)tdmx/tdmn, log2(mean-tdmn));
         perr(  "Jitters: %.0f <%.01lf> %.0f ns w/ %.04lgx, %.0lf:1K, %+.01lf‰\n",
             (df)jmn, jean, (df)jmx, (df)jmx/jean, dk(ctot,tncl,ctot), dk(mean,tdmn,jean));
     }
@@ -765,18 +765,17 @@ int main(int argc, char *argv[]) {
         else { free(hsh); } hsh = NULL;
     }
 
-    double avgbc = 0, avgmx = 0, avgmn = 256;
+    double   avgbc = 0, avgmx = 0, avgmn = 256;
     uint64_t bic = 0, max = 0, min = 256, avg = 0;
     uint64_t nk = 0, nt = 0, nx = 0, nn = 0, mt = 0;
 
     if(quiet < 2) {
         perr_app_info(0);
         if(prsts) { // RAF, TODO: dealing with size one.
-            perr("; repetitions: ");
             if(nblks < 2) {
                 perr("too short input, try longer!\n\n");
                 prsts = 0;
-            }
+            } else perr("; collision: ");
         } else perrprms("", -1);
     }
 
@@ -833,7 +832,7 @@ int main(int argc, char *argv[]) {
             }
         }
 
-        double curavg = (double)avg / nn;
+        df curavg = (df)avg / nn;
         if(avgmx < curavg) avgmx = curavg;
         if(avgmn > curavg) avgmn = curavg;
         avgbc += curavg;
@@ -848,30 +847,32 @@ int main(int argc, char *argv[]) {
     if(!prsts) return 0;
 
     uint64_t rt = get_nanos();
-    perr("%s\n", nk ? ", status KO" : "0, status OK");
+    perr("%s\n", nk ? ", status KO" : "no, status OK");
     perr("\n");
 
-    perr("Tests: %u w/ duplicates %.0lf over ", ntsts, (df)nk);
+    perr("Running %u ", ntsts);
     if((nt >> 3) > E6)
-        perr("%.2lfM hashes\n", (double)nt/E6);
+        perr("-> %.2lfMH (%.2lfGB)", (df)nt/(1ULL<<20), (df)nt/(1ULL<<27));
     else
-        perr("%.1lfK hashes\n", (double)nt/E3);
+        perr("-> %.1lfKH (%.1lfMB)", (df)nt/(1ULL<<10), (df)nt/(1ULL<<17));
+    perr(" w/ %.0lf duplicates\n", (df)nk);
+
 
     avgbc /= ntsts;
-    double bic_nx_absl = (double)bic / nx;
-    double bic_nx = (double)100 / 64 * bic_nx_absl;
-    #define devppm(v,a) ( ((double)v-a) * E6 / a )
+    df bic_nx_absl = (df)bic / nx;
+    df bic_nx = (df)100 / 64 * bic_nx_absl;
+    #define devppm(v,a) ( ((df)v-a) * E6 / a )
 
     perr("Hamming <weight>: %.4lf%% ~ 50%% by (%+.4lg ppm)\n",
         bic_nx, devppm(bic_nx, 50));
     perr("Hamming distance: %.0lf <%.6lf> %.0lf over %.4lgK XORs\n",
-        (double)min, bic_nx_absl, (double)max, (double)nx/E3);
+        (df)min, bic_nx_absl, (df)max, (df)nx/E3);
     perr("Hamming dist/avg: %.4lf < 1U:32 %+.4lg ppm > %.4lf\n",
         avgmn/bic_nx_absl, devppm(bic_nx_absl, 32), avgmx/bic_nx_absl);
 
     perr("\n");
     perr("Perform: exec %.3lgs, %.3lg MB/s; hash %.3lgs, %.4lg KH/s",
-        (double)rt/E9, (double)E6*nt/(rt<<7), (double)mt/E9, (double)E6*nt/mt);
+        (df)rt/E9, (df)E6*nt/(rt<<7), (df)mt/E9, (df)E6*nt/mt);
 
     uint32_t pmns = (uint32_t)djb2tum(DJB2VGET, 0, 0, pmdly, 0, 0);
     perrprms("\nSetting:", pmns);
