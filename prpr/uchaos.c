@@ -1,7 +1,7 @@
 /*
  * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2 license
  */
-#define VERSION "v0.5.3.1"
+#define VERSION "v0.5.3.2"
 /* Quick 2k test: cat uchaos.c  | ./chaos -T 2048 | ent
  * Boot log test: cat dmesg.txt | ./uchaos -S -M2 | ent
  *
@@ -388,7 +388,7 @@ typedef struct djb2tum_status {
 
 #define dtskew(x) (!x || (x)>>28)    // 2^29 is the biggest 2^n before 1E9
 
-#define djb2tum_status_init { 0,-1,0, 0,-1,0, 0,-1,0, 0,-1,0, 0,-1,0, HSHSEED }
+#define djb2tum_status_init { 0,-1,0, 0,-1,0, 0,-1,0, 0,0,0, 0,-1,0, HSHSEED }
 
 static uint64_t djb2tum(uint64_t seed, uint8_t maxn, uint32_t nsdly,
     uint32_t pmdly, uint8_t nbtls, uint8_t rset)
@@ -922,7 +922,7 @@ int main(int argc, char *argv[]) {
 
     perr("\nLatency: %.0f <%.01lf> %.01lfK ns, %.3lgK w/ ev:%.0f, ex:%5.02lf%%\n",
         (df)s->tdmn, mean, (df)s->tdmx/E3, (df)s->tncl/E3, (df)s->evnt,
-            100.0*(df)s->nexp/s->ctot);
+            ((df)s->nexp/s->ctot)*100);
     perr( "`Ratios: %.02lf <avg=1U> %.02lf, min=1U <%.02lf> %.01lf, %.01fb\n",
         (df)s->tdmn/mean, (df)s->tdmx/mean, mean/s->tdmn, (df)s->tdmx/s->tdmn,
             __builtin_log2f(mean - s->tdmn));
