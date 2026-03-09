@@ -647,7 +647,7 @@ static inline uint8_t *bin2str(uint8_t *buf, uint32_t nmax) {
     return buf;
 }
 
-archul_t *str2hsh(const uint8_t *str, uint32_t *size, uint32_t nsdly,
+archul_t *str2hsh(const uint8_t *str, archul_t *h, uint32_t *size, uint32_t nsdly,
     uint32_t pmdly, uint8_t nbtls, uint8_t rset)
 {
     if (!str || !size) return NULL;
@@ -659,10 +659,11 @@ archul_t *str2hsh(const uint8_t *str, uint32_t *size, uint32_t nsdly,
     // 2. Generate the words-sized array
     // We allocate a separate array for hashes if that was the intent, or we cast
     // the rotated string. Based on your code, you want a hash per 8-byte block.
-    archul_t *h = NULL;
-    if(posix_memalign((void **)&h, ALGN, nwords << ABL) || !h) {
-        perror("posix_memalign");
-        return NULL;
+    if(h == NULL) {
+        if(posix_memalign((void **)&h, ALGN, nwords << ABL) || !h) {
+            perror("posix_memalign");
+            return NULL;
+        }
     }
     *size = nwords;
 
@@ -874,10 +875,11 @@ int main(int argc, char *argv[]) {
     //if (nblks > 1) bin2str(str, n); // necessary because djb2tum() born for text,
     str[n] = 0;                      // refactoring it for binary input, is the way.
 
+    archul_t *hsh = NULL;
     for(uint32_t a = nrdry; a; a--) {
         uint32_t size = n;
-        if(!str2hsh(str, &size, nsdly, pmdly, nbtls, 0))
-            return EXIT_FAILURE;
+        hsh = str2hsh(str, hsh, &size, nsdly, pmdly, nbtls, 0);
+        if(!hsh) return EXIT_FAILURE;
     }
 
     archul_t max   = 0,   min = E9;
@@ -898,7 +900,7 @@ int main(int argc, char *argv[]) {
         // hashing
         uint32_t size = n;
         uint64_t stns = get_nanos(); /**** hashing time accounting start ******/
-        archul_t *hsh = str2hsh(str, &size, nsdly, pmdly, nbtls, rset);
+        hsh = str2hsh(str, hsh, &size, nsdly, pmdly, nbtls, rset);
         mt += get_nanos() - stns; /******* hashing time accounting stop *******/
         if(!hsh) return EXIT_FAILURE;
 
@@ -953,12 +955,11 @@ int main(int argc, char *argv[]) {
         avgbc += curavg;
         nt += size;
 
-        free(hsh); hsh = NULL;
         sched_yield();  // Statistics are a block of CPU data-crunching but also
                         // a predictable delay which sched_yield() can jeopardise.
                         // Stats makes the large size output slower 1.7x than -q.
     }
-
+    free(hsh); hsh = NULL;
     if(!prsts) return 0;
 
     uint64_t rt = get_nanos();
