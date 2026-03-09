@@ -540,7 +540,7 @@ hashotloop:                                      // a loop made by two ASM jumps
     }
     s.oid = cpuid;
 #endif
-    if( !ons ) { skw = 0; hsh = knuthmx(hsh^ons);          goto reschedule;    }
+    if( !ons ) { hsh = knuthmx(hsh^tm_4s_nsec);            goto reschedule;    }
 
     // 2. latency calculation //////////////////////////////////////////////////
 
@@ -567,7 +567,7 @@ notcrashstats:
         dff = dlt - s.dmn;
         ent ^= ~dff ^ s.dmx;
     }
-    if( !dff ) { hsh = knuthmx(hsh);     goto reschedule; }
+    if( !dff ) { hsh = knuthmx(hsh); skw = 0;             goto reschedule;    }
 
     // 4. jittering calculation ////////////////////////////////////////////////
 
@@ -575,10 +575,11 @@ notcrashstats:
     if( dff < nsdly + (pmdly ? PMDLY2NS(s.dmn) : 1) + excp ) {
         excp += 4;                   // increasing excp and accounting for dff
         s.nexp++;
+        skw = 0;
     } else {
         // Knuth, based on gold section seeded by 1E-3 ~ 1E-4 event idx
         if( excp ) { hsh = murmux3(hsh, ons); } excp = 0;
-        if( skw  ) { skw = 0;                              goto skiptoetropiy; }
+        if( skw  ) { skw = 0;                              goto skiptoetropy;  }
         // min,max jittering can be ommited
         if( s.jmn == -1 ) s.jmn = dff;
         else
@@ -589,7 +590,7 @@ notcrashstats:
     }
 
     // 5. entropy distillation /////////////////////////////////////////////////
-skiptoetropiy:
+skiptoetropy:
     ent ^= dlt        << ABz ;       // 1st derivative of time
     ent ^= tm_4s_nsec << rot3;       // current monotonic time
     ent  = knuthmx(ent ^ dff);       // 2nd derivative of time
@@ -608,16 +609,17 @@ skiptoetropiy:
     // it consumes entropy, and does hash the another rotation
     hsh ^= rotlbit(hsh, getprmx16(ent));
 
-    // 9. preparation for the next round ///////////////////////////////////////
+    // 8. preparation for the next round ///////////////////////////////////////
 
     s.ctot++;
     // copying with the VMs scheduler timings: continue made by an ASM jump
 reschedule:
-    if( !excp || skw  ) { maxn--; ons = tm_4s_nsec; }
+    if(   skw         ) { skw = 0; }
+    if( !excp         ) { maxn--; ons = tm_4s_nsec; }
     if(  excp || maxn ) {  sched_yield();                  goto hashotloop;    }
 
 /** HASHING LOOP CLOSE  *******************************************************/
-    // X. finalising w/ a 32+1 bit mix /////////////////////////////////////////
+    // 9. finalising w/ a 32+1 bit mix /////////////////////////////////////////
 
     ent = hsh;                       // forget the entropy mixed in hash
     hsh = murmux3(hsh, s.ohs);       // whitening the hash before deliver
@@ -948,10 +950,9 @@ int main(int argc, char *argv[]) {
                         // a predictable delay which sched_yield() can jeopardise.
                         // Stats makes the large size output slower 1.7x than -q.
     }
+
     uint64_t rt = get_nanos();
     free(hsh); hsh = NULL;
-    mt += rt;
-
     if(!prsts) return 0;
 
     perr("%s\n", nk ? ", status: KO" : "no, status: OK");
