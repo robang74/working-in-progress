@@ -1,14 +1,15 @@
 /*
  * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2 license
  */
-#define VERSION "v0.5.5.3"
+#define VERSION "v0.5.6"
 /* Quick 2k test: cat uchaos.c  | ./chaos -T 2048 | ent
  * Boot log test: cat dmesg.txt | ./uchaos -S -M2 | ent
  *
- * Compile w/libc:      gcc uchaos.c -O3 --fast-math -Wall -o uchaos -s -lm
+ * Compile w/libc:      gcc uchaos.c -O3 --fast-math -Wall -o uchaos -s -lm 
+ * Compile 4speed:                   -mavx2 -march=native -funroll-loops
  * Compile w/musl: musl-gcc uchaos.c -O3 --fast-math -Wall -o uchaos -s -static
  * Compile option: -D_USE_GET_RTSC (i686: -m32 -msse2), -D_USE_LINUX_RANDOM_H
- *                 -D_USE_FUNCS_32 (i686: -m32, native)
+ *                 -D_USE_FUNCS_32 (i686: -m32, native), -D_USE_PREV_TIME
  * Test with: ent, dieharder, PractRand RNG_test (compiled for Ubuntu 22.04 x64)
  *      drive.google.com/file/d/17ymBcxfO2pA8ET7T4ZxiiO2EYW6_F8Lu/view
  * Qemu test: cd bare-minimal-linux-system; sh start.sh "" bzImage.515x
@@ -121,6 +122,7 @@
 #include <stddef.h>
 #include <time.h>
 #include <math.h>
+#include <immintrin.h>
 #include <sys/ioctl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -167,14 +169,24 @@ static inline uint8_t *bin2s64(uint8_t *buf, uint32_t nmax) {
 
 #if USE_FUNCS_32
 #pragma message("Using the 32-bit functions set")
-typedef uint32_t archul_t;
-typedef float    archdf_t;
-#define AB     5         //  5 -> 32
+    typedef float    archdf_t;
+    typedef uint32_t archul_t;
+    #define AB     5     //  5 -> 32
 #else
-#pragma message("Using the 64-bit functions set")
-typedef uint64_t archul_t;
-typedef double   archdf_t;
-#define AB     6         //  6 -> 64
+    typedef double   archdf_t;
+    #if defined(__SIZEOF_INT128__)
+    #pragma message("Using the 128-bit functions set")
+        #define HAS_UINT128 1
+        typedef unsigned __int128 uint128_t;
+        typedef uint128_t archul_t;
+        #define AB  7    //  7 -> 64
+    #else
+    #pragma message("Using the 64-bit functions set")
+        #define HAS_UINT128 0
+        typedef uint64_t archul_t;
+        #define AB  6    //  6 -> 64
+    #endif
+
 #endif
 
 #define ABL (AB-3)       //  2 or  3
@@ -360,38 +372,69 @@ static inline uint16_t mm3ns16(uint16_t ns, uint16_t p) {
 #else /* ******************************************************************** */
 #define STBX 1
 #define perrwrn()
-#define FINAL_AVALANCHE_MLT 0xFF51AFD7ED558CCD
 #define entropy(sz) ((sz << 2) - sz) // eq. to 3x (4-1)
 static inline uint8_t  minmix8(uint8_t b) {
     b *= (b & 1) ? 0x4d : 0x65;
     b ^= ((b >> 3) | (b << 5));
     return b;
 }
+/*
+ * RAF, interesting sequence by a recursive function
+ *
+static inline archul_t rfv(archul_t x) { x >>= USE_FUNCS_32; x += !(x&1); return x; }
+#define rfc(x) ((x >> USE_FUNCS_32) + !((x >> USE_FUNCS_32)&1))
+#define ABT 47
+// rf(ABT) 47,23
+// rf(rf(ABT)) 23,13
+// rf(rf(rf(ABT))) 13,7
+// rf(rf(rf(rf(ABT)))) 7,3
+// rf(rf(rf(rf(rf(ABT))))) 3,1
+ */
+#if USE_FUNCS_32
+#define murmul1 0x85ebca6b
+#define murmul2 0xc2b2ae35
+#define murmul3 0x045d9f3b
+#define rot1    23
+#define rot2    17
+#define rot3     7
+#else
+    #if HAS_UINT128
+#define murmul1 (((uint128_t)0x87c37b91114253d5ULL << 64) | 0x4cf5ad432745937fULL)
+#define murmul2 (((uint128_t)0xff51afd7ed558ccdULL << 64) | 0xc4ceb9fe1a85ec53ULL)
+#define murmul3 (((uint128_t)0x9e3779b97f4a7c15ULL << 64) | 0xf39cc0605cedc834ULL)
+#define rot1    83
+#define rot2    31
+#define rot3    17
+    #else
+#define murmul1 0xff51afd7ed558ccdULL
+#define murmul2 0xc4ceb9fe1a85ec53ULL
+#define murmul3 0x9E3779B9045d9f3bULL
+#define rot1    47
+#define rot2    17
+#define rot3    13
+    #endif
+#endif
 static inline archul_t knuthmx(archul_t iw) {
     register archul_t w = iw;
     w  = rotlbit(w, getprmx16(w));
-    w *= (w & 1) ? 0x9E3779B9 : 0x45d9f3b;
-#if USE_FUNCS_32
-    w ^= rotlbit(w, (w & 2) ? 23 : 17);
-#else
-    w ^= rotlbit(w, (w & 2) ? 47 : 17);
-#endif
+    w *= (w & 1) ? 0x9E3779B9 : 0x045d9f3b;
+    w ^= rotlbit(w, (w & 2) ? (47 >> USE_FUNCS_32) : 17);
     return w;
 }
 static inline archul_t murmux3(archul_t ks, archul_t p) {
-    register archul_t z = ks;
-#if USE_FUNCS_32
-    z = (p ^ (z >> 13)) * 0x85ebca6b;
-    z = (z ^ (z >> 15)) * 0xc2b2ae35;
-    if ( p != ks )
-    z = (z ^ (z >> 17)) ^ (p << 13);
+#if 0
+    register archul_t z = knuthmx(~ks);
+    z = (p  ^ (z >> (ABx-2))) * murmul1;
+    z = (ks ^ (z <<  ABx   )) * murmul2;
+    z = (z  ^ (z >> (ABx+2))) * murmul3;
+    return rotlbit(z, getprmx16(p>>2));
 #else
-    z = (p ^ (z >> 29)) * 0xff51afd7ed558ccdULL;
-    z = (z ^ (z >> 31)) * 0xc4ceb9fe1a85ec53ULL;
-    if ( p != ks )
-    z = (z ^ (z >> 33)) ^ (p << 29);
-#endif
+    register archul_t z = ks;
+    z =  p ^ ((z >> (ABx-2)) * murmul1);
+    z = (z ^ ( z <<  ABx  )) * murmul2;
+    z =  z ^ ( z >> (ABx+2));
     return z;
+#endif
 }
 
 #endif /* ******************************************************************* */
@@ -428,7 +471,11 @@ typedef struct djb2tum_status {
  * 16777619               The FNV-1 offset basis (32-bit).
  * 14695981039346656037	  The FNV-1 offset basis (64-bit).
  */
-#define HSHSEED 5381
+#if USE_FUNCS_32
+#define HSHSEED 16777619
+#else
+#define HSHSEED 14695981039346656037ULL
+#endif
 
 #define dtskew(x) (!x || (x)>>28)    // 2^29 is the biggest 2^n before 1E9
 
@@ -439,15 +486,24 @@ static archul_t djb2tum(archul_t seed, uint8_t maxn, uint32_t nsdly,
 {
     // This is the internal state of the engine
     static djb2_t s = djb2tum_status_init;
+    /*
+     * In general, the previous time shouldn't be persistent across calls
+     * but this function is running in strict sequence in a manner that
+     * it makes sense keep the ons static, also because dtskew() exists
+     */
+#ifndef _USE_PREV_TIME
+    static
+#endif
+    archul_t __attribute__((aligned(16))) ons = 0;
 
     if( s.ncl || s.tncl || rset || seed == DJB2VGET ) {
-        s.tncl += s.ncl; s.ncl = 0;
+        s.tncl += s.ncl;   s.ncl = 0; 
         s.tdmx  = MAX(s.dmx, s.tdmx);
         s.tdmn  = MIN(s.dmn, s.tdmn);
         s.pmns  = PMDLY2NS  (s.tdmn);
     }
 
-    if( rset ) { s.dmn = -1, s.dmx = 0, s.ncl = 0; };
+    if( rset ) { s.dmn = -1, s.dmx = 0, s.ncl = 0; ons = 0; };
 
     // The best practice is to share a copy not the internal state
     if( seed == DJB2VGET ) return (uintptr_t)&s;
@@ -456,9 +512,9 @@ static archul_t djb2tum(archul_t seed, uint8_t maxn, uint32_t nsdly,
 
     // 0. hashing loop preparation, p.1 ////////////////////////////////////////
 
-    archul_t __attribute__((aligned(8))) tm_4s_nsec, dff, dlt, ons = 0, ent = 0;
+    archul_t __attribute__((aligned(16))) tm_4s_nsec, dff, dlt, ent = 0;
     register archul_t hsh = s.ohs;
-    uint8_t excp = 0;                // excp++ as uint8_t grants for convergence
+    uint8_t skw = !!ons, excp = 0;   // excp++ as uint8_t grants for convergence
 
     if( seed ) hsh ^= seed;
 
@@ -485,6 +541,7 @@ hashotloop:
     s.oid = cpuid;
 #endif
     if( !ons ) {
+        skw = 0;
         ons = tm_4s_nsec;
         hsh = knuthmx(hsh^ons);
         goto reschedule;
@@ -495,6 +552,7 @@ hashotloop:
     dlt = tm_4s_nsec - ons;       // within 4s is fine, with RTCS is always fine
     if( dtskew(dlt) ) { ons = tm_4s_nsec; goto reschedule; }
     if( s.dmn == -1 ) { s.dmn = dlt; goto reschedule; }
+    if( skw ) goto notcrashstats;
 
     // 3. internal state update ////////////////////////////////////////////////
 
@@ -510,6 +568,7 @@ hashotloop:
         ent ^= dff ^ -s.dmx;
         s.evnt++;
     } else {
+notcrashstats:
         dff = dlt - s.dmn;
         ent ^= ~dff ^ s.dmx;
     }
@@ -522,6 +581,9 @@ hashotloop:
         excp += 4;                   // increasing excp and accounting for dff
         s.nexp++;
     } else {
+        // Knuth, based on gold section seeded by 1E-3 ~ 1E-4 event idx
+        if( excp ) { hsh = murmux3(hsh, ons); } excp = 0;
+        if( skw  ) { skw = 0; goto skiptoetropiy; }
         // min,max jittering can be ommited
         if( s.jmn == -1 ) s.jmn = dff;
         else
@@ -529,15 +591,12 @@ hashotloop:
         if( dff > s.jmx ) s.jmx = dff;
         // avg calculation can be ommitted
         s.avg += dlt; s.javg += dff; s.ncl++;
-        // Knuth, based on gold section seeded by 1E-3 ~ 1E-4 event idx
-        if( excp ) hsh = murmux3(hsh, ons);
-        excp = 0;
     }
 
     // 5. entropy distillation /////////////////////////////////////////////////
-
-    ent ^= dlt        <<   7 ;       // 1st derivative of time
-    ent ^= tm_4s_nsec <<  13 ;       // current monotonic time
+skiptoetropiy:
+    ent ^= dlt        << ABz ;       // 1st derivative of time
+    ent ^= tm_4s_nsec << rot3;       // current monotonic time
     ent  = knuthmx(ent ^ dff);       // 2nd derivative of time
 
     // 6. macro-mix in djb2-style //////////////////////////////////////////////
@@ -588,56 +647,30 @@ static inline uint8_t *bin2str(uint8_t *buf, uint32_t nmax) {
     return buf;
 }
 
-archul_t *str2hsh(const uint8_t *str, uint32_t *size, uint32_t nsdly,
+archul_t *str2hsh(const uint8_t *str, archul_t *h, uint32_t *size, uint32_t nsdly,
     uint32_t pmdly, uint8_t nbtls, uint8_t rset)
 {
     if (!str || !size) return NULL;
 
-    // 0. Calculate the string lenght
-    uint32_t len = *size;
-    if(!len) {
-        len = strlen((char *)str);
-        if (len == 0) return NULL;
-    }
-
-    // 1. Calculate padding and allocation
+    // 1. Calculate allocation
     // We need enough 64-bit blocks to cover n bytes.
-    uint32_t nwords = (len + ABz) >> ABL;
-    uint32_t nbytes = nwords << ABL;
+    uint32_t i, n = 0, nwords = (*size + ABz) >> ABL;
 
-    // 2. Allocate aligned memory for the processed string
-    uint8_t *strng = NULL;
-    if(posix_memalign((void **)&strng, ALGN, nbytes) || !strng) {
-        perror("posix_memalign");
-        return NULL;
-    }
-
-    // 3. Determine rotation offset using monotonic time
-    uint32_t k = trndbyte() % len;
-    // 4. Perform rotation into the new buffer
-    // Copy from k to end
-    memcpy(strng, str + k, len - k);
-    // Copy from beginning to k
-    //perr("k = %d, len = %ld \n", k, len);
-    if (k) memcpy(strng + (len - k), str, k);
-    // Padding with zeros
-    memset(&strng[len], 0, nbytes - len);
-
-    // 5. Generate the words-sized array
+    // 2. Generate the words-sized array
     // We allocate a separate array for hashes if that was the intent, or we cast
     // the rotated string. Based on your code, you want a hash per 8-byte block.
-    archul_t *h = NULL;
-    if(posix_memalign((void **)&h, ALGN, nwords << ABL) || !h) {
-        perror("posix_memalign");
-        free(strng);
-        return NULL;
+    if(h == NULL) {
+        if(posix_memalign((void **)&h, ALGN, nwords << ABL) || !h) {
+            perror("posix_memalign");
+            return NULL;
+        }
     }
     *size = nwords;
-    //perr("len: %ld, wd: %ld\n", len, nwords);
 
-    // 6. Producing the hashing sequence
-    archul_t *p = (archul_t *)strng;
-    for (archul_t i = 0, n = ABz+1; i < nwords; i++, n += ABz+1) {
+    // 3. Producing the hashing sequence
+    archul_t *p = (archul_t *)str;
+    for (i = 0; i < nwords; i++) {
+        n += ABz+1;
         // Processing each n-bytes chunk of the rotated/padded string
         h[i] = djb2tum(p[i], 1 + !!rset, nsdly, pmdly, nbtls, 0);
         if ( rset && n >= ((archul_t)1 << rset) ) {
@@ -645,8 +678,6 @@ archul_t *str2hsh(const uint8_t *str, uint32_t *size, uint32_t nsdly,
         }
     }
 
-    // 7. free the string memory and return the hash
-    free(strng);
     return h;
 }
 
@@ -686,17 +717,9 @@ static inline uint32_t readbuf(int fd, uint8_t *buffer, uint32_t size, bool intr
     return tot;
 }
 
-#include <immintrin.h>
-#if ALGN > 64
-typedef unsigned __int128 uint128_t;
-#endif
 typedef union {
-    #if ALGN > 64
-    uint128_t uh[ 32];
-    #endif
-    uint64_t  u8[ 64];
-    uint32_t  u4[128];
     uint8_t   uc[BLOCK_SIZE];
+    archul_t  dt[BLOCK_SIZE>>ABL];
 } __attribute__((aligned(16))) block512_t;
 
 static inline uint32_t readblocks(int fd, uint8_t *buf, uint32_t *nblks) {
@@ -723,22 +746,12 @@ static inline uint32_t readblocks(int fd, uint8_t *buf, uint32_t *nblks) {
             if(n == BLOCK_SIZE)
                 memcpy(fst.uc, inp.uc, BLOCK_SIZE);
         }
-        block512_t *bp = (block512_t *)buf;
-#if ALGN > 64
-        // mixing the input by 128-bit words
-        n = (n + 15) >> 4;
-        for (a = 0; a < n; a++)
-            bp->uh[a] ^= inp.uh[a];
-#else
-        // mixing the input by  64-bit words
+        block512_t *bp = __builtin_assume_aligned( (block512_t *)buf, 16 );
+
+        // mixing the input by words
         n = (n + ABz) >> ABL;
         for (a = 0; a < n; a++)
-        #if USE_FUNCS_32
-            bp->u4[a] ^= inp.u4[a];
-        #else
-            bp->u8[a] ^= inp.u8[a];
-        #endif
-#endif
+            bp->dt[a] ^= inp.dt[a];
     }
     *nblks = i;
 
@@ -796,7 +809,7 @@ typedef double __attribute__((aligned(8))) df;
 int main(int argc, char *argv[]) {
     struct rand_pool_info_buf entrnd;
     uint8_t *str = NULL, nbtls = 0, prsts = 0, quiet = 0, rset = 0;
-    uint32_t ntsts = 1, nsdly = 0, nrdry = 1, pmdly = 0, nblks = 1;
+    uint32_t ntsts = 1, nsdly = 0, nrdry = 1, nblks = 1, pmdly = 0;
     int devfd = 0;
 
     // Collect arguments from optional command line parameters
@@ -862,10 +875,11 @@ int main(int argc, char *argv[]) {
     //if (nblks > 1) bin2str(str, n); // necessary because djb2tum() born for text,
     str[n] = 0;                      // refactoring it for binary input, is the way.
 
+    archul_t *hsh = NULL;
     for(uint32_t a = nrdry; a; a--) {
         uint32_t size = n;
-        if(!str2hsh(str, &size, nsdly, pmdly, nbtls, 0))
-            return EXIT_FAILURE;
+        hsh = str2hsh(str, hsh, &size, nsdly, pmdly, nbtls, 0);
+        if(!hsh) return EXIT_FAILURE;
     }
 
     archul_t max   = 0,   min = E9;
@@ -886,7 +900,7 @@ int main(int argc, char *argv[]) {
         // hashing
         uint32_t size = n;
         uint64_t stns = get_nanos(); /**** hashing time accounting start ******/
-        archul_t *hsh = str2hsh(str, &size, nsdly, pmdly, nbtls, rset);
+        hsh = str2hsh(str, hsh, &size, nsdly, pmdly, nbtls, rset);
         mt += get_nanos() - stns; /******* hashing time accounting stop *******/
         if(!hsh) return EXIT_FAILURE;
 
@@ -941,12 +955,11 @@ int main(int argc, char *argv[]) {
         avgbc += curavg;
         nt += size;
 
-        free(hsh); hsh = NULL;
         sched_yield();  // Statistics are a block of CPU data-crunching but also
                         // a predictable delay which sched_yield() can jeopardise.
                         // Stats makes the large size output slower 1.7x than -q.
     }
-
+    free(hsh); hsh = NULL;
     if(!prsts) return 0;
 
     uint64_t rt = get_nanos();
@@ -977,7 +990,7 @@ int main(int argc, char *argv[]) {
     perr("Hamming dist/avg: %.4lf < 1U:%u %+.4lg ppm > %.4lf\n",
         avgmn/bic_nx_absl, ABN, devppm(bic_nx_absl, 32), avgmx/bic_nx_absl);
 
-    perr("\nPerform: exec %.3lgs, %.3lg MB/s; hash %.3lgs, %.4lg KH/s",
+    perr("\nPerform: exec %.3lgs, %.3lg MB/s; hash %.3lgs, %.01lf KH/s",
         (df)rt/E9, (df)(E9>>(20-ABL))*nt/rt, (df)mt/E9, (df)(E9>>10)*nt/mt);
 
     df mean = (df)s->avg  / s->tncl;
