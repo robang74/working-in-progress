@@ -8,7 +8,7 @@
  * Compile w/libc:      gcc uchaos.c -O3 --fast-math -Wall -o uchaos -s -lm
  * Compile w/musl: musl-gcc uchaos.c -O3 --fast-math -Wall -o uchaos -s -static
  * Compile option: -D_USE_GET_RTSC (i686: -m32 -msse2), -D_USE_LINUX_RANDOM_H
- *                 -D_USE_FUNCS_32 (i686: -m32, native)
+ *                 -D_USE_FUNCS_32 (i686: -m32, native), -D_USE_PREV_TIME
  * Test with: ent, dieharder, PractRand RNG_test (compiled for Ubuntu 22.04 x64)
  *      drive.google.com/file/d/17ymBcxfO2pA8ET7T4ZxiiO2EYW6_F8Lu/view
  * Qemu test: cd bare-minimal-linux-system; sh start.sh "" bzImage.515x
@@ -470,7 +470,11 @@ typedef struct djb2tum_status {
  * 16777619               The FNV-1 offset basis (32-bit).
  * 14695981039346656037	  The FNV-1 offset basis (64-bit).
  */
-#define HSHSEED 5381
+#if USE_FUNCS_32
+#define HSHSEED 16777619
+#else
+#define HSHSEED 14695981039346656037ULL
+#endif
 
 #define dtskew(x) (!x || (x)>>28)    // 2^29 is the biggest 2^n before 1E9
 
@@ -481,15 +485,24 @@ static archul_t djb2tum(archul_t seed, uint8_t maxn, uint32_t nsdly,
 {
     // This is the internal state of the engine
     static djb2_t s = djb2tum_status_init;
+    /*
+     * In general, the previous time shouldn't be persistent across calls
+     * but this function is running in strict sequence in a manner that
+     * it makes sense keep the ons static, also because dtskew() exists
+     */
+#ifndef _USE_PREV_TIME
+    static
+#endif
+    archul_t __attribute__((aligned(16))) ons = 0;
 
     if( s.ncl || s.tncl || rset || seed == DJB2VGET ) {
-        s.tncl += s.ncl; s.ncl = 0;
+        s.tncl += s.ncl;   s.ncl = 0; 
         s.tdmx  = MAX(s.dmx, s.tdmx);
         s.tdmn  = MIN(s.dmn, s.tdmn);
         s.pmns  = PMDLY2NS  (s.tdmn);
     }
 
-    if( rset ) { s.dmn = -1, s.dmx = 0, s.ncl = 0; };
+    if( rset ) { s.dmn = -1, s.dmx = 0, s.ncl = 0; ons = 0; };
 
     // The best practice is to share a copy not the internal state
     if( seed == DJB2VGET ) return (uintptr_t)&s;
@@ -498,9 +511,9 @@ static archul_t djb2tum(archul_t seed, uint8_t maxn, uint32_t nsdly,
 
     // 0. hashing loop preparation, p.1 ////////////////////////////////////////
 
-    archul_t __attribute__((aligned(16))) tm_4s_nsec, dff, dlt, ons = 0, ent = 0;
+    archul_t __attribute__((aligned(16))) tm_4s_nsec, dff, dlt, ent = 0;
     register archul_t hsh = s.ohs;
-    uint8_t excp = 0;                // excp++ as uint8_t grants for convergence
+    uint8_t skw = !!ons, excp = 0;   // excp++ as uint8_t grants for convergence
 
     if( seed ) hsh ^= seed;
 
@@ -527,6 +540,7 @@ hashotloop:
     s.oid = cpuid;
 #endif
     if( !ons ) {
+        skw = 0;
         ons = tm_4s_nsec;
         hsh = knuthmx(hsh^ons);
         goto reschedule;
@@ -537,6 +551,7 @@ hashotloop:
     dlt = tm_4s_nsec - ons;       // within 4s is fine, with RTCS is always fine
     if( dtskew(dlt) ) { ons = tm_4s_nsec; goto reschedule; }
     if( s.dmn == -1 ) { s.dmn = dlt; goto reschedule; }
+    if( skw ) goto notcrashstats;
 
     // 3. internal state update ////////////////////////////////////////////////
 
@@ -552,6 +567,7 @@ hashotloop:
         ent ^= dff ^ -s.dmx;
         s.evnt++;
     } else {
+notcrashstats:
         dff = dlt - s.dmn;
         ent ^= ~dff ^ s.dmx;
     }
@@ -564,6 +580,9 @@ hashotloop:
         excp += 4;                   // increasing excp and accounting for dff
         s.nexp++;
     } else {
+        // Knuth, based on gold section seeded by 1E-3 ~ 1E-4 event idx
+        if( excp ) { hsh = murmux3(hsh, ons); } excp = 0;
+        if( skw  ) { skw = 0; goto skiptoetropiy; }
         // min,max jittering can be ommited
         if( s.jmn == -1 ) s.jmn = dff;
         else
@@ -571,13 +590,10 @@ hashotloop:
         if( dff > s.jmx ) s.jmx = dff;
         // avg calculation can be ommitted
         s.avg += dlt; s.javg += dff; s.ncl++;
-        // Knuth, based on gold section seeded by 1E-3 ~ 1E-4 event idx
-        if( excp ) hsh = murmux3(hsh, ons);
-        excp = 0;
     }
 
     // 5. entropy distillation /////////////////////////////////////////////////
-
+skiptoetropiy:
     ent ^= dlt        << ABz ;       // 1st derivative of time
     ent ^= tm_4s_nsec << rot3;       // current monotonic time
     ent  = knuthmx(ent ^ dff);       // 2nd derivative of time
@@ -972,7 +988,7 @@ int main(int argc, char *argv[]) {
     perr("Hamming dist/avg: %.4lf < 1U:%u %+.4lg ppm > %.4lf\n",
         avgmn/bic_nx_absl, ABN, devppm(bic_nx_absl, 32), avgmx/bic_nx_absl);
 
-    perr("\nPerform: exec %.3lgs, %.3lg MB/s; hash %.3lgs, %.4lg KH/s",
+    perr("\nPerform: exec %.3lgs, %.3lg MB/s; hash %.3lgs, %.01lf KH/s",
         (df)rt/E9, (df)(E9>>(20-ABL))*nt/rt, (df)mt/E9, (df)(E9>>10)*nt/mt);
 
     df mean = (df)s->avg  / s->tncl;
