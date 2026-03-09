@@ -5,7 +5,8 @@
 /* Quick 2k test: cat uchaos.c  | ./chaos -T 2048 | ent
  * Boot log test: cat dmesg.txt | ./uchaos -S -M2 | ent
  *
- * Compile w/libc:      gcc uchaos.c -O3 --fast-math -Wall -o uchaos -s -lm
+ * Compile w/libc:      gcc uchaos.c -O3 --fast-math -Wall -o uchaos -s -lm 
+ * Compile 4speed:                   -mavx2 -march=native -funroll-loops
  * Compile w/musl: musl-gcc uchaos.c -O3 --fast-math -Wall -o uchaos -s -static
  * Compile option: -D_USE_GET_RTSC (i686: -m32 -msse2), -D_USE_LINUX_RANDOM_H
  *                 -D_USE_FUNCS_32 (i686: -m32, native), -D_USE_PREV_TIME
@@ -744,7 +745,7 @@ static inline uint32_t readblocks(int fd, uint8_t *buf, uint32_t *nblks) {
             if(n == BLOCK_SIZE)
                 memcpy(fst.uc, inp.uc, BLOCK_SIZE);
         }
-        block512_t *bp = (block512_t *)buf;
+        block512_t *bp = __builtin_assume_aligned( (block512_t *)buf, 16 );
 
         // mixing the input by words
         n = (n + ABz) >> ABL;
