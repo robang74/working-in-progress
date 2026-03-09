@@ -121,6 +121,7 @@
 #include <stddef.h>
 #include <time.h>
 #include <math.h>
+#include <immintrin.h>
 #include <sys/ioctl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -167,14 +168,24 @@ static inline uint8_t *bin2s64(uint8_t *buf, uint32_t nmax) {
 
 #if USE_FUNCS_32
 #pragma message("Using the 32-bit functions set")
-typedef uint32_t archul_t;
-typedef float    archdf_t;
-#define AB     5         //  5 -> 32
+    typedef float    archdf_t;
+    typedef uint32_t archul_t;
+    #define AB     5     //  5 -> 32
 #else
-#pragma message("Using the 64-bit functions set")
-typedef uint64_t archul_t;
-typedef double   archdf_t;
-#define AB     6         //  6 -> 64
+    typedef double   archdf_t;
+    #if defined(__SIZEOF_INT128__)
+    #pragma message("Using the 128-bit functions set")
+        #define HAS_UINT128 1
+        typedef unsigned __int128 uint128_t;
+        typedef uint128_t archul_t;
+        #define AB  7    //  7 -> 64
+    #else
+    #pragma message("Using the 64-bit functions set")
+        #define HAS_UINT128 0
+        typedef uint64_t archul_t;
+        #define AB  6    //  6 -> 64
+    #endif
+
 #endif
 
 #define ABL (AB-3)       //  2 or  3
@@ -386,12 +397,21 @@ static inline archul_t rfv(archul_t x) { x >>= USE_FUNCS_32; x += !(x&1); return
 #define rot2    17
 #define rot3     7
 #else
+    #if HAS_UINT128
+#define murmul1 (((uint128_t)0x87c37b91114253d5ULL << 64) | 0x4cf5ad432745937fULL)
+#define murmul2 (((uint128_t)0xff51afd7ed558ccdULL << 64) | 0xc4ceb9fe1a85ec53ULL)
+#define murmul3 (((uint128_t)0x9e3779b97f4a7c15ULL << 64) | 0xf39cc0605cedc834ULL)
+#define rot1    83
+#define rot2    31
+#define rot3    17
+    #else
 #define murmul1 0xff51afd7ed558ccdULL
 #define murmul2 0xc4ceb9fe1a85ec53ULL
 #define murmul3 0x9E3779B9045d9f3bULL
 #define rot1    47
 #define rot2    17
 #define rot3    13
+    #endif
 #endif
 static inline archul_t knuthmx(archul_t iw) {
     register archul_t w = iw;
@@ -478,7 +498,7 @@ static archul_t djb2tum(archul_t seed, uint8_t maxn, uint32_t nsdly,
 
     // 0. hashing loop preparation, p.1 ////////////////////////////////////////
 
-    archul_t __attribute__((aligned(8))) tm_4s_nsec, dff, dlt, ons = 0, ent = 0;
+    archul_t __attribute__((aligned(16))) tm_4s_nsec, dff, dlt, ons = 0, ent = 0;
     register archul_t hsh = s.ohs;
     uint8_t excp = 0;                // excp++ as uint8_t grants for convergence
 
@@ -679,17 +699,9 @@ static inline uint32_t readbuf(int fd, uint8_t *buffer, uint32_t size, bool intr
     return tot;
 }
 
-#include <immintrin.h>
-#if ALGN > 64
-typedef unsigned __int128 uint128_t;
-#endif
 typedef union {
-    #if ALGN > 64
-    uint128_t uh[ 32];
-    #endif
-    uint64_t  u8[ 64];
-    uint32_t  u4[128];
     uint8_t   uc[BLOCK_SIZE];
+    archul_t  dt[BLOCK_SIZE>>ABL];
 } __attribute__((aligned(16))) block512_t;
 
 static inline uint32_t readblocks(int fd, uint8_t *buf, uint32_t *nblks) {
@@ -717,21 +729,11 @@ static inline uint32_t readblocks(int fd, uint8_t *buf, uint32_t *nblks) {
                 memcpy(fst.uc, inp.uc, BLOCK_SIZE);
         }
         block512_t *bp = (block512_t *)buf;
-#if ALGN > 64
-        // mixing the input by 128-bit words
-        n = (n + 15) >> 4;
-        for (a = 0; a < n; a++)
-            bp->uh[a] ^= inp.uh[a];
-#else
-        // mixing the input by  64-bit words
+
+        // mixing the input by words
         n = (n + ABz) >> ABL;
         for (a = 0; a < n; a++)
-        #if USE_FUNCS_32
-            bp->u4[a] ^= inp.u4[a];
-        #else
-            bp->u8[a] ^= inp.u8[a];
-        #endif
-#endif
+            bp->dt[a] ^= inp.dt[a];
     }
     *nblks = i;
 
