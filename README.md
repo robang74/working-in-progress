@@ -10,8 +10,8 @@ Working in progress and other stuff that I prefer to share here to give them a c
 * **uChaos vs 0°K VMs**: 1. [presentation](uchaos-vs-zero-kelvin-qemu.md), &nbsp; 2. a QEMU peculiar configuration `QZERO=1` by [start.sh](https://github.com/robang74/bare-minimal-linux-system/releases/tag/bmls-v0.2.3)
 * **uChaos vs Thermodynamics**: 1. [presentation](uchaos-vs-thermodynamics.md), &nbsp; 2. release [v0.3.2](https://github.com/robang74/working-in-progress/releases/tag/uchaos-v0.3.2) as reference for uChaos testing
 * **uChaos static x86 64** available: 1. [prpr/bin](prpr/bin) folder, &nbsp; 2. self-extracting executable by [gzcmd.sh](https://github.com/robang74/bare-minimal-linux-system/blob/main/gzcmd.sh)
-* **uChaos testing in 0°K VM** in: 1. [blms-v0.2.6](https://github.com/robang74/bare-minimal-linux-system/releases/tag/bmls-v0.2.6), &nbsp; 2. run `sh start.sh -Z` or `-z` for manual
-* **uChaos supports i686 32bit** in: 1. [v0.5.3.2](https://github.com/robang74/working-in-progress/releases/tag/uchaos-v0.5.3.2), &nbsp; 2. qemu testing requires `uchaos` recompilation.
+* **uChaos testing in 0°K VM** in: 1. [blms-v0.2.6](https://github.com/robang74/bare-minimal-linux-system/releases/tag/bmls-v0.2.6), &nbsp; 2. run `sh start.sh -Z` or `-z` for manual.
+* **uChaos supports i686 32bit** in: 1. [v0.5.6](https://github.com/robang74/working-in-progress/releases/tag/uchaos-v0.5.6), &nbsp; 2. reference to [blms-v0.2.7](https://github.com/robang74/bare-minimal-linux-system/releases/tag/bmls-v0.2.7) for VM tests.
 
 Because exceptions, do not need to be common but just exist. In particular, about Chaos Shell Engine:
 
