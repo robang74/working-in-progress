@@ -5,7 +5,7 @@
 /* Quick 2k test: cat uchaos.c  | ./chaos -T 2048 | ent
  * Boot log test: cat dmesg.txt | ./uchaos -S -M2 | ent
  *
- * Compile w/libc:      gcc uchaos.c -O3 --fast-math -Wall -o uchaos -s -lm 
+ * Compile w/libc:      gcc uchaos.c -O3 --fast-math -Wall -o uchaos -s -lm
  * Compile 4speed:                   -mavx2 -march=native -funroll-loops
  * Compile w/musl: musl-gcc uchaos.c -O3 --fast-math -Wall -o uchaos -s -static
  * Compile option: -D_USE_GET_RTSC (i686: -m32 -msse2), -D_USE_LINUX_RANDOM_H
@@ -497,7 +497,7 @@ static archul_t djb2tum(archul_t seed, uint8_t maxn, uint32_t nsdly,
     archul_t __attribute__((aligned(16))) ons = 0;
 
     if( s.ncl || s.tncl || rset || seed == DJB2VGET ) {
-        s.tncl += s.ncl;   s.ncl = 0; 
+        s.tncl += s.ncl;   s.ncl = 0;
         s.tdmx  = MAX(s.dmx, s.tdmx);
         s.tdmn  = MIN(s.dmn, s.tdmn);
         s.pmns  = PMDLY2NS  (s.tdmn);
@@ -518,7 +518,7 @@ static archul_t djb2tum(archul_t seed, uint8_t maxn, uint32_t nsdly,
 
     if( seed ) hsh ^= seed;
 
-hashotloop:
+hashotloop:                                      // a loop made by two ASM jumps
 /** HASHING LOOP START  *******************************************************/
     // 0. hashing loop preparation, p.2 ////////////////////////////////////////
 
@@ -540,19 +540,14 @@ hashotloop:
     }
     s.oid = cpuid;
 #endif
-    if( !ons ) {
-        skw = 0;
-        ons = tm_4s_nsec;
-        hsh = knuthmx(hsh^ons);
-        goto reschedule;
-    }
+    if( !ons ) { skw = 0; hsh = knuthmx(hsh^ons);          goto reschedule;    }
 
     // 2. latency calculation //////////////////////////////////////////////////
 
     dlt = tm_4s_nsec - ons;       // within 4s is fine, with RTCS is always fine
-    if( dtskew(dlt) ) { ons = tm_4s_nsec; goto reschedule; }
-    if( s.dmn == -1 ) { s.dmn = dlt; goto reschedule; }
-    if( skw ) goto notcrashstats;
+    if( dtskew(dlt) ) {                                    goto reschedule;    }
+    if( s.dmn == -1 ) { s.dmn = dlt;                       goto reschedule;    }
+    if( skw )         {                                    goto notcrashstats; }
 
     // 3. internal state update ////////////////////////////////////////////////
 
@@ -572,7 +567,7 @@ notcrashstats:
         dff = dlt - s.dmn;
         ent ^= ~dff ^ s.dmx;
     }
-    if( !dff ) { hsh = knuthmx(hsh); goto reschedule; }
+    if( !dff ) { hsh = knuthmx(hsh);     goto reschedule; }
 
     // 4. jittering calculation ////////////////////////////////////////////////
 
@@ -583,7 +578,7 @@ notcrashstats:
     } else {
         // Knuth, based on gold section seeded by 1E-3 ~ 1E-4 event idx
         if( excp ) { hsh = murmux3(hsh, ons); } excp = 0;
-        if( skw  ) { skw = 0; goto skiptoetropiy; }
+        if( skw  ) { skw = 0;                              goto skiptoetropiy; }
         // min,max jittering can be ommited
         if( s.jmn == -1 ) s.jmn = dff;
         else
@@ -613,19 +608,13 @@ skiptoetropiy:
     // it consumes entropy, and does hash the another rotation
     hsh ^= rotlbit(hsh, getprmx16(ent));
 
-    // 8. exceptions management ////////////////////////////////////////////////
-
-    // copying with the VMs scheduler timings: continue made by an ASM jump
-    s.ctot++; if( excp ) goto reschedule;
-
     // 9. preparation for the next round ///////////////////////////////////////
 
-    if( --maxn ) {
-        ons  = tm_4s_nsec;
+    s.ctot++;
+    // copying with the VMs scheduler timings: continue made by an ASM jump
 reschedule:
-        sched_yield();
-        goto hashotloop;             // a loop made by two ASM jumps
-    }
+    if( !excp || skw  ) { maxn--; ons = tm_4s_nsec; }
+    if(  excp || maxn ) {  sched_yield();                  goto hashotloop;    }
 
 /** HASHING LOOP CLOSE  *******************************************************/
     // X. finalising w/ a 32+1 bit mix /////////////////////////////////////////
@@ -889,7 +878,7 @@ int main(int argc, char *argv[]) {
     if(quiet < 2) {
         perr_app_info(0);
         if(prsts) { // RAF, TODO: dealing with size one.
-            if(nblks < 2) {
+            if(0 && nblks < 2) {
                 perr("; too short input %u, no stats/check!\n\n", ntsts);
                 prsts = 0;
             } else perr("; collision: ");
@@ -933,7 +922,7 @@ int main(int argc, char *argv[]) {
         for (uint32_t n = 0; n < size; n++) {
             for (uint32_t i = n + 1; i < size; i++) {
                 if (hsh[i] == hsh[n]) {
-                    if(prsts) perr("%d:%d ", n, i);
+                    perr("%d:%d ", n, i);
                     nk++; continue;
                 }
                 archul_t cb = hsh[i] ^ hsh[n];
@@ -955,14 +944,16 @@ int main(int argc, char *argv[]) {
         avgbc += curavg;
         nt += size;
 
-        sched_yield();  // Statistics are a block of CPU data-crunching but also
+        //sched_yield();// Statistics are a block of CPU data-crunching but also
                         // a predictable delay which sched_yield() can jeopardise.
                         // Stats makes the large size output slower 1.7x than -q.
     }
+    uint64_t rt = get_nanos();
     free(hsh); hsh = NULL;
+    mt += rt;
+
     if(!prsts) return 0;
 
-    uint64_t rt = get_nanos();
     perr("%s\n", nk ? ", status: KO" : "no, status: OK");
 
     // print statistics ////////////////////////////////////////////////////////
@@ -970,12 +961,14 @@ int main(int argc, char *argv[]) {
     djb2_t *s = (djb2_t *)(uintptr_t)djb2tum(DJB2VGET, 0, 0, pmdly, 0, 0);
     perrprms("Setting:", (uint32_t)(s ? s->pmns : 0));
 
-    perr("Running %u: ", ntsts);
+    perr("Hashing: %u, ", ntsts);
     if((nt >> 3) > E6)
-        perr("%.2lfMH (%.2lfGB)",  (df)nt/(1ULL<<20), (df)nt/(1ULL<<27));
+        perr("%.2lfMH (%.2lfGB)",  (df)nt/(1ULL<<20), (df)nt/(1ULL<<(30-ABL)));
     else
-        perr("%.1lfKH (%.1lfMB)",  (df)nt/(1ULL<<10), (df)nt/(1ULL<<17));
+        perr("%.1lfKH (%.1lfMB)",  (df)nt/(1ULL<<10), (df)nt/(1ULL<<(20-ABL)));
     perr(" w/ %.0lf duplicates\n", (df)nk);
+
+    if(nblks < 2) goto skiphamming;
 
     avgbc /= ntsts;
     df bic_nx_absl = (df)bic / nx;
@@ -987,26 +980,31 @@ int main(int argc, char *argv[]) {
         bic_nx, devppm(bic_nx, 50));
     perr("Hamming distance: %.0lf <%.6lf> %.0lf over %.4lgK XORs\n",
         (df)min, bic_nx_absl, (df)max, (df)nx/E3);
-    perr("Hamming dist/avg: %.4lf < 1U:%u %+.4lg ppm > %.4lf\n",
+    perr("Hamming dist/avg: %.4lf < 1U:%u %+.4lg ppm > %.4lf\n\n",
         avgmn/bic_nx_absl, ABN, devppm(bic_nx_absl, 32), avgmx/bic_nx_absl);
 
-    perr("\nPerform: exec %.3lgs, %.3lg MB/s; hash %.3lgs, %.01lf KH/s",
+skiphamming:
+    perr("Perform: exec %.3lgs, %.3lg MB/s; hash %.3lgs, %.01lf KH/s\n",
         (df)rt/E9, (df)(E9>>(20-ABL))*nt/rt, (df)mt/E9, (df)(E9>>10)*nt/mt);
+
+    if(nblks < 2) goto skiptimings;
 
     df mean = (df)s->avg  / s->tncl;
     df jean = (df)s->javg / s->tncl;
 
     #define dk(a,b,c) ( (1.0 - (df)(a-b)/c) * E3 )
 
-    perr("\nLatency: %.0f <%.01lf> %.01lfK ns, %.3lgK w/ ev:%.0f, ex:%5.02lf%%\n",
+    perr("Latency: %.0f <%.01lf> %.01lfK ns, %.3lgK w/ ev:%.0f, ex:%5.02lf%%\n",
         (df)s->tdmn, mean, (df)s->tdmx/E3, (df)s->tncl/E3, (df)s->evnt,
             ((df)s->nexp/s->ctot)*100);
-    perr( "`Ratios: %.02lf <avg=1U> %.02lf, min=1U <%.02lf> %.01lf, %.01fb\n",
+    perr("`Ratios: %.02lf <avg=1U> %.02lf, min=1U <%.02lf> %.01lf, %.01fb\n",
         (df)s->tdmn/mean, (df)s->tdmx/mean, mean/s->tdmn, (df)s->tdmx/s->tdmn,
             __builtin_log2f(mean - s->tdmn));
-    perr(  "Jitters: %.0f <%.01lf> %.0f ns w/ %.03lgx, %.0lf:1K, %+.01lf‰\n",
+    perr("Jitters: %.0f <%.01lf> %.0f ns w/ %.03lgx, %.0lf:1K, %+.01lf‰\n",
         (df)s->jmn, jean, (df)s->jmx, (df)s->jmx/jean, dk(s->ctot, s->tncl, s->ctot),
             dk(mean, s->tdmn, jean));
+
+skiptimings:
     perr("\n");
 
     return 0; // exit() do free()
