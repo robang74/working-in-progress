@@ -43,12 +43,12 @@
 
 #define DEVICE_NAME "uchaos"
 #define CLASS_NAME  "uchaos_cls"
-#define DRIVER_VERSION "0.3.8"
+#define DRIVER_VERSION "0.3.9"
 
 #define MAX_INPUT_SIZE (1024 << 3)
 
 // --- Module Parameters ---
-static int dry_runs = 7;
+static int dry_runs = 31;
 module_param(dry_runs, int, 0644);
 MODULE_PARM_DESC(dry_runs, "Number of dry runs for stat stabilization (default=7)");
 
@@ -112,7 +112,7 @@ repeat:
             hash *= getprmx((dmn + 1));
         } else {
             diff  = (delta > avg) ? (delta - avg) : (avg - delta);
-            if (diff > exception_range) { 
+            if (diff > exception_range) {
                 hash ^= rotl64(delta ^ diff, LSHIFT-1);
                 hash  = (hash ^ (hash >> LSHIFT)) * MULTIPLIER;
             } else {
@@ -172,18 +172,20 @@ static ssize_t dev_read(struct file *filep, char *buffer, size_t len, loff_t *of
 
 static ssize_t dev_write(struct file *filep, const char *buffer, size_t len, loff_t *offset) {
     u8 *k_buf;
-    size_t actual_len = min_t(size_t, len, MAX_INPUT_SIZE);
 
-    k_buf = kmalloc(actual_len, GFP_KERNEL);
+    if(len < HASHSIZE) return -EINVAL;
+    len = min_t(size_t, len, MAX_INPUT_SIZE);
+
+    k_buf = kmalloc(len, GFP_KERNEL);
     if (!k_buf) return -ENOMEM;
 
-    if (copy_from_user(k_buf, buffer, actual_len)) {
+    if (copy_from_user(k_buf, buffer, len)) {
         kfree(k_buf);
         return -EFAULT;
     }
 
     mutex_lock(&uchaos_lock);
-    current_hash = djb2tum(k_buf, actual_len, 1);
+    current_hash = djb2tum(k_buf, len, 1);
     current_hash = djb2tum((const u8 *)&current_hash, HASHSIZE, dry_runs);
     mutex_unlock(&uchaos_lock);
 
@@ -199,7 +201,7 @@ static struct file_operations fops = {
 static int __init uchaos_init(void) {
     major = register_chrdev(0, DEVICE_NAME, &fops);
     if (major < 0) return major;
-    
+
     if(loop_mult < 1) loop_mult = 1;
     if(dry_runs  < 1) dry_runs  = 1;
 
