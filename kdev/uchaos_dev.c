@@ -6,7 +6,8 @@
  * echo "seed data" > /dev/uchaos   (Triggers hashing/jitter)
  * cat /dev/uchaos                  (Reads the resulting 64-bit hash)
  * 
- * insmod lib/modules/uchaos_dev.ko && dmesg > /dev/uchaos ; cat /dev/uchaos
+ * insmod lib/modules/uchaos_dev.ko && dmesg > /dev/uchaos
+ * for i in $(seq 8); do cat /dev/uchaos | od -x; done
  *
  *******************************************************************************
  *
@@ -16,11 +17,16 @@
  * (/dev/uchaos) makes it much easier to debug, profile, and validate the "chaos"
  * logic through standard user-space tools.
  *
- * I have refactored the code to remove the hwrng framework and replace it with
- * a standard Linux Character Device. I’ve also added Module Parameters so you
+ * AI refactored the code to remove the hwrng framework and replace it with
+ * a standard Linux Character Device. I’ve also added Module Parameters so user
  * can tune the dry runs and exception range at runtime without recompiling.
  *
- * Source: prpr/uchaos-kernlnx-driver-by-grok.c
+ * Input source: prpr/uchaos-kernlnx-driver-by-grok.c
+ * Purpose of using AI: driver template and makefile quick writing
+ *
+ * Once upon a time we were copying a generic template from a book or Internet
+ * nowadays we ask to a chatbot to create a customised one for our needs and
+ * then we take care of filling the template of the relevant code.
  */
 
 #include <linux/module.h>
@@ -49,7 +55,8 @@ MODULE_PARM_DESC(exception_range, "Jitter delta exception range (default=3)");
 static int major;
 static struct class* uchaos_class = NULL;
 static struct device* uchaos_device = NULL;
-static u64 current_hash = 0x5381; // Initial seed
+static u64  current_hash = 0x5381; // Initial seed
+static bool current_hash_ready = 0;
 static DEFINE_MUTEX(uchaos_lock);
 
 static const u8 primes64[10] = {3, 61, 5, 59, 11, 53, 17, 47, 23, 41};
@@ -100,23 +107,25 @@ static u64 djb2tum(const u8 *str, size_t len, u64 seed) {
 
 // --- File Operations ---
 
-#define bytes_read 8
+#define HASHSIZE 8
 static ssize_t dev_read(struct file *filep, char *buffer, size_t len, loff_t *offset) {
-    char output[bytes_read]; // Sufficient for u64 in decimal + \n
-
+    char output[HASHSIZE]; // Sufficient for u64 in decimal + \n
 
     if (*offset > 0) return 0; // EOF after first read
 
     mutex_lock(&uchaos_lock);
-    memcpy(output, (uint8_t *)&current_hash, bytes_read);
+    if( ! current_hash_ready )
+        current_hash = djb2tum((uint8_t *)&current_hash, HASHSIZE, current_hash);
+    memcpy(output, (uint8_t *)&current_hash, HASHSIZE);
+    current_hash_ready = 0;
     mutex_unlock(&uchaos_lock);
 
-    //if (len < bytes_read) return -EINVAL;
+    //if (len < HASHSIZE) return -EINVAL;
 
-    if (copy_to_user(buffer, output, bytes_read)) return -EFAULT;
+    if (copy_to_user(buffer, output, HASHSIZE)) return -EFAULT;
 
-    *offset = bytes_read;
-    return bytes_read;
+    *offset = HASHSIZE;
+    return HASHSIZE;
 }
 
 static ssize_t dev_write(struct file *filep, const char *buffer, size_t len, loff_t *offset) {
@@ -133,6 +142,7 @@ static ssize_t dev_write(struct file *filep, const char *buffer, size_t len, lof
 
     mutex_lock(&uchaos_lock);
     current_hash = djb2tum(k_buf, actual_len, current_hash);
+    current_hash_ready = 1;
     mutex_unlock(&uchaos_lock);
 
     kfree(k_buf);
