@@ -43,7 +43,7 @@
 
 #define DEVICE_NAME "uchaos"
 #define CLASS_NAME  "uchaos_cls"
-#define DRIVER_VERSION "0.4.1"
+#define DRIVER_VERSION "0.4.2"
 
 #define MAX_INPUT_SIZE (1024 << 3)
 
@@ -144,6 +144,7 @@ repeat:
              tns = ktime_get_ns();
              dlt = tns - prev_ts;
              if( !dlt ) cpu_relax();
+             prev_ts = tns;
         } while( !dlt );
 
         // avg * 255 = avg + 256 - avg, faster
@@ -199,21 +200,32 @@ static ssize_t dev_read(struct file *filep, char *buffer, size_t len,
     loff_t *offset)
 {
     archul_t output;
+    size_t total_sent = 0;
 
     if (len < HASHSIZE) return -EINVAL;
 
     if (*offset > 0) return 0; // EOF after first read
 
-    mutex_lock(&uchaos_lock);
-    output = current_hash;
-    current_hash = djb2tum((uint8_t *)&current_hash, HASHSIZE, loop_mult);
-    output = murmux3(current_hash, output);
-    mutex_unlock(&uchaos_lock);
+    // Continuous loop to fill the user-requested buffer size
+    while (len >= HASHSIZE) {
+        // Check for signals to remain non-blocking/interruptible
+        if (signal_pending(current))
+            break;
 
-    if (copy_to_user(buffer, (u8 *)&output, HASHSIZE)) return -EFAULT;
+        mutex_lock(&uchaos_lock);
+        output = current_hash;
+        current_hash = djb2tum((uint8_t *)&current_hash, HASHSIZE, loop_mult);
+        output = murmux3(current_hash, output);
+        mutex_unlock(&uchaos_lock);
 
-    *offset = HASHSIZE;
-    return HASHSIZE;
+        if (copy_to_user(buffer, (u8 *)&output, HASHSIZE)) return -EFAULT;
+
+        total_sent += HASHSIZE;
+        len -= HASHSIZE;
+    }
+
+    //*offset = 0;
+    return total_sent;
 }
 
 static ssize_t dev_write(struct file *filep, const char *buffer, size_t len,
@@ -245,6 +257,7 @@ static ssize_t dev_write(struct file *filep, const char *buffer, size_t len,
 }
 
 static struct file_operations fops = {
+    .owner = THIS_MODULE,
     .read = dev_read,
     .write = dev_write,
 };
@@ -258,7 +271,17 @@ static int __init uchaos_init(void)
     if(dry_runs  < 1) dry_runs  = 1;
 
     uchaos_class = class_create(THIS_MODULE, CLASS_NAME);
+    if (IS_ERR(uchaos_class)) {
+        unregister_chrdev(major, DEVICE_NAME);
+        return PTR_ERR(uchaos_class);
+    }
+
     uchaos_device = device_create(uchaos_class, NULL, MKDEV(major, 0), NULL, DEVICE_NAME);
+    if (IS_ERR(uchaos_device)) {
+        class_destroy(uchaos_class);
+        unregister_chrdev(major, DEVICE_NAME);
+        return PTR_ERR(uchaos_device);
+    }
 
     printk(KERN_INFO "uchaos: Loaded with dry_runs=%d, exception_range=%d\n", dry_runs, exception_range);
     return 0;
@@ -277,5 +300,7 @@ module_init(uchaos_init);
 module_exit(uchaos_exit);
 
 MODULE_LICENSE("GPL v2");
-MODULE_AUTHOR("Roberto A. Foglietta");
+MODULE_VERSION(DRIVER_VERSION);
+MODULE_AUTHOR("Roberto A. Foglietta <roberto.foglietta@gmail.com>");
+MODULE_DESCRIPTION("Stochastic jitter-based chaos stream device");
 
