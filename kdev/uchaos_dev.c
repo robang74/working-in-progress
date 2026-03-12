@@ -30,6 +30,8 @@
  * Once upon a time we were copying a generic template from a book or Internet
  * nowadays we ask to a chatbot to create a customised one for our needs and
  * then we take care of filling the template of the relevant code.
+ *
+ * Relevant code source: prpr/uchaos.c
  */
 
 #include <linux/module.h>
@@ -43,22 +45,25 @@
 
 #define DEVICE_NAME "uchaos"
 #define CLASS_NAME  "uchaos_cls"
-#define DRIVER_VERSION "0.4.4"
+#define DRIVER_VERSION "0.4.5"
 
 #define MAX_INPUT_SIZE (1024 << 3)
 
 // --- Module Parameters ---
-static int dry_runs = 31;
+static int dry_runs = 7;
 module_param(dry_runs, int, 0644);
-MODULE_PARM_DESC(init_runs, " Number of initial runs for stat stabilization (default=7) ");
+MODULE_PARM_DESC(init_runs,
+    " Number of initial runs for stat stabilization (default=7) ");
 
-static int exception_range = 3;
-module_param(exception_range, int, 0644);
-MODULE_PARM_DESC(min_delta, " Minimum delta otherwise do an extra passage (default=3) ");
+static int min_delta = 3;
+module_param(min_delta, int, 0644);
+MODULE_PARM_DESC(min_delta,
+    " Minimum delta otherwise do an extra passage (default=3) ");
 
 static int loop_mult = 1;
 module_param(loop_mult, int, 0644);
-MODULE_PARM_DESC(loop_mult, " Number of repetitions of the hashing loop (default=1) ");
+MODULE_PARM_DESC(loop_mult,
+    " Number of repetitions of the hashing loop (default=1) ");
 
 // --- Driver State ---
 static int major;
@@ -81,7 +86,7 @@ static DEFINE_MUTEX(uchaos_lock);
 #define rot3    13
 
 #define getprmx16(w) (5 + (((w) & ABy) << 1))
-#define getprmx(val) (primes64[getprmx16((val))]) // previous %10 was slower
+#define getprmx(val) (primes64[getprmx16((val))])  // previous %10 was slower
 #define HASH_SEED 14695981039346656037ULL
 #define MULTIPLIER 0xff51afd7ed558ccdULL
 #define HASHSIZE (ABN >> 3)
@@ -114,7 +119,7 @@ static inline archul_t murmux3(archul_t ks, archul_t p)
     z =  z ^ ( z >> (ABx+2));
     return z;
 }
-
+#if 0
 static inline archul_t ent_dstl(archul_t tm_4s_nsec, archul_t dlt, archul_t dff)
 {
     static archul_t ent = HASH_SEED * MULTIPLIER;
@@ -123,12 +128,12 @@ static inline archul_t ent_dstl(archul_t tm_4s_nsec, archul_t dlt, archul_t dff)
     ent  = knuthmx(ent ^ dff);       // 2nd derivative of time
     return ent;
 }
-
+#endif
 #define dtskew(x) (!x || (x)>>28)    // 2^29 is the biggest 2^n before 1E9
 
 static inline archul_t djb2tum_core(archul_t seed)
 {
-    static archul_t avg = 0, dmx = 0, dmn = -1, jmn = 1, jmx = 0, javg = 0;
+    static archul_t dmx = 0, dmn = -1, jmn = -1, jmx = 0; //, avg = 0, javg = 0;
     static archul_t ohs = HASH_SEED;
     register archul_t hsh = ohs;
 
@@ -177,14 +182,13 @@ reschedule:
         }
         if( !dff ) { hsh = knuthmx(hsh);                      goto reschedule; }
 
-        // avg * 255 = avg + 256 - avg, faster
-        // avg = ((avg << 8) - avg + dlt) >> 8;
+        // mavg * 255 = mavg + 256 - mavg, faster
+        // mavg = ((mavg << 8) - mavg + dlt) >> 8;
 
         // dff is jittering for the exeption manager activation
-        if( dff < exception_range + excp ) {
-            excp += 4;                   // increasing excp and accounting for dff
+        if( dff < min_delta + excp ) {
+            excp += 4;               // increasing excp and accounting for dff
             //nexp++;
-            //skw = 0;
         } else {
             // Knuth, based on gold section seeded by 1E-3 ~ 1E-4 event idx
             if( excp ) { hsh = murmux3(hsh, ons); } excp = 0;
@@ -194,12 +198,12 @@ reschedule:
             if( dff < jmn ) jmn = dff;
             if( dff > jmx ) jmx = dff;
             // avg calculation can be ommitted
-            avg += dlt; javg += dff; //ncl++;
+            // avg += dlt; javg += dff; //ncl++;
         }
 
-        ent ^= dlt        << ABz ;       // 1st derivative of time
-        ent ^= tns        << rot3;       // current monotonic time
-        ent  = knuthmx(ent ^ dff);       // 2nd derivative of time
+        ent ^= dlt        << ABz ;   // 1st derivative of time
+        ent ^= tns        << rot3;   // current monotonic time
+        ent  = knuthmx(ent ^ dff);   // 2nd derivative of time
 
         b0 = ent & 0x01, b1 = ent & 0x02;
         hsh = ( hsh << (4 + (b0 ? b1 : 1)) ) + (b1 ? -hsh : hsh);
@@ -235,7 +239,7 @@ static ssize_t dev_read(struct file *filep, char *buffer, size_t len,
 
     if (len < HASHSIZE) return -EINVAL;
 
-    if (*offset > 0) return 0; // EOF after first read
+    if (*offset > 0) return 0;  // EOF after first read
 
     // Continuous loop to fill the user-requested buffer size
     while (len >= HASHSIZE) {
@@ -305,14 +309,16 @@ static int __init uchaos_init(void)
         return PTR_ERR(uchaos_class);
     }
 
-    uchaos_device = device_create(uchaos_class, NULL, MKDEV(major, 0), NULL, DEVICE_NAME);
+    uchaos_device = device_create(uchaos_class,
+        NULL, MKDEV(major, 0), NULL, DEVICE_NAME);
     if (IS_ERR(uchaos_device)) {
         class_destroy(uchaos_class);
         unregister_chrdev(major, DEVICE_NAME);
         return PTR_ERR(uchaos_device);
     }
 
-    printk(KERN_INFO "uchaos: Loaded with dry_runs=%d, exception_range=%d\n", dry_runs, exception_range);
+    printk(KERN_INFO "uchaos: loop_mult=%d dry_runs=%d, min_delta=%d\n",
+        loop_mult, dry_runs, min_delta);
     return 0;
 }
 
