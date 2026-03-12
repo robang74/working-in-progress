@@ -34,6 +34,7 @@
  * Relevant code source: prpr/uchaos.c
  */
 
+#include <linux/version.h>
 #include <linux/module.h>
 #include <linux/kernel.h>
 #include <linux/fs.h>
@@ -45,7 +46,7 @@
 
 #define DEVICE_NAME "uchaos"
 #define CLASS_NAME  "uchaos_cls"
-#define DRIVER_VERSION "0.4.5"
+#define DRIVER_VERSION "0.4.6"
 
 #define MAX_INPUT_SIZE (1024 << 3)
 
@@ -248,7 +249,7 @@ static ssize_t dev_read(struct file *filep, char *buffer, size_t len,
             break;
 
         mutex_lock(&uchaos_lock);
-        output = djb2tum(0, loop_mult);
+        output = djb2tum(HASH_SEED, loop_mult);
         mutex_unlock(&uchaos_lock);
 
         if (copy_to_user(buffer + sent, (u8 *)&output, HASHSIZE))
@@ -303,7 +304,11 @@ static int __init uchaos_init(void)
     if(loop_mult < 1) loop_mult = 1;
     if(dry_runs  < 1) dry_runs  = 1;
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 4, 0)
+    uchaos_class = class_create(CLASS_NAME);
+#else
     uchaos_class = class_create(THIS_MODULE, CLASS_NAME);
+#endif
     if (IS_ERR(uchaos_class)) {
         unregister_chrdev(major, DEVICE_NAME);
         return PTR_ERR(uchaos_class);
