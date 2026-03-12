@@ -43,18 +43,18 @@
 
 #define DEVICE_NAME "uchaos"
 #define CLASS_NAME  "uchaos_cls"
-#define DRIVER_VERSION "0.4.3"
+#define DRIVER_VERSION "0.4.4"
 
 #define MAX_INPUT_SIZE (1024 << 3)
 
 // --- Module Parameters ---
 static int dry_runs = 31;
 module_param(dry_runs, int, 0644);
-MODULE_PARM_DESC(dry_runs, " Number of dry runs for stat stabilization (default=7) ");
+MODULE_PARM_DESC(init_runs, " Number of initial runs for stat stabilization (default=7) ");
 
 static int exception_range = 3;
 module_param(exception_range, int, 0644);
-MODULE_PARM_DESC(exception_range, " Jitter delta exception range (default=3) ");
+MODULE_PARM_DESC(min_delta, " Minimum delta otherwise do an extra passage (default=3) ");
 
 static int loop_mult = 1;
 module_param(loop_mult, int, 0644);
@@ -140,16 +140,16 @@ static inline archul_t djb2tum_core(archul_t seed)
     else { ons = ent = 0; }
 
     for (i = 0; i < 1; i++) {
-        if( ent ) ent ^= rotlbit(ent, getprmx16(hsh));
-
-// -----------------------------------------------------------------------------
+        if(  ent ) ent ^= rotlbit(ent, getprmx16(hsh));
         if( !ons ) {
             ons = ktime_get_ns();
             hsh = knuthmx(hsh ^ ons);
             cpu_relax();
         }
+// -----------------------------------------------------------------------------
 // WARNING:
 // this might loop forever, because of a BUG rather than in corner case
+// -----------------------------------------------------------------------------
 reschedule:
         do {
             tns = ktime_get_ns();
