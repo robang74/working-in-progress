@@ -43,22 +43,22 @@
 
 #define DEVICE_NAME "uchaos"
 #define CLASS_NAME  "uchaos_cls"
-#define DRIVER_VERSION "0.3.10"
+#define DRIVER_VERSION "0.4.0"
 
 #define MAX_INPUT_SIZE (1024 << 3)
 
 // --- Module Parameters ---
 static int dry_runs = 31;
 module_param(dry_runs, int, 0644);
-MODULE_PARM_DESC(dry_runs, "Number of dry runs for stat stabilization (default=7)");
+MODULE_PARM_DESC(dry_runs, " Number of dry runs for stat stabilization (default=7) ");
 
 static int exception_range = 3;
 module_param(exception_range, int, 0644);
-MODULE_PARM_DESC(exception_range, "Jitter delta exception range (default=3)");
+MODULE_PARM_DESC(exception_range, " Jitter delta exception range (default=3) ");
 
 static int loop_mult = 7;
 module_param(loop_mult, int, 0644);
-MODULE_PARM_DESC(loop_mult, "Number of repetitions of the hashing loop (default=7)");
+MODULE_PARM_DESC(loop_mult, " Number of repetitions of the hashing loop (default=7) ");
 
 // --- Driver State ---
 static int major;
@@ -66,26 +66,69 @@ static struct class* uchaos_class = NULL;
 static struct device* uchaos_device = NULL;
 static DEFINE_MUTEX(uchaos_lock);
 
+#define AB  (6)
+#define ABL (AB-3)        //  2 or  3
+#define ABN (1<<AB)       // 32 or 64
+#define ABX (ABN-1)       // 31 or 63
+#define ABx ((ABN>>1)-1)  // 15 or 31
+#define ABy ((ABN>>2)-1)  //  7 or 15
+#define ABz ((ABN>>3)-1)  //  3 or  7
+
+#define murmul1 0xff51afd7ed558ccdULL
+#define murmul2 0xc4ceb9fe1a85ec53ULL
+#define rot1    47
+#define rot2    17
+#define rot3    13
+
+#define getprmx16(w) (5 + (((w) & ABy) << 1))
+#define getprmx(val) (primes64[getprmx16(val)]) // previous %10 was slower
+#define HASH_SEED 14695981039346656037ULL
+#define MULTIPLIER 0xff51afd7ed558ccdULL
+#define HASHSIZE (ABN >> 3)
+#define LSHIFT (ABx+2)
+
+typedef u64 archul_t;
+
+static archul_t current_hash = 0;
+
 static const u8 primes64[20] = {  3, 61,  5, 59, 11, 53, 17, 47, 23, 41,
                                  19, 45, 29, 35, 31, 33, 13, 51,  7, 57 };
 
-static inline u64 rotl64(u64 n, u8 c) {
-    c &= 63; return (n << c) | (n >> ((-c) & 63));
+static inline archul_t rotlbit(archul_t n, u8 c) {
+    c &= ABX; return (n << c) | (n >> ((-c) & ABX));
 }
 
-static u64 current_hash = 0;
+static inline archul_t knuthmx(archul_t iw) {
+    register archul_t w = iw;
+    w  = rotlbit(w, getprmx16(w));
+    w *= (w & 1) ? 0x9E3779B9 : 0x045d9f3b;
+    w ^= rotlbit(w, (w & 2) ? rot1 : rot2);
+    return w;
+}
 
-#define getprmx(val) (primes64[2 + (val & 0x1f)]) // previous %10 was slower
-#define HASH_SEED 14695981039346656037ULL
-#define MULTIPLIER 0xff51afd7ed558ccdULL
-#define HASHSIZE 8
-#define BITSIZE 64
-#define LSHIFT 33
+static inline archul_t murmux3(archul_t ks, archul_t p)
+{
+    register archul_t z = ks;
+    z =  p ^ ((z >> (ABx-2)) * murmul1);
+    z = (z ^ ( z <<  ABx  )) * murmul2;
+    z =  z ^ ( z >> (ABx+2));
+    return z;
+}
 
-static inline u64 djb2tum_core(const u8 *str, size_t len) {
+static inline archul_t ent_dstl(archul_t tm_4s_nsec, archul_t dlt, archul_t dff)
+{
+    static archul_t ent = HASH_SEED * MULTIPLIER;
+    ent ^= dlt        << ABz ;       // 1st derivative of time
+    ent ^= tm_4s_nsec << rot3;       // current monotonic time
+    ent  = knuthmx(ent ^ dff);       // 2nd derivative of time
+    return ent;
+}
+
+static inline archul_t djb2tum_core(const u8 *str, size_t len)
+{
     static u64 avg = 0, dmx = 0, dmn = 1000000000ULL, prev_ts = 0;
-    static u64 hash = HASH_SEED;
-    u64 ts, delta, diff;
+    static archul_t hash = HASH_SEED;
+    archul_t ts, delta, diff;
 
     int i;
     for (i = 0; i < len; i++) {
@@ -104,16 +147,16 @@ repeat:
 
         if (delta < dmn) {
             dmn   = delta;
-            hash  = rotl64(hash, getprmx(delta));
+            hash  = rotlbit(hash, getprmx(delta));
             hash ^= (hash >> LSHIFT);
         } else if (delta > dmx) {
             dmx   = delta;
-            hash  = rotl64(hash, BITSIZE - getprmx(delta));
+            hash  = rotlbit(hash, ABN - getprmx(delta));
             hash *= getprmx((dmn + 1));
         } else {
             diff  = (delta > avg) ? (delta - avg) : (avg - delta);
             if (diff > exception_range) {
-                hash ^= rotl64(delta ^ diff, LSHIFT-1);
+                hash ^= rotlbit(delta ^ diff, LSHIFT-1);
                 hash  = (hash ^ (hash >> LSHIFT)) * MULTIPLIER;
             } else {
                 cpu_relax();
@@ -128,8 +171,9 @@ repeat:
 }
 
 // Core uchaos logic
-static u64 djb2tum(const u8 *str, size_t len, size_t num) {
-    u64 hash;
+static archul_t djb2tum(const u8 *str, size_t len, size_t num)
+{
+    archul_t hash;
     int j;
 
     for (j = 0; j < num; j++) hash = djb2tum_core(str, len);
@@ -139,20 +183,10 @@ static u64 djb2tum(const u8 *str, size_t len, size_t num) {
 
 // --- File Operations ---
 
-#define murmul1 0xff51afd7ed558ccdULL
-#define murmul2 0xc4ceb9fe1a85ec53ULL
-typedef u64 archul_t;
-
-static inline archul_t murmux3(archul_t ks, archul_t p) {
-    register archul_t z = ks;
-    z =  p ^ (( z >> (LSHIFT-4) ) * murmul1);
-    z = (z ^ ( z << (LSHIFT-2) )) * murmul2;
-    z =  z ^ ( z >>  LSHIFT    );
-    return z;
-}
-
-static ssize_t dev_read(struct file *filep, char *buffer, size_t len, loff_t *offset) {
-    u64 output;
+static ssize_t dev_read(struct file *filep, char *buffer, size_t len,
+    loff_t *offset)
+{
+    archul_t output;
 
     if (len < HASHSIZE) return -EINVAL;
 
@@ -170,10 +204,12 @@ static ssize_t dev_read(struct file *filep, char *buffer, size_t len, loff_t *of
     return HASHSIZE;
 }
 
-static ssize_t dev_write(struct file *filep, const char *buffer, size_t len, loff_t *offset) {
+static ssize_t dev_write(struct file *filep, const char *buffer, size_t len,
+    loff_t *offset)
+{
     size_t n, nh;
     u8 *k_buf = NULL;
-    u64 *p = (uint64_t *)buffer;
+    archul_t *p = (archul_t *)buffer;
 
     if(len < HASHSIZE) return -EINVAL;
     len = min_t(size_t, len, MAX_INPUT_SIZE);
@@ -201,7 +237,8 @@ static struct file_operations fops = {
     .write = dev_write,
 };
 
-static int __init uchaos_init(void) {
+static int __init uchaos_init(void)
+{
     major = register_chrdev(0, DEVICE_NAME, &fops);
     if (major < 0) return major;
 
@@ -215,7 +252,8 @@ static int __init uchaos_init(void) {
     return 0;
 }
 
-static void __exit uchaos_exit(void) {
+static void __exit uchaos_exit(void)
+{
     device_destroy(uchaos_class, MKDEV(major, 0));
     class_unregister(uchaos_class);
     class_destroy(uchaos_class);
