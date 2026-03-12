@@ -6,6 +6,7 @@
  * echo "seed data" > /dev/uchaos   (Triggers hashing/jitter)
  * cat /dev/uchaos                  (Reads the resulting 64-bit hash)
  * 
+ * insmod lib/modules/uchaos_dev.ko && dmesg > /dev/uchaos ; cat /dev/uchaos
  *
  *******************************************************************************
  *
@@ -33,7 +34,7 @@
 
 #define DEVICE_NAME "uchaos"
 #define CLASS_NAME  "uchaos_cls"
-#define MAX_INPUT_SIZE 1024
+#define MAX_INPUT_SIZE (1024 << 3)
 
 // --- Module Parameters ---
 static int dry_runs = 7; 
@@ -99,17 +100,18 @@ static u64 djb2tum(const u8 *str, size_t len, u64 seed) {
 
 // --- File Operations ---
 
+#define bytes_read 8
 static ssize_t dev_read(struct file *filep, char *buffer, size_t len, loff_t *offset) {
-    char output[21]; // Sufficient for u64 in decimal + \n
-    int bytes_read;
+    char output[bytes_read]; // Sufficient for u64 in decimal + \n
+
 
     if (*offset > 0) return 0; // EOF after first read
 
     mutex_lock(&uchaos_lock);
-    bytes_read = snprintf(output, sizeof(output), "%llu\n", current_hash);
+    memcpy(output, (uint8_t *)&current_hash, bytes_read);
     mutex_unlock(&uchaos_lock);
 
-    if (len < bytes_read) return -EINVAL;
+    //if (len < bytes_read) return -EINVAL;
 
     if (copy_to_user(buffer, output, bytes_read)) return -EFAULT;
 
