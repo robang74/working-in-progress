@@ -43,7 +43,7 @@
 
 #define DEVICE_NAME "uchaos"
 #define CLASS_NAME  "uchaos_cls"
-#define DRIVER_VERSION "0.4.2"
+#define DRIVER_VERSION "0.4.3"
 
 #define MAX_INPUT_SIZE (1024 << 3)
 
@@ -56,9 +56,9 @@ static int exception_range = 3;
 module_param(exception_range, int, 0644);
 MODULE_PARM_DESC(exception_range, " Jitter delta exception range (default=3) ");
 
-static int loop_mult = 7;
+static int loop_mult = 1;
 module_param(loop_mult, int, 0644);
-MODULE_PARM_DESC(loop_mult, " Number of repetitions of the hashing loop (default=7) ");
+MODULE_PARM_DESC(loop_mult, " Number of repetitions of the hashing loop (default=1) ");
 
 // --- Driver State ---
 static int major;
@@ -124,74 +124,105 @@ static inline archul_t ent_dstl(archul_t tm_4s_nsec, archul_t dlt, archul_t dff)
     return ent;
 }
 
-static inline archul_t djb2tum_core(const u8 *str, size_t len)
-{
-    static u64 avg = 0, dmx = 0, dmn = 1000000000ULL, prev_ts = 0;
-    static archul_t hash = HASH_SEED;
-    archul_t tns, dlt, dff, ent;
-    u8 b0, b1;
+#define dtskew(x) (!x || (x)>>28)    // 2^29 is the biggest 2^n before 1E9
 
+static inline archul_t djb2tum_core(archul_t seed)
+{
+    static archul_t avg = 0, dmx = 0, dmn = -1, jmn = 1, jmx = 0, javg = 0;
+    static archul_t ohs = HASH_SEED;
+    register archul_t hsh = ohs;
+
+    archul_t tns, dlt, dff, ent = 0, ons = 0;
+    u8 b0, b1, excp = 0;
     int i;
-    for (i = 0; i < len; i++) {
-        if( ent ) ent ^= rotlbit(ent, getprmx16(hash));
+
+    if( seed ) hsh ^= seed;
+    else { ons = ent = 0; }
+
+    for (i = 0; i < 1; i++) {
+        if( ent ) ent ^= rotlbit(ent, getprmx16(hsh));
 
 // -----------------------------------------------------------------------------
-        if( !prev_ts ) { prev_ts = ktime_get_ns(); cpu_relax(); }
+        if( !ons ) {
+            ons = ktime_get_ns();
+            hsh = knuthmx(hsh ^ ons);
+            cpu_relax();
+        }
 // WARNING:
 // this might loop forever, because of a BUG rather than in corner case
-repeat:
+reschedule:
         do {
-             tns = ktime_get_ns();
-             dlt = tns - prev_ts;
-             if( !dlt ) cpu_relax();
-             prev_ts = tns;
-        } while( !dlt );
+            tns = ktime_get_ns();
+            dlt = tns - ons;
+            if( !dlt )
+                cpu_relax();
+            else
+                ons = tns;
+        } while( dtskew(dlt) );
+
+        if(dmn == -1) { dmn = dlt;                            goto reschedule; }
+
+        if( dlt < dmn ) {
+            dff = dmn - dlt; dmn = dlt;
+            ent ^= -dff ^ dmn;
+            //evnt++;
+        } else
+        if( dlt > dmx ) {
+            dff = dlt - dmn; dmx = dlt;
+            ent ^= dff ^ -dmx;
+            //evnt++;
+        } else {
+            dff = dlt - dmn;
+            ent ^= ~dff ^ dmx;
+        }
+        if( !dff ) { hsh = knuthmx(hsh);                      goto reschedule; }
 
         // avg * 255 = avg + 256 - avg, faster
-        avg = ((avg << 8) - avg + dlt) >> 8;
+        // avg = ((avg << 8) - avg + dlt) >> 8;
 
-        if (dlt < dmn) {
-            dmn   = dlt;
-            hash  = rotlbit(hash, getprmx(dlt));
-            hash ^= (hash >> LSHIFT);
-        } else if (dlt > dmx) {
-            dmx   = dlt;
-            hash  = rotlbit(hash, ABN - getprmx(dlt));
-            hash *= getprmx((dmn + 1));
+        // dff is jittering for the exeption manager activation
+        if( dff < exception_range + excp ) {
+            excp += 4;                   // increasing excp and accounting for dff
+            //nexp++;
+            //skw = 0;
         } else {
-            dff = (dlt > avg) ? (dlt - avg) : (avg - dlt);
-            if (dff > exception_range) {
-                hash ^= rotlbit(dlt ^ dff, LSHIFT-1);
-                hash ^= (hash >> LSHIFT) * MULTIPLIER;
-            } else {
-                cpu_relax();
-                goto repeat;
-            }
+            // Knuth, based on gold section seeded by 1E-3 ~ 1E-4 event idx
+            if( excp ) { hsh = murmux3(hsh, ons); } excp = 0;
+            // min,max jittering can be ommited
+            if( jmn == -1 ) jmn = dff;
+            else
+            if( dff < jmn ) jmn = dff;
+            if( dff > jmx ) jmx = dff;
+            // avg calculation can be ommitted
+            avg += dlt; javg += dff; //ncl++;
         }
-        hash = ((hash << 5) + hash) + str[i];
-// -----------------------------------------------------------------------------
 
-        ent = ent_dstl(tns, dlt, dff);
+        ent ^= dlt        << ABz ;       // 1st derivative of time
+        ent ^= tns        << rot3;       // current monotonic time
+        ent  = knuthmx(ent ^ dff);       // 2nd derivative of time
+
+        b0 = ent & 0x01, b1 = ent & 0x02;
+        hsh = ( hsh << (4 + (b0 ? b1 : 1)) ) + (b1 ? -hsh : hsh);
+        hsh ^= rotlbit(hsh, getprmx16(ent >> 2));
+
         cpu_relax();
     }
 
-    b0   = ent & 0x01;
-    b1   = ent & 0x02;
-    hash = ( hash << (4 + (b0 ? b1 : 1)) ) + (b1 ? -hash : hash);
-    hash = rotlbit(hash ^ ent, getprmx16(ent >> 2));
+    ent = hsh;                       // forget the entropy mixed in hash
+    hsh = murmux3(hsh, ohs);         // whitening the hash before deliver
+    ohs = ent;                       // keep the hashing internal state
 
-    return hash;
+    return hsh;
 }
 
 // Core uchaos logic
-static archul_t djb2tum(const u8 *str, size_t len, size_t num)
+static inline archul_t djb2tum(archul_t seed, size_t num)
 {
-    archul_t hash;
     int j;
 
-    for (j = 0; j < num; j++) hash = djb2tum_core(str, len);
+    for (j = 0; j < num; j++) current_hash = djb2tum_core(seed);
 
-    return hash;
+    return current_hash;
 }
 
 // --- File Operations ---
@@ -200,7 +231,7 @@ static ssize_t dev_read(struct file *filep, char *buffer, size_t len,
     loff_t *offset)
 {
     archul_t output;
-    size_t total_sent = 0;
+    size_t sent = 0;
 
     if (len < HASHSIZE) return -EINVAL;
 
@@ -213,19 +244,17 @@ static ssize_t dev_read(struct file *filep, char *buffer, size_t len,
             break;
 
         mutex_lock(&uchaos_lock);
-        output = current_hash;
-        current_hash = djb2tum((uint8_t *)&current_hash, HASHSIZE, loop_mult);
-        output = murmux3(current_hash, output);
+        output = djb2tum(0, loop_mult);
         mutex_unlock(&uchaos_lock);
 
-        if (copy_to_user(buffer, (u8 *)&output, HASHSIZE)) return -EFAULT;
+        if (copy_to_user(buffer + sent, (u8 *)&output, HASHSIZE))
+            return -EFAULT;
 
-        total_sent += HASHSIZE;
+        sent += HASHSIZE;
         len -= HASHSIZE;
     }
 
-    //*offset = 0;
-    return total_sent;
+    return sent;
 }
 
 static ssize_t dev_write(struct file *filep, const char *buffer, size_t len,
@@ -249,7 +278,7 @@ static ssize_t dev_write(struct file *filep, const char *buffer, size_t len,
     mutex_lock(&uchaos_lock);
     for(n = 0, nh = len >> 3; n < nh; n++)
         current_hash ^= p[n];
-    current_hash = djb2tum((const u8 *)&current_hash, HASHSIZE, dry_runs);
+    current_hash = djb2tum(current_hash, dry_runs);
     mutex_unlock(&uchaos_lock);
 
     kfree(k_buf);

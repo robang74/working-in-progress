@@ -540,7 +540,7 @@ hashotloop:                                      // a loop made by two ASM jumps
     }
     s.oid = cpuid;
 #endif
-    if( !ons ) { hsh = knuthmx(hsh^tm_4s_nsec);            goto reschedule;    }
+    if( !ons ) { hsh = knuthmx(hsh ^ tm_4s_nsec);         goto reschedule;    }
 
     // 2. latency calculation //////////////////////////////////////////////////
 
