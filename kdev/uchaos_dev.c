@@ -43,7 +43,7 @@
 
 #define DEVICE_NAME "uchaos"
 #define CLASS_NAME  "uchaos_cls"
-#define DRIVER_VERSION "0.3.3"
+#define DRIVER_VERSION "0.3.4"
 
 #define MAX_INPUT_SIZE (1024 << 3)
 
@@ -83,6 +83,7 @@ static inline u64 djb2tum_core(u64 hash) {
     if( !prev_ts ) { prev_ts = ktime_get_ns(); cpu_relax(); }
     // WARNING:
     // this might loop forever, because of a BUG rather than in corner case
+repeat:
     do {
         ts = ktime_get_ns();
         delta = ts - prev_ts;
@@ -94,17 +95,20 @@ static inline u64 djb2tum_core(u64 hash) {
 
     if (delta < dmn) {
         dmn   = delta;
-        hash  = rotl64(hash, getprmx(dmn));
+        hash  = rotl64(hash, getprmx(delta));
         hash ^= (hash >> LSHIFT);
     } else if (delta > dmx) {
         dmx   = delta;
-        hash  = rotl64(hash, BITSIZE - getprmx(dmn));
+        hash  = rotl64(hash, BITSIZE - getprmx(delta));
         hash *= getprmx((dmn + 1));
     } else {
         diff  = (delta > avg) ? (delta - avg) : (avg - delta);
-        if (diff > exception_range) {
-            hash ^= rotl64(delta, LSHIFT-1);
+        if (diff > exception_range) { 
+            hash ^= rotl64(delta ^ diff, LSHIFT-1);
             hash  = (hash ^ (hash >> LSHIFT)) * MULTIPLIER;
+        } else {
+            cpu_relax();
+            goto repeat;
         }
     }
 
