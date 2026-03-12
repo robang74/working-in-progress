@@ -2,10 +2,10 @@
  * uchaos_dev.c - Character device for uchaos-based jitter hashing
  * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com> GPLv2
  *
- * Ported for Linux 5.15.x, usage: 
+ * Ported for Linux 5.15.x, usage:
  * echo "seed data" > /dev/uchaos   (Triggers hashing/jitter)
  * cat /dev/uchaos                  (Reads the resulting 64-bit hash)
- * 
+ *
  * insmod lib/modules/uchaos_dev.ko && dmesg > /dev/uchaos    # to load and init
  * dd if=/dev/uchaos bs=8 count=1 | od -x; done               # to check unicity
  * dd if=/dev/uchaos bs=1k count=1k of=/dev/null              # to check speed
@@ -15,7 +15,7 @@
  *******************************************************************************
  *
  * GEMINI 1ST ATTEMPT TO CONVERT GROK'S DRIVER INTO CHARACTER DEVICE DRIVER
- * 
+ *
  * Converting the driver from a passive entropy source to a character device
  * (/dev/uchaos) makes it much easier to debug, profile, and validate the "chaos"
  * logic through standard user-space tools.
@@ -43,12 +43,12 @@
 
 #define DEVICE_NAME "uchaos"
 #define CLASS_NAME  "uchaos_cls"
-#define DRIVER_VERSION "0.3.2"
+#define DRIVER_VERSION "0.3.3"
 
 #define MAX_INPUT_SIZE (1024 << 3)
 
 // --- Module Parameters ---
-static int dry_runs = 7; 
+static int dry_runs = 7;
 module_param(dry_runs, int, 0644);
 MODULE_PARM_DESC(dry_runs, "Number of dry runs for stat stabilization (default=7)");
 
@@ -60,7 +60,7 @@ MODULE_PARM_DESC(exception_range, "Jitter delta exception range (default=3)");
 static int major;
 static struct class* uchaos_class = NULL;
 static struct device* uchaos_device = NULL;
-static u64  current_hash = 0x5381; // Initial seed
+static u64  current_hash = 14695981039346656037ULL; // Initial seed
 static bool current_hash_ready = 0;
 static DEFINE_MUTEX(uchaos_lock);
 
@@ -76,40 +76,49 @@ static inline u64 rotl64(u64 n, u8 c) {
 #define BITSIZE 64
 #define LSHIFT 33
 
+static inline u64 djb2tum_core(u64 hash) {
+    static u64 avg = 0, dmx = 0, dmn = 1000000000ULL, prev_ts = 0;
+    u64 ts, delta, diff;
+
+    if( !prev_ts ) { prev_ts = ktime_get_ns(); cpu_relax(); }
+    // WARNING:
+    // this might loop forever, because of a BUG rather than in corner case
+    do {
+        ts = ktime_get_ns();
+        delta = ts - prev_ts;
+        if( !delta ) cpu_relax();
+    } while( !delta );
+
+    // avg * 255 = avg + 256 - avg, faster
+    avg = ((avg << 8) - avg + delta) >> 8;
+
+    if (delta < dmn) {
+        dmn   = delta;
+        hash  = rotl64(hash, getprmx(dmn));
+        hash ^= (hash >> LSHIFT);
+    } else if (delta > dmx) {
+        dmx   = delta;
+        hash  = rotl64(hash, BITSIZE - getprmx(dmn));
+        hash *= getprmx((dmn + 1));
+    } else {
+        diff  = (delta > avg) ? (delta - avg) : (avg - delta);
+        if (diff > exception_range) {
+            hash ^= rotl64(delta, LSHIFT-1);
+            hash  = (hash ^ (hash >> LSHIFT)) * MULTIPLIER;
+        }
+    }
+
+    return hash;
+}
+
 // Core uchaos logic
 static u64 djb2tum(const u8 *str, size_t len, u64 seed) {
-    u64 hash    = seed;
-    u64 dmn     = 1000000000ULL;
-    u64 dmx     = 0;
-    u64 avg     = 0;
-    u64 prev_ts = ktime_get_ns();
+    u64 hash = seed;
     int i, run;
 
     for (run = 0; run < dry_runs; run++) {
         for (i = 0; i < len; i++) {
-            u64 ts = ktime_get_ns();
-            u64 delta = ts - prev_ts;
-            prev_ts = ts;
-
-            // avg * 255 = avg + 256 - avg, faster
-            avg = ((avg << 8) - avg + delta) >> 8;
-
-            if (delta < dmn) {
-                dmn   = delta;
-                hash  = rotl64(hash, getprmx(run));
-                hash ^= (hash >> LSHIFT);
-            } else if (delta > dmx) {
-                dmx   = delta;
-                hash  = rotl64(hash, BITSIZE - getprmx(run));
-                hash *= getprmx((run+1));
-            } else {
-                u64 diff  = (delta > avg) ? (delta - avg) : (avg - delta);
-                if (diff > exception_range) {
-                    hash ^= rotl64(delta, LSHIFT-1);
-                    hash  = (hash ^ (hash >> LSHIFT)) * MULTIPLIER;
-                }
-            }
-
+            hash = djb2tum_core(hash);
             hash = ((hash << 5) + hash) + str[i];
             cpu_relax();
         }
