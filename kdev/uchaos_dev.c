@@ -1,13 +1,16 @@
 /*
  * uchaos_dev.c - Character device for uchaos-based jitter hashing
- * (c) Roberto A. Foglietta <roberto.foglietta@gmail.com> GPLv2
+ * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com> GPLv2
  *
  * Ported for Linux 5.15.x, usage: 
  * echo "seed data" > /dev/uchaos   (Triggers hashing/jitter)
  * cat /dev/uchaos                  (Reads the resulting 64-bit hash)
  * 
- * insmod lib/modules/uchaos_dev.ko && dmesg > /dev/uchaos
- * for i in $(seq 8); do cat /dev/uchaos | od -x; done
+ * insmod lib/modules/uchaos_dev.ko && dmesg > /dev/uchaos    # to load and init
+ * dd if=/dev/uchaos bs=8 count=1 | od -x; done               # to check unicity
+ * dd if=/dev/uchaos bs=1k count=1k of=/dev/null              # to check speed
+ *
+ * dd if=/dev/uchaos bs=1k count=8k | RNG_test.gz.sh stdin64 -tlshow 512K
  *
  *******************************************************************************
  *
@@ -40,6 +43,8 @@
 
 #define DEVICE_NAME "uchaos"
 #define CLASS_NAME  "uchaos_cls"
+#define DRIVER_VERSION "0.3.2"
+
 #define MAX_INPUT_SIZE (1024 << 3)
 
 // --- Module Parameters ---
@@ -59,11 +64,17 @@ static u64  current_hash = 0x5381; // Initial seed
 static bool current_hash_ready = 0;
 static DEFINE_MUTEX(uchaos_lock);
 
-static const u8 primes64[10] = {3, 61, 5, 59, 11, 53, 17, 47, 23, 41};
+static const u8 primes64[20] = {  3, 61,  5, 59, 11, 53, 17, 47, 23, 41,
+                                 19, 45, 29, 35, 31, 33, 13, 51,  7, 57 };
 
 static inline u64 rotl64(u64 n, u8 c) {
     c &= 63; return (n << c) | (n >> ((-c) & 63));
 }
+
+#define getprmx(val) (primes64[2 + (val & 0x1f)]) // previous %10 was slower
+#define MULTIPLIER 0xff51afd7ed558ccdULL
+#define BITSIZE 64
+#define LSHIFT 33
 
 // Core uchaos logic
 static u64 djb2tum(const u8 *str, size_t len, u64 seed) {
@@ -80,21 +91,22 @@ static u64 djb2tum(const u8 *str, size_t len, u64 seed) {
             u64 delta = ts - prev_ts;
             prev_ts = ts;
 
-            avg = ((avg * 255) + delta) >> 8;
+            // avg * 255 = avg + 256 - avg, faster
+            avg = ((avg << 8) - avg + delta) >> 8;
 
             if (delta < dmn) {
-                dmn = delta;
-                hash = rotl64(hash, primes64[run % 10]);
-                hash ^= (hash >> 33);
+                dmn   = delta;
+                hash  = rotl64(hash, getprmx(run));
+                hash ^= (hash >> LSHIFT);
             } else if (delta > dmx) {
-                dmx = delta;
-                hash = rotl64(hash, 64 - primes64[run % 10]);
-                hash *= primes64[(run + 1) % 10];
+                dmx   = delta;
+                hash  = rotl64(hash, BITSIZE - getprmx(run));
+                hash *= getprmx((run+1));
             } else {
-                u64 diff = (delta > avg) ? (delta - avg) : (avg - delta);
+                u64 diff  = (delta > avg) ? (delta - avg) : (avg - delta);
                 if (diff > exception_range) {
-                    hash ^= rotl64(delta, 32);
-                    hash = (hash ^ (hash >> 33)) * 0xff51afd7ed558ccdULL;
+                    hash ^= rotl64(delta, LSHIFT-1);
+                    hash  = (hash ^ (hash >> LSHIFT)) * MULTIPLIER;
                 }
             }
 
