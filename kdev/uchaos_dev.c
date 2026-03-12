@@ -46,7 +46,7 @@
 
 #define DEVICE_NAME "uchaos"
 #define CLASS_NAME  "uchaos_cls"
-#define DRIVER_VERSION "0.4.6"
+#define DRIVER_VERSION "0.4.9"
 
 #define MAX_INPUT_SIZE (1024 << 3)
 
@@ -236,14 +236,13 @@ static ssize_t dev_read(struct file *filep, char *buffer, size_t len,
     loff_t *offset)
 {
     archul_t output;
-    size_t sent = 0;
+    size_t sent;
 
+    len = ( len >> ABL ) << ABL;
     if (len < HASHSIZE) return -EINVAL;
-
-    if (*offset > 0) return 0;  // EOF after first read
-
+    
     // Continuous loop to fill the user-requested buffer size
-    while (len >= HASHSIZE) {
+    for (sent = 0; sent < len; sent += HASHSIZE) {
         // Check for signals to remain non-blocking/interruptible
         if (signal_pending(current))
             break;
@@ -254,40 +253,35 @@ static ssize_t dev_read(struct file *filep, char *buffer, size_t len,
 
         if (copy_to_user(buffer + sent, (u8 *)&output, HASHSIZE))
             return -EFAULT;
-
-        sent += HASHSIZE;
-        len -= HASHSIZE;
     }
 
-    return sent;
+    return sent ? sent : -ERESTARTSYS;
 }
 
 static ssize_t dev_write(struct file *filep, const char *buffer, size_t len,
     loff_t *offset)
 {
+    int ret = 0;
     size_t n, nh;
-    u8 *k_buf = NULL;
-    archul_t *p = (archul_t *)buffer;
+    static u8 k_buf[MAX_INPUT_SIZE]; // Stack allocation, one char device only
+    archul_t *p = (archul_t *)k_buf;
 
     if(len < HASHSIZE) return -EINVAL;
     len = min_t(size_t, len, MAX_INPUT_SIZE);
 
-    k_buf = kmalloc(len, GFP_KERNEL);
-    if (!k_buf) return -ENOMEM;
+    if (mutex_lock_interruptible(&uchaos_lock))
+        return -ERESTARTSYS;
 
-    if (copy_from_user(k_buf, buffer, len)) {
-        kfree(k_buf);
-        return -EFAULT;
+    if(copy_from_user(k_buf, buffer, len)) {
+        ret = -EFAULT;
+    } else {
+        ret = len;
+        for(n = 0, nh = len >> ABL; n < nh; hash ^= p[n++]);
+        (void)djb2tum(hash, dry_runs);
     }
 
-    mutex_lock(&uchaos_lock);
-    for(n = 0, nh = len >> 3; n < nh; n++)
-        current_hash ^= p[n];
-    current_hash = djb2tum(current_hash, dry_runs);
     mutex_unlock(&uchaos_lock);
-
-    kfree(k_buf);
-    return len;
+    return ret;
 }
 
 static struct file_operations fops = {
@@ -333,7 +327,7 @@ static void __exit uchaos_exit(void)
     class_unregister(uchaos_class);
     class_destroy(uchaos_class);
     unregister_chrdev(major, DEVICE_NAME);
-    printk(KERN_INFO "uchaos: Unloaded\n");
+    printk(KERN_INFO "uchaos: unloaded\n");
 }
 
 module_init(uchaos_init);
