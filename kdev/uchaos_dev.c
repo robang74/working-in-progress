@@ -43,7 +43,7 @@
 
 #define DEVICE_NAME "uchaos"
 #define CLASS_NAME  "uchaos_cls"
-#define DRIVER_VERSION "0.3.5"
+#define DRIVER_VERSION "0.3.6"
 
 #define MAX_INPUT_SIZE (1024 << 3)
 
@@ -56,9 +56,9 @@ static int exception_range = 3;
 module_param(exception_range, int, 0644);
 MODULE_PARM_DESC(exception_range, "Jitter delta exception range (default=3)");
 
-static int loop_mult = 1;
+static int loop_mult = 7;
 module_param(loop_mult, int, 0644);
-MODULE_PARM_DESC(loop_mult, "Number of repetitions of the hashing loop (default=1)");
+MODULE_PARM_DESC(loop_mult, "Number of repetitions of the hashing loop (default=7)");
 
 // --- Driver State ---
 static int major;
@@ -76,69 +76,68 @@ static inline u64 rotl64(u64 n, u8 c) {
 }
 
 #define getprmx(val) (primes64[2 + (val & 0x1f)]) // previous %10 was slower
+#define HASH_SEED 14695981039346656037ULL
 #define MULTIPLIER 0xff51afd7ed558ccdULL
 #define BITSIZE 64
 #define LSHIFT 33
 
-static inline u64 djb2tum_core(u64 hash) {
+static inline u64 djb2tum_core(const u8 *str, size_t len) {
     static u64 avg = 0, dmx = 0, dmn = 1000000000ULL, prev_ts = 0;
+    static u64 hash = HASH_SEED;
     u64 ts, delta, diff;
 
-    if( !prev_ts ) { prev_ts = ktime_get_ns(); cpu_relax(); }
-    // WARNING:
-    // this might loop forever, because of a BUG rather than in corner case
+    int i;
+    for (i = 0; i < len; i++) {
+        if( !prev_ts ) { prev_ts = ktime_get_ns(); cpu_relax(); }
+// WARNING:
+// this might loop forever, because of a BUG rather than in corner case
 repeat:
-    do {
-        ts = ktime_get_ns();
-        delta = ts - prev_ts;
-        if( !delta ) cpu_relax();
-    } while( !delta );
+        do {
+            ts = ktime_get_ns();
+            delta = ts - prev_ts;
+            if( !delta ) cpu_relax();
+        } while( !delta );
 
-    // avg * 255 = avg + 256 - avg, faster
-    avg = ((avg << 8) - avg + delta) >> 8;
+        // avg * 255 = avg + 256 - avg, faster
+        avg = ((avg << 8) - avg + delta) >> 8;
 
-    if (delta < dmn) {
-        dmn   = delta;
-        hash  = rotl64(hash, getprmx(delta));
-        hash ^= (hash >> LSHIFT);
-    } else if (delta > dmx) {
-        dmx   = delta;
-        hash  = rotl64(hash, BITSIZE - getprmx(delta));
-        hash *= getprmx((dmn + 1));
-    } else {
-        diff  = (delta > avg) ? (delta - avg) : (avg - delta);
-        if (diff > exception_range) { 
-            hash ^= rotl64(delta ^ diff, LSHIFT-1);
-            hash  = (hash ^ (hash >> LSHIFT)) * MULTIPLIER;
+        if (delta < dmn) {
+            dmn   = delta;
+            hash  = rotl64(hash, getprmx(delta));
+            hash ^= (hash >> LSHIFT);
+        } else if (delta > dmx) {
+            dmx   = delta;
+            hash  = rotl64(hash, BITSIZE - getprmx(delta));
+            hash *= getprmx((dmn + 1));
         } else {
-            cpu_relax();
-            goto repeat;
+            diff  = (delta > avg) ? (delta - avg) : (avg - delta);
+            if (diff > exception_range) { 
+                hash ^= rotl64(delta ^ diff, LSHIFT-1);
+                hash  = (hash ^ (hash >> LSHIFT)) * MULTIPLIER;
+            } else {
+                cpu_relax();
+                goto repeat;
+            }
         }
-    }
 
+        hash = ((hash << 5) + hash) + str[i];
+        cpu_relax();
+    }
     return hash;
 }
 
 // Core uchaos logic
-static u64 djb2tum(const u8 *str, size_t len, u64 seed) {
-    u64 hash = seed;
-    int i, j;
+static u64 djb2tum(const u8 *str, size_t len) {
+    u64 hash;
+    int j;
 
-
-    for (j = 0; j < dry_runs; j++) {
-        for (i = 0; i < len; i++) {
-            hash = djb2tum_core(hash);
-            hash = ((hash << 5) + hash) + str[i];
-            cpu_relax();
-        }
+    while(dry_runs) {
+        hash = djb2tum_core(str, len);
+        dry_runs--;
     }
 
     for (j = 0; j < loop_mult; j++) {
-        for (i = 0; i < len; i++) {
-            hash = djb2tum_core(hash);
-            hash = ((hash << 5) + hash) + str[i];
-            cpu_relax();
-        }
+        hash = djb2tum_core(str, len);
     }
 
     return hash;
@@ -154,7 +153,7 @@ static ssize_t dev_read(struct file *filep, char *buffer, size_t len, loff_t *of
 
     mutex_lock(&uchaos_lock);
     if( ! current_hash_ready )
-        current_hash = djb2tum((uint8_t *)&current_hash, HASHSIZE, current_hash);
+        current_hash = djb2tum((uint8_t *)&current_hash, HASHSIZE);
     memcpy(output, (uint8_t *)&current_hash, HASHSIZE);
     current_hash_ready = 0;
     mutex_unlock(&uchaos_lock);
@@ -180,7 +179,7 @@ static ssize_t dev_write(struct file *filep, const char *buffer, size_t len, lof
     }
 
     mutex_lock(&uchaos_lock);
-    current_hash = djb2tum(k_buf, actual_len, current_hash);
+    current_hash = djb2tum(k_buf, actual_len);
     current_hash_ready = 1;
     mutex_unlock(&uchaos_lock);
 
