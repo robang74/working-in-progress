@@ -43,7 +43,7 @@
 
 #define DEVICE_NAME "uchaos"
 #define CLASS_NAME  "uchaos_cls"
-#define DRIVER_VERSION "0.3.6"
+#define DRIVER_VERSION "0.3.7"
 
 #define MAX_INPUT_SIZE (1024 << 3)
 
@@ -64,8 +64,6 @@ MODULE_PARM_DESC(loop_mult, "Number of repetitions of the hashing loop (default=
 static int major;
 static struct class* uchaos_class = NULL;
 static struct device* uchaos_device = NULL;
-static u64  current_hash = 14695981039346656037ULL; // Initial seed
-static bool current_hash_ready = 0;
 static DEFINE_MUTEX(uchaos_lock);
 
 static const u8 primes64[20] = {  3, 61,  5, 59, 11, 53, 17, 47, 23, 41,
@@ -75,9 +73,12 @@ static inline u64 rotl64(u64 n, u8 c) {
     c &= 63; return (n << c) | (n >> ((-c) & 63));
 }
 
+static u64 current_hash = 0;
+
 #define getprmx(val) (primes64[2 + (val & 0x1f)]) // previous %10 was slower
 #define HASH_SEED 14695981039346656037ULL
 #define MULTIPLIER 0xff51afd7ed558ccdULL
+#define HASHSIZE 8
 #define BITSIZE 64
 #define LSHIFT 33
 
@@ -127,38 +128,28 @@ repeat:
 }
 
 // Core uchaos logic
-static u64 djb2tum(const u8 *str, size_t len) {
+static u64 djb2tum(const u8 *str, size_t len, size_t num) {
     u64 hash;
     int j;
 
-    while(dry_runs) {
-        hash = djb2tum_core(str, len);
-        dry_runs--;
-    }
-
-    for (j = 0; j < loop_mult; j++) {
-        hash = djb2tum_core(str, len);
-    }
+    for (j = 0; j < num; j++) hash = djb2tum_core(str, len);
 
     return hash;
 }
 
 // --- File Operations ---
 
-#define HASHSIZE 8
 static ssize_t dev_read(struct file *filep, char *buffer, size_t len, loff_t *offset) {
-    char output[HASHSIZE]; // Sufficient for u64 in decimal + \n
+    char output[HASHSIZE];
+
+    if (len < HASHSIZE) return -EINVAL;
 
     if (*offset > 0) return 0; // EOF after first read
 
     mutex_lock(&uchaos_lock);
-    if( ! current_hash_ready )
-        current_hash = djb2tum((uint8_t *)&current_hash, HASHSIZE);
-    memcpy(output, (uint8_t *)&current_hash, HASHSIZE);
-    current_hash_ready = 0;
+    current_hash = djb2tum((uint8_t *)&current_hash, HASHSIZE, loop_mult);
+    *(u64 *)&output = current_hash;
     mutex_unlock(&uchaos_lock);
-
-    //if (len < HASHSIZE) return -EINVAL;
 
     if (copy_to_user(buffer, output, HASHSIZE)) return -EFAULT;
 
@@ -179,8 +170,8 @@ static ssize_t dev_write(struct file *filep, const char *buffer, size_t len, lof
     }
 
     mutex_lock(&uchaos_lock);
-    current_hash = djb2tum(k_buf, actual_len);
-    current_hash_ready = 1;
+    current_hash = djb2tum_core(k_buf, actual_len);
+    current_hash = djb2tum((const u8 *)&current_hash, HASHSIZE, dry_runs);
     mutex_unlock(&uchaos_lock);
 
     kfree(k_buf);
@@ -197,6 +188,7 @@ static int __init uchaos_init(void) {
     if (major < 0) return major;
     
     if(loop_mult < 1) loop_mult = 1;
+    if(dry_runs  < 1) dry_runs  = 1;
 
     uchaos_class = class_create(THIS_MODULE, CLASS_NAME);
     uchaos_device = device_create(uchaos_class, NULL, MKDEV(major, 0), NULL, DEVICE_NAME);
