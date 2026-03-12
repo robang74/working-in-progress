@@ -1,53 +1,56 @@
 /*
  * uchaos_entropy.c - Kernel module for uchaos-based auxiliary entropy source
- * Based on uchaos v0.2.5.3 by robang74, ported for Linux 5.15.x
- * Registers as hwrng, mixes jitter-hash at init for boot entropy.
  * 
  * (c) Roberto A. Foglietta <roberto.foglietta@gmail.com> GPLv2
- *
- *******************************************************************************
  * 
  * GROK'S 1ST ATTEMPT TO CONVERT UCHAOS IN A LINUX KERNEL DRIVER
  *
-I can handle a PoC kernel module that registers as an auxiliary entropy source 
-via the hwrng (hardware RNG) framework in Linux 5.15.x. This way, it mixes jitter-
-driven chaos into the pool at boot/init time (when entropy is scarce) and can 
-provide ongoing reads if needed. It's not a direct patch to random.c (which would
-require kernel rebuild), but a loadable module—safer for testing, and aligns with 
-our 3rd-party plan.
+ * Based on uchaos v0.2.5.3 by robang74, ported for Linux 5.15.x
+ * Registers as hwrng, mixes jitter-hash at init for boot entropy.
+ *
+ *******************************************************************************
 
-I fetched the original uchaos.c and kernel's random.c sources to port the logic.
-Key tweaks:
+  I can handle a PoC kernel module that registers as an auxiliary entropy source 
+  via the hwrng (hardware RNG) framework in Linux 5.15.x. This way, it mixes 
+  jitter-driven chaos into the pool at boot/init time (when entropy is scarce)
+  and can provide ongoing reads if needed. It's not a direct patch to random.c
+  (which would require kernel rebuild), but a loadable module—safer for testing,
+  and aligns with our 3rd-party plan.
 
-- Replaced user-space sched_yield/clock_gettime with kernel ktime_get_ns and 
-  cpu_relax for jitter (kernel-safe delays).
-- Used a fixed input string (e.g., a kernel version banner or static text) for 
-  hashing, since dmesg access at early boot is tricky (ring buffer not fully 
-  populated).
-- Hash output mixes into the pool via add_device_randomness at module init
-  (boot-time boost).
-- Registered as hwrng with a read callback for ongoing entropy (quality set low,
-  as it's jitter-based, not true HW).
-- Kept stochastic branches and djb2tum core for chaos.
-- Compiled/tested mentally (no real kernel env here), but this should build with
-  `make modules` in kernel tree.
+  I fetched the original uchaos.c and kernel's random.c sources to port the logic.
+  Key tweaks:
 
-Here's the PoC module code (`uchaos_entropy.c`—place in drivers/char/, add to
-Makefile/Kconfig):
+  - Replaced user-space sched_yield/clock_gettime with kernel ktime_get_ns and 
+    cpu_relax for jitter (kernel-safe delays).
+  - Used a fixed input string (e.g., a kernel version banner or static text)
+    for hashing, since dmesg access at early boot is tricky (ring buffer not
+    fully populated).
+  - Hash output mixes into the pool via add_device_randomness at module init
+    (boot-time boost).
+  - Registered as hwrng with a read callback for ongoing entropy (quality set
+    low, as it's jitter-based, not true HW).
+  - Kept stochastic branches and djb2tum core for chaos.
+  - Compiled/tested mentally (no real kernel env here), but this should build
+    with `make modules` in kernel tree.
 
-To build/test:
+  Here's the PoC module code (`uchaos_entropy.c`—place in drivers/char/, add
+  to Makefile/Kconfig):
 
-1. In kernel source (5.15.x): Add to drivers/char/Makefile: `
-   obj-$(CONFIG_UCHAOS_ENTROPY) += uchaos_entropy.o`
-2. In Kconfig: Add `config UCHAOS_ENTROPY bool "uchaos auxiliary entropy"
-   depends on HWRNG help "Jitter-based entropy from uchaos for boot."`
-3. `make modules` then `insmod uchaos_entropy.ko`
-4. Check dmesg for init, /proc/sys/kernel/random/entropy_avail for boost.
+  To build/test:
 
-If this doesn't fit (e.g., needs more kernel tweaks), you can take it from here—
-random.c integration would involve adding a call in init_static_randomdata or
-similar, but module's safer.
-*/
+  1. In kernel source (5.15.x): Add to drivers/char/Makefile: `
+     obj-$(CONFIG_UCHAOS_ENTROPY) += uchaos_entropy.o`
+  2. In Kconfig: Add `config UCHAOS_ENTROPY bool "uchaos auxiliary entropy"
+     depends on HWRNG help "Jitter-based entropy from uchaos for boot."`
+  3. `make modules` then `insmod uchaos_entropy.ko`
+  4. Check dmesg for init, /proc/sys/kernel/random/entropy_avail for boost.
+
+  If this doesn't fit (e.g., needs more kernel tweaks), you can take it from
+  here—random.c integration would involve adding a call in init_static_randomdata
+  or similar, but module's safer.
+
+ *******************************************************************************
+ */
 
 #include <linux/module.h>
 #include <linux/kernel.h>
