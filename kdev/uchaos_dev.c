@@ -43,7 +43,7 @@
 
 #define DEVICE_NAME "uchaos"
 #define CLASS_NAME  "uchaos_cls"
-#define DRIVER_VERSION "0.4.0"
+#define DRIVER_VERSION "0.4.1"
 
 #define MAX_INPUT_SIZE (1024 << 3)
 
@@ -81,7 +81,7 @@ static DEFINE_MUTEX(uchaos_lock);
 #define rot3    13
 
 #define getprmx16(w) (5 + (((w) & ABy) << 1))
-#define getprmx(val) (primes64[getprmx16(val)]) // previous %10 was slower
+#define getprmx(val) (primes64[getprmx16((val))]) // previous %10 was slower
 #define HASH_SEED 14695981039346656037ULL
 #define MULTIPLIER 0xff51afd7ed558ccdULL
 #define HASHSIZE (ABN >> 3)
@@ -128,45 +128,57 @@ static inline archul_t djb2tum_core(const u8 *str, size_t len)
 {
     static u64 avg = 0, dmx = 0, dmn = 1000000000ULL, prev_ts = 0;
     static archul_t hash = HASH_SEED;
-    archul_t ts, delta, diff;
+    archul_t tns, dlt, dff, ent;
+    u8 b0, b1;
 
     int i;
     for (i = 0; i < len; i++) {
+        if( ent ) ent ^= rotlbit(ent, getprmx16(hash));
+
+// -----------------------------------------------------------------------------
         if( !prev_ts ) { prev_ts = ktime_get_ns(); cpu_relax(); }
 // WARNING:
 // this might loop forever, because of a BUG rather than in corner case
 repeat:
         do {
-            ts = ktime_get_ns();
-            delta = ts - prev_ts;
-            if( !delta ) cpu_relax();
-        } while( !delta );
+             tns = ktime_get_ns();
+             dlt = tns - prev_ts;
+             if( !dlt ) cpu_relax();
+        } while( !dlt );
 
         // avg * 255 = avg + 256 - avg, faster
-        avg = ((avg << 8) - avg + delta) >> 8;
+        avg = ((avg << 8) - avg + dlt) >> 8;
 
-        if (delta < dmn) {
-            dmn   = delta;
-            hash  = rotlbit(hash, getprmx(delta));
+        if (dlt < dmn) {
+            dmn   = dlt;
+            hash  = rotlbit(hash, getprmx(dlt));
             hash ^= (hash >> LSHIFT);
-        } else if (delta > dmx) {
-            dmx   = delta;
-            hash  = rotlbit(hash, ABN - getprmx(delta));
+        } else if (dlt > dmx) {
+            dmx   = dlt;
+            hash  = rotlbit(hash, ABN - getprmx(dlt));
             hash *= getprmx((dmn + 1));
         } else {
-            diff  = (delta > avg) ? (delta - avg) : (avg - delta);
-            if (diff > exception_range) {
-                hash ^= rotlbit(delta ^ diff, LSHIFT-1);
-                hash  = (hash ^ (hash >> LSHIFT)) * MULTIPLIER;
+            dff = (dlt > avg) ? (dlt - avg) : (avg - dlt);
+            if (dff > exception_range) {
+                hash ^= rotlbit(dlt ^ dff, LSHIFT-1);
+                hash ^= (hash >> LSHIFT) * MULTIPLIER;
             } else {
                 cpu_relax();
                 goto repeat;
             }
         }
-
         hash = ((hash << 5) + hash) + str[i];
+// -----------------------------------------------------------------------------
+
+        ent = ent_dstl(tns, dlt, dff);
         cpu_relax();
     }
+
+    b0   = ent & 0x01;
+    b1   = ent & 0x02;
+    hash = ( hash << (4 + (b0 ? b1 : 1)) ) + (b1 ? -hash : hash);
+    hash = rotlbit(hash ^ ent, getprmx16(ent >> 2));
+
     return hash;
 }
 

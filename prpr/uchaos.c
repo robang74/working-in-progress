@@ -522,7 +522,7 @@ hashotloop:                                      // a loop made by two ASM jumps
 /** HASHING LOOP START  *******************************************************/
     // 0. hashing loop preparation, p.2 ////////////////////////////////////////
 
-    if(ent) ent ^= rotlbit(ent, getprmx16(hsh));
+    if( ent ) ent ^= rotlbit(ent, getprmx16(hsh));
 
     // 1. ns latency time retrievement /////////////////////////////////////////
 
