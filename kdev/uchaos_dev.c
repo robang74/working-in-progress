@@ -43,7 +43,7 @@
 
 #define DEVICE_NAME "uchaos"
 #define CLASS_NAME  "uchaos_cls"
-#define DRIVER_VERSION "0.3.4"
+#define DRIVER_VERSION "0.3.5"
 
 #define MAX_INPUT_SIZE (1024 << 3)
 
@@ -55,6 +55,10 @@ MODULE_PARM_DESC(dry_runs, "Number of dry runs for stat stabilization (default=7
 static int exception_range = 3;
 module_param(exception_range, int, 0644);
 MODULE_PARM_DESC(exception_range, "Jitter delta exception range (default=3)");
+
+static int loop_mult = 1;
+module_param(loop_mult, int, 0644);
+MODULE_PARM_DESC(loop_mult, "Number of repetitions of the hashing loop (default=1)");
 
 // --- Driver State ---
 static int major;
@@ -118,15 +122,25 @@ repeat:
 // Core uchaos logic
 static u64 djb2tum(const u8 *str, size_t len, u64 seed) {
     u64 hash = seed;
-    int i, run;
+    int i, j;
 
-    for (run = 0; run < dry_runs; run++) {
+
+    for (j = 0; j < dry_runs; j++) {
         for (i = 0; i < len; i++) {
             hash = djb2tum_core(hash);
             hash = ((hash << 5) + hash) + str[i];
             cpu_relax();
         }
     }
+
+    for (j = 0; j < loop_mult; j++) {
+        for (i = 0; i < len; i++) {
+            hash = djb2tum_core(hash);
+            hash = ((hash << 5) + hash) + str[i];
+            cpu_relax();
+        }
+    }
+
     return hash;
 }
 
@@ -182,6 +196,8 @@ static struct file_operations fops = {
 static int __init uchaos_init(void) {
     major = register_chrdev(0, DEVICE_NAME, &fops);
     if (major < 0) return major;
+    
+    if(loop_mult < 1) loop_mult = 1;
 
     uchaos_class = class_create(THIS_MODULE, CLASS_NAME);
     uchaos_device = device_create(uchaos_class, NULL, MKDEV(major, 0), NULL, DEVICE_NAME);
