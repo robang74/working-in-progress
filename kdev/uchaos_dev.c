@@ -43,7 +43,7 @@
 
 #define DEVICE_NAME "uchaos"
 #define CLASS_NAME  "uchaos_cls"
-#define DRIVER_VERSION "0.3.7"
+#define DRIVER_VERSION "0.3.8"
 
 #define MAX_INPUT_SIZE (1024 << 3)
 
@@ -139,19 +139,32 @@ static u64 djb2tum(const u8 *str, size_t len, size_t num) {
 
 // --- File Operations ---
 
+#define murmul1 0xff51afd7ed558ccdULL
+#define murmul2 0xc4ceb9fe1a85ec53ULL
+typedef u64 archul_t;
+
+static inline archul_t murmux3(archul_t ks, archul_t p) {
+    register archul_t z = ks;
+    z =  p ^ (( z >> (LSHIFT-4) ) * murmul1);
+    z = (z ^ ( z << (LSHIFT-2) )) * murmul2;
+    z =  z ^ ( z >>  LSHIFT    );
+    return z;
+}
+
 static ssize_t dev_read(struct file *filep, char *buffer, size_t len, loff_t *offset) {
-    char output[HASHSIZE];
+    u64 output;
 
     if (len < HASHSIZE) return -EINVAL;
 
     if (*offset > 0) return 0; // EOF after first read
 
     mutex_lock(&uchaos_lock);
+    output = current_hash;
     current_hash = djb2tum((uint8_t *)&current_hash, HASHSIZE, loop_mult);
-    *(u64 *)&output = current_hash;
+    output = murmux3(current_hash, output);
     mutex_unlock(&uchaos_lock);
 
-    if (copy_to_user(buffer, output, HASHSIZE)) return -EFAULT;
+    if (copy_to_user(buffer, (u8 *)&output, HASHSIZE)) return -EFAULT;
 
     *offset = HASHSIZE;
     return HASHSIZE;
@@ -170,7 +183,7 @@ static ssize_t dev_write(struct file *filep, const char *buffer, size_t len, lof
     }
 
     mutex_lock(&uchaos_lock);
-    current_hash = djb2tum_core(k_buf, actual_len);
+    current_hash = djb2tum(k_buf, actual_len, 1);
     current_hash = djb2tum((const u8 *)&current_hash, HASHSIZE, dry_runs);
     mutex_unlock(&uchaos_lock);
 
