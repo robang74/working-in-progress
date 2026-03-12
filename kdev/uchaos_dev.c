@@ -43,7 +43,7 @@
 
 #define DEVICE_NAME "uchaos"
 #define CLASS_NAME  "uchaos_cls"
-#define DRIVER_VERSION "0.3.9"
+#define DRIVER_VERSION "0.3.10"
 
 #define MAX_INPUT_SIZE (1024 << 3)
 
@@ -171,7 +171,9 @@ static ssize_t dev_read(struct file *filep, char *buffer, size_t len, loff_t *of
 }
 
 static ssize_t dev_write(struct file *filep, const char *buffer, size_t len, loff_t *offset) {
-    u8 *k_buf;
+    size_t n, nh;
+    u8 *k_buf = NULL;
+    u64 *p = (uint64_t *)buffer;
 
     if(len < HASHSIZE) return -EINVAL;
     len = min_t(size_t, len, MAX_INPUT_SIZE);
@@ -185,7 +187,8 @@ static ssize_t dev_write(struct file *filep, const char *buffer, size_t len, lof
     }
 
     mutex_lock(&uchaos_lock);
-    current_hash = djb2tum(k_buf, len, 1);
+    for(n = 0, nh = len >> 3; n < nh; n++)
+        current_hash ^= p[n];
     current_hash = djb2tum((const u8 *)&current_hash, HASHSIZE, dry_runs);
     mutex_unlock(&uchaos_lock);
 
