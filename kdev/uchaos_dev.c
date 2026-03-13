@@ -46,35 +46,42 @@
 #include <linux/slab.h>
 #include <linux/cdev.h>
 
-#define abs_t(x) ({ long __x = (x); (__x < 0) ? -__x : __x; })
-
 #define DEVICE_NAME "uchaos"
-#define CLASS_NAME  "uchaos_cls"
-#define DRIVER_VERSION "0.5.3"
-
-#define MAX_INPUT_SIZE (1024 << 3)
+#define  CLASS_NAME "uchaos_cls"
+#define DRIVER_VERSION "0.5.4"
+#define DRIVER_LICENSE "GPL v2"
+#define DRIVER_AUTHOR  "Roberto A. Foglietta <roberto.foglietta@gmail.com>"
+#define DRIVER_DESCRIPTION "Stochastic scheduler-jitter chaos RNG stream device"
 
 // --- Module Parameters ---
-static int dry_runs = 7;
-module_param(dry_runs, int, 0644);
+
+static int init_runs = 7;
+module_param(init_runs, int, 0644);
 MODULE_PARM_DESC(init_runs,
-    " Number of initial runs for stat stabilization (default=7) ");
+    " Number of initial runs as Lyapunov decoherence time (1:[7]:255) ");
 
 static int min_delta = 3;
 module_param(min_delta, int, 0644);
 MODULE_PARM_DESC(min_delta,
-    " Minimum delta otherwise do an extra passage (default=3) ");
+    " Minimum expected variance otherwise do an extra passage (1:[3]:255) ");
 
 static int loop_mult = 1;
 module_param(loop_mult, int, 0644);
 MODULE_PARM_DESC(loop_mult,
-    " Number of repetitions of the hashing loop (default=1) ");
+    " Number of chaos engine turns before providing the output (1:[1]:7) ");
 
 // --- Driver State ---
+
 static int major;
 static struct class* uchaos_class = NULL;
 static struct device* uchaos_device = NULL;
 static DEFINE_MUTEX(uchaos_lock);
+
+// --- Fuctional Definitions ---
+
+#define abs_t(x) ({ long __x = (x); (__x < 0) ? -__x : __x; })
+
+#define MAX_INPUT_SIZE (1024 << 3)
 
 #define AB  (6)
 #define ABL (AB-3)        //  2 or  3
@@ -96,6 +103,8 @@ static DEFINE_MUTEX(uchaos_lock);
 #define MULTIPLIER 0xff51afd7ed558ccdULL
 #define HASHSIZE (ABN >> 3)
 #define LSHIFT (ABx+2)
+
+// --- Fuctional Declarations ---
 
 typedef u64  archul_t __attribute__((aligned(64)));
 
@@ -124,6 +133,7 @@ static inline archul_t murmux3(archul_t ks, archul_t p)
     z =  z ^ ( z >> (ABx+2));
     return z;
 }
+
 #if 0
 static inline archul_t ent_dstl(archul_t tm_4s_nsec, archul_t dlt, archul_t dff)
 {
@@ -134,6 +144,7 @@ static inline archul_t ent_dstl(archul_t tm_4s_nsec, archul_t dlt, archul_t dff)
     return ent;
 }
 #endif
+
 #define dtskew(x) (!x || (x)>>28)    // 2^29 is the biggest 2^n before 1E9
 
 #define ONESEC msecs_to_jiffies(1<<10)
@@ -365,7 +376,7 @@ static ssize_t dev_write(struct file *filep, const char *buffer, size_t len,
     } else {
         ret = len;
         for(n = 0, nh = len >> ABL; n < nh; hash ^= (archul_t)kbuf[n++]);
-        (void)djb2tum(hash, dry_runs);
+        (void)djb2tum(hash, init_runs);
     }
 
     mutex_unlock(&uchaos_lock);
@@ -382,8 +393,13 @@ static struct file_operations fops = {
 
 static int __init uchaos_init(void)
 {
-    if(loop_mult < 1) loop_mult = 1;
-    if(dry_runs  < 1) dry_runs  = 1;
+    // Parameters ranges sanitisation
+    if(loop_mult <   1) loop_mult =   1;
+    if(init_runs <   1) init_runs =   1;
+    if(min_delta <   1) min_delta =   1;
+    if(loop_mult >   7) loop_mult =   7;
+    if(init_runs > 255) init_runs = 255;
+    if(min_delta > 255) min_delta = 255;
 
     // static *ptr allocation at init on: go or not-go, there is not try
     kbuf = kmalloc(MAX_INPUT_SIZE, GFP_KERNEL);
@@ -425,8 +441,9 @@ static int __init uchaos_init(void)
         retnfree( PTR_ERR(uchaos_device) );
     }
 
-    printk(KERN_INFO "uchaos: loop_mult=%d dry_runs=%d, min_delta=%d kbuf%%64:%lu\n",
-        loop_mult, dry_runs, min_delta, (uintptr_t)kbuf & 63);
+    printk(KERN_INFO
+        "uchaos: loop_mult=%d init_runs=%d, min_delta=%d; kbuf_offset: 0x%02lx\n",
+            loop_mult, init_runs, min_delta, (uintptr_t)kbuf & 255);
 
     return 0;
 }
@@ -443,8 +460,8 @@ static void __exit uchaos_exit(void)
 module_init(uchaos_init);
 module_exit(uchaos_exit);
 
-MODULE_LICENSE("GPL v2");
+MODULE_AUTHOR(DRIVER_AUTHOR);
+MODULE_LICENSE(DRIVER_LICENSE);
 MODULE_VERSION(DRIVER_VERSION);
-MODULE_AUTHOR("Roberto A. Foglietta <roberto.foglietta@gmail.com>");
-MODULE_DESCRIPTION("Stochastic jitter-based chaos stream device");
+MODULE_DESCRIPTION(DRIVER_DESCRIPTION);
 
