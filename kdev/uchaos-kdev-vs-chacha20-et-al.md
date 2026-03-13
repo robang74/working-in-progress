@@ -149,7 +149,7 @@ root@u-bmls:/# []
 
 ### Screenshot n.2 (dx, OCR)
 
-```sh
+```text
 Linux u-bmls 5.15.202 #4 Thu Mar 12 06:03:34 CET 2026 x86_64 GNU/Linux
 
 uChaos128 v0.5.6 w/sb!/pr s:0, q:1, d+p(0):3+1 ns, r:31, 1:16, Z:19
