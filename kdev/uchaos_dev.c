@@ -333,6 +333,21 @@ static ssize_t dev_write(struct file *filep, const char *buffer, size_t len,
     if (mutex_lock_interruptible(&uchaos_lock))
         return -ERESTARTSYS;
 
+    /*
+     * RATIONALE: because the access to djb2tum() is blocked at dev_read() after
+     * an "infinite loop" failure has been detected, there is no other way to
+     * unlock the device than writing 8-bytes at least into the char device.
+     * Since uChaos shows, both in kernel and userland spaces, to be able to
+     * extract entropy from the micro-chaos conditions it creates with dumb
+     * input as well then 8-byte from /dev/zero or echo "ciao bella" is enough
+     * to trigger the device and ripristinate its functioning. That's why the
+     * printk exists in first place: to inform sysadmin or debugging developers
+     * that a certain situation arises and it requires more attention than a
+     * simple read again or read later. Because it isn't supposed to happen.
+     * Moreover, the timeout of one second does not allow that an automated
+     * regular write() like a seeder or a watchdog would do frequently (1ms)
+     * can bypass the protection that prevents flooding the system of printks.
+     */
     if(copy_from_user((u8 *)kbuf, buffer, len)) {
         ret = -EFAULT;
     } else {
