@@ -35,6 +35,7 @@
  * Relevant code source: prpr/uchaos.c
  */
 
+#include <linux/jiffies.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/kernel.h>
@@ -133,6 +134,10 @@ static inline archul_t ent_dstl(archul_t tm_4s_nsec, archul_t dlt, archul_t dff)
 #endif
 #define dtskew(x) (!x || (x)>>28)    // 2^29 is the biggest 2^n before 1E9
 
+#define ONESEC msecs_to_jiffies(1<<10)
+static unsigned long failure_jiff = 0;
+static bool loop_failure = false;
+
 static inline archul_t djb2tum_core(archul_t seed)
 {
     static archul_t dmx = 0, dmn = -1, jmn = -1, jmx = 0; //, avg = 0, javg = 0;
@@ -142,6 +147,18 @@ static inline archul_t djb2tum_core(archul_t seed)
     archul_t tns, dlt, dff, ent = 0, ons = 0;
     u8 b0, b1, excp = 0;
     int i;
+
+    /*
+     * RATIONALE: also flooding the system of printks isn't a good idea, after all.
+     * There is not an easy way to fall in this "SYSBUG" but also not an easy way to
+     * deal with it because it is not within the coding/logic of this driver's scope. 
+     */
+    if( loop_failure ) {
+        if ( time_after(jiffies, failure_jiff + ONESEC) ) {
+            failure_jiff = 0;
+            loop_failure = false;
+        } else goto enforcedquit;
+    }
 
     if( seed ) hsh ^= seed;
     else { ons = ent = 0; }
@@ -172,9 +189,12 @@ reschedule:
          * uChaos will be the least of the issues. Not being a critical one, is enough.
          */
         if( (++i) >> 10 ) { // 2^10 is a large arbitrary value, don't overlook when coding
+            failure_jiff = jiffies;
             #define UCWRN "uChaos: EMERGENCY ABORT - "
             printk(KERN_ALERT UCWRN "Detected potential infinite reschedule loop!\n");
-            printk(KERN_ALERT UCWRN "i=%d, kbuf_offset=%lu\n", i, (unsigned long)kbuf & 255);
+            printk(KERN_ALERT UCWRN "loops=%d, kbuf_offset=0x%02x, jiffies=%lu\n",
+                i, (unsigned long)kbuf & 255, jiffies);
+            loop_failure = true;
             goto enforcedquit; // TODO: a more drastic way is to unregister the char device
         }
         do {
@@ -233,6 +253,11 @@ reschedule:
         cpu_relax();
     }
 
+    /*
+     * RATIONALE: if 'goto enforcedquit' is enforced, the system is probably done
+     * and near an imminent collapse but this wouldn't allow to creates a DoS here
+     * rather than a soft-degradation of the service quality like doing LCG as RNG.
+     */
 enforcedquit:
     ent = hsh;                       // forget the entropy mixed in hash
     hsh = murmux3(hsh, ohs);         // whitening the hash before deliver
