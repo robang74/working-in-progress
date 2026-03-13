@@ -97,7 +97,7 @@ static DEFINE_MUTEX(uchaos_lock);
 #define HASHSIZE (ABN >> 3)
 #define LSHIFT (ABx+2)
 
-typedef u64 volatile archul_t __attribute__((aligned(64)));
+typedef u64  archul_t __attribute__((aligned(64)));
 
 static archul_t *kbuf = NULL; // Stack allocation, one char device only
 
@@ -137,18 +137,19 @@ static inline archul_t ent_dstl(archul_t tm_4s_nsec, archul_t dlt, archul_t dff)
 #define dtskew(x) (!x || (x)>>28)    // 2^29 is the biggest 2^n before 1E9
 
 #define ONESEC msecs_to_jiffies(1<<10)
-static unsigned long failure_jiff = 0;
-static bool loop_failure = false;
+
+volatile bool loop_failure = false;  // read in many places, just wrote in one
 
 static inline archul_t djb2tum_core(archul_t seed)
 {
+    static unsigned long failure_jiff = 0;
     static archul_t dmx = 0, dmn = -1; //, jmn = -1, jmx = 0, avg = 0, javg = 0;
     static archul_t mavg = 0, ohs = HASH_SEED;
     register archul_t hsh = ohs;
 
     archul_t tns, dlt, dff, ent = 0, ons = 0;
     u8 b0, b1, excp = 0;
-    int i;
+    volatile int i; // volatile as memory barrier on relevant poitions in the hot-loop
 
     /*
      * RATIONALE: also flooding the system of printks isn't a good idea, after all.
@@ -292,7 +293,7 @@ static inline archul_t djb2tum(archul_t seed, size_t num)
 static ssize_t dev_read(struct file *filep, char *buffer, size_t len,
     loff_t *offset)
 {
-    archul_t *p = __builtin_assume_aligned((void *)kbuf, 8);
+    archul_t *p = __builtin_assume_aligned(kbuf, 8);
     size_t sent;
 
     /*
@@ -363,7 +364,7 @@ static ssize_t dev_write(struct file *filep, const char *buffer, size_t len,
         ret = -EFAULT;
     } else {
         ret = len;
-        for(n = 0, nh = len >> ABL; n < nh; hash ^= kbuf[n++]);
+        for(n = 0, nh = len >> ABL; n < nh; hash ^= (archul_t)kbuf[n++]);
         (void)djb2tum(hash, dry_runs);
     }
 
@@ -377,7 +378,7 @@ static struct file_operations fops = {
     .write = dev_write,
 };
 
-#define retnfree(x) { kfree((void *)kbuf); return (x); }
+#define retnfree(x) { kfree(kbuf); return (x); }
 
 static int __init uchaos_init(void)
 {
