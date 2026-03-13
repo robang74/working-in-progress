@@ -10,7 +10,8 @@
  * dd if=/dev/uchaos bs=8 count=1 | od -x; done               # to check unicity
  * dd if=/dev/uchaos bs=1k count=1k of=/dev/null              # to check speed
  *
- * dd if=/dev/uchaos bs=1k count=8k | RNG_test.gz.sh stdin64 -tlshow 512K
+ * dd if=/dev/uchaos bs=8k count=1k | RNG_test.gz.sh stdin64 -tlshow 512K
+ * Since the driver uses a 8KB buffer to provide reads to userland, bs=8K
  *
  *******************************************************************************
  *
@@ -46,7 +47,7 @@
 
 #define DEVICE_NAME "uchaos"
 #define CLASS_NAME  "uchaos_cls"
-#define DRIVER_VERSION "0.5.1"
+#define DRIVER_VERSION "0.5.2"
 
 #define MAX_INPUT_SIZE (1024 << 3)
 
@@ -93,7 +94,7 @@ static DEFINE_MUTEX(uchaos_lock);
 #define HASHSIZE (ABN >> 3)
 #define LSHIFT (ABx+2)
 
-typedef u64 archul_t __attribute__((aligned(8)));
+typedef u64 volatile archul_t __attribute__((aligned(64)));
 
 static archul_t *kbuf = NULL; // Stack allocation, one char device only
 
@@ -152,11 +153,30 @@ static inline archul_t djb2tum_core(archul_t seed)
             hsh = knuthmx(hsh ^ ons);
             cpu_relax();
         }
-// -----------------------------------------------------------------------------
-// WARNING:
-// this might loop forever, because of a BUG rather than in corner case
-// -----------------------------------------------------------------------------
+/* -----------------------------------------------------------------------------
+ * WARNING:
+ * it might loop forever, because of a BUG rather than falling in a corner case
+ * -------------------------------------------------------------------------- */
 reschedule:
+        /*
+         * RATIONALE: we cannot ignore that in some extreme conditions this code can
+         * create a livelock rescheduling for an unlimited number of times. Something
+         * exotic like ktime_get_ns() function pointer was corrupted in a way that it
+         * returns always the same value. The expectation is 3-12 range of reschedules
+         * for each function cold-call. When 1% might require 100x more, performance
+         * is halved and it is a degradation of the service but never a lock. Hopefully,
+         * we never see this kind of failure in a production system. In critical systems
+         * a lock/hack by ktime_get_ns() can cost a disaster, not just low-quality entropy
+         * or scarcity. Anyway, when ktime_get_ns() systematically fails much probably
+         * other parts of the kernel would create DoS or SysFail in such a way that
+         * uChaos will be the least of the issues. Not being a critical one, is enough.
+         */
+        if( (++i) >> 10 ) { // 2^10 is a large arbitrary value, don't overlook when coding
+            #define UCWRN "uChaos: EMERGENCY ABORT - "
+            printk(KERN_ALERT UCWRN "Detected potential infinite reschedule loop!\n");
+            printk(KERN_ALERT UCWRN "i=%d, kbuf_offset=%lu\n", i, (unsigned long)kbuf & 255);
+            goto enforcedquit; // TODO: a more drastic way is to unregister the char device
+        }
         do {
             tns = ktime_get_ns();
             dlt = tns - ons;
@@ -213,6 +233,7 @@ reschedule:
         cpu_relax();
     }
 
+enforcedquit:
     ent = hsh;                       // forget the entropy mixed in hash
     hsh = murmux3(hsh, ohs);         // whitening the hash before deliver
     ohs = ent;                       // keep the hashing internal state
