@@ -1,6 +1,6 @@
 /*
  * uchaos_dev.c - Character device for uchaos-based jitter hashing
- * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com> GPLv2
+ * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2
  *
  * Ported for Linux 5.15.x, usage:
  * echo "seed data" > /dev/uchaos   (Triggers hashing/jitter)
@@ -58,17 +58,17 @@
 static int init_runs = 7;
 module_param(init_runs, int, 0644);
 MODULE_PARM_DESC(init_runs,
-    " Number of initial runs as Lyapunov decoherence time (1:[7]:255) ");
+    " N. init runs as Lyapunov decoherence time (1:[7]:255)");
 
 static int min_delta = 3;
 module_param(min_delta, int, 0644);
 MODULE_PARM_DESC(min_delta,
-    " Minimum expected variance otherwise do an extra passage (1:[3]:255) ");
+    " Min. expected variance o/wise extra pass  (1:[3]:255)");
 
 static int loop_mult = 1;
 module_param(loop_mult, int, 0644);
 MODULE_PARM_DESC(loop_mult,
-    " Number of chaos engine turns before providing the output (1:[1]:7) ");
+    " Nun. of turns before providing the output (1:[1]:7)");
 
 // --- Driver State ---
 
