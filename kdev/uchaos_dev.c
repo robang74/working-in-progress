@@ -376,6 +376,20 @@ static int __init uchaos_init(void)
         retnfree( PTR_ERR(uchaos_class) );
     }
 
+    /*
+     * RATIONALE: a char device allows to test the quality of the output (audit)
+     * optionally also on a living system in production. Despite this could be a
+     * leak thus a possible security problem, a flag in compilation and a signed
+     * kernel will prevent anyone to load a module or incorporate code that later
+     * can be leveraged for a side attack. After all, every debug facility is keen
+     * to provide a larger and porose attack surface. No any news about this.
+     * The same concept applies to murmur3() as last whitening passage instead of
+     * using a cryptographic state of art function like ChaCha20(). Because murmur3
+     * spreads the bits, would not masquerade a poor-quality / low-quantity entropy
+     * source. This has been shown in userspace with uchaos.c: appling parkmiller32
+     * before murmur3, whitening preserve the grid-bias introduced by PM32 zeroing
+     * any doubt that murmur3() can conceal a LCG behind its hashing strength.
+     */
     uchaos_device = device_create(uchaos_class,
         NULL, MKDEV(major, 0), NULL, DEVICE_NAME);
     if (IS_ERR(uchaos_device)) {
