@@ -1,7 +1,6 @@
-## uCHAOS V0.5.4: SHOW ME YOUR CODE, INSTEAD!
+### uCHAOS V0.5.4: SHOW ME YOUR CODE, INSTEAD!
 
-- [LinkedIn post #1](https://www.linkedin.com/posts/robertofoglietta_uchaos-v054-show-me-your-code-instead-activity-7438251459344781313-6UQS)
-- [Facebook post #1](https://www.facebook.com/roberto.a.foglietta/posts/10163068326183736)
+- [LinkedIn post #1](https://www.linkedin.com/posts/robertofoglietta_uchaos-v054-show-me-your-code-instead-activity-7438251459344781313-6UQS) -- [Facebook post #1](https://www.facebook.com/roberto.a.foglietta/posts/10163068326183736)
 
 First of all, the screenshots:
 
@@ -36,10 +35,9 @@ Swap:       0      0      0
 
 ---
 
-## uCHAOS V0.5.4: SHOW ME YOUR CODE, INSTEAD! #2
+### uCHAOS V0.5.4: SHOW ME YOUR CODE, INSTEAD! #2
 
-- [LinkedIn post #2](https://www.linkedin.com/posts/robertofoglietta_uchaos-v054-show-me-your-code-instead-activity-7438256141433729024-LTW1)
-- [Facebook post #2](https://www.facebook.com/roberto.a.foglietta/posts/10163068385103736)
+- [LinkedIn post #2](https://www.linkedin.com/posts/robertofoglietta_uchaos-v054-show-me-your-code-instead-activity-7438256141433729024-LTW1) -- [Facebook post #2](https://www.facebook.com/roberto.a.foglietta/posts/10163068385103736)
 
 Every novelty challenges and shackes our state of arts, this create frictions, resistance, doubts and fears. We are humans, after all. We do dramas.
 
