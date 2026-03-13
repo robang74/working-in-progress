@@ -190,9 +190,9 @@ reschedule:
          */
         if( (++i) >> 10 ) { // 2^10 is a large arbitrary value, don't overlook when coding
             failure_jiff = jiffies;
-            #define UCWRN "uChaos: EMERGENCY ABORT - "
-            printk(KERN_ALERT UCWRN "Detected potential infinite reschedule loop!\n");
-            printk(KERN_ALERT UCWRN "loops=%d, kbuf_offset=0x%02x, jiffies=%lu\n",
+            #define UCWRN "uChaos: EMERGENCY ABORT -"
+            printk(KERN_ALERT "%s Detected potential infinite reschedule loop!\n", UCWRN);
+            printk(KERN_ALERT "%s loops=%d, kbuf_offset=0x%02lx, jiffies=%lu\n", UCWRN,
                 i, (unsigned long)kbuf & 255, jiffies);
             loop_failure = true;
             goto enforcedquit; // TODO: a more drastic way is to unregister the char device
@@ -281,8 +281,19 @@ static inline archul_t djb2tum(archul_t seed, size_t num)
 static ssize_t dev_read(struct file *filep, char *buffer, size_t len,
     loff_t *offset)
 {
-    archul_t *p = __builtin_assume_aligned(kbuf, 8);
+    archul_t *p = __builtin_assume_aligned((void *)kbuf, 8);
     size_t sent;
+
+    /*
+     * RATIONALE: a single read can provide 8KB of data not more. Doing LCG in
+     * a middle of a read() on average means 4KB of low-quality entropy which
+     * is a VERY bad but RARE condition of a system wide failure, anyway.
+     * Within 512 interactions in LCG mode there is a tiny hope that the sequence
+     * would not predictable despite the seed isn't known but "tiny" is about
+     * gov size attackers not a common threat. However, refuses to provide more
+     * LCG instead of entropy is a sany policy: end the current duty and stop.
+     */
+    if( loop_failure ) return -ETIMEDOUT;
 
     len = ( len >> ABL ) << ABL;
     if (len < HASHSIZE) return -EINVAL;
@@ -340,7 +351,7 @@ static struct file_operations fops = {
     .write = dev_write,
 };
 
-#define retnfree(x) { kfree(kbuf); return (x); }
+#define retnfree(x) { kfree((void *)kbuf); return (x); }
 
 static int __init uchaos_init(void)
 {
