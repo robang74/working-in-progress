@@ -46,9 +46,11 @@
 #include <linux/slab.h>
 #include <linux/cdev.h>
 
+#define abs_t(x) ({ long __x = (x); (__x < 0) ? -__x : __x; })
+
 #define DEVICE_NAME "uchaos"
 #define CLASS_NAME  "uchaos_cls"
-#define DRIVER_VERSION "0.5.2"
+#define DRIVER_VERSION "0.5.3"
 
 #define MAX_INPUT_SIZE (1024 << 3)
 
@@ -140,8 +142,8 @@ static bool loop_failure = false;
 
 static inline archul_t djb2tum_core(archul_t seed)
 {
-    static archul_t dmx = 0, dmn = -1, jmn = -1, jmx = 0; //, avg = 0, javg = 0;
-    static archul_t ohs = HASH_SEED;
+    static archul_t dmx = 0, dmn = -1; //, jmn = -1, jmx = 0, avg = 0, javg = 0;
+    static archul_t mavg = 0, ohs = HASH_SEED;
     register archul_t hsh = ohs;
 
     archul_t tns, dlt, dff, ent = 0, ons = 0;
@@ -223,9 +225,6 @@ reschedule:
         }
         if( !dff ) { hsh = knuthmx(hsh);                      goto reschedule; }
 
-        // mavg * 255 = mavg + 256 - mavg, faster
-        // mavg = ((mavg << 8) - mavg + dlt) >> 8;
-
         // dff is jittering for the exeption manager activation
         if( dff < min_delta + excp ) {
             excp += 4;               // increasing excp and accounting for dff
@@ -233,22 +232,34 @@ reschedule:
         } else {
             // Knuth, based on gold section seeded by 1E-3 ~ 1E-4 event idx
             if( excp ) { hsh = murmux3(hsh, ons); } excp = 0;
+            /*
             // min,max jittering can be ommited
             if( jmn == -1 ) jmn = dff;
             else
             if( dff < jmn ) jmn = dff;
             if( dff > jmx ) jmx = dff;
             // avg calculation can be ommitted
-            // avg += dlt; javg += dff; //ncl++;
+            avg += dlt; javg += dff; //ncl++;
+            */
         }
+        
+        // Half of the values above and below expected but few around creates
+        // uncertanty which affects how ent is calculated but not on average
+        // Instead, a trigger by "uncommon" events spawn a ca.10-12bit branch
+        // and this detour apports unpredicatbility not just flat-white noise.
+        #define MAVG(x) (( abs_t(dlt - mavg) > min_delta ) ? (x) : ~(x))
 
-        ent ^= dlt        << ABz ;   // 1st derivative of time
-        ent ^= tns        << rot3;   // current monotonic time
+        ent ^= MAVG(dlt)  << ABz ;   // 1st derivative of time
+        ent ^= MAVG(tns)  << rot3;   // current monotonic time
         ent  = knuthmx(ent ^ dff);   // 2nd derivative of time
 
         b0 = ent & 0x01, b1 = ent & 0x02;
         hsh = ( hsh << (4 + (b0 ? b1 : 1)) ) + (b1 ? -hsh : hsh);
-        hsh ^= rotlbit(hsh, getprmx16(ent >> 2));
+        hsh ^= rotlbit(hsh ^ (dlt - mavg), getprmx16(ent >> 2));
+
+        // Moving average
+        // mavg * 255 = mavg + 256 - mavg, faster
+        mavg = ((mavg << 8) - mavg + dlt) >> 8;
 
         cpu_relax();
     }
