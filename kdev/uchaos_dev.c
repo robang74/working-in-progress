@@ -46,7 +46,7 @@
 
 #define DEVICE_NAME "uchaos"
 #define CLASS_NAME  "uchaos_cls"
-#define DRIVER_VERSION "0.4.9"
+#define DRIVER_VERSION "0.5.1"
 
 #define MAX_INPUT_SIZE (1024 << 3)
 
@@ -93,9 +93,9 @@ static DEFINE_MUTEX(uchaos_lock);
 #define HASHSIZE (ABN >> 3)
 #define LSHIFT (ABx+2)
 
-typedef u64 archul_t;
+typedef u64 archul_t __attribute__((aligned(8)));
 
-static archul_t current_hash = 0;
+static archul_t *kbuf = NULL; // Stack allocation, one char device only
 
 static const u8 primes64[20] = {  3, 61,  5, 59, 11, 53, 17, 47, 23, 41,
                                  19, 45, 29, 35, 31, 33, 13, 51,  7, 57 };
@@ -225,9 +225,9 @@ static inline archul_t djb2tum(archul_t seed, size_t num)
 {
     int j;
 
-    for (j = 0; j < num; j++) current_hash = djb2tum_core(seed);
+    for (j = 0; j < num; j++) seed = djb2tum_core(seed);
 
-    return current_hash;
+    return seed;
 }
 
 // --- File Operations ---
@@ -235,27 +235,32 @@ static inline archul_t djb2tum(archul_t seed, size_t num)
 static ssize_t dev_read(struct file *filep, char *buffer, size_t len,
     loff_t *offset)
 {
-    archul_t output;
+    archul_t *p = __builtin_assume_aligned(kbuf, 8);
     size_t sent;
 
     len = ( len >> ABL ) << ABL;
     if (len < HASHSIZE) return -EINVAL;
+    len = min_t(size_t, len, MAX_INPUT_SIZE);
+
+    mutex_lock(&uchaos_lock);
     
     // Continuous loop to fill the user-requested buffer size
     for (sent = 0; sent < len; sent += HASHSIZE) {
         // Check for signals to remain non-blocking/interruptible
         if (signal_pending(current))
             break;
-
-        mutex_lock(&uchaos_lock);
-        output = djb2tum(HASH_SEED, loop_mult);
-        mutex_unlock(&uchaos_lock);
-
-        if (copy_to_user(buffer + sent, (u8 *)&output, HASHSIZE))
-            return -EFAULT;
+        *p++ = djb2tum(HASH_SEED, loop_mult);
     }
 
-    return sent ? sent : -ERESTARTSYS;
+    if ( !sent )
+        sent = -ERESTARTSYS;
+    else
+    if ( copy_to_user(buffer, (u8 *)kbuf, sent) )
+        sent = -EFAULT;
+
+    mutex_unlock(&uchaos_lock);
+
+    return sent;
 }
 
 static ssize_t dev_write(struct file *filep, const char *buffer, size_t len,
@@ -263,8 +268,7 @@ static ssize_t dev_write(struct file *filep, const char *buffer, size_t len,
 {
     int ret = 0;
     size_t n, nh;
-    static u8 k_buf[MAX_INPUT_SIZE]; // Stack allocation, one char device only
-    archul_t *p = (archul_t *)k_buf;
+    archul_t hash;
 
     if(len < HASHSIZE) return -EINVAL;
     len = min_t(size_t, len, MAX_INPUT_SIZE);
@@ -272,11 +276,11 @@ static ssize_t dev_write(struct file *filep, const char *buffer, size_t len,
     if (mutex_lock_interruptible(&uchaos_lock))
         return -ERESTARTSYS;
 
-    if(copy_from_user(k_buf, buffer, len)) {
+    if(copy_from_user((u8 *)kbuf, buffer, len)) {
         ret = -EFAULT;
     } else {
         ret = len;
-        for(n = 0, nh = len >> ABL; n < nh; hash ^= p[n++]);
+        for(n = 0, nh = len >> ABL; n < nh; hash ^= kbuf[n++]);
         (void)djb2tum(hash, dry_runs);
     }
 
@@ -290,13 +294,19 @@ static struct file_operations fops = {
     .write = dev_write,
 };
 
+#define retnfree(x) { kfree(kbuf); return (x); }
+
 static int __init uchaos_init(void)
 {
-    major = register_chrdev(0, DEVICE_NAME, &fops);
-    if (major < 0) return major;
-
     if(loop_mult < 1) loop_mult = 1;
     if(dry_runs  < 1) dry_runs  = 1;
+
+    // static *ptr allocation at init on: go or not-go, there is not try
+    kbuf = kmalloc(MAX_INPUT_SIZE, GFP_KERNEL);
+    if (!kbuf) return -ENOMEM;
+
+    major = register_chrdev(0, DEVICE_NAME, &fops);
+    if (major < 0) retnfree( major );
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 4, 0)
     uchaos_class = class_create(CLASS_NAME);
@@ -304,8 +314,9 @@ static int __init uchaos_init(void)
     uchaos_class = class_create(THIS_MODULE, CLASS_NAME);
 #endif
     if (IS_ERR(uchaos_class)) {
+        
         unregister_chrdev(major, DEVICE_NAME);
-        return PTR_ERR(uchaos_class);
+        retnfree( PTR_ERR(uchaos_class) );
     }
 
     uchaos_device = device_create(uchaos_class,
@@ -313,11 +324,12 @@ static int __init uchaos_init(void)
     if (IS_ERR(uchaos_device)) {
         class_destroy(uchaos_class);
         unregister_chrdev(major, DEVICE_NAME);
-        return PTR_ERR(uchaos_device);
+        retnfree( PTR_ERR(uchaos_device) );
     }
 
-    printk(KERN_INFO "uchaos: loop_mult=%d dry_runs=%d, min_delta=%d\n",
-        loop_mult, dry_runs, min_delta);
+    printk(KERN_INFO "uchaos: loop_mult=%d dry_runs=%d, min_delta=%d kbuf%%64:%lu\n",
+        loop_mult, dry_runs, min_delta, (uintptr_t)kbuf & 63);
+
     return 0;
 }
 
