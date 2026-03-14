@@ -415,21 +415,20 @@ static struct hwrng uchaos_rng = {
 #define retnfree(x) { if(kbufptr) kfree(kbufptr); return (x); }
 #endif
 
-#if defined(_CREDIT_INIT_ADDR) && defined(_STATIC_PRINTK)
-/*
- * hwrng_register() OOPS because a kernel bug despite the backport fix
- * then badboy mode and grep credit_init_bits linux-kernel/System.map
- */
-#define KASR_REAL_OFFSET ((uintptr_t)_printk - _STATIC_PRINTK)
 typedef void (* credit_entropy_bits_t)(size_t nbits);
-static credit_entropy_bits_t kernel_credit_entropy_bits = \
-      (credit_entropy_bits_t)_CREDIT_INIT_ADDR + KASR_REAL_OFFSET;
-#else
-#define kernel_credit_entropy_bits(x)
-#endif
 
 static int __init uchaos_init(void)
 {
+#if defined(_CREDIT_INIT_ADDR) && defined(_STATIC_PRINTK)
+  /*
+   * hwrng_register() OOPS because a kernel bug despite the backport fix
+   * then badboy mode and grep credit_init_bits linux-kernel/System.map
+   */
+    credit_entropy_bits_t kernel_credit_entropy_bits = (credit_entropy_bits_t)\
+        _CREDIT_INIT_ADDR + ((uintptr_t)_printk - _STATIC_PRINTK);
+#else
+#define kernel_credit_entropy_bits(x)
+#endif
     // 256 bit are enough to fullfil the kernel pool
     archul_t entropy_buf[4], *kbufptr = NULL;
 
@@ -478,7 +477,7 @@ static int __init uchaos_init(void)
     #else
     printk(KERN_INFO MODULE_NAME
         ": Credit entropy function address  : 0x%016lx\n",
-            _CREDIT_INIT_ADDR + KASR_REAL_OFFSET);
+            (uintptr_t)kernel_credit_entropy_bits);
     add_device_randomness(entropy_buf, len); // this is the only available
     kernel_credit_entropy_bits(len << 3);    // therefore badboy mode! ;-)
     #endif
