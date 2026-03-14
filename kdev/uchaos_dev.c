@@ -151,13 +151,13 @@ static inline archul_t murmux3(archul_t ks, archul_t p)
 
 /*
  * ATOMICITY ON A 1CPU vs SMP SYSTEM: the 'loop_failure' flag is read in many 
- * places, but wrote in one only: 'volatile' is fine, 'atomic_t' is the way.
+ * places, but wrote in one only: 'volatile' was fine, 'atomic_t' is the way.
  * However also failure_jiff requires multi-thread protection, by 'uchaos_lock'.
  * Because 'uchaos_lock' protects writes, reading a 'volatile bool' is safe.
  * The 'volatile' isn't a SMP memory barrier as we expect but each CPU core
  * cache therefore for the most general implementation 'atomic_t' is the way.
  */
-static volatile bool loop_failure = false;
+static atomic_t loop_failure = ATOMIC_INIT(0);
 
 static inline archul_t djb2tum(archul_t seed, size_t num)
 {
@@ -174,10 +174,10 @@ static inline archul_t djb2tum(archul_t seed, size_t num)
      * There is not an easy way to fall in this "SYSBUG" but also not an easy way to
      * deal with it because it is not within the coding/logic of this driver's scope.
      */
-    if( loop_failure ) {
+    if( atomic_read( &loop_failure ) ) {
         if ( time_after(jiffies, failure_jiff + ONESEC) ) {
             failure_jiff = 0;
-            loop_failure = false;
+            atomic_set(&loop_failure, 0);
         } else goto enforcedquit;
     }
 
@@ -215,7 +215,7 @@ reschedule:
             printk(KERN_ALERT UCWRN" Detected potential infinite reschedule loop!\n");
             printk(KERN_INFO  UCWRN" loops=%d,%d kbuf_offset=0x%02lx, jiffies=%lu\n",
                 i, j, (unsigned long)kbuf & 255, jiffies);
-            loop_failure = true;
+            atomic_set(&loop_failure, 1);
             goto enforcedquit; // TODO: a more drastic way is to unregister the char device
         }
         do {
@@ -333,7 +333,7 @@ static ssize_t dev_read(struct file *fp, char *ubuf, size_t len, loff_t *of)
      * gov size attackers not a common threat. However, refuses to provide more
      * LCG instead of entropy is a sany policy: end the current duty and stop.
      */
-    if( loop_failure ) return -ETIMEDOUT;
+    if( atomic_read( &loop_failure ) ) return -ETIMEDOUT;
 
     if (len < HASHSIZE) return -EINVAL;
 
@@ -477,7 +477,6 @@ static int __init uchaos_init(void)
     }
     add_hwgenerator_randomness(entropy_buf, len, len << 3);
 #else
-    //wait_for_random_bytes();
     printk(KERN_INFO MODULE_NAME
         ": Inject entropy %ld bytes, 1st hash: 0x%016llx\n",
             len, entropy_buf[0]);
@@ -490,8 +489,7 @@ static int __init uchaos_init(void)
         printk(KERN_INFO MODULE_NAME
             ": Credit entropy function address  : 0x%016lx\n",
                 (uintptr_t)kernel_credit_entropy_bits);
-
-                                        // when doing good OOPS &
+                                                    // when doing good OOPS &
         add_device_randomness(entropy_buf, len);   // this is the only viable
         kernel_credit_entropy_bits(len << 3);     // then badboy mode init! ;-)
     }
@@ -549,7 +547,6 @@ static int __init uchaos_init(void)
 static void __exit uchaos_exit(void)
 {
     device_destroy(uchaos_class, MKDEV(major, 0));
-    //class_unregister(uchaos_class);
     class_destroy(uchaos_class);
     unregister_chrdev(major, DEVICE_NAME);
     printk(KERN_INFO MODULE_NAME ": unloaded\n");
