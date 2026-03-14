@@ -144,7 +144,15 @@ static inline archul_t murmux3(archul_t ks, archul_t p)
 
 #define ONESEC msecs_to_jiffies(1<<10)
 
-volatile bool loop_failure = false;  // read in many places, just wrote in one
+/*
+ * ATOMICITY ON A 1CPU vs SMP SYSTEM: the 'loop_failure' flag is read in many 
+ * places, but wrote in one only: 'volatile' is fine, 'atomic_t' is the way.
+ * However also failure_jiff requires multi-thread protection, by 'uchaos_lock'.
+ * Because 'uchaos_lock' protects writes, reading a 'volatile bool' is safe.
+ * The 'volatile' isn't a SMP memory barrier as we expect but each CPU core
+ * cache therefore for the most general implementation 'atomic_t' is the way.
+ */
+static volatile bool loop_failure = false;
 
 static inline archul_t djb2tum(archul_t seed, size_t num)
 {
@@ -285,13 +293,15 @@ enforcedquit:
 
 // --- File Operations ---
 
+#define ABL_ALIGN(x) ( ( ( (archul_t)(x) + (1 << ABL) -1 ) >> ABL ) << ABL )
+
 static inline ssize_t _unprotected_interuptible_kbuf_fill(size_t len) {
     archul_t *p = __builtin_assume_aligned(kbuf, 8);
     size_t sent;
 
     if ( !len ) return 0;
 
-    len = ( ( len + (1 << ABL) -1 ) >> ABL ) << ABL;
+    len = (size_t)ABL_ALIGN( len );
     len = min_t(size_t, len, MAX_INPUT_SIZE);
 
     // Continuous loop to fill the user-requested buffer size
@@ -400,19 +410,20 @@ static struct hwrng uchaos_rng = {
     .read = uchaos_read,
     .quality = 100,
 };
-#define retnfree(x) { hwrng_unregister(&uchaos_rng); if(kbuf) kfree(kbuf); return (x); }
+#define retnfree(x) { hwrng_unregister(&uchaos_rng); if(kbufptr) kfree(kbufptr); return (x); }
 #else
-#define retnfree(x) { if(kbuf) kfree(kbuf); return (x); }
+#define retnfree(x) { if(kbufptr) kfree(kbufptr); return (x); }
 #endif
 
-#ifdef _CREDIT_INIT_ADDR
+#if defined(_CREDIT_INIT_ADDR) && defined(_STATIC_PRINTK)
 /*
  * hwrng_register() OOPS because a kernel bug despite the backport fix
  * then badboy mode and grep credit_init_bits linux-kernel/System.map
  */
+#define KASR_REAL_OFFSET ((uintptr_t)_printk - _STATIC_PRINTK)
 typedef void (* credit_entropy_bits_t)(size_t nbits);
 static credit_entropy_bits_t kernel_credit_entropy_bits = \
-      (credit_entropy_bits_t)_CREDIT_INIT_ADDR;
+      (credit_entropy_bits_t)_CREDIT_INIT_ADDR + KASR_REAL_OFFSET;
 #else
 #define kernel_credit_entropy_bits(x)
 #endif
@@ -420,7 +431,7 @@ static credit_entropy_bits_t kernel_credit_entropy_bits = \
 static int __init uchaos_init(void)
 {
     // 256 bit are enough to fullfil the kernel pool
-    archul_t entropy_buf[4];
+    archul_t entropy_buf[4], *kbufptr = NULL;
 
     // Parameters ranges sanitisation min values
     if( !loop_mult ) loop_mult = 1;
@@ -465,17 +476,19 @@ static int __init uchaos_init(void)
     #ifdef add_bootloader_randomness
     add_bootloader_randomness(entropy_buf, len);
     #else
+    printk(KERN_INFO MODULE_NAME
+        ": Credit entropy function address  : 0x%016lx\n",
+            _CREDIT_INIT_ADDR + KASR_REAL_OFFSET);
     add_device_randomness(entropy_buf, len); // this is the only available
     kernel_credit_entropy_bits(len << 3);    // therefore badboy mode! ;-)
-    printk(KERN_INFO MODULE_NAME
-        ": Credit entropy function address  : 0x%016lx\n", _CREDIT_INIT_ADDR);
     #endif
 #endif
     /* -------------------------------------------------------------------- */ }
 
     // static *ptr allocation at init on: go or not-go, there is not try
-    kbuf = kmalloc(MAX_INPUT_SIZE, GFP_KERNEL);
-    if (!kbuf) retnfree( -ENOMEM );
+    kbufptr = kzalloc(MAX_INPUT_SIZE + HASHSIZE, GFP_KERNEL);
+    if (!kbufptr) retnfree( -ENOMEM );
+    kbuf = (archul_t *)ABL_ALIGN( kbufptr );
 
     major = register_chrdev(0, DEVICE_NAME, &fops);
     if (major < 0) retnfree( major );

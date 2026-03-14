@@ -13,14 +13,27 @@ KO_FILE := $(MODULE_NAME).ko
 KDIR := linux-kernel/
 PWD  := $(shell pwd)
 
-KMAP := System.map
-ADDR := 0x$(shell grep " _credit_init_bits" $(KDIR)/$(KMAP) $(KMAP) \
-            2>/dev/null | tail -n1 | cut -d' ' -f1 | cut -d: -f2)
-
+KMAP := $(KDIR)/System.map System.map
+ADDR := 0x$(shell grep " _credit_init_bits" $(KMAP) 2>/dev/null |\
+            tail -n1 | cut -d' ' -f1 | cut -d: -f2)
 ccflags-y += -D_CREDIT_INIT_ADDR=$(ADDR)
 
+KCFG  := $(KDIR)/.config .config
+KASLR := $(shell grep "CONFIG_RANDOMIZE_BASE=y" $(KCFG) 2>/dev/null)
+ifneq ($(KASLR),)
+    KASLR := 1
+    ccflags-y += -D_KASLR_ENABLED=1
+else
+    KASLR := 0
+    ccflags-y += -D_KASLR_ENABLED=0
+endif
+
+PRINTK := 0x$(shell grep -w "_printk" $(KMAP) 2>/dev/null |\
+             tail -n1 | cut -d' ' -f1 | cut -d: -f2)
+ccflags-y += -D_STATIC_PRINTK=$(PRINTK)
+
 default:
-	@echo "_CREDIT_INIT_ADDR=$(ADDR)"
+	@echo "_CREDIT_INIT_ADDR=$(ADDR) w/ KASLR=$(KASLR),$(PRINTK)"
 	$(MAKE) -C $(KDIR) M=$(PWD) modules_prepare modules
 
 dist: default
