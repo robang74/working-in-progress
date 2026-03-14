@@ -46,9 +46,10 @@
 #include <linux/slab.h>
 #include <linux/cdev.h>
 
-#define DEVICE_NAME "uchaos"
-#define  CLASS_NAME "uchaos_cls"
-#define DRIVER_VERSION "0.5.4"
+#define MODULE_NAME "uchaos"
+#define DEVICE_NAME MODULE_NAME
+#define  CLASS_NAME MODULE_NAME"_cls"
+#define DRIVER_VERSION "0.5.5"
 #define DRIVER_LICENSE "GPL v2"
 #define DRIVER_AUTHOR  "Roberto A. Foglietta <roberto.foglietta@gmail.com>"
 #define DRIVER_DESCRIPTION "Stochastic scheduler-jitter chaos RNG stream device"
@@ -65,10 +66,15 @@ module_param(min_delta, int, 0644);
 MODULE_PARM_DESC(min_delta,
     " Min. expected variance o/wise extra pass  (1:[3]:255)");
 
-static int loop_mult = 1;
+static int loop_mult = 1;          
 module_param(loop_mult, int, 0644);
 MODULE_PARM_DESC(loop_mult,
     " Nun. of turns before providing the output (1:[1]:7)");
+
+static int entr_qlty = 100;
+module_param(entr_qlty, int, 0644);
+MODULE_PARM_DESC(entr_qlty,
+    " Entropy quality source for the kernel (1:[100]:1000)");
 
 // --- Driver State ---
 
@@ -106,7 +112,7 @@ static DEFINE_MUTEX(uchaos_lock);
 
 // --- Fuctional Declarations ---
 
-typedef u64  archul_t __attribute__((aligned(64)));
+typedef u64 __attribute__((aligned(8))) archul_t;
 
 static archul_t *kbuf = NULL; // Stack allocation, one char device only
 
@@ -204,9 +210,9 @@ reschedule:
          */
         if( (++i) >> 10 ) { // 2^10 is a large arbitrary value, don't overlook when coding
             failure_jiff = jiffies;
-            #define UCWRN "uChaos: EMERGENCY ABORT -"
-            printk(KERN_ALERT "%s Detected potential infinite reschedule loop!\n", UCWRN);
-            printk(KERN_ALERT "%s loops=%d, kbuf_offset=0x%02lx, jiffies=%lu\n", UCWRN,
+            #define UCWRN MODULE_NAME": EMERGENCY ABORT -"
+            printk(KERN_ALERT UCWRN" Detected potential infinite reschedule loop!\n");
+            printk(KERN_ALERT UCWRN" loops=%d, kbuf_offset=0x%02lx, jiffies=%lu\n",
                 i, (unsigned long)kbuf & 255, jiffies);
             loop_failure = true;
             goto enforcedquit; // TODO: a more drastic way is to unregister the char device
@@ -389,21 +395,95 @@ static struct file_operations fops = {
     .write = dev_write,
 };
 
-#define retnfree(x) { kfree(kbuf); return (x); }
+#include <linux/random.h>
+#include <linux/bitops.h>
+#include <linux/hw_random.h>
 
+#ifdef hwrng_register
+static int uchaos_read(struct hwrng *rng, void *buf, size_t max, bool wait) {
+    archul_t hash;
+    if(max < HASHSIZE) return -EINVAL;
+    hash = djb2tum(HASH_SEED, loop_mult);
+    memcpy(buf, &hash, HASHSIZE);
+    return HASHSIZE;
+}
+static struct hwrng uchaos_rng = {
+    .name = MODULE_NAME,
+    .read = uchaos_read,
+    .quality = 100,
+};
+#define retnfree(x) { hwrng_unregister(&uchaos_rng); if(kbuf) kfree(kbuf); return (x); }
+#else
+#define retnfree(x) { if(kbuf) kfree(kbuf); return (x); }
+#endif
+
+// hwrng_register() OOPS because a kernel bug despite the backport fix
+// then badboy mode and grep credit_init_bits linux-kernel/System.map
+typedef void (* credit_entropy_bits_t)(size_t nbits);
+static credit_entropy_bits_t kernel_credit_entropy_bits = \
+      (credit_entropy_bits_t)_CREDIT_INIT_ADDR;
+
+
+static archul_t entropy_buf[4];  // 256 bit are enough to fullfil the kernel pool
 static int __init uchaos_init(void)
 {
+    //unsigned long addr;
+    //kstrtoul(_CREDIT_INIT_ADDR, 16, &addr);
+    //kernel_credit_entropy_bits = (credit_entropy_bits_t)addr;
+
     // Parameters ranges sanitisation
-    if(loop_mult <   1) loop_mult =   1;
-    if(init_runs <   1) init_runs =   1;
-    if(min_delta <   1) min_delta =   1;
-    if(loop_mult >   7) loop_mult =   7;
-    if(init_runs > 255) init_runs = 255;
-    if(min_delta > 255) min_delta = 255;
+    if(loop_mult <    1) loop_mult =    1;
+    if(init_runs <    1) init_runs =    1;
+    if(min_delta <    1) min_delta =    1;
+    if(entr_qlty <    1) entr_qlty =    1;
+    if(loop_mult >    7) loop_mult =    7;
+    if(init_runs >  255) init_runs =  255;
+    if(min_delta >  255) min_delta =  255;
+    if(entr_qlty > 1000) entr_qlty = 1000;
+
+    printk(KERN_INFO MODULE_NAME
+        ": Initializing auxiliary entropy source, quality: %d\n", entr_qlty);
+    entropy_buf[0] = ktime_get_ns();
+    entropy_buf[0] = djb2tum(entropy_buf[0], init_runs);
+    // by default settings, the previous call with init_runs brings in variance
+    entropy_buf[1] = ktime_get_ns();
+    entropy_buf[1] = djb2tum(entropy_buf[1], loop_mult);
+    // by default settings, further calls with loop_mult have a smaller variance
+    entropy_buf[2] = djb2tum(HASH_SEED,      loop_mult);
+    entropy_buf[3] = djb2tum(HASH_SEED,      loop_mult);
+
+    /* -------------------------------------------------------------------- */ {
+    size_t len = sizeof(entropy_buf);
+    
+#ifdef hwrng_register
+    int err;
+    uchaos_rng.quality = entr_qlty;
+    err = hwrng_register(&uchaos_rng); // this OOPS because a kernel bug
+    if (err) {
+        printk(KERN_ERR MODULE_NAME
+            ": Failed to register as hwrng source: %d\n", err);
+        return err;
+    }
+    add_hwgenerator_randomness(entropy_buf, 1, 1 << 3);
+#else
+    //wait_for_random_bytes();
+    printk(KERN_INFO MODULE_NAME
+        ": Inject entropy %ld bytes, 1st hash: 0x%016llx\n",
+            len, entropy_buf[0]);
+    #ifdef add_bootloader_randomness
+    add_bootloader_randomness(entropy_buf, len);
+    #else
+    add_device_randomness(entropy_buf, len); // this is the only available
+    printk(KERN_INFO MODULE_NAME
+        ": Credit entropy function address  : 0x%016lx\n", _CREDIT_INIT_ADDR); 
+    kernel_credit_entropy_bits(len << 3);    // therefore badboy mode! ;-)
+    #endif
+#endif
+    /* -------------------------------------------------------------------- */ }
 
     // static *ptr allocation at init on: go or not-go, there is not try
     kbuf = kmalloc(MAX_INPUT_SIZE, GFP_KERNEL);
-    if (!kbuf) return -ENOMEM;
+    if (!kbuf) retnfree( -ENOMEM );
 
     major = register_chrdev(0, DEVICE_NAME, &fops);
     if (major < 0) retnfree( major );
@@ -414,7 +494,6 @@ static int __init uchaos_init(void)
     uchaos_class = class_create(THIS_MODULE, CLASS_NAME);
 #endif
     if (IS_ERR(uchaos_class)) {
-        
         unregister_chrdev(major, DEVICE_NAME);
         retnfree( PTR_ERR(uchaos_class) );
     }
@@ -441,8 +520,8 @@ static int __init uchaos_init(void)
         retnfree( PTR_ERR(uchaos_device) );
     }
 
-    printk(KERN_INFO
-        "uchaos: loop_mult=%d init_runs=%d, min_delta=%d; kbuf_offset: 0x%02lx\n",
+    printk(KERN_INFO MODULE_NAME
+        "loop_mult=%d init_runs=%d, min_delta=%d; kbuf_offset: 0x%02lx\n",
             loop_mult, init_runs, min_delta, (uintptr_t)kbuf & 255);
 
     return 0;
@@ -450,11 +529,14 @@ static int __init uchaos_init(void)
 
 static void __exit uchaos_exit(void)
 {
+#ifdef hwrng_register
+    hwrng_unregister(&uchaos_rng);
+#endif
     device_destroy(uchaos_class, MKDEV(major, 0));
     class_unregister(uchaos_class);
     class_destroy(uchaos_class);
     unregister_chrdev(major, DEVICE_NAME);
-    printk(KERN_INFO "uchaos: unloaded\n");
+    printk(KERN_INFO MODULE_NAME ": unloaded\n");
 }
 
 module_init(uchaos_init);
