@@ -56,6 +56,11 @@
 
 // --- Module Parameters ---
 
+static int badb_init = 0;
+module_param(badb_init, int, 0644);
+MODULE_PARM_DESC(badb_init,
+    " Badboy enforces the kernel RNG unsafe init  ([0]:1)");
+
 static int entr_qlty = 100;
 module_param(entr_qlty, int, 0644);
 MODULE_PARM_DESC(entr_qlty,
@@ -415,6 +420,7 @@ static struct hwrng uchaos_rng = {
 #define retnfree(x) { if(kbufptr) kfree(kbufptr); return (x); }
 #endif
 
+static archul_t *kbufptr = NULL;
 typedef void (* credit_entropy_bits_t)(size_t nbits);
 
 static int __init uchaos_init(void)
@@ -430,7 +436,7 @@ static int __init uchaos_init(void)
 #define kernel_credit_entropy_bits(x)
 #endif
     // 256 bit are enough to fullfil the kernel pool
-    archul_t entropy_buf[4], *kbufptr = NULL;
+    archul_t entropy_buf[4];
 
     // Parameters ranges sanitisation min values
     if( !loop_mult ) loop_mult = 1;
@@ -442,9 +448,12 @@ static int __init uchaos_init(void)
     if( init_runs >>  6 ) init_runs =   63;
     if( min_delta >>  8 ) min_delta =  255;
     if( entr_qlty > 1000) entr_qlty = 1000;
+    // Parameters ranges sanitisation bool flags
+    badb_init = !!badb_init;
 
     printk(KERN_INFO MODULE_NAME
-        ": Initializing auxiliary entropy source, quality: %d\n", entr_qlty);
+        ": Initializing(bb:%d) auxiliary entropy source, quality: %d\n",
+            badb_init, entr_qlty);
     entropy_buf[0] = ktime_get_ns();
     entropy_buf[0] = djb2tum(entropy_buf[0], init_runs * loop_mult);
     // by default settings, the previous call with init_runs brings in variance
@@ -475,11 +484,17 @@ static int __init uchaos_init(void)
     #ifdef add_bootloader_randomness
     add_bootloader_randomness(entropy_buf, len);
     #else
-    printk(KERN_INFO MODULE_NAME
-        ": Credit entropy function address  : 0x%016lx\n",
-            (uintptr_t)kernel_credit_entropy_bits);
-    add_device_randomness(entropy_buf, len); // this is the only available
-    kernel_credit_entropy_bits(len << 3);    // therefore badboy mode! ;-)
+    if(!badb_init) {
+        add_hwgenerator_randomness(entropy_buf, len, len << 3);
+    } else {
+        printk(KERN_INFO MODULE_NAME
+            ": Credit entropy function address  : 0x%016lx\n",
+                (uintptr_t)kernel_credit_entropy_bits);
+
+                                        // when doing good OOPS &
+        add_device_randomness(entropy_buf, len);   // this is the only viable
+        kernel_credit_entropy_bits(len << 3);     // then badboy mode init! ;-)
+    }
     #endif
 #endif
     /* -------------------------------------------------------------------- */ }
@@ -533,14 +548,12 @@ static int __init uchaos_init(void)
 
 static void __exit uchaos_exit(void)
 {
-#ifdef hwrng_register
-    hwrng_unregister(&uchaos_rng);
-#endif
     device_destroy(uchaos_class, MKDEV(major, 0));
-    class_unregister(uchaos_class);
+    //class_unregister(uchaos_class);
     class_destroy(uchaos_class);
     unregister_chrdev(major, DEVICE_NAME);
     printk(KERN_INFO MODULE_NAME ": unloaded\n");
+    retnfree((void)0);
 }
 
 module_init(uchaos_init);
