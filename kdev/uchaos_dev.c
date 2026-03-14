@@ -417,19 +417,22 @@ static struct hwrng uchaos_rng = {
 #define retnfree(x) { if(kbuf) kfree(kbuf); return (x); }
 #endif
 
-// hwrng_register() OOPS because a kernel bug despite the backport fix
-// then badboy mode and grep credit_init_bits linux-kernel/System.map
+#ifdef _CREDIT_INIT_ADDR
+/*
+ * hwrng_register() OOPS because a kernel bug despite the backport fix
+ * then badboy mode and grep credit_init_bits linux-kernel/System.map
+ */
 typedef void (* credit_entropy_bits_t)(size_t nbits);
 static credit_entropy_bits_t kernel_credit_entropy_bits = \
       (credit_entropy_bits_t)_CREDIT_INIT_ADDR;
+#else
+#define kernel_credit_entropy_bits(x)
+#endif
 
-
-static archul_t entropy_buf[4];  // 256 bit are enough to fullfil the kernel pool
 static int __init uchaos_init(void)
 {
-    //unsigned long addr;
-    //kstrtoul(_CREDIT_INIT_ADDR, 16, &addr);
-    //kernel_credit_entropy_bits = (credit_entropy_bits_t)addr;
+    // 256 bit are enough to fullfil the kernel pool
+    archul_t entropy_buf[4];
 
     // Parameters ranges sanitisation
     if(loop_mult <    1) loop_mult =    1;

@@ -14,7 +14,8 @@ KDIR := linux-kernel/
 PWD  := $(shell pwd)
 
 KMAP := System.map
-ADDR := 0x$(shell grep " _credit_init_bits" $(KDIR)/$(KMAP) $(KMAP) 2>/dev/null | cut -d' ' -f1 | cut -d: -f2)
+ADDR := 0x$(shell grep " _credit_init_bits" $(KDIR)/$(KMAP) $(KMAP) \
+            2>/dev/null | tail -n1 | cut -d' ' -f1 | cut -d: -f2)
 
 ccflags-y += -D_CREDIT_INIT_ADDR=$(ADDR)
 
