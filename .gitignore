@@ -11,3 +11,12 @@ cosmos.env/lib/
 cosmos.env/libexec/
 cosmos.env/pkg.d/
 cosmos.env/x86_64-linux-cosmo/
+kdev/uchaos_dev.ko
+kdev/Module.symvers
+kdev/linux-kernel
+kdev/modules.order
+kdev/*.cmd
+kdev/*.mod*
+kdev/*.o
+
+

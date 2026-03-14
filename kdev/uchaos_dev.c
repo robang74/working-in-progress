@@ -49,32 +49,32 @@
 #define MODULE_NAME "uchaos"
 #define DEVICE_NAME MODULE_NAME
 #define  CLASS_NAME MODULE_NAME"_cls"
-#define DRIVER_VERSION "0.5.5"
+#define DRIVER_VERSION "0.5.6"
 #define DRIVER_LICENSE "GPL v2"
 #define DRIVER_AUTHOR  "Roberto A. Foglietta <roberto.foglietta@gmail.com>"
 #define DRIVER_DESCRIPTION "Stochastic scheduler-jitter chaos RNG stream device"
 
 // --- Module Parameters ---
 
-static int init_runs = 7;
-module_param(init_runs, int, 0644);
-MODULE_PARM_DESC(init_runs,
-    " N. init runs as Lyapunov decoherence time (1:[7]:255)");
+static int entr_qlty = 100;
+module_param(entr_qlty, int, 0644);
+MODULE_PARM_DESC(entr_qlty,
+    " Entropy source's quality for the kernel (1:[100]:1000)");
 
 static int min_delta = 3;
 module_param(min_delta, int, 0644);
 MODULE_PARM_DESC(min_delta,
     " Min. expected variance o/wise extra pass  (1:[3]:255)");
 
-static int loop_mult = 1;          
+static int init_runs = 7;
+module_param(init_runs, int, 0644);
+MODULE_PARM_DESC(init_runs,
+    " N. init runs as Lyapunov decoherence time (1:[7]:63)");
+
+static int loop_mult = 1;
 module_param(loop_mult, int, 0644);
 MODULE_PARM_DESC(loop_mult,
     " Nun. of turns before providing the output (1:[1]:7)");
-
-static int entr_qlty = 100;
-module_param(entr_qlty, int, 0644);
-MODULE_PARM_DESC(entr_qlty,
-    " Entropy quality source for the kernel (1:[100]:1000)");
 
 // --- Driver State ---
 
@@ -85,7 +85,7 @@ static DEFINE_MUTEX(uchaos_lock);
 
 // --- Fuctional Definitions ---
 
-#define abs_t(x) ({ long __x = (x); (__x < 0) ? -__x : __x; })
+#define abs_t(t, x) ({ t __x = (x); (__x < 0) ? -__x : __x; })
 
 #define MAX_INPUT_SIZE (1024 << 3)
 
@@ -112,7 +112,7 @@ static DEFINE_MUTEX(uchaos_lock);
 
 // --- Fuctional Declarations ---
 
-typedef u64 __attribute__((aligned(8))) archul_t;
+typedef u64 __attribute__((aligned(HASHSIZE))) archul_t;
 
 static archul_t *kbuf = NULL; // Stack allocation, one char device only
 
@@ -140,38 +140,26 @@ static inline archul_t murmux3(archul_t ks, archul_t p)
     return z;
 }
 
-#if 0
-static inline archul_t ent_dstl(archul_t tm_4s_nsec, archul_t dlt, archul_t dff)
-{
-    static archul_t ent = HASH_SEED * MULTIPLIER;
-    ent ^= dlt        << ABz ;       // 1st derivative of time
-    ent ^= tm_4s_nsec << rot3;       // current monotonic time
-    ent  = knuthmx(ent ^ dff);       // 2nd derivative of time
-    return ent;
-}
-#endif
-
 #define dtskew(x) (!x || (x)>>28)    // 2^29 is the biggest 2^n before 1E9
 
 #define ONESEC msecs_to_jiffies(1<<10)
 
 volatile bool loop_failure = false;  // read in many places, just wrote in one
 
-static inline archul_t djb2tum_core(archul_t seed)
+static inline archul_t djb2tum(archul_t seed, size_t num)
 {
     static unsigned long failure_jiff = 0;
-    static archul_t dmx = 0, dmn = -1; //, jmn = -1, jmx = 0, avg = 0, javg = 0;
-    static archul_t mavg = 0, ohs = HASH_SEED;
+    static archul_t dmx = 0, dmn = -1, mavg = 0, ohs = HASH_SEED;
     register archul_t hsh = ohs;
+    volatile int i, j = 0;           // volatile as memory barrier in the loop
 
     archul_t tns, dlt, dff, ent = 0, ons = 0;
     u8 b0, b1, excp = 0;
-    volatile int i; // volatile as memory barrier on relevant poitions in the hot-loop
 
     /*
      * RATIONALE: also flooding the system of printks isn't a good idea, after all.
      * There is not an easy way to fall in this "SYSBUG" but also not an easy way to
-     * deal with it because it is not within the coding/logic of this driver's scope. 
+     * deal with it because it is not within the coding/logic of this driver's scope.
      */
     if( loop_failure ) {
         if ( time_after(jiffies, failure_jiff + ONESEC) ) {
@@ -183,7 +171,7 @@ static inline archul_t djb2tum_core(archul_t seed)
     if( seed ) hsh ^= seed;
     else { ons = ent = 0; }
 
-    for (i = 0; i < 1; i++) {
+    for (i = 0; i < num; i++) {
         if(  ent ) ent ^= rotlbit(ent, getprmx16(hsh));
         if( !ons ) {
             ons = ktime_get_ns();
@@ -208,12 +196,12 @@ reschedule:
          * other parts of the kernel would create DoS or SysFail in such a way that
          * uChaos will be the least of the issues. Not being a critical one, is enough.
          */
-        if( (++i) >> 10 ) { // 2^10 is a large arbitrary value, don't overlook when coding
+        if( (++j) >> 10 ) { // 2^10 is a large arbitrary value, don't overlook when coding
             failure_jiff = jiffies;
             #define UCWRN MODULE_NAME": EMERGENCY ABORT -"
             printk(KERN_ALERT UCWRN" Detected potential infinite reschedule loop!\n");
-            printk(KERN_ALERT UCWRN" loops=%d, kbuf_offset=0x%02lx, jiffies=%lu\n",
-                i, (unsigned long)kbuf & 255, jiffies);
+            printk(KERN_INFO  UCWRN" loops=%d,%d kbuf_offset=0x%02lx, jiffies=%lu\n",
+                i, j, (unsigned long)kbuf & 255, jiffies);
             loop_failure = true;
             goto enforcedquit; // TODO: a more drastic way is to unregister the char device
         }
@@ -260,23 +248,23 @@ reschedule:
             avg += dlt; javg += dff; //ncl++;
             */
         }
-        
+
         // Half of the values above and below expected but few around creates
         // uncertanty which affects how ent is calculated but not on average
         // Instead, a trigger by "uncommon" events spawn a ca.10-12bit branch
         // and this detour apports unpredicatbility not just flat-white noise.
-        #define MAVG(x) (( abs_t(dlt - mavg) > min_delta ) ? (x) : ~(x))
+        #define MAVG(x) (( tns > min_delta ) ? (x) : ~(x))
 
-        ent ^= MAVG(dlt)  << ABz ;   // 1st derivative of time
-        ent ^= MAVG(tns)  << rot3;   // current monotonic time
-        ent  = knuthmx(ent ^ dff);   // 2nd derivative of time
+        tns  = abs_t(u32, dlt - mavg);
+        ent ^= MAVG(dlt)  <<      ABz;       // 1st derivative of time
+        ent ^= MAVG(ons)  <<     rot3;      // current monotonic time
+        ent  = knuthmx(ent ^ MAVG(dff));   // 2nd derivative of time
 
         b0 = ent & 0x01, b1 = ent & 0x02;
         hsh = ( hsh << (4 + (b0 ? b1 : 1)) ) + (b1 ? -hsh : hsh);
-        hsh ^= rotlbit(hsh ^ (dlt - mavg), getprmx16(ent >> 2));
+        hsh ^= rotlbit( hsh ^ MAVG(tns), getprmx16(ent >> 2) );
 
-        // Moving average
-        // mavg * 255 = mavg + 256 - mavg, faster
+        // Moving average, where (mavg * 255) = (mavg + 256 - mavg) but faster
         mavg = ((mavg << 8) - mavg + dlt) >> 8;
 
         cpu_relax();
@@ -295,22 +283,30 @@ enforcedquit:
     return hsh;
 }
 
-// Core uchaos logic
-static inline archul_t djb2tum(archul_t seed, size_t num)
-{
-    int j;
-
-    for (j = 0; j < num; j++) seed = djb2tum_core(seed);
-
-    return seed;
-}
-
 // --- File Operations ---
 
-static ssize_t dev_read(struct file *filep, char *buffer, size_t len,
-    loff_t *offset)
-{
+static inline ssize_t _unprotected_interuptible_kbuf_fill(size_t len) {
     archul_t *p = __builtin_assume_aligned(kbuf, 8);
+    size_t sent;
+
+    if ( !len ) return 0;
+
+    len = ( ( len + (1 << ABL) -1 ) >> ABL ) << ABL;
+    len = min_t(size_t, len, MAX_INPUT_SIZE);
+
+    // Continuous loop to fill the user-requested buffer size
+    for (sent = 0; sent < len; sent += HASHSIZE) {
+        // Check for signals to remain non-blocking/interruptible
+        if (signal_pending(current))
+            break;
+        *p++ = djb2tum(HASH_SEED, loop_mult);
+    }
+
+    return sent;
+}
+
+static ssize_t dev_read(struct file *fp, char *ubuf, size_t len, loff_t *of)
+{
     size_t sent;
 
     /*
@@ -324,27 +320,19 @@ static ssize_t dev_read(struct file *filep, char *buffer, size_t len,
      */
     if( loop_failure ) return -ETIMEDOUT;
 
-    len = ( len >> ABL ) << ABL;
     if (len < HASHSIZE) return -EINVAL;
-    len = min_t(size_t, len, MAX_INPUT_SIZE);
 
-    mutex_lock(&uchaos_lock);
-    
-    // Continuous loop to fill the user-requested buffer size
-    for (sent = 0; sent < len; sent += HASHSIZE) {
-        // Check for signals to remain non-blocking/interruptible
-        if (signal_pending(current))
-            break;
-        *p++ = djb2tum(HASH_SEED, loop_mult);
-    }
+    if (mutex_lock_interruptible(&uchaos_lock)) // lock for kbuf ------------ //
+        return -ERESTARTSYS;
 
+    sent = _unprotected_interuptible_kbuf_fill(len);
     if ( !sent )
         sent = -ERESTARTSYS;
     else
-    if ( copy_to_user(buffer, (u8 *)kbuf, sent) )
+    if ( copy_to_user(ubuf, (u8 *)kbuf, sent) )
         sent = -EFAULT;
 
-    mutex_unlock(&uchaos_lock);
+    mutex_unlock(&uchaos_lock); // ------------------------------------------- //
 
     return sent;
 }
@@ -401,11 +389,11 @@ static struct file_operations fops = {
 
 #ifdef hwrng_register
 static int uchaos_read(struct hwrng *rng, void *buf, size_t max, bool wait) {
-    archul_t hash;
-    if(max < HASHSIZE) return -EINVAL;
-    hash = djb2tum(HASH_SEED, loop_mult);
-    memcpy(buf, &hash, HASHSIZE);
-    return HASHSIZE;
+    mutex_lock(&uchaos_lock);
+    max = _unprotected_interuptible_kbuf_fill(max);
+    memcpy(buf, kbuf, max);
+    mutex_unlock(&uchaos_lock);
+    return max;
 }
 static struct hwrng uchaos_rng = {
     .name = MODULE_NAME,
@@ -434,20 +422,21 @@ static int __init uchaos_init(void)
     // 256 bit are enough to fullfil the kernel pool
     archul_t entropy_buf[4];
 
-    // Parameters ranges sanitisation
-    if(loop_mult <    1) loop_mult =    1;
-    if(init_runs <    1) init_runs =    1;
-    if(min_delta <    1) min_delta =    1;
-    if(entr_qlty <    1) entr_qlty =    1;
-    if(loop_mult >    7) loop_mult =    7;
-    if(init_runs >  255) init_runs =  255;
-    if(min_delta >  255) min_delta =  255;
-    if(entr_qlty > 1000) entr_qlty = 1000;
+    // Parameters ranges sanitisation min values
+    if( !loop_mult ) loop_mult = 1;
+    if( !init_runs ) init_runs = 1;
+    if( !min_delta ) min_delta = 1;
+    if( !entr_qlty ) entr_qlty = 1;
+    // Parameters ranges sanitisation max values
+    if( loop_mult >>  3 ) loop_mult =    7;
+    if( init_runs >>  6 ) init_runs =   63;
+    if( min_delta >>  8 ) min_delta =  255;
+    if( entr_qlty > 1000) entr_qlty = 1000;
 
     printk(KERN_INFO MODULE_NAME
         ": Initializing auxiliary entropy source, quality: %d\n", entr_qlty);
     entropy_buf[0] = ktime_get_ns();
-    entropy_buf[0] = djb2tum(entropy_buf[0], init_runs);
+    entropy_buf[0] = djb2tum(entropy_buf[0], init_runs * loop_mult);
     // by default settings, the previous call with init_runs brings in variance
     entropy_buf[1] = ktime_get_ns();
     entropy_buf[1] = djb2tum(entropy_buf[1], loop_mult);
@@ -457,7 +446,7 @@ static int __init uchaos_init(void)
 
     /* -------------------------------------------------------------------- */ {
     size_t len = sizeof(entropy_buf);
-    
+
 #ifdef hwrng_register
     int err;
     uchaos_rng.quality = entr_qlty;
@@ -467,7 +456,7 @@ static int __init uchaos_init(void)
             ": Failed to register as hwrng source: %d\n", err);
         return err;
     }
-    add_hwgenerator_randomness(entropy_buf, 1, 1 << 3);
+    add_hwgenerator_randomness(entropy_buf, len, len << 3);
 #else
     //wait_for_random_bytes();
     printk(KERN_INFO MODULE_NAME
@@ -477,9 +466,9 @@ static int __init uchaos_init(void)
     add_bootloader_randomness(entropy_buf, len);
     #else
     add_device_randomness(entropy_buf, len); // this is the only available
-    printk(KERN_INFO MODULE_NAME
-        ": Credit entropy function address  : 0x%016lx\n", _CREDIT_INIT_ADDR); 
     kernel_credit_entropy_bits(len << 3);    // therefore badboy mode! ;-)
+    printk(KERN_INFO MODULE_NAME
+        ": Credit entropy function address  : 0x%016lx\n", _CREDIT_INIT_ADDR);
     #endif
 #endif
     /* -------------------------------------------------------------------- */ }
