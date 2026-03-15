@@ -49,7 +49,7 @@
 #define MODULE_NAME "uchaos"
 #define DEVICE_NAME MODULE_NAME
 #define  CLASS_NAME MODULE_NAME"_cls"
-#define DRIVER_VERSION "0.5.7"
+#define DRIVER_VERSION "0.5.8"
 #define DRIVER_LICENSE "GPL v2"
 #define DRIVER_AUTHOR  "Roberto A. Foglietta <roberto.foglietta@gmail.com>"
 #define DRIVER_DESCRIPTION "Stochastic scheduler-jitter chaos RNG stream device"
@@ -485,15 +485,16 @@ static int __init uchaos_init(void)
     #else                                                    // backport fix but
     if( badb_init == 2 ) {                                  // in 5.15.202 OOPS!
         add_hwgenerator_randomness(entropy_buf, len, len << 3);
-    }                                                     //
-    add_device_randomness(entropy_buf, len);             // always safe to mix
-    if( badb_init == 1 ) {                              //
-        printk(KERN_INFO MODULE_NAME                   //
+    } else {                                              //
+        add_device_randomness(entropy_buf, len);         // always safe to mix
+    }                                                   //
+    if( badb_init == 1 ) {                             //
+        printk(KERN_INFO MODULE_NAME                  //
             ": Credit entropy function address  : 0x%016lx\n",
                 (uintptr_t)kernel_credit_entropy_bits);
-                                                   // when doing good OOPS and
-                                                  // this is the only viable way
-        kernel_credit_entropy_bits(len << 3);    // then badboy mode init! ;-)
+                                                  // when doing good OOPS and
+                                                 // this is the only viable way
+        kernel_credit_entropy_bits(len << 3);   // then badboy mode init! ;-)
     }
     #endif
 #endif
