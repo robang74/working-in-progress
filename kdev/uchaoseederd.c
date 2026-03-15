@@ -29,7 +29,7 @@
  *                     read or ioctl failure → do NOT pet)
  *
  * Compile:
- *   gcc -static -O2 -Wall -o uchaos-seed-daemon uchaos-seed-daemon.c
+ *   musl-gcc uchaoseederd.c -o uchaoseederd -static -s -Os -Wall
  *
  * Start from /init (example):
  *   /sbin/uchaos-seed-daemon 10 /dev/uchaos /dev/random 1 &
@@ -41,8 +41,6 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
-#include <linux/random.h>
-#include <linux/watchdog.h>
 #include <string.h>
 #include <errno.h>
 
@@ -53,6 +51,16 @@
 static int source_fd = -1;
 static int sink_fd   = -1;
 static int wd_fd     = -1;
+
+#ifdef _USE_KERNEL_HEADERS
+#include <linux/random.h>
+#include <linux/watchdog.h>
+#else
+#include <stdint.h>
+#define RNDADDENTROPY    0x40085203 // _IOW('R', 3, int[32]) in linux/random.h
+#define WDIOC_KEEPALIVE  0x8001 //     _IO('w', 1)           in linux/watchdog.h
+typedef uint32_t __u32;
+#endif
 
 typedef struct {
     int entropy_count;
