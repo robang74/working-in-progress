@@ -62,20 +62,46 @@ static int wd_fd     = -1;
 typedef uint32_t __u32;
 #endif
 
+#define APPNAME "uchaoseederd"
+typedef uint8_t bool;
+
 typedef struct {
     int entropy_count;
     int buf_size;
     __u32 buf[ENTROPY_BYTES / sizeof(__u32)];
 } rand_pool_info_fixed;
 
+#include <signal.h>
+#include <sys/types.h>
+
+static volatile sig_atomic_t force_reseed = 0;
+static void sigusr_handler(int sig) {
+    (void)sig; // unused
+    force_reseed = 1;
+}
+
+static void setup_signals(void) {
+    struct sigaction sa;
+
+    /* Ignore SIGINT and SIGTERM (daemon stays alive unless SIGKILL) */
+    sa.sa_handler = SIG_IGN;
+    sa.sa_flags = 0;
+    sigemptyset(&sa.sa_mask);
+    sigaction(SIGINT,  &sa, NULL);
+    sigaction(SIGTERM, &sa, NULL);
+
+    /* SIGUSR1 --> trigger immediate reseed */
+    sa.sa_handler = sigusr_handler;
+    sa.sa_flags = SA_RESTART;         // important: restart interrupted syscalls
+    sigaction(SIGUSR1, &sa, NULL);
+}
+
 static void do_reseed(void)
 {
     char buf[ENTROPY_BYTES];
     ssize_t n = read(source_fd, buf, ENTROPY_BYTES);
 
-    if (n != ENTROPY_BYTES) {
-        return;                     /* silent failure */
-    }
+    if (n != ENTROPY_BYTES) return; // silent failure
 
     rand_pool_info_fixed info = {
         .entropy_count = CREDIT_BITS,
@@ -84,42 +110,46 @@ static void do_reseed(void)
     memcpy(info.buf, buf, ENTROPY_BYTES);
 
     if (ioctl(sink_fd, RNDADDENTROPY, &info) == 0) {
-        /* Success → pet watchdog if enabled */
+        // Success --> pet watchdog, if enabled
         if (wd_fd >= 0) {
             ioctl(wd_fd, WDIOC_KEEPALIVE, NULL);
         }
-    }
-    /* ioctl failure or partial read → do nothing (no watchdog pet) */
+    } // ioctl failure or partial read --> do nothing (no watchdog pet)
+
+    // Whatever a signal might haver reactivated it in the meantime, 
+    // because the deamon is designed to be lazy 1-sec time-grained
+    force_reseed = 0;
 }
 
 int main(int argc, char **argv)
 {
-    int interval = DEFAULT_INTERVAL;
-    const char *source = "/dev/uchaos";
-    const char *sink   = "/dev/random";
-    int enable_wd = 0;
+    bool enable_wd = 0;
+    unsigned interval = DEFAULT_INTERVAL;
+    const char *caos = "/dev/uchaos";
+    const char *sink = "/dev/random";
+    const char *wdog = "/dev/watchdog";
 
     /* Argument parsing */
     if (argc > 1) {
         interval = atoi(argv[1]);
         if (interval < 1) interval = 1;
     }
-    if (argc > 2) source = argv[2];
-    if (argc > 3) sink   = argv[3];
-    if (argc > 4) enable_wd = 1;          /* any 4th argument enables watchdog */
+    if (argc > 2) caos = argv[2];
+    if (argc > 3) sink = argv[3];
+    if (argc > 4) enable_wd = 1 ;           // any 4th argument enables watchdog
 
-    /* Open source */
-    source_fd = open(source, O_RDONLY | O_NONBLOCK);
+    /* Open the entropy provider device driver*/
+    source_fd = open(caos, O_RDONLY | O_NONBLOCK);
     if (source_fd < 0) {
-        fprintf(stderr, "uchaos-seed-daemon: cannot open %s: %s\n",
-                source, strerror(errno));
+        fprintf(stderr, APPNAME ": cannot open %s: %s\n",
+                caos, strerror(errno));
         return 1;
     }
 
     /* Open sink */
     sink_fd = open(sink, O_RDWR);
     if (sink_fd < 0) {
-        fprintf(stderr, "uchaos-seed-daemon: cannot open %s: %s\n",
+        fprintf(stderr, APPNAME ": cannot open %s: %s\n",
                 sink, strerror(errno));
         close(source_fd);
         return 1;
@@ -127,10 +157,8 @@ int main(int argc, char **argv)
 
     /* Optional watchdog */
     if (enable_wd) {
-        wd_fd = open("/dev/watchdog", O_WRONLY);
-        if (wd_fd < 0) {
-            wd_fd = -1;                 /* silently disable if no watchdog */
-        }
+        wd_fd = open(wdog, O_WRONLY);
+        if (wd_fd < 0) wd_fd = -1;            // silently disable if no watchdog
     }
 
     /* Daemonize (double fork + setsid) */
@@ -142,13 +170,16 @@ int main(int argc, char **argv)
     chdir("/");
     close(0); close(1); close(2);
 
-    /* First reseed immediately */
-    do_reseed();
+    /* First trap signals then reseed immediately */
+    setup_signals();
 
     /* Main loop */
+    unsigned rest = 0;
     while (1) {
-        sleep((unsigned int)interval);
+        if (rest) rest = sleep((unsigned)rest);
+        if (rest && !force_reseed) continue;
         do_reseed();
+        rest = interval;
     }
 
     /* Never reached */
