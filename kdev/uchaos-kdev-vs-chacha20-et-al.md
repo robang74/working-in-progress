@@ -87,6 +87,40 @@ Also in this context the bare-minimum principle is ruling: the uChaos continues 
 
 For sake of clarity: `/dev/uchaos` is 1/3 less efficient (so `/dev/random` is 50% more efficient in terms of I/O per icount tick) because uChaos, as a producer of raw entropy, relies on `cpu_relax()`, whereas `/dev/random` performs "collection & computation" without pauses, as it certainly operates on a request-based (to give) or queuing (to take) basis. Despite `cpu_relax()` does not generate instructions by itself, it allows another kernel thread to temporarily take over, and that thread advances the ticks counter, which in the -icount virtual machine is the 1:1 basis for the time passing.
 
+---
+
+### uCHAOS v0.5.7: GUESS THE SEQUENCE, IF YOU CAN
+
+- [LinkedIn post #4](https://www.linkedin.com/posts/robertofoglietta_uchaos-v056-kernel-hacked-despite-backport-activity-7438876459647107072-trW6) — [Facebook post #4](https://www.facebook.com/roberto.a.foglietta/posts/10163076655653736)
+
+Can we simulate a Lorentz attractor by running a deterministic software on a deterministic machine? No, those are just pictures that provide a vague idea of that math concept. Yes, that's because the machine has an intrinsic chaotic nature but it usually does not emerge because engineers did their best to keep the hardware (and software) within conditions in which determinism and predictability appear to be absolute.
+
+Under this perspective uChaos does the opposite: hypersensitive to nanosecond variations leverage them for forking stochastics (triggered by p=1:999, not p~50%) branches. Therefore it achieves unpredictability not because it is "magic" but because it is working outside the perimeter of stability that engineers designed. In some systems, that perimeter is about nanosecond scale, in others it might be micro or millisecond scale. Whatever the scale is, there is always a finite timing precision behind which the chaos can be found and exploited for providing randomness.
+
+Wrong to say that uChaos emulates a Lorentz strange attractor. It works considering the whole system as a chaotic system. Therefore, chaos is over there even before uChaos 1st instruction runs. From this awareness, the user arguments (or their default values) instruct uChaos to work on the edge where determinism is fading into chaos and thus real entropy is abundant. Not pure white noise, but stochastic events that fork randomness into an unpredictable sequence of branches. uChaos is the endpoint of ONE of too many to guess the line of Universe.
+
+- [alt-barto-fasano-king.pdf](https://courses.csail.mit.edu/6.857/2015/files/alt-barto-fasano-king.pdf) (paper, 2015)
+
+From the “Entropy Poisoning from the Hypervisor” PoV, uchaos_dev does exactly the same when calling an internal not exported function of the Linux crng and init that system with 8 bytes of "its stuff". Then it exports the /dev/uchaos that can be seed by 8 zeros. At that point the side channel is created /dev/uchaos and the /dev/random is the victim. The main point and challenge: by all these facilities I provided you can you guess something?
+
+No? Because the chaos belong to the system beforehand and uchaos extract and amplify it.
+
+Yes? Then I need to improve the sensitivity of the branch frequencies. That's the reason because uchaos_dev has parameters. This is the main assumption to falsify: zeroing the chaos nature intrically embedded in any complex system to the point of not being leveraged by uchaos is equivalent to destroying utility or dumping the whole system to gain root/god privileges. Both aren't feasible in practice, and hard to reach in extreme controlled labs, if any.
+
+#### ENTROPY AS THE ARROW OF TIME, IS HERE
+
+- [LinkedIn post #5](https://www.linkedin.com/posts/robertofoglietta_uchaos-v056-kernel-hacked-despite-backport-activity-7438867792776294401-PaTJ) — [Facebook post #4](https://www.facebook.com/roberto.a.foglietta/posts/10163076655653736)
+
+From a skilled engineer (or a group of engineers aka consensus) everything about uChaos is a complex matter. From a physics PoV, it is the application of the Heisenberg principle: precision has a limit and beyond that limit noise.
+
+Because it is hard to establish what is "noise" (and the pure white noise is just a peculiar idealistic form of noise) then triggering stochastics branches grants unpredictability.
+
+Because noise might have a zero average (50%:50%) thus there is a fair chance to guess which bi-forkation can be taken even 2^n bi-forcation are a lot to compute. While p=1:999 isn't manageable because apparently it is a flow for the main way but every single below nanosecond (precision) variation that emerges flipping the least significant bit can at ANY moment triggering a fork.
+
+This means that at each operation both branches should be calculated but trajectory is moving on those are less probable, discarding all the others requires a full-precision calculation of all the 2^n. It is not irreversible "di per se" but in practice it is: every time, even rarely, an egg is broken and can never be reassembled but it is easier to make or buy another egg than repairing it.
+
+The entropy is in fact the monotonicity of the time, the arrow of the time, by its deepest meaningful definition. Thus, it's REAL entropy: one side direction only. Or at least, uChaos has been designed to achieve that goal. Whether it made it or not, it is a matter of practical investigation but a 32 GB pass cannot be unnoticed when every LCG would fail in their first megabyte or less.
+
 #### Endless PractRand test
 
 When `QZERO` is set to "0" the qemu VM is leveraging the passthrough `kvm` acceleration:
@@ -94,6 +128,12 @@ When `QZERO` is set to "0" the qemu VM is leveraging the passthrough `kvm` accel
 - `UCTEST=4 QZERO=0 QWARM=0 QMSZE=1G sh start.sh "" bzImage.515x`
 
 Otherwise the set to "1" means `tcg` software emulation with/out `QWARM=0/1` `-icount`.
+
+```text
+rng=RNG_stdin64, seed=unknown
+length= 32 gigabytes (2^35 bytes), time= 3818 seconds
+ no anomalies in 296 test result(s)
+```
 
 ---
 
@@ -373,7 +413,7 @@ static int __init uchaos_init(void)
 
 - [Full original 1st chat with x/Grok](https://x.com/i/grok/share/34127737a3764e7ca46440ea0e8a8f79)
 
-- [Full original 2nd chat with x/Grok](https://x.com/i/grok/share/402666ac70674027b3a917984287f805)
+- [Full original 2nd chat with x/Grok](https://x.com/i/grok/share/e15a28c30c814ba4b55da00d96ba2570)
 
 You make two very strong and fair points. I’ll address them directly and honestly, because your approach deserves it.
 
@@ -437,7 +477,7 @@ The 2015 “Entropy Poisoning from the Hypervisor” research (MIT 6.857 project
 
 Here is the direct link (the exact PDF you can check right now):
 
-- [alt-barto-fasano-king.pdf](https://courses.csail.mit.edu/6.857/2015/files/alt-barto-fasano-king.pdf)
+- [alt-barto-fasano-king.pdf](https://courses.csail.mit.edu/6.857/2015/files/alt-barto-fasano-king.pdf) (paper, 2015)
 
 #### What the paper actually says about the timing attack (the part relevant to uChaos)
 
