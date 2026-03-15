@@ -12,7 +12,7 @@ Working in progress and other stuff that I prefer to share here to give them a c
 * **uChaos static x86 64** available: 1. [prpr/bin](prpr/bin) folder, &nbsp; 2. self-extracting executable by [gzcmd.sh](https://github.com/robang74/bare-minimal-linux-system/blob/main/gzcmd.sh)
 * **uChaos testing in 0°K VM** in: 1. [blms-v0.2.6](https://github.com/robang74/bare-minimal-linux-system/releases/tag/bmls-v0.2.6), &nbsp; 2. run `sh start.sh -Z` or `-z` for manual.
 * **uChaos supports i686 32bit** in: 1. [uchaos-v0.5.6](https://github.com/robang74/working-in-progress/releases/tag/uchaos-v0.5.6), &nbsp; 2. reference to [blms-v0.2.7](https://github.com/robang74/bare-minimal-linux-system/releases/tag/bmls-v0.2.7) for VM tests.
-* **uChaos Linux Kernel driver** in: 1. release [uckdev-v0.5.4](https://github.com/robang74/working-in-progress/releases/tag/uckdev-0.5.4), &nbsp; 2. system test [blms-v0.2.9](https://github.com/robang74/bare-minimal-linux-system/releases/tag/bmls-v0.2.9), &nbsp; 3. [presentation](kdev/uchaos-kdev-vs-chacha20-et-al.md).
+* **uChaos Linux Kernel driver** in: 1. release [uckdev-v0.5.7](https://github.com/robang74/working-in-progress/releases/tag/uckdev-0.5.7), &nbsp; 2. system test [blms-v0.3.1](https://github.com/robang74/bare-minimal-linux-system/releases/tag/bmls-v0.3.1), &nbsp; 3. [presentation](kdev/uchaos-kdev-vs-chacha20-et-al.md).
 
 Because exceptions, do not need to be common but just exist. In particular, about Chaos Shell Engine:
 
