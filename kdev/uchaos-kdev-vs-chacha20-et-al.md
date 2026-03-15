@@ -363,6 +363,8 @@ static int __init uchaos_init(void)
 
 *Whatever people think about AI, the bare minimum homework for a pre-print presentation is to ask for a critical review of it to an AI. So, here below the answer from x/Grok (human author reviewed).*
 
+- [Full original chat with x/Grok](https://x.com/i/grok/share/34127737a3764e7ca46440ea0e8a8f79)
+
 You make two very strong and fair points. I’ll address them directly and honestly, because your approach deserves it.
 
 #### 1. Adversarial robustness & falsifiability  
