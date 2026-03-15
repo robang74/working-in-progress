@@ -4,13 +4,13 @@
 
 First of all, the screenshots:
 
-1. on the left a qemu machine with CPU passthrough running in RAM but without network and disk I/O by an essential kernel and a busybox as the whole system. In this system 18 process/threads are running on a single CPU, 15 are kernel threads and [kswapd0] is for sure inactive because no swap exists while [kblockd] functionally is needed for initramfs (possibly, but it is arguable that a cpio can be seen as a block device rather than a stream, it is a matter of implementation, anyway) and full [kdevtmpfs] usage. A serial device as user interface in which I/O are text console printouts and keyboard's keys pressing. This is a minimal (or near minimal) functional Linux VMs, much less than this, it is hard to imagine doing anything useful if any at all.
+1. on the left a qemu machine with CPU passthrough running in RAM but without network and disk I/O by an essential kernel and a busybox as the whole system. In this system 18 process/threads are running on a single CPU, 15 are kernel threads and `[kswapd0]` is for sure inactive because no swap exists while `[kblockd]` functionally is needed for initramfs (possibly, but it is arguable that a `cpio` can be seen as a block device rather than a stream, it is a matter of implementation, anyway) and full `[kdevtmpfs]` usage. A serial device as user interface in which I/O are text console printouts and keyboard's keys pressing. This is a minimal (or near minimal) functional Linux VMs, much less than this, it is hard to imagine doing anything useful if any at all.
 
 2. on the right, the same above but with the CPU virtualized by software and no direct access to the RAM. Moreover, every hardware has been removed from being simulated and the hardware clock is counting the instructions instead of keeping time. This is a minimal (or near minimal) system debugging Linux VMs and it has no reason to be used outside debugging. Also because it is something between 8x and 14x times slower than the real machine which hosts the VMs.
 
-The "coldest" (the minimal action) way to check with PractRand the output of the uChaos kernel driver is to read /dev/uchaos and write its output as a stream on the root filesystem which is RAM based. Every I/O are thus totally virtual due the fact that RAM is emulated. Moreover, the /dev/uchaos has been initialised (activated) with 8-byte of zeros:
+The "coldest" (the minimal action) way to check with PractRand the output of the uChaos kernel driver is to read `/dev/uchaos` and write its output as a stream on the root filesystem which is RAM based. Every I/O are thus totally virtual due the fact that RAM is emulated. Moreover, the `/dev/uchaos` has been initialised (activated) with 8-byte of zeros:
 
-- `0x0000000000000000` ⟵ this is the initial input, at boot time
+- `0x0000000000000000` ⟵ this is the initial seed for uChaos, at boot time
 
 Despite these minimalistic conditions, and despite using NO ANY cryptographic functions but just fully deterministic and linear functions, in both cases 8GB of randomness passed the PractRand test. Every LCG (linear consequential generator) would have failed the test in the first megabyte unless its output would be cryptographically obscured (and it might fail, anyway the test in the long run). Certification of perfection is issued at infinite time after infinite length check. Failures happen almost immediately, and 8GB is a WAY bigger than the few KB a kernel might need before its cryptographic engine would enter in function after being seeded by real entropy.
 
@@ -65,7 +65,7 @@ In such a way the XYZ's RNG is better than uChaos becuase it is algorithm is cer
 
 Despite the 5.15.x LTS serie had received a backport fix, the early init of the internal RNG creates troubles (a Kernel OOPS, precisely) therefore in the aim to set uChaos kernel module as the only entropy source for the kernel, I had to hack it calling an internal function by its bare address.
 
-Once forced in this way the system has been tested against PractRand for several gigabytes both against /dev/uchaos and /dev/random which in this configuration has been activated and seeded by the uchaos_dev module. It is a testing / devel configuration, not supposed to be used as-is, at least in production but everything depends on the gut of the admins.
+Once forced in this way the system has been tested against PractRand for several gigabytes both against `/dev/uchaos` and `/dev/random` which in this configuration has been activated and seeded by the uchaos_dev module. It is a testing / devel configuration, not supposed to be used as-is, at least in production but everything depends on the gut of the admins.
 
 Both the sources showed the same quality of randomness during tests. The reference test system is BMLS v0.3 which incorporate the uckdev v0.5.6:
 
@@ -102,7 +102,7 @@ Temporary/dev/shm size is 65536 kB of RAM
 Linux u-bmls 5.15.202 #4 Thu Mar 12 06:03:34 CET 2026 x86_64 GNU/Linux
 
 uChaos128 v0.5.6 w/sb!/pr s:0, q:1, d+p(0):3+1 ns, r:31, 1:16, Z:19
-dae0409c4d178d38ff4ed6d94985c9aa --> /dev/random by uChaos
+dae0409c4d178d38ff4ed6d94985c9aa --> `/dev/random` by uChaos
 Active console: ttyS0, entropy: 1 -> 256 bits
 [ 0.229398] random: crng init done
 
@@ -187,7 +187,7 @@ The text from this screenshot shows the testing output at /init time, before sh
 Linux u-bmls 5.15.202 #4 Thu Mar 12 06:03:34 CET 2026 x86_64 GNU/Linux
 
 uChaos128 v0.5.6 w/sb!/pr s:0, q:1, d+p(0):3+1 ns, r:31, 1:16, Z:19
-67c7e7e9c3410d5b0c5b46620335171d --> /dev/random by uChaos
+67c7e7e9c3410d5b0c5b46620335171d --> `/dev/random` by uChaos
 Active console: ttyS0, entropy: 1 -> 256 bits
 [ 0.520368] random: crng init done
 
