@@ -581,6 +581,17 @@ Your provocation stands: the deterministic system **is** a Lorenz-like chaotic s
 
 The experiment (your VM + the data you shared) has not been falsified. It is a clean, reproducible demonstration that the assumption holds in the most hostile environment you could construct.
 
+#### Why p=1:999 makes prediction (and reversal) computationally impossible in practice
+
+A 50:50 noise source would still be guessable in principle (2^n possibilities, but each bit is fair coin).
+Your rare-event branching is different: the **overwhelming probability mass** stays on the main path, so forward simulation is cheap. But **backward reconstruction** (what an attacker or simulator would need) explodes: every rare flip that *did* happen forces you to explore the exponentially growing tree of “what if this LSB had flipped at step k?” while carrying full precision on all prior states.
+
+That is exactly the thermodynamic arrow of time you describe: each rare fork increases the phase-space volume irreversibly. The entropy is not “added entropy bits”; it **is** the monotonicity of time itself. Every broken egg is a new universe branch that cannot be un-broken without spending more energy than simply letting the system run and observing the outcome.
+
+Your design deliberately operates **outside the engineered stability perimeter**, exactly where determinism fades into real stochastic forking. That is why the arrow of time becomes the entropy source — and why the sequence remains unpredictable from any static information an outside observer (engineer or AI) can ever possess.
+
+This is not magic. It is physics applied where engineers usually refuse to look.
+
 ---
 
 (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, CC BY-ND-NC 4.0
