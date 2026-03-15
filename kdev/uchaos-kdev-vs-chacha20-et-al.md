@@ -59,7 +59,39 @@ In such a way the XYZ's RNG is better than uChaos becuase it is algorithm is cer
 
 ---
 
+### uCHAOS v0.5.6: KERNEL HACKED DESPITE BACKPORT FIX
+
+- [LinkedIn post #3](https://www.linkedin.com/posts/robertofoglietta_uchaos-v056-kernel-hacked-despite-backport-activity-7438605909947346944-mW-C) -- [Facebook post #3](https://www.facebook.com/roberto.a.foglietta/posts/10163073136668736)
+
+Despite the 5.15.x LTS serie had received a backport fix, the early init of the internal RNG creates troubles (a Kernel OOPS, precisely) therefore in the aim to set uChaos kernel module as the only entropy source for the kernel, I had to hack it calling an internal function by its bare address.
+
+Once forced in this way the system has been tested against PractRand for several gigabytes both against /dev/uchaos and /dev/random which in this configuration has been activated and seeded by the uchaos_dev module. It is a testing / devel configuration, not supposed to be used as-is, at least in production but everything depends on the gut of the admins.
+
+Both the sources showed the same quality of randomness during tests. The reference test system is BMLS v0.3 which incorporate the uckdev v0.5.6:
+
+- [testing system w/ qemu, release v0.3](https://github.com/robang74/bare-minimal-linux-system/releases/tag/bmls-v0.3)
+
+- [Linux kernel driver, release v0.5.6](https://github.com/robang74/working-in-progress/releases/tag/uckdev-0.5.6)
+
+- [Linux 5.15.x kernel .config](https://github.com/robang74/bare-minimal-linux-system/blob/main/5.15.lts/kmod.config)
+
+- [Makefile supporting the hack](https://github.com/robang74/working-in-progress/blob/main/kdev/Makefile)
+
+#### UPDATE (CODE CLARIFICATION)
+
+Direct Feed Mechanism: The module does not rely on standard registration interfaces (which are often unstable on kernel 5.15.x), but injects raw entropy via `add_device_randomness()` and immediately validates the bits through a direct call to `credit_entropy_bits()`. This ensures that the kernel pool is instantly seeded at init without relying on external handlers.
+
+Making a bare-address call within `uchaos_init()` means that the uchaos module is not a continuous generator in the traditional kernel sense, but acts as a boot super-seeder. Upon loading, it ensures that the entropy goes from "zero" to "ready" almost instantly. Injecting the bare minimum volume of data for such a task which is for certainty less than 8 bits entropy per byte. This underfeeding is deliberate: if it fails, it should fail fast.
+
+Also in this context the bare-minimum principle is ruling: the uChaos continues to not using cryptographic whitening, does whitening as less as possible (before delivery the final output, only), inits the RNG internals with the theoretical bare minimum entropy to set it "ready" and never re-seed it again which is the main difference between `/dev/uchaos` and `/dev/random`. Which is "possibly" the reason because the first does 22 MB/ticks while the second 33 MB/ticks (+50% more instruction per I/O byte efficiency).
+
+For sake of clarity: `/dev/uchaos` is 1/3 less efficient (so `/dev/random` is 50% more efficient in terms of I/O per icount tick) because uChaos, as a producer of raw entropy, relies on `cpu_relax()`, whereas `/dev/random` performs "collection & computation" without pauses, as it certainly operates on a request-based (to give) or queuing (to take) basis. Despite `cpu_relax()` does not generate instructions by itself, it allows another kernel thread to temporarily take over, and that thread advances the ticks counter, which in the -icount virtual machine is the 1:1 basis for the time passing.
+
+---
+
 ### Screenshot n.1 (sx, OCR)
+
+The text from this screenshot shows the testing output at /init time, before sh
 
 ```text
 Run /init as init process
@@ -149,6 +181,8 @@ root@u-bmls:/# []
 
 ### Screenshot n.2 (dx, OCR)
 
+The text from this screenshot shows the testing output at /init time, before sh
+
 ```text
 Linux u-bmls 5.15.202 #4 Thu Mar 12 06:03:34 CET 2026 x86_64 GNU/Linux
 
@@ -223,6 +257,102 @@ no anomalies in 256 test result(s)
 rng=RNG_stdin64, seed=unknown 
 length 8 gigabytes (2^33 bytes), time= 735 seconds 
 no anomalies in 270 test result(s)
+```
+
+---
+
+### Screenshot n.3 (cx, TXT)
+
+The code from this screenshot highlights the parts related to the kernel hack.
+
+```c
+static archul_t *kbufptr = NULL;
+//##############################################################################
+typedef void (* credit_entropy_bits_t)(size_t nbits);
+//##############################################################################
+
+static int __init uchaos_init(void)
+{
+//##############################################################################
+#if defined(_CREDIT_INIT_ADDR) && defined(_STATIC_PRINTK)
+  /*
+   * hwrng_register() OOPS because a kernel bug despite the backport fix
+   * then badboy mode and grep credit_init_bits linux-kernel/System.map
+   */
+    credit_entropy_bits_t kernel_credit_entropy_bits = (credit_entropy_bits_t)\
+        _CREDIT_INIT_ADDR + ((uintptr_t)_printk - _STATIC_PRINTK);
+#else
+#define kernel_credit_entropy_bits(x)
+#endif
+//##############################################################################
+    // 256 bit are enough to fullfil the kernel pool
+    archul_t entropy_buf[4];
+
+    // Parameters ranges sanitisation min values
+    if( !loop_mult ) loop_mult = 1;
+    if( !init_runs ) init_runs = 1;
+    if( !min_delta ) min_delta = 1;
+    if( !entr_qlty ) entr_qlty = 1;
+    // Parameters ranges sanitisation max values
+    if( loop_mult >>  3 ) loop_mult =    7;
+    if( init_runs >>  6 ) init_runs =   63;
+    if( min_delta >>  8 ) min_delta =  255;
+    if( entr_qlty > 1000) entr_qlty = 1000;
+    // Parameters ranges sanitisation bool flags
+    badb_init = !!badb_init;
+
+    printk(KERN_INFO MODULE_NAME
+        ": Initializing(bb:%d) auxiliary entropy source, quality: %d\n",
+            badb_init, entr_qlty);
+    entropy_buf[0] = ktime_get_ns();
+    entropy_buf[0] = djb2tum(entropy_buf[0], init_runs * loop_mult);
+    // by default settings, the previous call with init_runs brings in variance
+    entropy_buf[1] = ktime_get_ns();
+    entropy_buf[1] = djb2tum(entropy_buf[1], loop_mult);
+    // by default settings, further calls with loop_mult have a smaller variance
+    entropy_buf[2] = djb2tum(HASH_SEED,      loop_mult);
+    entropy_buf[3] = djb2tum(HASH_SEED,      loop_mult);
+
+    /* -------------------------------------------------------------------- */ {
+    size_t len = sizeof(entropy_buf);
+
+#ifdef hwrng_register
+    int err;
+    uchaos_rng.quality = entr_qlty;
+    err = hwrng_register(&uchaos_rng); // this OOPS because a kernel bug
+    if (err) {
+        printk(KERN_ERR MODULE_NAME
+            ": Failed to register as hwrng source: %d\n", err);
+        return err;
+    }
+    add_hwgenerator_randomness(entropy_buf, len, len << 3);
+#else
+    printk(KERN_INFO MODULE_NAME
+        ": Inject entropy %ld bytes, 1st hash: 0x%016llx\n",
+            len, entropy_buf[0]);
+    #ifdef add_bootloader_randomness
+    add_bootloader_randomness(entropy_buf, len);
+//##############################################################################
+    #else
+    if(!badb_init) {
+        add_hwgenerator_randomness(entropy_buf, len, len << 3);
+    } else {
+        printk(KERN_INFO MODULE_NAME
+            ": Credit entropy function address  : 0x%016lx\n",
+                (uintptr_t)kernel_credit_entropy_bits);
+                                                    // when doing good OOPS &
+        add_device_randomness(entropy_buf, len);   // this is the only viable
+        kernel_credit_entropy_bits(len << 3);     // then badboy mode init! ;-)
+    }
+    #endif
+//##############################################################################
+#endif
+    /* -------------------------------------------------------------------- */ }
+
+    // static *ptr allocation at init on: go or not-go, there is not try
+    kbufptr = kzalloc(MAX_INPUT_SIZE + HASHSIZE, GFP_KERNEL);
+    if (!kbufptr) retnfree( -ENOMEM );
+    kbuf = (archul_t *)ABL_ALIGN( kbufptr );
 ```
 
 ---
