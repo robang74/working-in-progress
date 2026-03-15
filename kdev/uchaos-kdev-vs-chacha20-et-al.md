@@ -119,7 +119,7 @@ Because noise might have a zero average (50%:50%) thus there is a fair chance to
 
 This means that at each operation both branches should be calculated but trajectory is moving on those are less probable, discarding all the others requires a full-precision calculation of all the 2^n. It is not irreversible "di per se" but in practice it is: every time, even rarely, an egg is broken and can never be reassembled but it is easier to make or buy another egg than repairing it.
 
-The entropy is in fact the monotonicity of the time, the arrow of the time, by its deepest meaningful definition. Thus, it's REAL entropy: one side direction only. Or at least, uChaos has been designed to achieve that goal. Whether it made it or not, it is a matter of practical investigation but a 32 GB pass cannot be unnoticed when every LCG would fail in their first megabyte or less.
+The entropy is in fact the monotonicity of the time, the arrow of the time, by its deepest meaningful definition. Thus, it's REAL entropy: one side direction only. Or at least, uChaos has been designed to achieve that goal. Whether it made it or not, it is a matter of practical investigation but a 64 GB pass cannot be unnoticed when every LCG would fail in their first megabyte or less and no cryptographic function is involved to mask whatever structure it might have.
 
 #### Endless PractRand test
 
@@ -133,6 +133,10 @@ Otherwise the set to "1" means `tcg` software emulation with/out `QWARM=0/1` `-i
 rng=RNG_stdin64, seed=unknown
 length= 32 gigabytes (2^35 bytes), time= 3818 seconds
  no anomalies in 296 test result(s)
+
+rng=RNG_stdin64, seed=unknown
+length= 64 gigabytes (2^36 bytes), time= 7578 seconds
+  no anomalies in 308 test result(s)
 ```
 
 ---
