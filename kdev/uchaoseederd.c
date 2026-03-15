@@ -17,15 +17,19 @@
  * Simple userspace daemon for early /init (initramfs).
  * Reads 16 bytes from /dev/uchaos (or custom device),
  * credits 256 bits of entropy to /dev/random via RNDADDENTROPY ioctl.
- *
- * Usage:
- *   uchaos-seed-daemon [interval_sec] [source_dev] [sink_dev] [watchdog_flag]
- *
- *   interval_sec   : reseed every N seconds (min 1, default 10)
- *   source_dev     : default /dev/uchaos
- *   sink_dev       : default /dev/random
- *   watchdog_flag  : any 4th argument enables watchdog on /dev/watchdog
- *                    (reseeds successfully → pet watchdog;
+ */
+#define APPNAME "uchaoseederd"
+#define VERSION "v0.0.5"
+const char USAGE_STRING[] = 
+    "\nUsage " APPNAME " " VERSION ":\n\n"
+    "  /sbin/uchaoseederd [interval_sec] [source_dev] [sink_dev] [watchdog_flag]\n\n"
+    "Arguments:\n\n"
+    "  interval_sec   : Reseed interval in seconds (min: 1, default: 10)\n"
+    "  source_dev     : Entropy source device (default: /dev/uchaos)\n"
+    "  sink_dev       : Entropy sink device   (default: /dev/random)\n"
+    "  watchdog_flag  : Watchdog interaction  (0:off,1: /dev/watchdog)\n\n"
+    "Note: Ensure source_dev is available before starting the daemon.\n\n";
+/*                    (reseeds successfully → pet watchdog;
  *                     read or ioctl failure → do NOT pet)
  *
  * Compile:
@@ -44,13 +48,14 @@
 #include <string.h>
 #include <errno.h>
 
-#define DEFAULT_INTERVAL 10
-#define ENTROPY_BYTES    16
+
+#define DEFAULT_INTERVAL  10
+#define ENTROPY_BYTES     16
 #define CREDIT_BITS      256
 
 static int esfd = -1;
-static int skfd   = -1;
-static int wdfd     = -1;
+static int skfd = -1;
+static int wdfd = -1;
 
 #ifdef _USE_KERNEL_HEADERS
 #include <linux/random.h>
@@ -62,7 +67,6 @@ static int wdfd     = -1;
 typedef uint32_t __u32;
 #endif
 
-#define APPNAME "uchaoseederd"
 typedef uint8_t bool;
 
 typedef struct {
@@ -121,6 +125,11 @@ static void do_reseed(void)
     force_reseed = 0;
 }
 
+static void usage(bool usage) {
+    if(usage) printf(USAGE_STRING);
+    else printf(APPNAME " " VERSION "\n");
+}
+
 int main(int argc, char **argv)
 {
     bool wpet = 0;
@@ -131,6 +140,10 @@ int main(int argc, char **argv)
 
     /* Argument parsing */
     if (argc > 1) {
+        switch (argv[1][1]) {
+            case 'v': usage(0); return 0;
+            case 'h': usage(1); return 0;
+        }
         interval = atoi(argv[1]);
         if (interval < 1) interval = 1;
     }
