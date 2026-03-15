@@ -1,6 +1,6 @@
 ### uCHAOS V0.5.4: SHOW ME YOUR CODE, INSTEAD!
 
-- [LinkedIn post #1](https://www.linkedin.com/posts/robertofoglietta_uchaos-v054-show-me-your-code-instead-activity-7438251459344781313-6UQS) -- [Facebook post #1](https://www.facebook.com/roberto.a.foglietta/posts/10163068326183736)
+- [LinkedIn post #1](https://www.linkedin.com/posts/robertofoglietta_uchaos-v054-show-me-your-code-instead-activity-7438251459344781313-6UQS) — [Facebook post #1](https://www.facebook.com/roberto.a.foglietta/posts/10163068326183736)
 
 First of all, the screenshots:
 
@@ -10,7 +10,7 @@ First of all, the screenshots:
 
 The "coldest" (the minimal action) way to check with PractRand the output of the uChaos kernel driver is to read /dev/uchaos and write its output as a stream on the root filesystem which is RAM based. Every I/O are thus totally virtual due the fact that RAM is emulated. Moreover, the /dev/uchaos has been initialised (activated) with 8-byte of zeros:
 
-- `0x0000000000000000` <-- this is the initial input, at boot time
+- `0x0000000000000000` ⟵ this is the initial input, at boot time
 
 Despite these minimalistic conditions, and despite using NO ANY cryptographic functions but just fully deterministic and linear functions, in both cases 8GB of randomness passed the PractRand test. Every LCG (linear consequential generator) would have failed the test in the first megabyte unless its output would be cryptographically obscured (and it might fail, anyway the test in the long run). Certification of perfection is issued at infinite time after infinite length check. Failures happen almost immediately, and 8GB is a WAY bigger than the few KB a kernel might need before its cryptographic engine would enter in function after being seeded by real entropy.
 
@@ -37,7 +37,7 @@ Swap:       0      0      0
 
 ### uCHAOS V0.5.4: SHOW ME YOUR CODE, INSTEAD! #2
 
-- [LinkedIn post #2](https://www.linkedin.com/posts/robertofoglietta_uchaos-v054-show-me-your-code-instead-activity-7438256141433729024-LTW1) -- [Facebook post #2](https://www.facebook.com/roberto.a.foglietta/posts/10163068385103736)
+- [LinkedIn post #2](https://www.linkedin.com/posts/robertofoglietta_uchaos-v054-show-me-your-code-instead-activity-7438256141433729024-LTW1) — [Facebook post #2](https://www.facebook.com/roberto.a.foglietta/posts/10163068385103736)
 
 Every novelty challenges and shackes our state of arts, this create frictions, resistance, doubts and fears. We are humans, after all. We do dramas.
 
@@ -61,7 +61,7 @@ In such a way the XYZ's RNG is better than uChaos becuase it is algorithm is cer
 
 ### uCHAOS v0.5.6: KERNEL HACKED DESPITE BACKPORT FIX
 
-- [LinkedIn post #3](https://www.linkedin.com/posts/robertofoglietta_uchaos-v056-kernel-hacked-despite-backport-activity-7438605909947346944-mW-C) -- [Facebook post #3](https://www.facebook.com/roberto.a.foglietta/posts/10163073136668736)
+- [LinkedIn post #3](https://www.linkedin.com/posts/robertofoglietta_uchaos-v056-kernel-hacked-despite-backport-activity-7438605909947346944-mW-C) — [Facebook post #3](https://www.facebook.com/roberto.a.foglietta/posts/10163073136668736)
 
 Despite the 5.15.x LTS serie had received a backport fix, the early init of the internal RNG creates troubles (a Kernel OOPS, precisely) therefore in the aim to set uChaos kernel module as the only entropy source for the kernel, I had to hack it calling an internal function by its bare address.
 
@@ -354,6 +354,8 @@ static int __init uchaos_init(void)
     if (!kbufptr) retnfree( -ENOMEM );
     kbuf = (archul_t *)ABL_ALIGN( kbufptr );
 ```
+
+- Original source code: [`kdev/uchaos_dev.c` (#65b40bf9)](http://github.com/robang74/working-in-progress/blob/65b40bf9c63bb29a3c8bb8d8999fafbb28b32b3e/kdev/uchaos_dev.c)
 
 ---
 
