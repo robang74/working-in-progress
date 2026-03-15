@@ -107,7 +107,9 @@ No? Because the chaos belong to the system beforehand and uchaos extract and amp
 
 Yes? Then I need to improve the sensitivity of the branch frequencies. That's the reason because uchaos_dev has parameters. This is the main assumption to falsify: zeroing the chaos nature intrically embedded in any complex system to the point of not being leveraged by uchaos is equivalent to destroying utility or dumping the whole system to gain root/god privileges. Both aren't feasible in practice, and hard to reach in extreme controlled labs, if any.
 
-#### ENTROPY AS THE ARROW OF TIME, IS HERE
+---
+
+### ENTROPY AS THE ARROW OF TIME, IS HERE
 
 - [LinkedIn post #5](https://www.linkedin.com/posts/robertofoglietta_uchaos-v056-kernel-hacked-despite-backport-activity-7438867792776294401-PaTJ) — [Facebook post #4](https://www.facebook.com/roberto.a.foglietta/posts/10163076655653736)
 
@@ -138,6 +140,36 @@ rng=RNG_stdin64, seed=unknown
 length= 64 gigabytes (2^36 bytes), time= 7578 seconds
   no anomalies in 308 test result(s)
 ```
+
+---
+
+### uCHAOS v0.5.8: COLD BOOT COMPARISON TEST
+
+- [LinkedIn post #6](https://www.linkedin.com/posts/robertofoglietta_uchaos-v058-cold-boot-comparison-test-share-7439014403733303296-51MQ) — [Facebook post #6](https://www.facebook.com/roberto.a.foglietta/posts/10163078884428736)
+
+Let check the initial states between two runs with a totally deterministic VM:
+
+- `UCTEST=0 QMSZE=2G QZERO=1 ZWARM=0 sh start.sh "" bzImage.515x`
+
+Using uchaos_dev v0.5.8 which exposes more information about internal states, they look the same as in the previous test: uchaos deliver the same seed and the kernel `cnrg` provides the same output as expected to do in such conditions.
+
+- `UCTEST=0 QMSZE=2G QZERO=1 ZWARM=1 sh start.sh "" bzImage.515x`
+
+While, with `ZWARM=1`, maintaining the software emulation (tcg), but discarding the `-icount` that tampers the system clock up to the least significant bit, two consecutives runs doesn't provide the same output.
+
+The first configuration is almost useless apart for debugging purposes. The second case is rare to find in the wild because 100% software emulated and isolated machines are rarely useful. From this experiment, the conclusion is straightforward: a totally deterministic machine is a totally predictable machine, and in such case entropy is always zero therefore the random generation security relies only on a well preserved (forget is even better) secret, the initial seeding which should be provided as input from the extern. Period.
+
+Using `ZWARM=1` that seed is the nanosecond precision time of start and every clock/CPU skew/jittering during the boot up to the first seeding action. The absolute time and the dmesg boot timings are the only internal information that can provide some "entropy" because also in an isolated 100% software emulated machine they are related with the host. However, in an on-demand scalable cloud cluster also the host could be anything else than a virtual machine.
+
+The good news is that, when multiple levels of virtualisation are at stake also performances are at stakes thus KVM emulation and CPU and RAM are the only two universal passtroughts, everything else is a risk to being emulated via software in a highly deterministic manner. Deterministic software emulation is a fierce enemy of the performance (throughputs) but are much more keen to be load-balanced which compensate on average and provides the benefit of reliability and resilience.
+
+Therefore, in modern systems and large deployments, the CPU jittering is the universal source of entropy because everything else is (much more) at risk. Networking is a common bus passthrough when performances are at stake usually in combination with boot from the network. It might seem a better alternative but network timings can be tampered easily without the need to alter the transportation layer while tampering a CPU is a totally another story in which only producers and microcode supply chain actors can be involved in mass attacks.
+
+There is no "magic" in uchaos and this is good news for every rational-minded person. Zero entropy is zero entropy but a system with a zero entropy is almost useless. So, uchaos failed precisely where it was expecting it should have failed. On the other side, it is shown to be competitive with the Linux crng, 1. relying only on CPU jittering, 2. with a much simpler architecture and 3. without using cryptographic functions. Which isn't "nothing" when we compare the team, the skills, the time frame, and resources allocated on the two projects.
+
+It is hard to think that the Linux kernel will ever integrate uchaos in any way. Possibly as an ancillary source of entropy for those cases in which someone to blame is better than nothing. While some embedded systems or applications -- in which the Linux kernel is considered a bloatware, mainly because too general -- uchaos has a reasonable chance to be a protagonist candidate. Mainly in the IoT and Edge device areas in which the keyword *cloud* is replaced by *mesh* or *swarm* for tiny bare metal devices.
+
+Finally, uchaos is more a demonstration of the author's abilities in providing system integration, system test, software and kernel driver development rather than a product. This closure wouldn't surprise anyone rooted in the field because open source -- due to the copyleft licensing -- is strongly based on consultancy and know-how rather than software as a product. Nothing new again, a good PoC was always used to skip the HR department and get rewarded by those who can appreciate technical skills. A sort of marketing, for a specific market niche.
 
 ---
 
