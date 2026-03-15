@@ -87,6 +87,14 @@ Also in this context the bare-minimum principle is ruling: the uChaos continues 
 
 For sake of clarity: `/dev/uchaos` is 1/3 less efficient (so `/dev/random` is 50% more efficient in terms of I/O per icount tick) because uChaos, as a producer of raw entropy, relies on `cpu_relax()`, whereas `/dev/random` performs "collection & computation" without pauses, as it certainly operates on a request-based (to give) or queuing (to take) basis. Despite `cpu_relax()` does not generate instructions by itself, it allows another kernel thread to temporarily take over, and that thread advances the ticks counter, which in the -icount virtual machine is the 1:1 basis for the time passing.
 
+#### Endless PractRand test
+
+When `QZERO` is set to "0" the qemu VM is leveraging the passthrough `kvm` acceleration:
+
+- `UCTEST=4 QZERO=0 QWARM=0 QMSZE=1G sh start.sh "" bzImage.515x`
+
+Otherwise the set to "1" means `tcg` software emulation with/out `QWARM=0/1` `-icount`.
+
 ---
 
 ### Screenshot n.1 (sx, OCR)
