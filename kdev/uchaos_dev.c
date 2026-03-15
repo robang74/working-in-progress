@@ -49,7 +49,7 @@
 #define MODULE_NAME "uchaos"
 #define DEVICE_NAME MODULE_NAME
 #define  CLASS_NAME MODULE_NAME"_cls"
-#define DRIVER_VERSION "0.5.6"
+#define DRIVER_VERSION "0.5.7"
 #define DRIVER_LICENSE "GPL v2"
 #define DRIVER_AUTHOR  "Roberto A. Foglietta <roberto.foglietta@gmail.com>"
 #define DRIVER_DESCRIPTION "Stochastic scheduler-jitter chaos RNG stream device"
@@ -59,7 +59,7 @@
 static int badb_init = 0;
 module_param(badb_init, int, 0644);
 MODULE_PARM_DESC(badb_init,
-    " Badboy enforces the kernel RNG unsafe init  ([0]:1)");
+    " Badboy mode enforces the kernel's crng init ([0]:1:2)");
 
 static int entr_qlty = 100;
 module_param(entr_qlty, int, 0644);
@@ -150,7 +150,7 @@ static inline archul_t murmux3(archul_t ks, archul_t p)
 #define ONESEC msecs_to_jiffies(1<<10)
 
 /*
- * ATOMICITY ON A 1CPU vs SMP SYSTEM: the 'loop_failure' flag is read in many 
+ * ATOMICITY ON A 1CPU vs SMP SYSTEM: the 'loop_failure' flag is read in many
  * places, but wrote in one only: 'volatile' was fine, 'atomic_t' is the way.
  * However also failure_jiff requires multi-thread protection, by 'uchaos_lock'.
  * Because 'uchaos_lock' protects writes, reading a 'volatile bool' is safe.
@@ -449,10 +449,10 @@ static int __init uchaos_init(void)
     if( min_delta >>  8 ) min_delta =  255;
     if( entr_qlty > 1000) entr_qlty = 1000;
     // Parameters ranges sanitisation bool flags
-    badb_init = !!badb_init;
+    // badb_init = !!badb_init;
 
     printk(KERN_INFO MODULE_NAME
-        ": Initializing(bb:%d) auxiliary entropy source, quality: %d\n",
+        ": Init (bb:%d) auxiliary entropy source, quality: %d\n",
             badb_init, entr_qlty);
     entropy_buf[0] = ktime_get_ns();
     entropy_buf[0] = djb2tum(entropy_buf[0], init_runs * loop_mult);
@@ -482,16 +482,18 @@ static int __init uchaos_init(void)
             len, entropy_buf[0]);
     #ifdef add_bootloader_randomness
     add_bootloader_randomness(entropy_buf, len);
-    #else
-    if(!badb_init) {
+    #else                                                    // backport fix but
+    if( badb_init == 2 ) {                                  // in 5.15.202 OOPS!
         add_hwgenerator_randomness(entropy_buf, len, len << 3);
-    } else {
-        printk(KERN_INFO MODULE_NAME
+    }                                                     //
+    add_device_randomness(entropy_buf, len);             // always safe to mix
+    if( badb_init == 1 ) {                              //
+        printk(KERN_INFO MODULE_NAME                   //
             ": Credit entropy function address  : 0x%016lx\n",
                 (uintptr_t)kernel_credit_entropy_bits);
-                                                    // when doing good OOPS &
-        add_device_randomness(entropy_buf, len);   // this is the only viable
-        kernel_credit_entropy_bits(len << 3);     // then badboy mode init! ;-)
+                                                   // when doing good OOPS and
+                                                  // this is the only viable way
+        kernel_credit_entropy_bits(len << 3);    // then badboy mode init! ;-)
     }
     #endif
 #endif
