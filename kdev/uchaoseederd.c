@@ -32,7 +32,7 @@
  *   musl-gcc uchaoseederd.c -o uchaoseederd -static -s -Os -Wall
  *
  * Start from /init (example):
- *   /sbin/uchaos-seed-daemon 10 /dev/uchaos /dev/random 1 &
+ *   /sbin/uchaoseederd 10 /dev/uchaos /dev/random 1 &
  */
 
 #define _GNU_SOURCE
@@ -48,9 +48,9 @@
 #define ENTROPY_BYTES    16
 #define CREDIT_BITS      256
 
-static int source_fd = -1;
-static int sink_fd   = -1;
-static int wd_fd     = -1;
+static int esfd = -1;
+static int skfd   = -1;
+static int wdfd     = -1;
 
 #ifdef _USE_KERNEL_HEADERS
 #include <linux/random.h>
@@ -80,7 +80,7 @@ static void sigusr_handler(int sig) {
     force_reseed = 1;
 }
 
-static void setup_signals(void) {
+static void trap_signals(void) {
     struct sigaction sa;
 
     /* Ignore SIGINT and SIGTERM (daemon stays alive unless SIGKILL) */
@@ -99,7 +99,7 @@ static void setup_signals(void) {
 static void do_reseed(void)
 {
     char buf[ENTROPY_BYTES];
-    ssize_t n = read(source_fd, buf, ENTROPY_BYTES);
+    ssize_t n = read(esfd, buf, ENTROPY_BYTES);
 
     if (n != ENTROPY_BYTES) return; // silent failure
 
@@ -109,10 +109,10 @@ static void do_reseed(void)
     };
     memcpy(info.buf, buf, ENTROPY_BYTES);
 
-    if (ioctl(sink_fd, RNDADDENTROPY, &info) == 0) {
+    if (ioctl(skfd, RNDADDENTROPY, &info) == 0) {
         // Success --> pet watchdog, if enabled
-        if (wd_fd >= 0) {
-            ioctl(wd_fd, WDIOC_KEEPALIVE, NULL);
+        if (wdfd >= 0) {
+            ioctl(wdfd, WDIOC_KEEPALIVE, NULL);
         }
     } // ioctl failure or partial read --> do nothing (no watchdog pet)
 
@@ -123,7 +123,7 @@ static void do_reseed(void)
 
 int main(int argc, char **argv)
 {
-    bool enable_wd = 0;
+    bool wpet = 0;
     unsigned interval = DEFAULT_INTERVAL;
     const char *caos = "/dev/uchaos";
     const char *sink = "/dev/random";
@@ -134,31 +134,31 @@ int main(int argc, char **argv)
         interval = atoi(argv[1]);
         if (interval < 1) interval = 1;
     }
-    if (argc > 2) caos = argv[2];
-    if (argc > 3) sink = argv[3];
-    if (argc > 4) enable_wd = 1 ;           // any 4th argument enables watchdog
+    if (argc > 2 && argv[2][0]) caos = argv[2];
+    if (argc > 3 && argv[3][0]) sink = argv[3];
+    if (argc > 4 && argv[4][0]) wpet = !!atoi(argv[4]); 
 
     /* Open the entropy provider device driver*/
-    source_fd = open(caos, O_RDONLY | O_NONBLOCK);
-    if (source_fd < 0) {
+    esfd = open(caos, O_RDONLY | O_NONBLOCK);
+    if (esfd < 0) {
         fprintf(stderr, APPNAME ": cannot open %s: %s\n",
-                caos, strerror(errno));
+            caos, strerror(errno));
         return 1;
     }
 
     /* Open sink */
-    sink_fd = open(sink, O_RDWR);
-    if (sink_fd < 0) {
-        fprintf(stderr, APPNAME ": cannot open %s: %s\n",
-                sink, strerror(errno));
-        close(source_fd);
+    skfd = open(sink, O_RDWR);
+    if (skfd < 0) {
+        fprintf(stderr, APPNAME ": cannot open %s: %s\n", 
+            sink, strerror(errno));
+        close(esfd);
         return 1;
     }
 
     /* Optional watchdog */
-    if (enable_wd) {
-        wd_fd = open(wdog, O_WRONLY);
-        if (wd_fd < 0) wd_fd = -1;            // silently disable if no watchdog
+    if (wpet) {
+        wdfd = open(wdog, O_WRONLY);
+        if (wdfd < 0) wdfd = -1;              // silently disable if no watchdog
     }
 
     /* Daemonize (double fork + setsid) */
@@ -171,7 +171,7 @@ int main(int argc, char **argv)
     close(0); close(1); close(2);
 
     /* First trap signals then reseed immediately */
-    setup_signals();
+    trap_signals();
 
     /* Main loop */
     unsigned rest = 0;
