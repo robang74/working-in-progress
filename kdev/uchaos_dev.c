@@ -436,7 +436,7 @@ static int __init uchaos_init(void)
 #define kernel_credit_entropy_bits(x)
 #endif
     // 256 bit are enough to fullfil the kernel pool
-    archul_t entropy_buf[4];
+    archul_t ebuf[4];
 
     // Parameters ranges sanitisation min values
     if( !loop_mult ) loop_mult = 1;
@@ -454,17 +454,17 @@ static int __init uchaos_init(void)
     printk(KERN_INFO MODULE_NAME
         ": Init (bb:%d) auxiliary entropy source, quality: %d\n",
             badb_init, entr_qlty);
-    entropy_buf[0] = ktime_get_ns();
-    entropy_buf[0] = djb2tum(entropy_buf[0], init_runs * loop_mult);
+    ebuf[0] = ktime_get_ns();
+    ebuf[0] = djb2tum(ebuf[0], loop_mult * init_runs);
     // by default settings, the previous call with init_runs brings in variance
-    entropy_buf[1] = ktime_get_ns();
-    entropy_buf[1] = djb2tum(entropy_buf[1], loop_mult);
+    ebuf[1] = ktime_get_ns();
+    ebuf[1] = djb2tum(ebuf[1], loop_mult);
     // by default settings, further calls with loop_mult have a smaller variance
-    entropy_buf[2] = djb2tum(HASH_SEED,      loop_mult);
-    entropy_buf[3] = djb2tum(HASH_SEED,      loop_mult);
+    ebuf[2] = djb2tum(0,       loop_mult);
+    ebuf[3] = djb2tum(0,       loop_mult);
 
     /* -------------------------------------------------------------------- */ {
-    size_t len = sizeof(entropy_buf);
+    size_t len = sizeof(ebuf);
 
 #ifdef hwrng_register
     int err;
@@ -475,18 +475,18 @@ static int __init uchaos_init(void)
             ": Failed to register as hwrng source: %d\n", err);
         return err;
     }
-    add_hwgenerator_randomness(entropy_buf, len, len << 3);
+    add_hwgenerator_randomness(ebuf, len, len << 3);
 #else
     printk(KERN_INFO MODULE_NAME
-        ": Inject entropy %ld bytes, 1st hash: 0x%016llx\n",
-            len, entropy_buf[0]);
+        ": Inject entropy %ld bytes, 1st seed: 0x%016llx\n",
+            len, ebuf[0]);
     #ifdef add_bootloader_randomness
-    add_bootloader_randomness(entropy_buf, len);
+    add_bootloader_randomness(ebuf, len);
     #else                                                    // backport fix but
     if( badb_init == 2 ) {                                  // in 5.15.202 OOPS!
-        add_hwgenerator_randomness(entropy_buf, len, len << 3);
+        add_hwgenerator_randomness(ebuf, len, len << 3);
     } else {                                              //
-        add_device_randomness(entropy_buf, len);         // always safe to mix
+        add_device_randomness(ebuf, len);         // always safe to mix*
     }                                                   //
     if( badb_init == 1 ) {                             //
         printk(KERN_INFO MODULE_NAME                  //
@@ -498,6 +498,10 @@ static int __init uchaos_init(void)
     }
     #endif
 #endif
+    // Only for debug and testing purposes, like everything else here, anyway
+    get_random_bytes(ebuf, HASHSIZE<<2);
+    printk(KERN_INFO MODULE_NAME ": crng begins w/: 0x%016llx 0x%016llx\n",
+        ebuf[0], ebuf[1]);
     /* -------------------------------------------------------------------- */ }
 
     // static *ptr allocation at init on: go or not-go, there is not try
