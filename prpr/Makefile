@@ -10,7 +10,7 @@ LDFLAGS     := -static -s
 # Example: -lpthread, -lm, -lz, --fast-math, etc.
 EXTRA_FLAGS_mixtrd  := -lpthread
 EXTRA_FLAGS_uchaos  := -lm --fast-math
-EXTRA_FLAGS_flatz   := -lz
+EXTRA_FLAGS_flatz   := -I../minz/ ../minz/miniz.c
 
 # List of final executables (stem = basename without .c)
 TARGETS :=  \
@@ -36,8 +36,17 @@ $(TARGETS): % : %.c
 
 all: $(TARGETS)
 
+flatz: flatz.c ../minz/miniz_export.h
+
 clean:
 	rm -f $(TARGETS)
+
+# Create dummy miniz_export.h if missing (needed by some miniz versions/forks)
+../minz/miniz_export.h:
+	@echo "/* Dummy miniz_export.h for static musl build */" > $@
+	@echo "#ifndef MINIZ_EXPORT" >> $@
+	@echo "#define MINIZ_EXPORT" >> $@
+	@echo "#endif" >> $@
 
 # Optional: rebuild everything if Makefile changes
 $(TARGETS): Makefile

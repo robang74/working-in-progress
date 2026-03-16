@@ -18,7 +18,7 @@
 #include <stddef.h>
 #include <time.h>
 #include <math.h>
-#include <zlib.h>
+#include <miniz.h>
 
 #define AVGV 127.5
 #define E3 1000L
@@ -403,9 +403,9 @@ size_t zdeflating(const int action, uint8_t const *zbuf, z_stream *pstrm,
         zbuffer = (uint8_t *)zbuf;
         pstrm->next_out = zbuffer;
         pstrm->avail_out = MAX_COMP_SIZE;
-        ret = deflate(pstrm, action);
+        ret = mz_deflate(pstrm, action);
         if(ret !=  Z_OK && ret != Z_STREAM_END) {
-            perror("zlib::deflateEnd");
+            perror("miniz::deflateEnd");
             exit(EXIT_FAILURE);
         }
 /* TODO: -hN -tN
@@ -692,8 +692,8 @@ int main(int argc, char *argv[]) {
     if (Z_ON) {
         strm.next_out = zbuf;
         strm.avail_out = MAX_COMP_SIZE;
-        if (deflateInit(&strm, zipl) != Z_OK) {
-            perror("libz::deflateInit");
+        if (mz_deflateInit(&strm, zipl) != Z_OK) {
+            perror("miniz::deflateInit");
             exit(EXIT_FAILURE);
         }
     }
@@ -753,11 +753,11 @@ int main(int argc, char *argv[]) {
     printstats(0, 0, 0, 0, 0, 0, 1);
 #endif
 
-    // Finalise the zlib compression process
+    // Finalise the zlib/miniz compression process
     if (Z_ON) {
         ZDEF(Z_FINISH);
-        if(deflateEnd(&strm) != Z_OK) {
-            perror("zlib::deflateEnd");
+        if(mz_deflateEnd(&strm) != Z_OK) {
+            perror("miniz::deflateEnd");
             exit(EXIT_FAILURE);
         }
         setout(zs.data, zs.bsize);
