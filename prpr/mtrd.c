@@ -5,6 +5,8 @@
  *
  * Compile with lib pthread: gcc mtrd.c -O3 -o mtrd -lpthread -Wall
  *
+ * Static ELF binary: musl-gcc mtrd.c -O3 -o mtrd -lpthread -Wall -s -static
+ *
  */
 
 #define _GNU_SOURCE

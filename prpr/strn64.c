@@ -8,6 +8,8 @@
  * dd if=uchaos.c count=1 | ./strsum | ent --> Entropy = 7.622394 bits per byte.
  *
  * Entropy here likely means how many symbols in 256 available have been used.
+ *
+ * Compile with: musl-gcc strn64.c -o strn64 -Wall -s -static
  */
 
 #include <stdio.h>
