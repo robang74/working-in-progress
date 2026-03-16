@@ -32,7 +32,7 @@
  * nowadays we ask to a chatbot to create a customised one for our needs and
  * then we take care of filling the template of the relevant code.
  *
- * Relevant code source: prpr/uchaos.c
+ * Relevant code primary source: prpr/uchaos.c
  */
 
 #include <linux/jiffies.h>
@@ -49,7 +49,7 @@
 #define MODULE_NAME "uchaos"
 #define DEVICE_NAME MODULE_NAME
 #define  CLASS_NAME MODULE_NAME"_cls"
-#define DRIVER_VERSION "0.5.8"
+#define DRIVER_VERSION "0.5.9"
 #define DRIVER_LICENSE "GPL v2"
 #define DRIVER_AUTHOR  "Roberto A. Foglietta <roberto.foglietta@gmail.com>"
 #define DRIVER_DESCRIPTION "Stochastic scheduler-jitter chaos RNG stream device"
@@ -60,6 +60,19 @@ static int badb_init = 0;
 module_param(badb_init, int, 0644);
 MODULE_PARM_DESC(badb_init,
     " Badboy mode enforces the kernel's crng init ([0]:1:2)");
+
+/*
+ * WARNING: badboy mode is a temporary hack which is needed only at init time
+ * and before acting in such mode, it should check being called from pid == 1.
+ * Instead the following parameter would be better to have as sysctl variables
+ * in a production grade implementation. Command line parameters offer a simple
+ * and immediately actionable way which is the best for .ko debug and testing
+ */
+
+static int verbosity = 4;
+module_param(verbosity, int, 0644);
+MODULE_PARM_DESC(verbosity,
+    " Verbosity level is for debug / testing only (0:[4]:8)");
 
 static int entr_qlty = 100;
 module_param(entr_qlty, int, 0644);
@@ -84,7 +97,7 @@ MODULE_PARM_DESC(loop_mult,
 // --- Driver State ---
 
 static int major;
-static struct class* uchaos_class = NULL;
+static struct class* uchaos_class   = NULL;
 static struct device* uchaos_device = NULL;
 static DEFINE_MUTEX(uchaos_lock);
 
@@ -109,7 +122,7 @@ static DEFINE_MUTEX(uchaos_lock);
 #define rot3    13
 
 #define getprmx16(w) (5 + (((w) & ABy) << 1))
-#define getprmx(val) (primes64[getprmx16((val))])  // previous %10 was slower
+#define getprmx(val) (primes64[getprmx16((val))])  // because %10 is slower
 #define HASH_SEED 14695981039346656037ULL
 #define MULTIPLIER 0xff51afd7ed558ccdULL
 #define HASHSIZE (ABN >> 3)
@@ -149,6 +162,8 @@ static inline archul_t murmux3(archul_t ks, archul_t p)
 
 #define ONESEC msecs_to_jiffies(1<<10)
 
+#define prtkinfo(x...) { if(verbosity) printk(KERN_INFO MODULE_NAME ": " x); }
+
 /*
  * ATOMICITY ON A 1CPU vs SMP SYSTEM: the 'loop_failure' flag is read in many
  * places, but wrote in one only: 'volatile' was fine, 'atomic_t' is the way.
@@ -163,10 +178,14 @@ static inline archul_t djb2tum(archul_t seed, size_t num)
 {
     static unsigned long failure_jiff = 0;
     static archul_t dmx = 0, dmn = -1, mavg = 0, ohs = HASH_SEED;
-    register archul_t hsh = ohs;
-    volatile int i, j = 0;           // volatile as memory barrier in the loop
 
-    archul_t tns, dlt, dff, ent = 0, ons = 0;
+#ifdef _PROVIDE_STATS
+    static u64 nexp = 0, evnt = 0, ncl = 0, tcyl = 0, nhsh = 0;
+    static archul_t avg = 0, jmn = -1, jmx = 0;
+#endif
+    volatile int i, j = 0; // volatile as current CPU memory barrier in the loop
+    register archul_t ent = 0, hsh = ohs; // these two in particular need accel.
+    archul_t tns, dlt, dff, ons = 0;
     u8 b0, b1, excp = 0;
 
     /*
@@ -184,13 +203,13 @@ static inline archul_t djb2tum(archul_t seed, size_t num)
     if( seed ) hsh ^= seed;
     else { ons = ent = 0; }
 
+    if( !ons ) {
+        ons = ktime_get_ns();
+        hsh = knuthmx(hsh ^ ons);
+    }
+
     for (i = 0; i < num; i++) {
-        if(  ent ) ent ^= rotlbit(ent, getprmx16(hsh));
-        if( !ons ) {
-            ons = ktime_get_ns();
-            hsh = knuthmx(hsh ^ ons);
-            cpu_relax();
-        }
+        if( ent && hsh ) ent ^= rotlbit(ent, getprmx16(hsh));
 /* -----------------------------------------------------------------------------
  * WARNING:
  * it might loop forever, because of a BUG rather than falling in a corner case
@@ -209,22 +228,31 @@ reschedule:
          * other parts of the kernel would create DoS or SysFail in such a way that
          * uChaos will be the least of the issues. Not being a critical one, is enough.
          */
-        if( (++j) >> 10 ) { // 2^10 is a large arbitrary value, don't overlook when coding
+        // 2^10 is a large arbitrary value, don't overlook 'arbitrary' when coding
+        if( (++j) >> 10 ) {
             failure_jiff = jiffies;
-            #define UCWRN MODULE_NAME": EMERGENCY ABORT -"
-            printk(KERN_ALERT UCWRN" Detected potential infinite reschedule loop!\n");
-            printk(KERN_INFO  UCWRN" loops=%d,%d kbuf_offset=0x%02lx, jiffies=%lu\n",
+            #define UCWRN MODULE_NAME ": EMERGENCY ABORT - "
+            printk(KERN_ALERT UCWRN "potential infinite reschedule loop!\n");
+            if(verbosity)
+            prtkinfo("Abort w/ loops=%d,%d kbuf_offset=0x%02lx, jiffies=%lu\n",
                 i, j, (unsigned long)kbuf & 255, jiffies);
             atomic_set(&loop_failure, 1);
-            goto enforcedquit; // TODO: a more drastic way is to unregister the char device
+            // A more drastic way would be unregistering the char device
+            goto enforcedquit;
         }
+        /*
+         * Immediately after the infinite loop check,
+         * hashing stuff is starting with a CPU nap!
+         */
+        cpu_relax();
+#ifdef _PROVIDE_STATS
+        nexp++;
+#endif
         do {
             tns = ktime_get_ns();
             dlt = tns - ons;
-            if( !dlt )
-                cpu_relax();
-            else
-                ons = tns;
+            if( !dlt ) {                                      goto reschedule; }
+            else ons = tns;
         } while( dtskew(dlt) );
 
         if(dmn == -1) { dmn = dlt;                            goto reschedule; }
@@ -232,12 +260,16 @@ reschedule:
         if( dlt < dmn ) {
             dff = dmn - dlt; dmn = dlt;
             ent ^= -dff ^ dmn;
-            //evnt++;
+#ifdef _PROVIDE_STATS
+            evnt++;
+#endif
         } else
         if( dlt > dmx ) {
             dff = dlt - dmn; dmx = dlt;
             ent ^= dff ^ -dmx;
-            //evnt++;
+#ifdef _PROVIDE_STATS
+            evnt++;
+#endif
         } else {
             dff = dlt - dmn;
             ent ^= ~dff ^ dmx;
@@ -246,20 +278,22 @@ reschedule:
 
         // dff is jittering for the exeption manager activation
         if( dff < min_delta + excp ) {
-            excp += 4;               // increasing excp and accounting for dff
-            //nexp++;
+            excp += 4;                     // excp is accounting vs dff
+#ifdef _PROVIDE_STATS
+            nexp++;
+#endif
         } else {
             // Knuth, based on gold section seeded by 1E-3 ~ 1E-4 event idx
-            if( excp ) { hsh = murmux3(hsh, ons); } excp = 0;
-            /*
-            // min,max jittering can be ommited
+            if( excp ) { hsh = murmux3(hsh, ons); }
+            excp = 0;
+#ifdef _PROVIDE_STATS
             if( jmn == -1 ) jmn = dff;
             else
             if( dff < jmn ) jmn = dff;
             if( dff > jmx ) jmx = dff;
-            // avg calculation can be ommitted
-            avg += dlt; javg += dff; //ncl++;
-            */
+            avg += dlt; javg += dff;
+            ncl++;
+#endif
         }
 
         // Half of the values above and below expected but few around creates
@@ -279,9 +313,11 @@ reschedule:
 
         // Moving average, where (mavg * 255) = (mavg + 256 - mavg) but faster
         mavg = ((mavg << 8) - mavg + dlt) >> 8;
-
-        cpu_relax();
     }
+#ifdef _PROVIDE_STATS
+    nexp -= num;
+    tcyl += num;
+#endif
 
     /*
      * RATIONALE: if 'goto enforcedquit' is enforced, the system is probably done
@@ -289,10 +325,13 @@ reschedule:
      * rather than a soft-degradation of the service quality like doing LCG as RNG.
      */
 enforcedquit:
-    ent = hsh;                       // forget the entropy mixed in hash
-    hsh = murmux3(hsh, ohs);         // whitening the hash before deliver
-    ohs = ent;                       // keep the hashing internal state
+    ent = hsh;                             // forget the entropy mixed in hash
+    hsh = murmux3(hsh, ohs);               // whitening the hash before deliver
+    ohs = ent;                             // keep the hashing internal state
 
+#ifdef _PROVIDE_STATS
+    nhsh++;
+#endif
     return hsh;
 }
 
@@ -448,12 +487,11 @@ static int __init uchaos_init(void)
     if( init_runs >>  6 ) init_runs =   63;
     if( min_delta >>  8 ) min_delta =  255;
     if( entr_qlty > 1000) entr_qlty = 1000;
-    // Parameters ranges sanitisation bool flags
-    // badb_init = !!badb_init;
+    // It is a mode index, every value is fine
+    // badb_init = badb_init
 
-    printk(KERN_INFO MODULE_NAME
-        ": Init (bb:%d) auxiliary entropy source, quality: %d\n",
-            badb_init, entr_qlty);
+    prtkinfo("Init (bb:%d) auxiliary entropy source, quality: %d\n",
+        badb_init, entr_qlty);
     ebuf[0] = ktime_get_ns();
     ebuf[0] = djb2tum(ebuf[0], loop_mult * init_runs);
     // by default settings, the previous call with init_runs brings in variance
@@ -466,7 +504,7 @@ static int __init uchaos_init(void)
     /* -------------------------------------------------------------------- */ {
     size_t len = sizeof(ebuf);
 
-#ifdef hwrng_register
+#ifdef hwrng_register                  // UNTESTED branch
     int err;
     uchaos_rng.quality = entr_qlty;
     err = hwrng_register(&uchaos_rng); // this OOPS because a kernel bug
@@ -477,34 +515,35 @@ static int __init uchaos_init(void)
     }
     add_hwgenerator_randomness(ebuf, len, len << 3);
 #else
-    printk(KERN_INFO MODULE_NAME
-        ": Inject entropy %ld bytes, 1st seed: 0x%016llx\n",
+    if(verbosity >> 2)
+        prtkinfo("Inject entropy %ld bytes, 1st seed: 0x%016llx\n",
             len, ebuf[0]);
-    #ifdef add_bootloader_randomness
+    #ifdef add_bootloader_randomness   // UNTESTED branch
     add_bootloader_randomness(ebuf, len);
     #else                                                    // backport fix but
     if( badb_init == 2 ) {                                  // in 5.15.202 OOPS!
-        add_hwgenerator_randomness(ebuf, len, len << 3);
+        add_hwgenerator_randomness(ebuf, len, len << 3);   //
     } else {                                              //
-        add_device_randomness(ebuf, len);         // always safe to mix*
+        add_device_randomness(ebuf, len);                // always safe to mix*
     }                                                   //
     if( badb_init == 1 ) {                             //
-        printk(KERN_INFO MODULE_NAME                  //
-            ": Credit entropy function address  : 0x%016lx\n",
+        if(verbosity >> 1)                            //
+            prtkinfo("Credit entropy function address  : 0x%016lx\n",
                 (uintptr_t)kernel_credit_entropy_bits);
-                                                  // when doing good OOPS and
-                                                 // this is the only viable way
-        kernel_credit_entropy_bits(len << 3);   // then badboy mode init! ;-)
-    }
-    #endif
+                                                   // when doing good OOPS and
+                                                  // this is the only viable way
+        kernel_credit_entropy_bits(len << 3);    // then badboy mode init! ;-)
+    }                                           //
+    #endif                                     //* always safe, unless paranoic
 #endif
     // Only for debug and testing purposes, like everything else here, anyway
-    get_random_bytes(ebuf, HASHSIZE<<2);
-    printk(KERN_INFO MODULE_NAME ": crng begins w/: 0x%016llx 0x%016llx\n",
-        ebuf[0], ebuf[1]);
+    if(verbosity >> 2) {
+        get_random_bytes(ebuf, sizeof(ebuf));
+        prtkinfo("crng begins w/: 0x%016llx 0x%016llx\n", ebuf[0], ebuf[1]);
+    }
     /* -------------------------------------------------------------------- */ }
 
-    // static *ptr allocation at init on: go or not-go, there is not try
+    // static *ptr allocation at init means: go or not-go, there is not try
     kbufptr = kzalloc(MAX_INPUT_SIZE + HASHSIZE, GFP_KERNEL);
     if (!kbufptr) retnfree( -ENOMEM );
     kbuf = (archul_t *)ABL_ALIGN( kbufptr );
@@ -544,10 +583,14 @@ static int __init uchaos_init(void)
         retnfree( PTR_ERR(uchaos_device) );
     }
 
-    printk(KERN_INFO MODULE_NAME
-        "loop_mult=%d init_runs=%d, min_delta=%d; kbuf_offset: 0x%02lx\n",
-            loop_mult, init_runs, min_delta, (uintptr_t)kbuf & 255);
-
+    if(verbosity >> 1) {
+        printk(KERN_INFO MODULE_NAME "loop=%d init=%d, dlta=%d, qlty=%d, "
+            "verb=%d; kbuf algn: %u bits, size: %u, offs: 0x%02lx\n",
+            loop_mult, init_runs, min_delta, entr_qlty, verbosity,
+            HASHSIZE << 3, MAX_INPUT_SIZE, (uintptr_t)kbuf & 0xff);
+    } else {
+        if(verbosity) printk(KERN_INFO MODULE_NAME "loaded");
+    }
     return 0;
 }
 
@@ -556,7 +599,7 @@ static void __exit uchaos_exit(void)
     device_destroy(uchaos_class, MKDEV(major, 0));
     class_destroy(uchaos_class);
     unregister_chrdev(major, DEVICE_NAME);
-    printk(KERN_INFO MODULE_NAME ": unloaded\n");
+    if(verbosity)  printk(KERN_INFO MODULE_NAME ": unloaded\n");
     retnfree((void)0);
 }
 
