@@ -23,7 +23,7 @@
 #include <getopt.h>
 
 #define PROGRAM_NAME "mtrd"
-#define VERSION      "v0.5.0"
+#define VERSION      "v0.5.1"
 
 #define AVGV 127.5
 #define NS 1000000000L
@@ -70,6 +70,7 @@ static inline void prt_nanos(unsigned char a, unsigned char b) {
 }
 
 extern char **environ;
+static pthread_barrier_t barrier;
 
 void *spawn_and_mix(void *arg) {
     char *cmd = (char *)arg;
@@ -103,6 +104,7 @@ void *spawn_and_mix(void *arg) {
     }
 
     close(pipefd[1]);
+    pthread_barrier_wait(&barrier); // The aim is to sync the output producers
 
     // Lettura a basso livello
     ssize_t n;
@@ -198,7 +200,6 @@ int main(int argc, char *argv[]) {
     // Disabilitiamo il buffering di stdout del processo principale
     setvbuf(stdout, NULL, _IONBF, 0);
 
-    pthread_barrier_t barrier;
     pthread_barrier_init(&barrier, NULL, num_threads);
 
     for (int i = 0; i < num_threads; i++) {

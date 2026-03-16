@@ -12,7 +12,7 @@
 #define DEFAULT_LEN  16
 #define ALPH16       "0123456789abcdef"
 #define PROGRAM_NAME "prnt16"
-#define VERSION      "v0.0.3"
+#define VERSION      "v0.1.0"
 
 static void usage(const char *progname) {
     fprintf(stderr,
@@ -23,7 +23,7 @@ static void usage(const char *progname) {
         "\n"
         "Options:\n"
         "  -n, --len=NUMBER      Number of characters to print (default: %d)\n"
-        "  -m, --method=TYPE     Output method: 'putchar' or 'write' (default: putchar)\n"
+        "  -m, --method=TYPE     Output method p:'putchar' or w:'write' (default: w)\n"
         "  -d, --delay=USECS     Delay in microseconds between characters (default: 0)\n"
         "  -v, --version         Show version information and exit\n"
         "  -h, --help            Show this help message and exit\n"
@@ -40,9 +40,9 @@ static void usage(const char *progname) {
 
 int main(int argc, char *argv[])
 {
-    size_t len          = DEFAULT_LEN;
-    unsigned int delay  = 0;              // microseconds
-    int use_write       = 0;              // 0 = putchar, 1 = write
+    size_t len      = DEFAULT_LEN;
+    unsigned delay  = 0;              // microseconds
+    int use_write   = 1;              // 0 = putchar, 1 = write
 
     static struct option long_options[] = {
         {"method",  required_argument, 0, 'm'},
@@ -57,9 +57,10 @@ int main(int argc, char *argv[])
     while ((c = getopt_long(argc, argv, "m:n:d:hv", long_options, NULL)) != -1) {
         switch (c) {
             case 'm':
-                if (strcmp(optarg, "putchar") == 0) {
+                if (optarg[0] == 'p') {
                     use_write = 0;
-                } else if (strcmp(optarg, "write") == 0) {
+                } else
+                if (optarg[0] == 'w') {
                     use_write = 1;
                 } else {
                     fprintf(stderr, "Error: --method must be 'putchar' or 'write'\n");
