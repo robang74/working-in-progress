@@ -1,4 +1,4 @@
-/* 
+/*
  * (c) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, MIT
  *
  * Compile with: musl-gcc prnt16.c -o prnt16 -Wall -s -static
@@ -12,10 +12,11 @@
 #define DEFAULT_LEN  16
 #define ALPH16       "0123456789abcdef"
 #define PROGRAM_NAME "prnt16"
-#define VERSION      "0.0.2"
+#define VERSION      "v0.0.3"
 
 static void usage(const char *progname) {
     fprintf(stderr,
+        "\n"
         "Usage: %s [OPTIONS]\n"
         "\n"
         "Synchronised output a circular sequence of hex digits (0-f) to stdout.\n"
@@ -34,6 +35,7 @@ static void usage(const char *progname) {
         "\n",
         progname, DEFAULT_LEN, progname, progname, progname
     );
+    fflush(stderr);
 }
 
 int main(int argc, char *argv[])
@@ -90,7 +92,7 @@ int main(int argc, char *argv[])
                 return 0;
 
             case 'v':
-                printf("%s version %s\n", PROGRAM_NAME, VERSION);
+                printf("%s %s\n", PROGRAM_NAME, VERSION);
                 return 0;
 
             case '?':
