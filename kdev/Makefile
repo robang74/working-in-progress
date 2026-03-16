@@ -21,11 +21,11 @@ ccflags-y += -D_CREDIT_INIT_ADDR=$(ADDR)
 KCFG  := $(KDIR)/.config .config
 KASLR := $(shell grep "CONFIG_RANDOMIZE_BASE=y" $(KCFG) 2>/dev/null)
 ifneq ($(KASLR),)
-    KASLR := 1
-    ccflags-y += -D_KASLR_ENABLED=1
+	KASLR := 1
+	ccflags-y += -D_KASLR_ENABLED=1
 else
-    KASLR := 0
-    ccflags-y += -D_KASLR_ENABLED=0
+	KASLR := 0
+	ccflags-y += -D_KASLR_ENABLED=0
 endif
 
 PRINTK := 0x$(shell grep -w "_printk" $(KMAP) 2>/dev/null |\
