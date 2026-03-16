@@ -2,15 +2,19 @@
 #  Makefile for small static utilities built with musl-gcc
 # =============================================================================
 
-CC          := musl-gcc
-CFLAGS      := -Os -Wall -static -s
-LDFLAGS     := -static -s
+CC      := musl-gcc
+CFLAGS  := -static -s -flto -Os -Wall
+LDFLAGS := -static -s -flto
+
+CFLAGS  += -ffunction-sections -fdata-sections
+LDFLAGS += -Wl,--gc-sections
 
 # Extra flags per program (only if needed)
 # Example: -lpthread, -lm, -lz, --fast-math, etc.
 EXTRA_FLAGS_mixtrd  := -lpthread
 EXTRA_FLAGS_uchaos  := -lm --fast-math
-EXTRA_FLAGS_flatz   := -I../minz/ ../minz/miniz.c
+EXTRA_FLAGS_flatz   := -I../minz/amalgamation/ ../minz/amalgamation/miniz.c
+EXTRA_FLAGS_flatz   += -DMINIZ_NO_INFLATE -DMINIZ_NO_ZIP -DMINIZ_NO_ARCHIVE -DMINIZ_NO_STDIO
 
 # List of final executables (stem = basename without .c)
 TARGETS :=  \
@@ -27,6 +31,7 @@ TARGETS :=  \
 # Pattern: target depends on corresponding .c file
 $(TARGETS): % : %.c
 	$(CC) $(CFLAGS) $(EXTRA_FLAGS_$*) $(LDFLAGS) -o $@ $<
+	strip --strip-all --remove-section=.comment --remove-section=.note* $@
 
 # =============================================================================
 #  Standard targets
@@ -36,7 +41,7 @@ $(TARGETS): % : %.c
 
 all: $(TARGETS)
 
-flatz: flatz.c ../minz/miniz_export.h
+# flatz: flatz.c ../minz/miniz_export.h
 
 clean:
 	rm -f $(TARGETS)

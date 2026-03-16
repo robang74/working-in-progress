@@ -64,9 +64,7 @@ int main(int argc, char *argv[]) {
     unsigned char buffer[MAX_BLOCK_SIZE];
 
     while (1) {
-        size_t bytes_read = 0, nr = 0, nw = 0;
-        unsigned char *output_ptr = buffer;
-        size_t bytes_to_write = 0;
+        size_t bytes_read = 0, nr = 0;
 
         while (bytes_read < r_size) {
             nr = read(STDIN_FILENO, buffer + bytes_read, r_size - bytes_read);
