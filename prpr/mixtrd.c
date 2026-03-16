@@ -147,7 +147,7 @@ static void print_usage(const char *progname) {
         "  %s -t4 \"curl -s http://example.com\"\n"
         "  %s -h\n"
         "\n"
-        "Note: requires /usr/bin/stdbuf from coreutils to disable buffering.\n"
+        "Note: requires /usr/bin/stdbuf to disable buffering.\n"
         "\n",
         progname, progname, progname, progname
     );
