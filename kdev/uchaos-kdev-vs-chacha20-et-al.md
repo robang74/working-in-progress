@@ -173,6 +173,71 @@ Finally, uchaos is more a demonstration of the author's abilities in providing s
 
 ---
 
+uCHAOS: WHAT IF A 100% DETERMINISTIC ISN'T 100%?
+
+- [LinkedIn post #7](https://www.linkedin.com/posts/robertofoglietta_uchaos-what-if-a-100-deterministic-isnt-activity-7439508193371697152-4r9L) — [Facebook post #7](https://www.facebook.com/roberto.a.foglietta/posts/10163086525253736)
+
+A totally deterministic machine is a totally predictable machine.
+
+I have no doubt about that, it would be surprising being different.
+
+However, is it possible to create a totally deterministic machine above 0°K?
+
+That's another story, completely. However, the hard part is to catch those tiny variations that usually aren't relevant at all. But every system has its own limits, and on the edge of that limit the determinism fades away and chaos starts to appear. Jurassic Park docet.
+
+In theory, in practice? On the left is the fixed screenshot of a near 0°K machine and that screenshot repeats the same at every reboot. Two different randomness generators provide the same output. Timings are strictly the same at the nanosecond precision.
+
+On the left, a first try of the uchaosbox which is a 96KB binary which leverages the same concept of Busybox and it can run multiple tools.
+
+```sh
+root@u-bmls:/# uchaosbox mixtrd -n16
+"uchaosbox prnt16 -n96 -mw" | md5sum
+2b37e50454bbbe78b14fa05207f56376 -
+```
+
+The operation above is predictable, it always returns the same hash. The same operation with -n8192 instead of -n96, it doesn't. It takes much more time 0.54 instead of 0.02 and that longer time is enough to decoherence that unstable micro-system. Because time is precious and we do not want waste it, then this operation made the micro-system even more unstable:
+
+```sh
+root@u-bmls:/# uchaosbox mixtrd -tn16
+"uchaosbox prnt16 -n96 -mw" | md5sum
+```
+
+This operation takes 0.02 almost the same as the shorter one above but it doesn't return the same value. It is a long way to say that EVERY time is going to return a different value, or that the values never repeat. Note that the word "never" here means relative to the space of the 32-bit hash, after 2^32 = 4 billion tries, it is granted one repetition at least.
+
+What does this mean? In practice even the most deterministic virtual machine that I managed to run, it is not totally 100% deterministic because from the host which is a real machine with a real processor, a bit of chaos leaks into the virtual machine, and a highly unstable micro-system combined with a high-sensitivity catcher can detected that leak and provide real entropy.
+
+I am not expecting that entropy will be abundant, but enough to be collected enough and enough quickly to seed the chaos engine and then forget the seed. Because the seed is self generated and thus can be forgotten without even ever sharing with another process, there is a good chance that it will remain a secret for long enough to collect some more entropy from the leaking host. Thus the system will remain self-sufficient.
+
+In brief, the machine isn't totally deterministic because the host isn't deterministic and on the right side the pink are repetitions of the same operation which provides the same output and in dark blue, the two that aren't granted to return the same value and usually they do not.
+
+- [uchaosbox source code](https://github.com/robang74/working-in-progress/blob/main/prpr/uchaosbox.c)
+
+---
+
+uCHAOS: REPEATABILITY vs PREDICTABILITY
+
+- [LinkedIn post #8](https://www.linkedin.com/posts/robertofoglietta_uchaos-what-if-a-100-deterministic-isnt-activity-7439508193371697152-4r9L) — [Facebook post #8](https://www.facebook.com/roberto.a.foglietta/posts/10163086525253736)
+
+First of all, it is important to note that the VM is not totally isolated because it communicates with the host through a serial console /dev/ttyS0. However, that console is not something physical but emulated both on the VM and host sides. Therefore, the VM is isolated via software in practice.
+
+This highlights the importance of the "passthrough" (aka KVM acceleration) in order to extract and amplify entropy from its jittering. We may argue if a CPU has any entropy at all and it is a relevant question but for our own peace of mind, on this topic, we assume that real-world stuff above 0°K is affected by chaos to some degree and it is possible to extract and amplify that "noise". Wondering about which philosophical implication is interesting for sure but practice first, wondering after.
+
+The practice says that the `QZERO=1` `ZWARM=0` virtual machine is isolated and it is, as far as we know, deterministic in its behaviour. Therefore, it is important to check the difference between repeatability and predictability.
+
+A repeating pattern is predictable. A non repeating pattern can be predictable. A predictable pattern can be guessed or not. For example, the pi-greco decimals did not repeat but we can predict them by calculating it. In practice, we can have a series of digit starting from the Nth and an attacker might have a great difficulty in predicting the sequence when N is unknown. This is the fundamental concept behind every RNG which is deterministic and thus predictable when the seed is known or can be guessed in practice.
+
+The Linux cnrg is both deterministic and predictable when the seed is known, the same uChaos when the CPU doesn't leak entropy otherwise is NOT deterministic but chaotic/stochastic by its own design. That design is enough to provide the same quality of a cryptographic RNG like Linux cnrg. That's bold, and amazing. But it cannot do miracles.
+
+The blueish instructions do not repeat, but are predictable. In fact, when we execute them two times in the same exact point of the `/init` sequence (which now includes `/etc/init.d/rcS` also) the two provide different values but that values are the same if we reboot the VM.
+
+In this case predictability means repeatability among reboot not among userland independent starts. In the first case the scope is the whole machine, in the second case the scope is the shell session. In general, determinism leads to predictability when scope repeatability can be granted.
+
+In the real world, like at the billiard pools, micro-variations grants that perfect repeatability (analog values) of the initial conditions isn't possible thus chaos starts to appear as long as the system evolves further the decoherence time limit (aka billiard 7-cushions).
+
+In a digital world, initial conditions can be granted exactly the same among runs of the same virtual machine, thus repeatability emerges in plain sight. As long as the virtual machine is isolated and deterministic.
+
+---
+
 ### Screenshot n.1 (sx, OCR)
 
 The text from this screenshot shows the testing output at /init time, before sh
