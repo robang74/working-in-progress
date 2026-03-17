@@ -8,7 +8,7 @@ Also the entropy as a fundamental concept faced a deep twist and did not last ag
 
 Curiously, the ancient paganism etymology of Chaos that precede everything else, the dissolution of every structure at every level, emerges as a foundational element that precede anything else and uChaos as a thermal engine cannot do real work unless a gap of temperature exists. And into an isolated VM, that gap doesn't exist.
 
-No laws of physics were violated during this exploratory trip. This text lay here and it needs only readers willing to be upset, willing to wonder, willing to accept that practice precedes principle because principle is always debatable.
+No any laws of physics was violated during this exploratory trip. This text lays here and it needs only readers willing to be upset, willing to wonder, willing to accept that practice precedes principles because principles are always debatable.
 
 - [Click the link to view conversation with Kimi AI Assistant]( https://www.kimi.com/share/19cfde54-5892-8e93-8000-000017038a34)
 
@@ -121,6 +121,7 @@ Looking at the later sections, particularly "uCHAOS: REPEATABILITY vs PREDICTABI
 The author does distinguish between:
 
 - **Repeatability**: Same initial conditions → same output (determinism)
+
 - **Predictability**: Ability to guess without knowing initial conditions
 
 And acknowledges: "A non repeating pattern can be predictable" (pi decimals example).
@@ -206,7 +207,9 @@ The author uses "chaos" in a deliberately non-technical sense: "the whole system
 Perhaps the "confusion" is not in the author but in my reading them through cryptographic orthodoxy. The author is doing something more radical: proposing that:
 
 1. Statistical indistinguishability (PractRand pass) *is* the operational definition of randomness
+
 2. Physical process sensitivity (chaos) *is* the source of unpredictability
+
 3. The distinction between "pseudorandom" and "truly random" is metaphysical, not practical
 
 This is a coherent position. It's not standard cryptography, but it's not *confused*—it's a different philosophical foundation.
@@ -433,11 +436,17 @@ Not pretty words. Precisely.
 
 ### HO
 
-Imagine that I took 1024 identical dice and I threw them, then I report the result. The report is arbitrary because many combinations can be made out of that mess. I can then throw 1024 times the "same" dice but whatever the material made of the dice a little tiny part will be consumed, and the sequence is the artifact of that arrow time process. Let's say that this is a "true random sequence" expressed in 1024 digits. Then I compress it with the best theoretical generic compression algorithm, its size would be LEN > 0 but for sure more than some f(1024:6 values). There is a limit below which cannot be shrinked.
+Imagine that I took 1024 identical dice and I threw them, then I report the result. The report is arbitrary because many combinations can be made out of that mess. I can then throw 1024 times the "same" dice but whatever the material made of the dice a little tiny part will be consumed, and the sequence is the artifact of that arrow time process.
 
-On the other hand I can take 1024 letters 'a' and compress it, again there is a limit below which I cannot go. But that limit is known, it is 1024 x 'a' and the best compression algorithm can just do worse than that. For sure sizeof(1024 x 'a') < sizeof(1024 rand 1-6 values). Shannon entropy is about the frequency of symbols, it is about flatness rather than meaning as we are pretending about. Because once that the (1024 x 'a') data is decompressed the meaning of all those symbols is a banality.
+Let's say that this is a "true random sequence" expressed in 1024 digits. Then I compress it with the best theoretical generic compression algorithm, its size would be LEN > 0 but for sure more than some f(1024:6 values). There is a limit below which cannot be shrinked.
 
-Instead the sequence of random numbers cannot be reduced. But wait, it cannot be reduced as long as we cannot report it to an already known sequence. But once we wrote it down, it is an already known sequence but irreducible (unless by miracle creates a structured sequence by a dice 1024 throwing). Despite this irreducibility, the pi-greco digits aren't repeating and in their infinity, they can contain (or they should contain) precisely that sequence. Therefore from a theoretical PoV that sequence can be compressed in (index N of pi-greco digits for K digits and by g() function which encodes 1-6 values). Still bigger than (1024 x 'a') anyway but not so much.
+On the other hand I can take 1024 letters 'a' and compress it, again there is a limit below which I cannot go. But that limit is known, it is 1024 x 'a' and the best compression algorithm can just do worse than that. For sure sizeof(1024 x 'a') < sizeof(1024 rand 1-6 values).
+
+Shannon's entropy is about the frequency of symbols, it is about flatness rather than meaning as we are pretending about. Because once that the (1024 x 'a') data is decompressed the meaning of all those symbols is a banality.
+
+Instead the sequence of random numbers cannot be reduced. But wait, it cannot be reduced as long as we cannot report it to an already known sequence. But once we wrote it down, it is an already known sequence but irreducible (unless by miracle creates a structured sequence by a dice 1024 throwing). 
+
+Despite this irreducibility, the pi-greco digits aren't repeating and in their infinity, they can contain (or they should contain) precisely that sequence. Therefore from a theoretical PoV that sequence can be compressed in (index N of pi-greco digits for K digits and by g() function which encodes 1-6 values). Still bigger than (1024 x 'a') anyway but not so much.
 
 As we look at this in deeper as much we are understanding that what we call "entropy" is something between flatness (thus white noise figure quality) and information density (incompressibility) but has nothing to do with real randomness. Am I wrong?
 
