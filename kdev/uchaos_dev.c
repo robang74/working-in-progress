@@ -49,7 +49,7 @@
 #define MODULE_NAME "uchaos"
 #define DEVICE_NAME MODULE_NAME
 #define  CLASS_NAME MODULE_NAME"_cls"
-#define DRIVER_VERSION "0.5.9"
+#define DRIVER_VERSION "0.5.9.1"
 #define DRIVER_LICENSE "GPL v2"
 #define DRIVER_AUTHOR  "Roberto A. Foglietta <roberto.foglietta@gmail.com>"
 #define DRIVER_DESCRIPTION "Stochastic scheduler-jitter chaos RNG stream device"
@@ -584,10 +584,12 @@ static int __init uchaos_init(void)
     }
 
     if(verbosity >> 1) {
-        printk(KERN_INFO MODULE_NAME "loop=%d init=%d, dlta=%d, qlty=%d, "
-            "verb=%d; kbuf algn: %u bits, size: %u, offs: 0x%02lx\n",
-            loop_mult, init_runs, min_delta, entr_qlty, verbosity,
-            HASHSIZE << 3, MAX_INPUT_SIZE, (uintptr_t)kbuf & 0xff);
+        printk(KERN_INFO MODULE_NAME
+            ": kbuf algn: %u bits, size: %u bytes, offs: 0x%02lx lsb\n",
+                HASHSIZE << 3, MAX_INPUT_SIZE, (uintptr_t)kbuf & 0xff);
+        printk(KERN_INFO MODULE_NAME
+            ": kmod loop=%d, init=%d, dlta=%d, qlty=%d, verb=%d\n",
+                loop_mult, init_runs, min_delta, entr_qlty, verbosity);
     } else {
         if(verbosity) printk(KERN_INFO MODULE_NAME "loaded");
     }
