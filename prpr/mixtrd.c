@@ -22,8 +22,14 @@
 #include <string.h>
 #include <getopt.h>
 
-#define PROGRAM_NAME "mtrd"
-#define VERSION      "v0.5.1"
+#ifdef _USE_STDBUF
+#else
+#include <pty.h>        // forkpty() in musl only
+#include <utmp.h> 
+#endif
+
+#define PROGRAM_NAME "mixtrd"
+#define VERSION      "v0.5.2"
 
 #define AVGV 127.5
 #define NS 1000000000L
@@ -74,9 +80,11 @@ static pthread_barrier_t barrier;
 
 void *spawn_and_mix(void *arg) {
     char *cmd = (char *)arg;
-    int pipefd[2];
+    int pipefd[2] = { -1, -1 };
 
     prt_nanos('[','>');
+
+#ifdef _USE_STDBUF
     if(pipe(pipefd) < 0) {
         perror("pipe");
         return NULL;
@@ -102,8 +110,21 @@ void *spawn_and_mix(void *arg) {
         close(pipefd[1]);
         return NULL;
     }
-
     close(pipefd[1]);
+#else
+    pid_t pid = forkpty(&pipefd[0], NULL, NULL, NULL);
+    if (pid < 0) {
+        perror("forkpty");
+        return NULL;
+    }
+
+    if (pid == 0) {
+        execl("/bin/sh", "sh", "-c", cmd, (char *)NULL);
+        perror("execl /bin/sh -c");
+        _exit(127);
+    }
+#endif
+
     pthread_barrier_wait(&barrier); // The aim is to sync the output producers
 
     // Lettura a basso livello
@@ -118,12 +139,18 @@ void *spawn_and_mix(void *arg) {
         }
     }
     if (n < 0) {
+#ifdef _USE_STDBUF
+#else
+        if (errno != EIO)
+#endif
         perror("read from pipe");
     }
 
     close(pipefd[0]);
     waitpid(pid, NULL, 0);
+#ifdef _USE_STDBUF
     posix_spawn_file_actions_destroy(&actions);
+#endif
 
     prt_nanos('<',']');
     return NULL;
@@ -146,8 +173,10 @@ static void print_usage(const char *progname) {
         "  %s -n6 \"echo $RANDOM; sleep 1\"\n"
         "  %s -t4 \"curl -s http://example.com\"\n"
         "  %s -h\n"
+#ifdef _USE_STDBUF
         "\n"
-        "Note: requires /usr/bin/stdbuf to disable buffering.\n"
+        "Note: compiled w/ _USE_STDBUF and it requires /usr/bin/stdbuf.\n"
+#endif
         "\n",
         progname, progname, progname, progname
     );
