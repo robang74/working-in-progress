@@ -106,7 +106,6 @@ static inline ssize_t writebuf(int fd, const uint8_t *buffer, size_t ntwr) {
 }
 
 /* ************************************************************************** */
-
 int main(int argc, char *argv[]) {
     uint8_t str[BLOCK_SIZE + 1];
     size_t n = readbuf(STDIN_FILENO, str, BLOCK_SIZE, 1);

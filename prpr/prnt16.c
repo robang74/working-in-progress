@@ -38,8 +38,8 @@ static void usage(const char *progname) {
     fflush(stderr);
 }
 
-int main(int argc, char *argv[])
-{
+
+int main(int argc, char *argv[]) {
     size_t len      = DEFAULT_LEN;
     unsigned delay  = 0;              // microseconds
     int use_write   = 1;              // 0 = putchar, 1 = write

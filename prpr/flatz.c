@@ -202,27 +202,27 @@ static inline void print_hash(uint64_t hj, uint16_t hl) {
 /* ************************************************************************** */
 
 // Funzione per ottenere il tempo in nanosecondi
-long get_nanos() {
-    static long start = 0;
+uint64_t get_nanos(void) {
+    static uint64_t start = 0;
     struct timespec ts;
 
     clock_gettime(CLOCK_MONOTONIC, &ts);
     if (!start) {
-      start = (long)ts.tv_sec * 1000000000L + ts.tv_nsec;
-      return start;
+        start = (uint64_t)ts.tv_sec * E9 + ts.tv_nsec;
+        return start;
     }
-    return ((long)ts.tv_sec * 1000000000L + ts.tv_nsec) - start;
+    return ((uint64_t)ts.tv_sec * E9 + ts.tv_nsec) - start;
 }
 
 static inline void stats_print_head(const char *dscr, size_t size, double ratio) {
   perr("\n%s: %ld bytes, %.1lf Kb, %.3lf Mb", dscr,
       size, (double)size / (1<<10), (double)size / (1<<20));
   if(ratio > 0) {
-    perr(", rtio: %lf %% (1 : %.3lf)\n", ratio * 100, 1.0 / ratio);
+      perr(", rtio: %lf %% (1 : %.3lf)\n", ratio * 100, 1.0 / ratio);
   } else {
-    long nsrun = get_nanos();
-    perr(", pid: %d, elab: %.1lf ms (%.1lf Kb/s)\n",
-        getpid(), (double)nsrun / E6, (double)size * (E9 >> 10) / nsrun);
+      long nsrun = get_nanos();
+      perr(", pid: %d, elab: %.1lf ms (%.1lf Kb/s)\n",
+          getpid(), (double)nsrun / E6, (double)size * (E9 >> 10) / nsrun);
   }
 }
 

@@ -752,7 +752,7 @@ static inline uint32_t readblocks(int fd, uint8_t *buf, uint32_t *nblks) {
 /* ** main & its supporters ************************************************* */
 
 // Funzione per ottenere il tempo in nanosecondi
-uint64_t get_nanos(void) {
+static uint64_t get_nanos(void) {
     static uint64_t start = 0;
     struct timespec ts;
 

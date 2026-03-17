@@ -20,6 +20,7 @@
 #include <errno.h>
 #include <sys/wait.h>
 #include <string.h>
+#include <stdint.h>
 #include <getopt.h>
 
 #ifdef _USE_STDBUF
@@ -29,28 +30,31 @@
 #endif
 
 #define PROGRAM_NAME "mixtrd"
-#define VERSION      "v0.5.2"
+#define VERSION      "v0.5.3"
 
 #define AVGV 127.5
-#define NS 1000000000L
+#define E3 1000L
+#define E6 1000000L
+#define E9 1000000000L
 #define MAX_READ_SIZE 16384
 #define ABS(a) ((a<0)?-(a):(a))
 #define MIN(a,b) ((a<b)?(a):(b))
 #define MAX(a,b) ((a>b)?(a):(b))
 
 // Funzione per ottenere il tempo in nanosecondi
-long get_nanos() {
-    static long start = 0;
+static uint64_t get_nanos(void) {
+    static uint64_t start = 0;
     struct timespec ts;
 
     clock_gettime(CLOCK_MONOTONIC, &ts);
     if (!start) {
-      start = (long)ts.tv_sec * 1000000000L + ts.tv_nsec;
-      return start;
+        start = (uint64_t)ts.tv_sec * E9 + ts.tv_nsec;
+        return start;
     }
-    return ((long)ts.tv_sec * 1000000000L + ts.tv_nsec) - start;
+    return ((uint64_t)ts.tv_sec * E9 + ts.tv_nsec) - start;
 }
 
+#define NS E9
 unsigned char prtnano = 0;
 static inline void prt_nanos(unsigned char a, unsigned char b) {
     const int BFLN = 32;
