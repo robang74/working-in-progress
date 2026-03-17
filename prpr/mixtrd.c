@@ -30,7 +30,7 @@
 #endif
 
 #define PROGRAM_NAME "mixtrd"
-#define VERSION      "v0.5.3"
+#define VERSION      "v0.5.4"
 
 #define AVGV 127.5
 #define E3 1000L
@@ -55,26 +55,31 @@ static uint64_t get_nanos(void) {
 }
 
 #define NS E9
+#define BFLN 32
 unsigned char prtnano = 0;
 static inline void prt_nanos(unsigned char a, unsigned char b) {
-    const int BFLN = 32;
     static char first = 1;
-    unsigned char buf[BFLN];
-    long nanos;
+    unsigned char buf[BFLN], len;
+    uint64_t nanos;
 
     if(!prtnano) return;
 
     nanos = get_nanos();
     if(first) {
         first = 0;
-        snprintf((char *)buf, BFLN, "%cs.%09ld%c\n", a, nanos % NS, b);
+        len = snprintf((char *)buf, BFLN, "%cs.%09ld%c\n", a, nanos % NS, b);
     } else {
-        snprintf((char *)buf, BFLN, "\n%c%ld.%09ld%c\n", a, nanos / NS, nanos % NS, b);
+        len = snprintf((char *)buf, BFLN, "\n%c%ld.%09ld%c\n", a, nanos / NS, nanos % NS, b);
     }
-
+    if(len > BFLN-1) len = BFLN-1;
     buf[BFLN-1] = 0;
+
+#if 0
     fprintf(stdout, "%s", buf);
     fflush(stdout);
+#else
+    write(fileno(stdout), buf, len);
+#endif
 
     return;
 }
@@ -188,8 +193,6 @@ static void print_usage(const char *progname) {
 }
 
 int main(int argc, char *argv[]) {
-    (void)get_nanos(); // Inizializzazione di start
-
     int num_threads = 0;
     int c;
 
@@ -222,7 +225,15 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
+/* ************************************************************************** */
+    if (fork() != 0) _exit(0);
+    setsid();
+    if (fork() != 0) _exit(0);
+/* ************************************************************************** */
+
     const char *cmd = argv[optind];
+    
+    (void)get_nanos(); // Inizializzazione di start
 
     // Make parent's own stdout unbuffered (helps when we mix writes)
     setvbuf(stdout, NULL, _IONBF, 0);
