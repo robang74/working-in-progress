@@ -2,6 +2,11 @@
 
 Working in progress and other stuff that I prefer to share here to give them a chance someone notice.
 
+> [!NOTE]
+> 
+> uChaos moved in a its own repository [uChaoSys](https://github.com/robang74/uchaosys) and evolved in an embedded system<br>
+> with a **footprint below 2MB**, musl all-static and it completes the **boot in less than 1/10s**. 
+
 ### Index
 
 * **Chaos Shell Engine**: 1. [presentation](chaos-shell-engine.md), &nbsp; 2. [lab notes](random.txt) &nbsp; 3. [thesys on jitters](2007-07-30-Tesi_Foglietta-051a.pdf)
