@@ -8,6 +8,12 @@ The project above linked is able to provide the same output in about 20m, depend
 
 Considering that the system footprint is below 2MB, offering a binary sample makes sense independently from the outages. This snapshot is not supposed to be updated often, therefore refers to the above project link.
 
+### Quick start
+
+```sh
+sh start.sh -q -m 32
+```
+
 ## License
 
 The overall license for the uChaoSys binaries is dependent on the system components thus the GPLv2 is the reference as the most demanding license among those involved as long as "GPLv2 or later" means GPLv2 as an option.
