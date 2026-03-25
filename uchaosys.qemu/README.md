@@ -1,8 +1,8 @@
 # uchaosys.qemu
 
-This folder contains a binary copy of the embedded system provided by sources and compilation recipes available in this project:
+This folder contains a binary copy of the embedded system v0.6.3 provided by sources and compilation recipes available in this project:
 
-- [github.com/robang74/uchaosys](https://github.com/robang74/uchaosys)
+- [github.com/robang74/uchaosys](https://github.com/robang74/uchaosys/tree/v063)
 
 The project above linked is able to provide the same output in about 20m, depending on the download transfer rate. Unfortunately, these days many GNU repositories are experiencing severe downtime.
 
