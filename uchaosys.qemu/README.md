@@ -1,4 +1,4 @@
-# uchaosys.qemu
+## uchaosys.qemu
 
 This folder contains a binary copy of the embedded system v0.6.3 provided by sources and compilation recipes available in this project:
 
@@ -14,6 +14,10 @@ Considering that the system footprint is below 2MB, offering a binary sample mak
 sh start.sh -q -m 32
 ```
 
-## License
+<br>
+
+### License
+
+- **`(c)`** 2026 – Roberto A. Foglietta &lt;roberto.foglietta@gmail.com&gt;
 
 The overall license for the uChaoSys binaries is dependent on the system components thus the GPLv2 is the reference as the most demanding license among those involved as long as "GPLv2 or later" means GPLv2 as an option.
