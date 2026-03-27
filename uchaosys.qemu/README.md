@@ -15,7 +15,7 @@ tar xvzf u*-roms.tgz
 sh start.sh -q -m 32
 ```
 
-The uqemu system emulator, here provided, supports microvm and q35 machines, the tgc (sw) and the kvm (hw) acceleration, provided the kernel module for kvm support and userland access privileges granted.
+The `uqemu` system emulator, here provided, supports `microvm` and `q35` machines, the `tgc` (sw) and the `kvm` (hw) acceleration, as long as the kernel module for `kvm` support and userland access privileges are granted, obviously.
 
 It is a "frankestain" glibc-musl elf64 static binary which has **not** been extensively tested and it was designed for embedded systems in mind, not desktops. However, it passed the self-contained self-hosted test which can be considered the ultimate health check in terms of a self-sufficient static binary: it works also for the embedded systems for which it has been designed for.
 
