@@ -8,6 +8,9 @@ append_for_kernel_debug="earlyprintk=serial nokaslr -pidfile vm.pid -panic=1"
 kimg="bzImage"
 rfsimg="initramfs.cpio"
 qemubin="qemu-system-x86_64"
+test -r $qemubin.gz.sh && qemubin="$qemubin.gz.sh"
+
+export PATH=.:$PATH
 
 test -r ${rfsimg}.gz && rfsimg="${rfsimg}.gz"
 rfsdir=$(echo "$rfsimg" | sed 's/\.cpio\.gz//;s/\.cpio//')
@@ -26,7 +29,7 @@ zerokelv=0
 zerotest=0
 quietrun=0
 
-while getopts "ZzuUqm:w" opt; do
+while getopts "ZzuUqm:wM:" opt; do
   case $opt in
     u)
       imgupdte=1
@@ -47,6 +50,9 @@ while getopts "ZzuUqm:w" opt; do
     m)
       QMSZE=$OPTARG
       ;;
+    M)
+      QMACH=$OPTARG
+      ;;
     w)
       ZWARM=1
       ;;
@@ -64,12 +70,12 @@ fi
 
 if [ $zerotest -ne 0 ]; then
   export QZERO=1 QMSZE=${QMSZE:-256M} UCTEST=${UCTEST:-1}
-  cmdlnx="UCTEST=${UCTEST:-1}"
+  cmdlnx="$cmdlnx UCTEST=${UCTEST:-1}"
 elif [ $zerokelv -ne 0 ]; then
   export QZERO=1 QMSZE=${QMSZE:-256M} UCTEST=${UCTEST:-0}
-  cmdlnx="UCTEST=${UCTEST:-1}"
+  cmdlnx="$cmdlnx UCTEST=${UCTEST:-1}"
 elif [ -n "$UCTEST" ]; then
-  cmdlnx="UCTEST=$UCTEST"
+  cmdlnx="$cmdlnx UCTEST=$UCTEST"
 fi
 
 if [ $imgupdte -ne 0 ]; then
@@ -91,8 +97,15 @@ nograp="-nographic -vga none -display none"
 
 if [ "${QZERO:-0}" = "0" ]; then
   boxnme="-name tinylnx"
-  qaccel="-enable-kvm -cpu host -machine accel=kvm"
-  netisl="-netdev user,id=net0,restrict=yes -device virtio-net-pci,netdev=net0"
+  qaccel="-enable-kvm -cpu host,migratable=off,+invtsc"
+# netisl="-netdev user,id=net0,restrict=yes"
+  if "$QMACH" = "microvm" ; then
+    qaccel="$qaccel -M microvm,accel=kvm,x-option-roms=off,pit=off,pic=off,rtc=off,acpi=off"
+#   netisl="$netisl -device virtio-net-device,netdev=net0"
+  else
+    qaccel="$qaccel -M q35,accel=kvm,usb=off,vmport=off,dump-guest-core=off -boot order=dc"
+#   netisl="$netisl -device virtio-net-pci,netdev=net0"
+  fi
 else
   echo
   echo "Zero Kelvin Linux mode"
@@ -108,16 +121,20 @@ else
   if [ "${ZWARM:-0}" = "1" ]; then
     qaccel="-cpu qemu64 -smp 1";
   fi
+  qaccel="${QMACH:+-M $QMACH} $qaccel"
 fi
 
 cmdlnx="-append '$cmdlnx ${KARGS:-}'"
 
+# disable this line if it creates trouble because ulimit -l isn't friendly
+grep -qi uchaos /etc/os-release || qaccel="$qaccel -overcommit mem-lock=on"
+
 cmd="$qemubin -m ${QMSZE:-128M} -kernel ${kimg} -initrd ${rfsimg} ${nograp:-} \
-              -no-reboot -boot order=dc ${boxnme:-} ${qaccel:-} ${netisl:-} \
+              -no-reboot ${boxnme:-} ${qaccel:-} ${netisl:-} \
               ${cmdlnx:-} ${QARGS:-}"
 
 # Starting the QEMU configuraed virtual machine ################################
 
 sh -xc "$cmd"; stty sane; printf '\e[?7h'
-echo $cmd
+echo; echo $cmd; echo
 
