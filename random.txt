@@ -5029,8 +5029,8 @@ length= 512 megabytes (2^29 bytes), time= 301 seconds
 
 rng=RNG_stdin64, seed=unknown
 length= 1 gigabyte (2^30 bytes), time= 609 seconds
-  Test Name                         Raw       Processed     Evaluation       
-  [Low1/64]BCFN(2+0,13-5U)          R=  +9.6  p =  6.2e-4   unusual          
+  Test Name                         Raw       Processed     Evaluation   
+  [Low1/64]BCFN(2+0,13-5U)          R=  +9.6  p =  6.2e-4   unusual      
   ...and 226 test result(s) without anomalies
 
 error reading from file
@@ -5055,8 +5055,8 @@ length= 4 megabytes (2^22 bytes), time= 2.1 seconds
 
 rng=RNG_stdin64, seed=unknown
 length= 8 megabytes (2^23 bytes), time= 4.5 seconds
-  Test Name                         Raw       Processed     Evaluation       
-  [Low1/64]BDayS2(4,24)[18]         R=  -4.0  p~=1-3.4e-5   unusual          
+  Test Name                         Raw       Processed     Evaluation   
+  [Low1/64]BDayS2(4,24)[18]         R=  -4.0  p~=1-3.4e-5   unusual      
   ...and 134 test result(s) without anomalies
 
 rng=RNG_stdin64, seed=unknown
@@ -5065,8 +5065,8 @@ length= 16 megabytes (2^24 bytes), time= 8.9 seconds
 
 rng=RNG_stdin64, seed=unknown
 length= 32 megabytes (2^25 bytes), time= 17.6 seconds
-  Test Name                         Raw       Processed     Evaluation       
-  [Low16/64]Gap-16:B                R=  -4.4  p =1-7.1e-4   unusual          
+  Test Name                         Raw       Processed     Evaluation   
+  [Low16/64]Gap-16:B                R=  -4.4  p =1-7.1e-4   unusual      
   ...and 158 test result(s) without anomalies
 
 rng=RNG_stdin64, seed=unknown
@@ -5091,14 +5091,14 @@ length= 1 gigabyte (2^30 bytes), time= 840 seconds
 
 rng=RNG_stdin64, seed=unknown
 length= 2 gigabytes (2^31 bytes), time= 1693 seconds
-  Test Name                         Raw       Processed     Evaluation       
-  mod3n(5):(0,9-0)                  R=  +8.2  p =  1.3e-4   unusual          
+  Test Name                         Raw       Processed     Evaluation   
+  mod3n(5):(0,9-0)                  R=  +8.2  p =  1.3e-4   unusual      
   ...and 241 test result(s) without anomalies
 
 rng=RNG_stdin64, seed=unknown
 length= 4 gigabytes (2^32 bytes), time= 3345 seconds
-  Test Name                         Raw       Processed     Evaluation       
-  mod3n(5):(0,9-0)                  R= +19.9  p =  5.7e-11   VERY SUSPICIOUS 
+  Test Name                         Raw       Processed     Evaluation   
+  mod3n(5):(0,9-0)                  R= +19.9  p =  5.7e-11   VERY SUSPICIOUS
   ...and 255 test result(s) without anomalies
 
 error reading from file
@@ -5151,14 +5151,14 @@ length= 1 gigabyte (2^30 bytes), time= 849 seconds
 
 rng=RNG_stdin64, seed=unknown
 length= 2 gigabytes (2^31 bytes), time= 1701 seconds
-  Test Name                         Raw       Processed     Evaluation       
+  Test Name                         Raw       Processed     Evaluation   
   mod3n(5):(0,9-0)                  R= +10.9  p =  4.4e-6   mildly suspicious
   ...and 241 test result(s) without anomalies
 
 rng=RNG_stdin64, seed=unknown
 length= 4 gigabytes (2^32 bytes), time= 3356 seconds
-  Test Name                         Raw       Processed     Evaluation       
-  mod3n(5):(0,9-0)                  R= +19.2  p =  1.2e-10   VERY SUSPICIOUS 
+  Test Name                         Raw       Processed     Evaluation   
+  mod3n(5):(0,9-0)                  R= +19.2  p =  1.2e-10   VERY SUSPICIOUS
   ...and 255 test result(s) without anomalies
 
 error reading from file
