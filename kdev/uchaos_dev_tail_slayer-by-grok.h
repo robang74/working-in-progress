@@ -108,7 +108,7 @@ typedef u64 __attribute__((aligned(HASHSIZE))) archul_t;
 #define ABL_ALIGN(x) align_t(archul_t, x)
 
 /* ================================================================
- * TailSlayer-style Hedged Reader for Kernel Space (simplified)
+ * TailSlayer-style Hedged Reader simplified, kernel, 64-bit only
  * ================================================================ */
 
 #define TS_N_REPLICAS     4          // N=4 gives excellent tail reduction on most platforms
@@ -118,7 +118,6 @@ typedef u64 __attribute__((aligned(HASHSIZE))) archul_t;
 static struct {
     void *page;                      // 1GiB hugepage
     archul_t *replicas[TS_N_REPLICAS];
-    int cores[TS_N_REPLICAS];
     atomic_t initialized;
 } ts_hedger = { .initialized = ATOMIC_INIT(0) };
 
@@ -126,8 +125,7 @@ static struct {
 static inline archul_t ts_hedged_read(size_t logical_idx)
 {
     archul_t val = ~0ULL;
-    unsigned long best_latency = ~0UL;
-    u64 t0, t1;
+    u64 best_latency = ~0ULL, t0, t1;
 
     preempt_disable();   // critical for low jitter in kernel
 
@@ -174,12 +172,6 @@ static inline int ts_hedger_init(void)
         ts_hedger.replicas[i] = (archul_t*)(base + i * TS_CHANNEL_OFFSET);
     }
 
-    /* Core pinning suggestion - adjust to your isolated cores */
-    ts_hedger.cores[0] = 11;
-    ts_hedger.cores[1] = 12;
-    ts_hedger.cores[2] = 13;
-    ts_hedger.cores[3] = 14;
-
     atomic_set(&ts_hedger.initialized, 1);
     pr_info("uChaos: TailSlayer hedged reader initialized (N=%d)\n", TS_N_REPLICAS);
     return 0;
@@ -195,30 +187,29 @@ static inline void ts_hedger_free(void)
 }
 
 /* ================================================================
- * Original uChaos code with hedged integration
+ * Original uChaos code w/ hedged, 64-bit scalar, tight hot loop
  * ================================================================ */
 
 static archul_t *kbuf = NULL;
 
 static atomic_t loop_failure = ATOMIC_INIT(0);
 
-static inline archul_t rotlbit(archul_t n, u8 c) {
+[[gnu::always_inline]] static inline archul_t rotlbit(archul_t n, u8 c) {
     c &= ABX; return (n << c) | (n >> ((-c) & ABX));
 }
 
-static inline archul_t knuthmx(archul_t iw) {
-    register archul_t w = iw;
+[[gnu::always_inline]] static inline archul_t knuthmx(archul_t iw) {
+    archul_t w = iw;
     w  = rotlbit(w, getprmx16(w));
-    w *= (w & 1) ? 0x9E3779B9 : 0x045d9f3b;
+    w *= (w & 1) ? 0x9E3779B9ULL : 0x045d9f3bULL;
     w ^= rotlbit(w, (w & 2) ? rot1 : rot2);
     return w;
 }
 
-static inline archul_t murmux3(archul_t ks, archul_t p)
-{
-    register archul_t z = ks;
+[[gnu::always_inline]] static inline archul_t murmux3(archul_t ks, archul_t p) {
+    archul_t z = ks;
     z =  p ^ ((z >> (ABx-2)) * murmul1);
-    z = (z ^ ( z <<  ABx  )) * murmux2;
+    z = (z ^ ( z <<  ABx  )) * murmul2;
     z =  z ^ ( z >> (ABx+2));
     return z;
 }
@@ -226,17 +217,18 @@ static inline archul_t murmux3(archul_t ks, archul_t p)
 static archul_t djb2tum(archul_t seed, size_t num)
 {
     static unsigned long failure_jiff = 0;
-    static archul_t dmx = 0, dmn = -1, mavg = 0, ohs = HASHSEED;
+    static archul_t dmx = 0, dmn = -1ULL, mavg = 0, ohs = HASHSEED;
 
 #ifdef _PROVIDE_STATS
     static u64 nexp = 0, evnt = 0, ncl = 0, tcyl = 0, nhsh = 0;
     static archul_t avg = 0, jmn = -1, jmx = 0;
 #endif
 
-    volatile int i, j = 0;
-    register archul_t ent = 0, hsh = ohs;
+    volatile int j = 0;                     // only for reschedule guard
+    archul_t ent = 0, hsh = ohs;
     archul_t tns, dlt, dff, ons = 0;
     u8 b0, b1, excp = 0;
+    int i;
 
 #ifdef _CHK_LOOP_FAIL
     if (atomic_read(&loop_failure)) {
@@ -254,6 +246,7 @@ static archul_t djb2tum(archul_t seed, size_t num)
         hsh = knuthmx(hsh ^ ons);
     }
 
+    /* === TIGHT HOT LOOP (64-bit scalar) === */
     for (i = 0; i < num; i++) {
         if (ent && hsh) ent ^= rotlbit(ent, getprmx16(hsh));
 
@@ -276,7 +269,7 @@ reschedule:
             ons = tns;
         } while (dtskew(dlt));
 
-        if (dmn == -1) { dmn = dlt; goto reschedule; }
+        if (dmn == -1ULL) { dmn = dlt; goto reschedule; }
 
         if (dlt < dmn) {
             dff = dmn - dlt; dmn = dlt;
@@ -317,7 +310,10 @@ enforcedquit:
     return hsh;
 }
 
-/* Modified fill function using hedged reads where possible */
+/* ================================================================
+ * Fill function (uses hedging opportunistically)
+ * ================================================================ */
+
 static inline ssize_t _unprotected_interuptible_kbuf_fill(size_t len)
 {
     archul_t *p = __builtin_assume_aligned(kbuf, 8);
