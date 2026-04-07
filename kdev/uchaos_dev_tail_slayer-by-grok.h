@@ -44,10 +44,10 @@
  * chunk size to read. This note has been written by code and README reading, only.
  *
  * About uchaos: it is interesting to note that in the best case this tail-slayer
- * can kill latency tails from 2uS to 10ns but cannot prevent the scheduler jittering
+ * can kill tails jittering from 2uS to 10nS but cannot prevent the scheduler jittering
  * while uChaos is able to operate also with 2+3 bits of entropy. In which the 3 are
- * those fundamental and 2^8 is still granted even cutting down the random access time,
- * all of them. Which is hard to believe could happen in a production machine, anyway.
+ * those fundamental and they are still granted even cutting down the random access time,
+ * even all of them. Which is hard to believe could happen in a production machine, anyway.
  *
  * CODEBASE WARNING
  *
