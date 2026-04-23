@@ -1,6 +1,6 @@
 ## uchaosys.qemu
 
-This folder contains a binary copy of the embedded system (**v0.6.3**: bzImage and qemu, **v0.7.0**: initramfs w/ uchaos .ko & kit) provided by sources and compilation recipes available in this project:
+This folder contains a binary copy of the embedded system (bzImage **v0.6.3** + glib-musl static elf64 uqemu **v0.6.6** + initramfs w/ uchaos .ko & kit **v0.7.0**) provided by sources and compilation recipes available in this project:
 
 - [github.com/robang74/uchaosys](https://github.com/robang74/uchaosys/tree/v063)
 
