@@ -1,6 +1,6 @@
 ## uchaosys.qemu
 
-This folder contains a binary copy of the embedded system v0.6.3 provided by sources and compilation recipes available in this project:
+This folder contains a binary copy of the embedded system (**v0.6.3**: bzImage and qemu, **v0.7.0**: initramfs w/ uchaos .ko & kit) provided by sources and compilation recipes available in this project:
 
 - [github.com/robang74/uchaosys](https://github.com/robang74/uchaosys/tree/v063)
 
@@ -13,11 +13,15 @@ Considering that the system footprint is below 2MB, offering a binary sample mak
 ```sh
 tar xvzf u*-roms.tgz
 sh start.sh -q -m 32
+
+sh uckaos.gz.sh 128 | ent
 ```
 
 The `uqemu` system emulator, here provided, supports `microvm` and `q35` machines, the `tgc` (sw) and the `kvm` (hw) acceleration, as long as the kernel module for `kvm` support and userland access privileges are granted, obviously.
 
 It is a "frankestain" glibc-musl elf64 static binary which has **not** been extensively tested and it was designed for embedded systems in mind, not desktops. However, it passed the self-contained self-hosted test which can be considered the ultimate health check in terms of a self-sufficient static binary: it works also for the embedded systems for which it has been designed for.
+
+**Warning**: the uchaosys v0.7.0 correctly includes the uchaos_dev.ko v0.6.5, despite the two version seems similar they are indipendent. While `ent` is a pseudorandom number sequence test provided by 3rd party, as well as the PractRand suite.
 
 ### License
 
