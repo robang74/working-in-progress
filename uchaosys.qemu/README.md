@@ -11,10 +11,15 @@ Considering that the system footprint is below 2MB, offering a binary sample mak
 ### Quick start
 
 ```sh
-tar xvzf u*-roms.tgz
-sh start.sh -q -m 32
+sh start.sh -qm 32
 
-sh uckaos.gz.sh 128 | ent
+sh uckaos.gz.sh 128  | ent
+sh umkaos32.gz.sh 18 | ent
+
+sh uckaos.gz.sh $((128 << 10)) |
+  sh practrand_rng_test.gz.sh stdin64
+sh umkaos32.gz.sh 28 |
+  sh practrand_rng_test.gz.sh stdin64
 ```
 
 The `uqemu` system emulator, here provided, supports `microvm` and `q35` machines, the `tgc` (sw) and the `kvm` (hw) acceleration, as long as the kernel module for `kvm` support and userland access privileges are granted, obviously.
