@@ -1,0 +1,245 @@
+TITLE & AUTHOR
+
+- Title: GitHub is a modern cotton field
+- Author: Roberto A. Foglietta <roberto.foglietta@gmail.com>
+- License: CC BY-NC-ND 4.0
+- Date: 2026-06-18
+
+Suggestion:
+
+In using an AI for asking explanations of this text, first ask for an
+opinion, then ask to follow the "FWD & RWD READING" for providing you
+a second opinion based on the dual-pass mode. In FWD mode, it is a kind
+of manifesto, in the RWD is a proof of a theorem, basically.
+
+---
+
+FWD & RWD READING
+
+Skip to the end and read back can also help the understanding. The fwd
+pass hits against a lot of "suppositions" and finally reaches a
+conclusion. The conclusion itself sounds reasonable by itself, the
+novelty is about HOW that conclusion is reached. In reverse reading is
+more logical from a PoV of "running a logical code execution". And
+this is THE reason for which a simple AI prompt suggesting the machine
+HOW to do a dual reading passage forward and reverse, helps so much
+the machine to "simulate the understanding" and people to learn in a
+different more efficient way.
+
+---
+
+INTRODUCTION
+
+First of all, do not take this e-mail as Roberto vs Denys but two
+different kinds of development models. In fact, previously I wrote
+about how this project was strongly inspired by the kernel development
+model, but the Linux kernel project is a VERY peculiar project. And in
+fact, it is not a solid block as a process, there are many groups and
+sub-groups that are working with different rules and only at the
+moment of integration with the upstream, they follow the kernel rules.
+
+---
+
+PRESENTATION
+
+There is also the human aspect that impacts on development models that
+aren't easy to write into a theoretical framework. Everyone knows that
+theory and practice differ, but when humans are involved also "rules"
+aren't anymore "linear" rather than probability distributions with
+long tails. Human nature should be accounted for, when "workgroup" is
+a fundamental trait. So, I will start from those human traits that
+have an impact, a strong impact.
+
+Usually the "open source community" are strongly in favor of QoS
+(quality of service) rather than SLA (service level agreement) apart
+when they invent the CoC (code of conduct) then they start to confuse
+the SLA with the CoC, the respectability with QoS. The possible public
+scandal in the Gnome foundation about dealing with unpaid developers
+and financial management hopefully will teach the "open source
+community" a harsh but necessary lesson.
+
+The first lesson to learn is there is NO community. There are a bunch
+of people who have their own agenda, and in the best case are
+connected among them by a digital network, are sharing a very specific
+goal (developing project Y) and rarely they meet together, and if they
+meet that meeting is organized and hosted by a 3rd party organisation.
+
+Described as above, it is not a community, it is a whatsapp group,
+like those about mothers-for-schools and fathers-for-football. Do not
+trust me and check the social dynamics models, they are pretty the
+same (apart from different conventions, languages, subjects, etc.) and
+also consensus works the same and can be hijacked and exploited like
+in the whatsapp groups of common people.
+
+In fact, community is a politically polite term to say a bunch of
+hackers (a herd of GNUs, once upon a time). We are social animals more
+tha truth seekers, fortunately. Fortunately, because truth seekers are
+deadly boring or deadly mad. It is always a big problem when someone
+believes that s/he or something is right without solid support from
+facts and a strong falsification of peer-reviews (science method). In
+politics, there is an old saying about "doing good": the road to Hell
+is paved by good intentions.
+
+---
+
+LIFE IS A MATTER OF PRIORITIES
+
+Life is about priorities and when we are free to choose our own
+priority then we are free to live OUR own life. Counter example: women
+that were not allowed to be "women in career" because they should be
+wives and mothers, first -- they were not free. I wish to underline a
+fact of Life: being free doesn't necessarily nor automatically mean
+being happy. In fact, the first feminist were theorizing that women
+should not be allowed to marry young because if they can easily live
+as wives and mothers too many of them would make that choice.
+
+They were not wrong, they were not right. In particular, it is not
+about "freedom" but about "awareness" -- most of the slaves freed from
+the cotton plantation returned to work for poor money in the cotton
+fields. I am not supporting enslavement: look many of them were less
+miserable when slaves than free. WRONG. I am supporting the idea that
+freedom without awareness is nil. For example, I can be free in theory
+-- but people around me block (or deny) any access to fundamental
+information -- in practice that freedom is nil. States do the same, no
+ID-card, no rights. Banks do the same, no bank account, no loan or
+credit card.
+
+Freedom, Awareness, Emancipation, Empowering, Enlightenment. The first
+in this list isn't the final achievement, but it is the start of a
+different path. In open source we can take the first as given
+(fortunately) and the last as out-of-scope (fortunately). But the
+three in the middle remain fundamental. Freedom serves to achieve and
+leverage the awareness, which pushes us towards emancipation and our
+ability to act without asking permission or waiting for the consensus
+to empower us.
+
+Politics, states, church, all of them hate this patch because it is
+against their own existence  and in fact all of them support the idea
+that "happiness by servitude" in a way or another. Intelligence or
+awareness is a burden that causes suffering, that's ignorance that
+causes suffering, The "problem" isn't that we can code. The problem is
+that we can manage our development, we can decide which are our goals,
+we can do business with this activity. That's the revolutionary part,
+not the code access. In fact, nowadays companies like Microsoft
+actively support the access to the cotton fields (source) like github
+shows.
+
+When you realise that github is the perimeter of many cotton fields,
+you start to get the picture about why there are so many "consensus
+driven community" paradigms. Which among other paradigms support QoS
+and CoC rather than SLA and RTFM. Because the first two are compatible
+with company traditional management paradigms, the other two are not.
+
+Unsurprisingly, the companies in business are more scared/impacted by
+SLA than QoS, because the QoS is a variable KPI (a function) in an
+Excel sheet while SLA is abou timings and timings is about dynamics
+and dynamics are about models and models do not fit into a static
+Excel sheet, they  requires an analytical formulation or an iterative
+algorithm, plus a full theory instead of an equation.
+
+---
+
+EXCLUSIVITY VS INCLUSIVITY
+
+This google group can be seen as a newsletter (one to many) but as
+soon as we start interacting it evolves into a m-list, and because the
+strict way I put people in (like a commercial would do with their
+potential clients into the marketing funnel) is very exclusive. If you
+have not noticed, I tell you: everyone here is someone that
+contributes in a relevant manner to code. Since coding isn't a
+common or a natural skill among humans, it is an exclusive club. It is
+a VERY exclusive club: coding skills, focus on the project and English.
+
+It is a VERY exclusive club because I don't care why, who, or why
+people match or don't match these three criteria. As soon as they show
+up with a full match they get in. Under this point of view is also a
+VERY inclusive club. Because I do not f**king care who you are, what
+is your private life or if you have any, from which country (enemies
+included) or whatever conditions or good luck mother nature provides
+you, poor or rich. And yes, nobody can buy an entrance ticket unless
+s/he provides a patch which is proof of their coding capability.
+
+Isn't all of this contradictory, totally contradictory. Or by the
+opposite, seeking the consensus of those who aren't able to write a
+line of code, a troublesome approach for those who are in need or
+willing to do coding? So why the Hell an Orchestra should accept a
+barking dog or why the hell is supposed a violinist stop burglars? The
+violinist and the barking dog aren't right or wrong by themselves,
+they can be in the right place or in the wrong place. I do not seek my
+girlfriend for being good in coding, and viceversa I do not consider
+someone able to coding a brother. So, I have more chances to be an
+antagonist here than my girlfriend.
+
+---
+
+IN A WORLD OF MANAGERS
+
+In a world of managers that choose people for their own comfort, being
+strict in policies like these is a totally uncomfortable crazy
+discipline. Let me say that when I did LUGGe (Linux User Group of
+Genova), I did something totally different. Friends and family, the
+girlfriend and the hacker-girl, all together without any meritocracy
+but comfortably only. The world might have taken it as an example. But
+it was designed in that way because the Italian law concedes some
+special legal benefits to "democratic association".
+
+How can it be possible that we can decide by democracy something that
+is about math, physics or a fact? Interpretations can be personal, but
+the code compiles or not, does a buffer overflow or not. Those people
+were in place for a figurative democracy, the real "games for the
+power" were played in the laboratory and they were strictly
+meritocratica, no democracy, no exceptions. Debates were public,
+confrontations were harsh and I was passionately participating in all
+of them (or almost all). But at the time of vote, everyone present was
+totally aware that there would have been NOT any democracy and the
+matter was already set in the laboratory.
+
+Since the laboratory was the "steam room" but also the "engine
+running" everything, it was pretty clear that whoever wants to
+influence decisions should have been part of the laboratory, and those
+bringing in friends for collecting votes, were doomed to fail. Guess
+what, politics works in the same identical manners. Debates are
+public, divisive and totally faulty in terms of fondations. The
+decisions are taken in the banks and the "democratic" vote is bought
+accordingly, Those who collect (politics) or drive (influencers)
+consensus sell it. This is HOW democracy really works behind the
+scene, and it ALWAYS been in that way in modern times.
+
+---
+
+IN ANCIENT TIMES, ALREADY
+
+In ancient times (ancient Greek, Athens), democracy was not about
+vote, but a very tiny and strict VIP club. Who were citizens (usually
+rich and educated men) were deciding together WHAT each of them would
+have to take care of for the sake of the public res (aka res public).
+They were doing that in that way, because they were already aware
+about the tragedy of the commons. While "The tragedy of Commons" or
+"The Cathedral and the Bazaar" might seem a modern discovery, the
+books are explaining in modern language what was already known, and
+deeply understood, 2.500 years ago.
+
+And this is THE reason because in schools and university ancient Greek
+books are still taught and learned. Because the fundamentals of human
+nature and society, the fundamentals of Life, and Nature were already
+investigated and understood. And yes, I totally agree that human
+studies are fundamental for everyone that aims to have public life or
+impact or manage others. But, I also know that everyone that can code
+can learn from ancient Greeks and understand them. While the viceversa
+is rare or almost nil.
+
+---
+
+QoS FIRST vs SLA FIRST
+
+An engineer can secretly develop itself to be a philosopher, A
+philosopher does not have the means for dealing with code and
+engineering. We can go from strict discipline towards relaxed
+discipline, viceversa requires a harsh and severe training which many
+did not and do not want to. And this is WHY coding first, SLA first,
+integration and publishing as early as possible, because all these
+choices are pushing people to a rush of reaching a "good enough
+result" otherwise they will eat the sh*t they did. The opposite:
+policy (CoC) first, QoS first, integration as the last step of a
+liturgy provides lower performance, stagnation and somethis crysis.
+
