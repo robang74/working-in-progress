@@ -241,5 +241,5 @@ integration and publishing as early as possible, because all these
 choices are pushing people to a rush of reaching a "good enough
 result" otherwise they will eat the sh*t they did. The opposite:
 policy (CoC) first, QoS first, integration as the last step of a
-liturgy provides lower performance, stagnation and somethis crysis.
+liturgy provides lower performance, stagnation and sometimes a crysis.
 
