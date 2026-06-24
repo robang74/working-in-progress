@@ -1,4 +1,5 @@
 564b618f8ff427f8ebd3291336508537d3d79ba4  bzImage
+8dd849bd2ca99d189450076be413ac4274a2f9d9  gzcmd.gz.sh
 5508d020a287a2134a47126917d22628c045ea6e  initramfs.cpio.gz
 ef093d842ff0989ae2f691995f10ecd218d66a20  practrand_rng_test.gz.sh
 d43c5745d94676a079d726c0d0c4ad2bec3d66c9  start.sh
@@ -6,4 +7,4 @@ f93a2564db6921f1f895bdda1048cff59ea8262e  uckaos.gz.sh
 643d738fbaf7270e78eeea5619c7ae48eba4cf4e  umkaos32.gz.sh
 f79e56cd3f006caa2262ac378bb098d126b681fe  uqemu-system-x86_64.gz.sh
 386092d2585940d638635ea865f6e1f5dfd7daa8  uqemu-system-x86_64-roms.tgz
-58faaf710164c4750d45ba17d8507a11ba7d37de  uzpexec
+59b2e18e1783e890949e5b6f1765f699dacbd5cb  uzpexec
