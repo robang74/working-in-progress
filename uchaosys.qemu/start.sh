@@ -10,13 +10,13 @@ rfsimg="initramfs.cpio"
 qemubin="qemu-system-x86_64"
 rundir=$(realpath $(dirname $0))
 
-if [ -r "$rundir/$qemubin.gz.sh" ]; then
+if [ -r "$rundir/$qemubin.uzp" ]; then
   romstgz="$rundir/$qemubin-roms.tgz"
-  qemubin="$qemubin.gz.sh"
+  qemubin="$qemubin.uzp"
   chmod +x "$rundir/$qemubin"
-elif [ -r "$rundir/u$qemubin.gz.sh" ]; then
+elif [ -r "$rundir/u$qemubin.uzp" ]; then
   romstgz="$rundir/u$qemubin-roms.tgz"
-  qemubin="u$qemubin.gz.sh"
+  qemubin="u$qemubin.uzp"
   chmod +x "$rundir/$qemubin"
 else
   romstgz=
