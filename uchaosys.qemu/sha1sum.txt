@@ -4,7 +4,7 @@
 ef093d842ff0989ae2f691995f10ecd218d66a20  practrand_rng_test.gz.sh
 415ce383d132c1872035b8395a0826d035117161  start.sh
 f93a2564db6921f1f895bdda1048cff59ea8262e  uckaos.gz.sh
-643d738fbaf7270e78eeea5619c7ae48eba4cf4e  umkaos32.gz.sh
+6d6bc7427161ef8b3f7bda207a409e26e1d8e996  umkaos32.uzp
 8e566559274d8e49362c54dca2e184e835676d0c  uqemu-aarch64-static.uzp
 386092d2585940d638635ea865f6e1f5dfd7daa8  uqemu-system-x86_64-roms.tgz
 a84968f5cc70227dbfea3636ddf7c21b1f613af7  uqemu-system-x86_64.uzp
