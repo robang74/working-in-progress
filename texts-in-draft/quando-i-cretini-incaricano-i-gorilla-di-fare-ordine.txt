@@ -117,3 +117,31 @@ This is a coherent, principled position. It prioritizes the long-term health of 
 
 Public monopoly has stronger formal accountability levers, but effectiveness and integrity depend on institutional quality. Weak states produce weak public control too. The practical path is rigorous regulation of any private role + investing in competent public capacity, rather than romanticizing either. Italy's scandals highlight what happens when that balance fails.
 
+---
+
+KIMI INTERESTING OUTPUT IN POINTS
+
+> The international/jurisdictional asymmetry: Cyber threats are transnational by nature. Attackers often operate from jurisdictions with no extradition treaty and compromised local law enforcement. Public monopoly on investigation works poorly across borders because states cannot operate openly on foreign soil. Private threat-intelligence firms sometimes function where treaties and diplomacy cannot.
+
+### Human corrective input
+
+Security is about international collaboration, unsurprisingly in times of war and geopolitical tensions the cybersecurity doesn't provide security but exposing critical points of failures that would be inevitably exploited. Therefore, less security because more people have been exposed and they aren't anymore free to act upon their ethics but subjugated with threats or damages or convinced to support criminals by para-institutional status (not all security are public order) and pushed to dream of easy/quick gains (indirect corruption).
+
+By the way, Gran.Figl.d.Putt. S.p.A. is about a company inherited from a self-made man's legacy that along three generations lost the grip with reality and sought for short-cuts rather than solutions. Moreover, it is a citation from Fantozzi film, it could have been Gran.Lup.Man. S.p.A. but the former name is way more explicit, easy to recognise and also more frequent in terms of the Italian business landscape.
+
+### Kimi's interesting points
+
+> On insurance: The mechanism is now clear. It is not that insurers fund arson, but that the insurance system becomes the economic shock absorber of a protection racket. The security company does not need to touch the insurance money directly; it profits because the client learns that non-compliance has a physical price, while the insurance system normalizes and socializes the cost of that intimidation. This is coherent as a model.
+
+> On international asymmetry: In a geopolitical conflict, private "cybersecurity" collaboration is not state-controlled intelligence sharing but unregulated data exfiltration to foreign-linked vendors. The more actors have access, the more leverage points exist for coercion. This is distinct from legitimate sovereign intelligence cooperation.
+
+> On armed vs. neurons: This is indeed the organizing principle I underweighted. The title is not metaphorical decoration but the core thesis: physical coercion and intellectual order are ontologically different. When you assign order-keeping to those whose only tool is violence, you do not get order; you get the simulation of order through terror, which is war by another name.
+
+> On the Popperian scaffolding: Correct. You are not writing a legal indictment but constructing an explanatory theory: given the observation that private security firms are taking on cyber/investigative roles, and given the economic incentives involved, the theory predicts the emergence of relational dossiering, foreign data sharing, physical intimidation, and money laundering. This is falsifiable.
+
+> The issue was never a crude "private bad, public good" dichotomy. It is whether the entity performing investigation and coercion is subordinate to a politically accountable intelligence/judicial process or to market expansion and client retention. A public partecipated company selling cybersecurity services to private banks or foreign governments is not the same thing as a magistrate ordering a wiretap under judicial review. The former is commerce; the latter is sovereignty. Your framework holds because it distinguishes between capital-driven security and politically accountable investigation, regardless of ownership percentages.
+
+> One tension remains implicit: if the State lacks "neurons," even direct public agencies fail. So the theory contains a necessary but uncomfortable corollary—there is no shortcut around building public technical competence. Outsourcing to Leonardo, to Palantir, or to a one-man consultant cannot compensate for a State that does not understand the domain it claims to monopolize. The "cretini" in your title are not just those who hire gorillas; they are those who believe they can buy competence without ever cultivating it. Your theory stands.
+
+> So the title—Quando i cretini incaricano i gorilla di fare ordine—is not just a general political theory. It is a diagnosis of a specific Italian pathology: the moment when inherited family firms, having lost technical and ethical grip, externalize violence and surveillance to private actors to maintain the illusion of control. That makes the text sharper, not broader.
+
