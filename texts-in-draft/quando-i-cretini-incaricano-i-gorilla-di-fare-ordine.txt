@@ -145,3 +145,38 @@ By the way, Gran.Figl.d.Putt. S.p.A. is about a company inherited from a self-ma
 
 > So the title—Quando i cretini incaricano i gorilla di fare ordine—is not just a general political theory. It is a diagnosis of a specific Italian pathology: the moment when inherited family firms, having lost technical and ethical grip, externalize violence and surveillance to private actors to maintain the illusion of control. That makes the text sharper, not broader. The reference lands well for an Italian reader who can easily recognize the sarcasm.
 
+---
+
+GEMINI QUICK PEER-REVIEW
+(of the 3rd updated draft)
+
+Your theoretical framework—diagnosing the degeneration of corporate governance and security into private, para-criminal dossier mills—is conceptually robust, historically grounded, and acutely perceptive. The distinction between formal **legality** and the substantive **principle of Right (*Recht*)**, combined with the razor-sharp diagnosis of assigning "gorillas" (physical coercion) where one needs "neurons" (intellectual order), forms a coherent critique of modern institutional decay.
+
+However, looking closely at what might be **overlooked or underexplored**, a few critical dimensions expand and sharpen your thesis:
+
+### What Might Be Overlooked
+
+#### 1. The State as a Willing Accomplice (Plausible Deniability)
+
+Your model frames private intelligence firms as external corporate parasites usurping state functions due to managerial stupidity. In reality, modern state intelligence and law enforcement agencies often **deliberately cultivate and use private cutouts**.
+
+* **Why?** To bypass constitutional constraints, judicial oversight, and human rights laws.
+
+* When a private firm (like an NSO Group, a Palantir, or local dossier agencies) conducts illegal wiretaps, targeted doxxing, or aggressive data harvesting, it provides the state with **plausible deniability**. The state gets the intelligence without getting its hands legally dirty, creating a symbiotic loop between public intelligence failure and private corporate lawlessness.
+
+#### 2. The Systematic Starvation of Public Competence (Neoliberal Hollowing)
+
+The "cretini" managing these inherited family firms do not operate in a vacuum; they are products of decades of **New Public Management** and neoliberal governance. Public administrations across Europe have been systematically downsized, underfunded, and stripped of technical talent under the ideological banner that "private is always more efficient." When the State itself loses its internal "neurons" through decades of outsourcing, it becomes entirely dependent on private vendors to understand basic technological domains. The incompetence is structural, not just individual.
+
+#### 3. Transnational Infrastructure and Jurisdiction Shopping
+
+Local private security and dossier firms do not operate purely within national borders. They are plugged into global venture capital, offshore financial networks, and multinational surveillance supply chains. When an Italian firm hires a local "gorilla" agency equipped with foreign spyware, the data flows across multiple jurisdictions, making national parliamentary control or judicial remedy almost completely toothless.
+
+### My Opinion
+
+Your analysis hits on a profound structural pathology of late-stage capitalism: **the privatization of the monopoly on legitimate coercion and information gathering.**
+
+When private entities take over the architecture of investigation and surveillance, they replace the public concept of *justice* with the commercial logic of *risk mitigation and leverage*. A magistrate operating under judicial review must weigh public interest, evidence, and civil rights. A corporate dossier mill operating for a panicked board of directors weighs stock price, competitive advantage, and the neutralization of perceived threats.
+
+The ultimate danger you have successfully mapped out is that **this is not a malfunction of the system—it is becoming the system.** When security is commodified, peace becomes a recurring subscription fee, and intimidation becomes an outsourced service backed by insurance markets. Defending the "principle of Right" against this corporate-feudal drift is perhaps the most urgent political and institutional challenge of our time.
+
