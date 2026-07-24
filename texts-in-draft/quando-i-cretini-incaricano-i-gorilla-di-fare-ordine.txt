@@ -2,13 +2,13 @@
 
 Hackers can get very angry when they don’t get their way. That’s what happened in Romania when a crook wiped the country’s entire land registry database after an unsuccessful extortion attempt. Poor cyber hygiene didn't help, either.
 
-~> https://cybernews.com/security/hacker-deletes-romanian-land-registry-database/
+- https://cybernews.com/security/hacker-deletes-romanian-land-registry-database/
 
 2026-03-16 -- Sweden’s digital ID provider CGI Sweden confirms data breach. Hackers claim they’ve cracked a contractor tied to Sweden’s digital ID system, leaking code and credentials that could expose how citizens log in to government services.
 
 Hackers claim they’ve cracked a contractor tied to Sweden’s digital ID system, leaking code and credentials that could expose how citizens log in to government services.
 
-~> https://cybernews.com/security/cgi-sweden-bankid-hack-claims/
+- https://cybernews.com/security/cgi-sweden-bankid-hack-claims/
 
 ---
 
@@ -39,4 +39,81 @@ Perché poi è questo che osserviamo: civili militarizzati, personale armato con
 Aziende capitanate da manager incapaci e raccomandati che non sanno gestire i rischi -- perché se basta la percezione, allora è paranoia/over-reacting non gestione -- vengono sostenuti da aziende para-criminali, spesso finanziati da attività criminali che necessitano di un sistema di lavanderia "sicuro" che non infastidisca ma ingolosisca le banche. Perché speculazioni, o M&A o VC  di "insider" necessariamente devono degradare i modus-operandi per facilitare questo sistema criminale.
 
 Poi intervengono le assicurazioni, perché il prezzo da pagare per chi si ribella a questo modus-operandi è vedere bruciare le loro aziende oppure violate dai ladri o danneggiate da vandali. Perché quando si affida la propria sicurezza a del personale armato di pistole invece che di neuroni, appare ovvio che poi il conflitto di interessi avviene sul piano fisico, non su quello giuridico / negoziale. Per questo parlo di incapacità manageriale, perché bisogna essere dei cretini per affidare la sicurezza giuridica di un'azienda al personale armato. Come chiedere all'esercito di garantire l'ordine pubblico.
+
+---
+
+x/GROK OBJECTIONS AND CONCLUSION
+
+> That said, pure public monopoly isn't a panacea either. 
+
+It is not a panacea but at least is under the democratic control, because people can pressure a government and their Parliament for a public investigation. This democratic control ceases to exist in terms of private business that can suddenly close down and disappear.
+
+> Private expertise fills gaps in fast-moving cyber threats—specialized forensics, OSINT, threat intel.
+
+In fact, I suggested the model in which a private (one man one company) temporarily offers their skills for aid a certain investigation. The single one, isn't at risk of systemic distortion or vanishing. The person per-definition is accountable also at penal level. In fact, lawyers in Italy and probably in all the EU cannot create capital-based profit-driven companies but only an association of professionists in which everyone remains accountable for their own actions.
+
+> Public side limitations: Democratic control is slow, imperfect, and can be captured. Intelligence/law enforcement agencies often operate with secrecy justified by national security—oversight committees exist but can be toothless, politicized, or after-the-fact. 
+
+State intelligence exists, not by yesterday. The systemic / national threats can be addressed or mitigated by those agencies. Again, those agencies are theoretically under the democratic control. Even when the reality shows that the agencies try to avoid the democratic control or even manipulate it, all these actions re-enter into a scenario of power balancing. If the people decide for a turmoil and/or the governance changes like in Hungary, those who were tight to the previous modus-operandi soon face a cut of the budget and a zeroing of their influences. Human systems are NEVER perfect, not even near-perfect but the point is NOT the perfection. The main point is the "principle of the right" (not just the law or the norms, Die Recht) which relates to ethics (which is different from morality). It is about knowing that something is bad not for god's sake but because systematically derives into a loss for everyone.
+
+## x/Grok Conclusion
+
+**Agreed.** 
+
+Cyber threats are real and asymmetric. Hackers (state, criminal, script-kiddie) exploit exactly the poor hygiene you see in Romania/Sweden. Societies need effective response capacity. But weaponizing investigations into blanket surveillance/dossiers on innocents (or "potential threats" based on perception) is corrosive. It chills speech, creates blackmail markets, and delegitimizes institutions.
+
+State intelligence and law enforcement agencies exist precisely for systemic and national-level threats. They are — at least in principle — embedded in a constitutional framework subject to democratic oversight, separation of powers, parliamentary control, judicial review, and periodic electoral accountability. Even when they resist or subvert that control (which they often try), it remains a contest *within* the system of public power. A change in government (Hungary-style or otherwise), a budget cut, a new majority, or a determined reformist minister can reassert direction. That's the logic of sovereign authority residing with the state, not diffused to private actors.
+
+Your distinction between **law/norms** on one hand and the deeper **principle of Right** (diritto, Recht) on the other is important. This is classical territory: the idea that legitimacy derives not merely from formal legality or majority will, but from alignment with a public ethic grounded in observable consequences for the common good. Something is "bad" because it tends to erode trust, concentrate unaccountable power, create permanent factions with private interests in coercion, or undermine the conditions for ordered liberty and prosperity. It's consequentialist in a republican sense: what preserves the res publica over time.
+
+### Realistic view
+
+Human systems are indeed never perfect, nor near-perfect. Public agencies suffer from inertia, mission creep, politicization, and the classic "who watches the watchers" problem. Private actors introduce a different pathology: profit-seeking logic applied to the monopoly on legitimate violence and investigation. Both can deviate. The decisive point is **where the default locus of power sits** and what mechanisms exist to correct course.
+
+- Entrusting core functions (deep investigations, dossiers, access to state databases) primarily to **public institutions** keeps the principal (the polity) in a position to eventually correct abuses through political means.
+- Outsourcing to corporate structures fragments accountability and creates entities whose natural incentive is to expand their own influence and revenue, with easier exit options (dissolution, jurisdiction shopping).
+
+Your earlier proposal for **temporary individual professional experts** under strict public direction fits cleanly here: it augments capacity without ceding institutional power or creating parallel power centers.
+
+### The ethical core
+
+You put it well: the issue isn't chasing perfection but recognizing patterns that reliably produce **net loss for everyone** in the long run. Systematic private dossier mills, even when initially "efficient," tend to:
+- Weaken the state's monopoly on legitimate coercion.
+- Generate conflicts of interest (security sold as a recurring service).
+- Erode public trust when abuses surface.
+- Create insider networks that are harder for democratic politics to dislodge than flawed but visible public agencies.
+
+This doesn't require romanticizing the state. It requires insisting that instruments of public force and investigation remain *public* in character, with all the messy democratic correctives (however imperfect) that entails. Private competence can advise or execute narrowly defined tasks; it should not become the architecture.
+
+This is a coherent, principled position. It prioritizes the long-term health of the political order over short-term operational convenience. In the context of the cyber incidents and doxxing concerns you shared, it explains why the instinctive reaction against delegating investigative powers to profit-driven firms feels like a defense of the "principle of the Right" rather than mere nostalgia or anti-market ideology.
+
+State intelligence and law enforcement agencies exist precisely for systemic and national-level threats. They are — at least in principle — embedded in a constitutional framework subject to democratic oversight, separation of powers, parliamentary control, judicial review, and periodic electoral accountability. Even when they resist or subvert that control (which they often try), it remains a contest *within* the system of public power. A change in government (Hungary-style or otherwise), a budget cut, a new majority, or a determined reformist minister can reassert direction. That's the logic of sovereign authority residing with the state, not diffused to private actors.
+
+Your distinction between **law/norms** on one hand and the deeper **principle of Right** (diritto, Recht) on the other is important. This is classical territory: the idea that legitimacy derives not merely from formal legality or majority will, but from alignment with a public ethic grounded in observable consequences for the common good. Something is "bad" because it tends to erode trust, concentrate unaccountable power, create permanent factions with private interests in coercion, or undermine the conditions for ordered liberty and prosperity. It's consequentialist in a republican sense: what preserves the res publica over time.
+
+### Realistic view
+
+Human systems are indeed never perfect, nor near-perfect. Public agencies suffer from inertia, mission creep, politicization, and the classic "who watches the watchers" problem. Private actors introduce a different pathology: profit-seeking logic applied to the monopoly on legitimate violence and investigation. Both can deviate. The decisive point is **where the default locus of power sits** and what mechanisms exist to correct course.
+
+- Entrusting core functions (deep investigations, dossiers, access to state databases) primarily to **public institutions** keeps the principal (the polity) in a position to eventually correct abuses through political means.
+- Outsourcing to corporate structures fragments accountability and creates entities whose natural incentive is to expand their own influence and revenue, with easier exit options (dissolution, jurisdiction shopping).
+
+Your earlier proposal for **temporary individual professional experts** under strict public direction fits cleanly here: it augments capacity without ceding institutional power or creating parallel power centers.
+
+### The ethical core
+
+You put it well: the issue isn't chasing perfection but recognizing patterns that reliably produce **net loss for everyone** in the long run. Systematic private dossier mills, even when initially "efficient," tend to:
+
+- Weaken the state's monopoly on legitimate coercion.
+- Generate conflicts of interest (security sold as a recurring service).
+- Erode public trust when abuses surface.
+- Create insider networks that are harder for democratic politics to dislodge than flawed but visible public agencies.
+
+This doesn't require romanticizing the state. It requires insisting that instruments of public force and investigation remain *public* in character, with all the messy democratic correctives (however imperfect) that entails. Private competence can advise or execute narrowly defined tasks; it should not become the architecture.
+
+This is a coherent, principled position. It prioritizes the long-term health of the political order over short-term operational convenience. In the context of the cyber incidents and doxxing concerns you shared, it explains why the instinctive reaction against delegating investigative powers to profit-driven firms feels like a defense of the "principle of the Right" rather than mere nostalgia or anti-market ideology.
+
+### In short
+
+Public monopoly has stronger formal accountability levers, but effectiveness and integrity depend on institutional quality. Weak states produce weak public control too. The practical path is rigorous regulation of any private role + investing in competent public capacity, rather than romanticizing either. Italy's scandals highlight what happens when that balance fails.
 
