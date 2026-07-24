@@ -1,0 +1,42 @@
+2026-07-21 - Hacker wipes European country’s entire land registry database, paralyzing real-estate market.
+
+Hackers can get very angry when they don’t get their way. That’s what happened in Romania when a crook wiped the country’s entire land registry database after an unsuccessful extortion attempt. Poor cyber hygiene didn't help, either.
+
+~> https://cybernews.com/security/hacker-deletes-romanian-land-registry-database/
+
+2026-03-16 -- Sweden’s digital ID provider CGI Sweden confirms data breach. Hackers claim they’ve cracked a contractor tied to Sweden’s digital ID system, leaking code and credentials that could expose how citizens log in to government services.
+
+Hackers claim they’ve cracked a contractor tied to Sweden’s digital ID system, leaking code and credentials that could expose how citizens log in to government services.
+
+~> https://cybernews.com/security/cgi-sweden-bankid-hack-claims/
+
+---
+
+IL DOXXING DA STRUMENTO A MINACCIA
+
+In questo articolo si scrive che "il malfattore è stato doxxato" e vorrei chiarire a cosa si riferisce questo termine. Significa creare un dossier su una persona, che è un'attività investigativa MOLTO più vasta di quanto non sia la mera identificazione. Si legge anche che questa attività è stata svolta da una società di cybersicurezza.
+
+Prima di tutto c'è un problema di diritto (dove per diritto intendo qualcosa che viene prima della legge e delle norme) perché che un Pubblico Ministero decida di indagare una persona è funzionale al concetto di diritto ma che lo faccia una società privata la cui stessa esistenza è per produrre profitto (a scopo di lucro) è chiaramente una violazione del diritto e NON fa differenza se dietro c'è il mandato di un Pubblico Ministero. Perché delegare le investigazioni a società private (non ad un singolo consulete che temporaneamente può prestare le sue competenze alle forze dell'ordine) è una forma di deriva del diritto inaccettabile. Non stiamo parlando di privacy dei criminali, stiamo parlando di sicurezza e diritto.
+
+Perché l'identificazione è un concetto ben preciso che pone in correlazione una data persona fisica (agente) ad una data attività (fatto) tramite evidenze. Il doxxing va oltre, significa creare un dossier anche sulle persone che sono funzionalmente o accidentalmente vicine al soggetto, tipo la madre, il padre, il fratello, il fornaio, il medico di base, gli amici, la compagna e quindi non è una profilazione, è una raccolta indiscriminata di dati su persone che con quell'evento non c'entrano nulla.
+
+Ora, penso di non dire una novità, qualsiasi istituzione pubblica o privata non è ermeticamente chiusa, non è invulnerabile da corruzione e non è priva di insider che vendono informazioni che dovrebbero rimanere segrete. Ma sopratutto tali società private hanno un enorme interesse a condizionare le attività del malfattore tramite le persone a lui vicine per -- ad esempio -- fare speculazioni in borsa, magari tramite un banca, e paradossalmente mantenere il malfattore indenne dall'azione penale.
+
+Curiosamente, si può fare anche con una persona innocente, basta che una persona sia sufficientemete preparata per costituire una minaccia teorica o legale alla Gran Figl.d.Putt. S.p.A. che improvvisamente è il consulente esperto anche di sicurezza che si trova ad essere dossierato. Non perché sia un criminale, ma semplicemente perché ha scoperto cose che generano ansia nel management.
+
+Non serve nemmeno una pericolosità effettiva o pontenziale. É sufficiente la percezione. Un politico o un manager che percepiscono un pericolo "agiscono" immediatamente per mitigare quel pericolo, ma non lo fanno con un approccio manageriale propriamente detto (che sarebbe fallimentare stante il fatto che sono delle mezze seghe, o del tutto seghe) lo fanno tramite società di dossieraggio che si spacciano per società di cybersicurezza e che invece sono delle aziende di para-criminali.
+
+---
+
+IL DOXXING DA STRUMENTO A MINACCIA, P.#2
+
+Volete sapere qual'è la cosa più "divertente" di tutta questa faccenda? Non è la natura dell'azione o la composizione societaria ma la natura del personale. In pratica, le società che fanno guardianaggio alle aziende, quindi si occpano della sicurezza del perimetro fisico, e che in passato venivano usato anche per il dossieraggio del middle-management, attravero il loro personale assunto per il guardianaggio armato quindi con clearence di sicurezza e la passiano per lo "smanettamento" unito ad un diploma ITIS come esperti di cibersicurezza.
+
+Ovviamente questa gente non capisce una cippa e compra i servizi e i software da società affatto neutrali che esse si chiamanino Paragon o Palantir non cambia il concetto: significa che chi fa dossieraggio paga la sua incompetenza con la condivisione dei dati raccolti con società che sono istituzionalmente collegate con paesi esteri, spesso e volentieri, in guerra con altri stati e prive di una legislazione che tuteli almeno i diritti umani fondamentali. Insomma, come già pre-annunciato, sono società para-criminali, dove il prefisso para- non è un diminutivo o un vezzeggiativo ma un'aggravante perché è lo stato di diritto che si fa stato criminale.
+
+Perché poi è questo che osserviamo: civili militarizzati, personale armato con la cognizione e capacità operativa di un netturbino che esegue ordini mentre indossa una divisa di un'azienda di guardianaggio e che spesso affidano carte prepagate intestate a prestanomi a commercianti consenzienti in cui tramite vari giri di lavanderia fanno convergere il denaro illecitamente sottratto mediante falsi contratti alle aziende di cui dovrebbero difendere il perimetro fisico. Perché è questo che stiamo osservando e lo stiamo osservando come un'attività organizzata e di natura sistemica dal 2015.
+
+Aziende capitanate da manager incapaci e raccomandati che non sanno gestire i rischi -- perché se basta la percezione, allora è paranoia/over-reacting non gestione -- vengono sostenuti da aziende para-criminali, spesso finanziati da attività criminali che necessitano di un sistema di lavanderia "sicuro" che non infastidisca ma ingolosisca le banche. Perché speculazioni, o M&A o VC  di "insider" necessariamente devono degradare i modus-operandi per facilitare questo sistema criminale.
+
+Poi intervengono le assicurazioni, perché il prezzo da pagare per chi si ribella a questo modus-operandi è vedere bruciare le loro aziende oppure violate dai ladri o danneggiate da vandali. Perché quando si affida la propria sicurezza a del personale armato di pistole invece che di neuroni, appare ovvio che poi il conflitto di interessi avviene sul piano fisico, non su quello giuridico / negoziale. Per questo parlo di incapacità manageriale, perché bisogna essere dei cretini per affidare la sicurezza giuridica di un'azienda al personale armato. Come chiedere all'esercito di garantire l'ordine pubblico.
+
