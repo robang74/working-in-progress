@@ -13,15 +13,15 @@ Considering that the system footprint is below 2MB, offering a binary sample mak
 ```sh
 sh start.sh -qm 32
 
-sh uckaos.gz.sh 128  | ent
+sh uckaos.uzp 128  | ent
 sh umkaos32.gz.sh 18 | ent
 
-sh uckaos.gz.sh $((128 << 6)) |
+sh uckaos.uzp $((128 << 6)) |
   dd bs=1M of=/dev/null status=progress
 sh umkaos32.gz.sh 24 |
   dd bs=1M of=/dev/null status=progress
 
-sh uckaos.gz.sh $((128 << 10)) |
+sh uckaos.uzp $((128 << 10)) |
   sh practrand_rng_test.uzp stdin64
 sh umkaos32.gz.sh 28 |
   sh practrand_rng_test.uzp stdin64

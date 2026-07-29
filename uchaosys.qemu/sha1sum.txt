@@ -3,7 +3,7 @@
 5508d020a287a2134a47126917d22628c045ea6e  initramfs.cpio.gz
 bfdf3ee61ba6b3bc49cd1c8f9e6f4de16b529d37  practrand_rng_test.uzp
 415ce383d132c1872035b8395a0826d035117161  start.sh
-f93a2564db6921f1f895bdda1048cff59ea8262e  uckaos.gz.sh
+cc6724da2bb43c07f1ac3c8e3f5aa8d7a5b22ba6  uckaos.uzp
 fe379729a03a465bce948ce76daa5c4169abe22a  umkaos32.uzp
 90cbadf202d6276ab07a2db67b7f9340430238b0  uqemu-aarch64-static.uzp
 386092d2585940d638635ea865f6e1f5dfd7daa8  uqemu-system-x86_64-roms.tgz
