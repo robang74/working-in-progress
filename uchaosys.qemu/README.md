@@ -22,9 +22,9 @@ sh umkaos32.gz.sh 24 |
   dd bs=1M of=/dev/null status=progress
 
 sh uckaos.gz.sh $((128 << 10)) |
-  sh practrand_rng_test.gz.sh stdin64
+  sh practrand_rng_test.uzp stdin64
 sh umkaos32.gz.sh 28 |
-  sh practrand_rng_test.gz.sh stdin64
+  sh practrand_rng_test.uzp stdin64
 ```
 
 The `uqemu` system emulator, here provided, supports `microvm` and `q35` machines, the `tgc` (sw) and the `kvm` (hw) acceleration, as long as the kernel module for `kvm` support and userland access privileges are granted, obviously.
