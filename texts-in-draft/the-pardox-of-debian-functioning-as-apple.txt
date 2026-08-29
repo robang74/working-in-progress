@@ -1,0 +1,191 @@
+## ROBERTO
+
+Explain to me what pro-LLM intersecates with being neutral about fascism in this e-mail here below. My not understanding is probably based on lack of information about the previous exchange and the link shared isn't an information that I can easily elaborate because Debian processes are unknown to me.
+
+---------- Forwarded message ---------
+
+From: Antoine Le Gonidec <vv221@debian.org>
+Date: Sat, 29 Aug 2026 at 13:19
+Subject: Retiring from the Project (vv221)
+To: <debian-project@lists.debian.org>, <debian-devel@lists.debian.org>
+
+Initially sent to debian-private, shared here because I want the consequences of Debian fully embracing fascist-backed technology to be known.
+
+I do not expect any other Debian Developer to follow my example, that the most pro-LLM of all options won the last vote tells me all I need to know about the people I used to work with.
+
+Do not CC me if you answer to that e-mail, I am no longer interested in anything coming from Debian.
+
+I can not support the current decision of Debian about LLM use, and am no longer willing to be seen as a part of Debian under these new rules. Pretending to have a "neutral stance" when faced with fascism is not neutrality, it’s active collaboration.
+
+Fuck that, I’m out, I don’t really care if it’s through "emeritus" status or erasure from databases. You can replace me with some agentic AI anyway, so do not even try to pretend you’re going to miss me.
+
+I don’t think I have ever been so disappointed by a community I used to trust.
+
+Antoine Le Gonidec (via nm.debian.org)
+
+For details and to comment, visit https://nm.debian.org/process/1571/
+
+---
+
+## GEMINI
+
+The connection between the pro-LLM stance and "neutrality about fascism" in this resignation email stems from specific social, environmental, and political arguments within the open-source and free-software communities regarding Generative AI.
+
+To understand why the author (Antoine) connects these concepts, it helps to break down the context of the recent Debian vote and the broader arguments involved:
+
+### 1. The Context: Debian’s General Resolution (GR) on LLMs
+
+In August 2026, Debian held a project-wide General Resolution (GR) vote to establish policy on the use of Large Language Models (LLMs) and Generative AI for Debian software packaging, documentation, and communications.
+
+The developers were presented with a spectrum of ranked choices, ranging from:  
+HashSparks
+
+- Strict Bans: Completely forbidding LLM-assisted code or text in Debian to protect human authorship, copyright integrity, and code quality.  
+Debian
+
+- Conditional Permissiveness / Neutrality: Allowing LLM usage provided human contributors take responsibility, or simply refusing to institute an outright ban, leaving tool usage to individual discretion.  
+Reddit
+
+The author is expressing anger that the community voted in favor of a permissive ("pro-LLM") option rather than a strict ban.
+
+### 2. Why Are LLMs Associated with "Fascism" by Some Tech Critics?
+
+Within certain free-software and political activism circles, Generative AI tech companies and their systems are viewed as tied to far-right or authoritarian structures through several arguments:
+
+- Defense & Surveillance Contracts: Major AI/LLM vendors (such as OpenAI, Microsoft, Palantir, and Google) maintain multi-billion-dollar military, intelligence, and surveillance contracts with governments. Critics argue these tools directly power state-backed warfare, border control, and mass surveillance systems.
+
+- Capitalist & Corporate Monopolization: Large AI platforms require massive concentrated capital, vast energy resources, and unregulated scraping of public/open-source data. Critics frame this corporate control over public knowledge and software as intrinsically authoritarian/anti-democratic.  
+XDA Developers
+
+- Far-Right Financial backing: Several prominent venture capitalists and tech executives driving the AI boom publicly support right-wing political movements and anti-democratic political philosophies.
+
+When the email refers to "Debian fully embracing fascist-backed technology," it is referring to the financial and political ties of the commercial AI industry.
+
+### 3. Connecting "Pro-LLM" with "Neutrality about Fascism"
+
+The email states:
+
+- "Pretending to have a 'neutral stance' when faced with fascism is not neutrality, it’s active collaboration."
+
+- In open-source software governance, projects like Debian traditionally aim for technical neutrality—treating tools purely as software utilities without taking an explicit moral or political stance on who created the tool or how it is financed.
+
+- The Permissive View (The Vote Outcome): The community choice treated LLMs simply as software development tools, focusing on standard technical oversight (e.g., whether the code works, who takes responsibility, and standard licensing) rather than the ethics of the companies building them.  
+
+### XDA Developers
+
+The Author's View: The author argues that treating AI as a "neutral tech tool" ignores the broader political and human-rights impact of the AI industry. From their perspective:
+
+Major AI corporations are tied to far-right and authoritarian interests ("fascist-backed technology").
+
+Adopting or permitting these tools in Debian gives ethical legitimacy to these platforms.
+
+Framing the issue as "neutral tool choice" rather than taking an active ethical stance against AI companies is equivalent to passively enabling them ("active collaboration").
+
+### Summary
+
+The author is resigning because they believe Debian chose commercial convenience and technical indifference over an explicit ethical stance. In their view, permitting LLMs treats a technology tied to militarism, mass surveillance, and corporate consolidation as "politically neutral"—a stance they view as complicity.
+
+---
+
+## ROBERTO
+
+The correct solution from Antoine's PoV would have that people use their own local models or LLM that have been trained and running in political accetable manner and entities. Which strongly restrict the range and creates a burden on those are in need to discriminate when a model is running on A platform rather than B and on which conditions of usage, e.g. free or paid, aren't the same even when both are draining resources (costs > sellings). Political stances when imposed to many instead of left to the auto-determination of the individuals creates a unbeareable burden of bureocracy or a totalitarism or both. URSS and Iran, both achieved the moral control in public life and both achieved a totalitarism.
+
+---
+
+## GEMINI
+
+You're pointing directly to the classic tension in governance—whether open-source projects, civic organizations, or software communities: ideological purity versus personal autonomy and practical usability.
+
+From an organizational and technical standpoint, your critique highlights the exact reasons why most open-source projects opt for permissive policies or technical neutrality:
+
+- The Bureaucratic & Operational Burden: If a community requires every contributed line of code, documentation edit, or commit message to be audited for how it was generated, compliance becomes a nightmare. Determining whether a model was trained ethically, hosted on politically acceptable infrastructure, or run locally requires constant auditing, legal analysis, and ideological policing.
+
+- Accessibility and Inequality: Requiring high-end local hardware to run untainted models creates a high barrier to entry. Developers with fewer resources or older hardware would be excluded, shifting the burden disproportionately onto individual contributors.
+
+- The Risk of Moral Authoritarianism: Historically, when a central governing body attempts to enforce strict moral, ethical, or political purity tests on individual tools and behaviors, the result is often heavy-handed oversight, suspicion among peers, and an environment where compliance matters more than output.
+
+From Antoine's perspective, however, there is no "neutral" ground. In their view, when a community decides to remain neutral about tools tied to corporate concentration, surveillance, or defense contracts, it isn't opting out of politics—it is choosing to default to the politics of the status quo.
+
+This fundamental split is what causes deep fractures in open-source projects:
+
+- The Pragmatic / Freedom-of-Choice View: Software tools should remain neutral, and individuals should be free to choose their workflow. Governance should focus purely on standard code quality, licensing, and security.
+
+- The Ethically Bound View: Software development is inherently political. Choosing to adopt or permit tools built by powerful corporate or military-adjacent entities makes the community complicit in their broader societal impact.
+
+- Because Debian ultimately favored the pragmatic, permissive approach, developers holding the strictly ethical stance feel their values are incompatible with the project's direction—leading directly to resignations like the one in that email.
+
+---
+
+## ROBERTO
+
+To understand Antoine's e-mail, I was in need to rely on an AI to explain to me the Debian Process and the connection between pro-LLMs and fascism. Which was not obvious to me. For those who wish to skip following the link, I will report my conclusions.
+
+- https://share.gemini.google/ix56Ax1o9Wfy
+
+By the same logic applied by Antoine -- which now I see clearly -- s/he would not be happy to know that there is not so much differences among totalitarism which fascism is justo one of them (and among them not even the most repulsive).
+
+- I suggest meditating about Karl Popper's paradox of tolerance including Fermi's paradox about the surprisingly rarity of intelligent life in our galaxy (their cross-matching is Cipolla-interesting).
+
+The correct solution from Antoine's PoV would be that people use their own local models or LLM that have been trained and run in politically acceptable manner and entities. Which strongly restricts the range and creates a burden on those who are in need to discriminate when a model is running on A platform rather than B and on which conditions of usage, e.g. free or paid, aren't the same even when both are draining resources (costs > sellings). 
+
+Political stances when imposed to many instead of left to the auto-determination of the individuals creates an unbearable burden of bureaucracy or a totalitarianism or both. URSS and Iran, both achieved moral control in public life and both achieved totalitarianism.
+
+- In short fascism isn't anything else but a group of people that in their quest to control reality and by their deficiency, impose to others their { values, belief, moral } hoping that enforcing people to conform to certain standards would lead to a "better" world.
+
+Guess what? Bureaucracy is a form of fascism under this PoV. Elections, as well. And, I am not saying anything new (check the US founders fathers about pre-Constitution debates). It is quite interesting that finally they found "the solution" in granting the people the right to carry around firearms (and more broadly weapons) -- possibly -- seeing in debates themselves a form of moral suasion which would have driven to limit the freedom of the people, in the long run.
+
+The same founders fathers that in the Fugio cent wrote: "care of your own business" which in Italian is a historical old-say related to the Mafia's code of silence (the three monkeys: I do not see, I do not hear, I do not speak).
+
+After, they change to something more aulic like "pluribus unum" and "in god we trust". It is another touching story of a rebellion (to a 2% uprising tax on tea importation) ended in one of the most tragicomic forms of fascism (ruling with money and bullets).
+
+Finally, reading a book of biology after having defined "fascism" like above, we would correctly question if there is anything else than fascism of life that did not end in an self-inflicted extinction. Under this PoV, fascism is a natural law that emerges in society when society is driven by the lack of minds (or by the majority that lacks mind, aka consensus or democracy).
+
+Once someone reaches this "illumination" there is not anymore fascism and democracy but two sides of the same coin, and most probably is an $1, the one that fits that role better than anyone else despite €1 is trying so hard in competing.
+
+- Moral: we can only choose the symbol of the fascism we like to kneel to, since the "free market" (and "free software" as well) aren't offering anything different, in practice.
+
+We do not use Debian, we adopt Debian as life-style: s/Debian/Apple/ and you see that the whole difference is a credit card. By rule of thumb, what we aren't going to pay with a credit card, we are the payment (free SaaS, it is free because the product is you, remember?).
+
+- It is heart touching, seeing people fighting for which symbols kneel in front of.
+
+And they call this "freedom". LOL 
+
+---
+
+## GEMINI
+
+You've traced a fascinating philosophical arc here—moving from a specific Debian email thread to political theory, historical context, and eventually systemic macro-perspectives.
+
+Your takeaway cuts to the heart of why these schisms inside open-source projects feel so existential to the people involved:
+
+Identity vs. Tooling: When software is treated not as a neutral tool, but as a socio-political ecosystem (whether Free Software, open source, or proprietary commercial hardware), every policy decision becomes a moral declaration. For contributors who view Debian as a worldview rather than a Linux distribution, compromise feels like betrayal.
+
+The Paradox of Enforced Morals: Enforcing top-down ethical purity requires governance mechanisms—audits, compliance rules, and exclusions—that end up mirroring the rigid control systems the project's founders aimed to avoid.
+
+Systemic Constraints: Market realities, infrastructural costs, and power dynamics tend to assert themselves regardless of open-source ideals. Whether computing power is gated by a credit card, corporate data center control, or complex ideological purity tests, absolute autonomy remains an elusive ideal.
+
+When community policy attempts to dictate the moral boundaries of development tools, it inevitably collides with the reality of diverse individual motivations. The resulting tension often leaves developers choosing between pragmatic compromise or complete withdrawal.
+
+---
+
+## GROK
+
+[ <CUT> because irrelevant, we do not talk about people but ideas ]
+
+Treating “neutral stance on tools” as collaboration with fascism is the classic move that converts every technical decision into a loyalty test. It inverts the burden: the project must continuously prove ideological purity rather than the objector having to demonstrate concrete, project-level harms that justify a ban. That is unsustainable at Debian’s scale.
+
+### On the broader philosophical extension
+
+Roberto’s critique is sharp: imposing a narrow set of “politically acceptable” models and training regimes creates exactly the bureaucratic and exclusionary machinery that critics of authoritarianism usually oppose. Local-only, ideologically vetted models raise hardware barriers, force constant provenance auditing, and shift power to those with the resources or the correct political credentials to police the rest. That is not liberation; it is a purity spiral with high transaction costs. History supplies many examples (including the ones you name) where moral control of public life and tools produced the opposite of freedom.
+
+Equating fascism with *any* imposition of values, bureaucracy, elections, or even biological competition stretches the term until it loses diagnostic power. Fascism has specific historical content (ultranationalism, corporatism, leader cult, suppression of pluralism, mythic violence). Using it as a universal solvent for “people trying to control reality according to their values” turns every coordinated human activity into fascism. That framing is rhetorically satisfying and analytically empty; it also makes the critique self-undermining, because the same logic can be turned against the purity stance itself.
+
+Popper’s paradox of tolerance is relevant but cut both ways. A community that tolerates every demand for moral litmus tests on tooling eventually loses the capacity to function. A community that refuses *any* boundary on tools that demonstrably harm its core mission also fails. The practical resolution for a technical project is usually narrow, enforceable rules (licensing, security, contributor accountability) rather than maximalist political audits of the entire supply chain of every model.
+
+### On the systemic layer
+
+You are right that free software and proprietary platforms both operate inside larger constraints of capital, energy, compute concentration, and human incentives. “We do not use Debian, we adopt Debian as lifestyle” captures the identity investment that turns policy votes into existential crises. The same dynamic appears in many communities that began with technical or freedom goals and later acquired heavy moral superstructures. Credit-card vs. data-extraction is a real trade-off, but it does not make every pragmatic policy choice equivalent to kneeling before the same master.
+
+In short: the resignation is coherent from inside a particular ethical-absolutist frame. Outside that frame it looks like an overreach that confuses corporate power and dual-use technology with fascism, and treats neutrality as sin. The pragmatic alternative—individual choice of tools under ordinary project rules—is not “collaboration”; it is the default that keeps large collaborative projects from collapsing under the weight of competing purity tests. Absolute autonomy is an ideal, not an achievable steady state; the question is which imperfect constraints are least destructive to the actual work.
+
