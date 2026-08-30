@@ -123,7 +123,7 @@ To understand Antoine's e-mail, I was in need to rely on an AI to explain to me 
 
 - https://share.gemini.google/ix56Ax1o9Wfy
 
-By the same logic applied by Antoine -- which now I see clearly -- s/he would not be happy to know that there is not so much differences among totalitarism which fascism is justo one of them (and among them not even the most repulsive).
+By the same logic applied by Antoine -- which now I see clearly -- s/he would not be happy to know that there is not so much differences among totalitarismes which fascism is justo one of them (and among them not even the most repulsive).
 
 - I suggest meditating about Karl Popper's paradox of tolerance including Fermi's paradox about the surprisingly rarity of intelligent life in our galaxy (their cross-matching is Cipolla-interesting).
 
@@ -147,11 +147,9 @@ Once someone reaches this "illumination" there is not anymore fascism and democr
 
 - Moral: we can only choose the symbol of the fascism we like to kneel to, since the "free market" (and "free software" as well) aren't offering anything different, in practice.
 
-We do not use Debian, we adopt Debian as life-style: s/Debian/Apple/ and you see that the whole difference is a credit card. By rule of thumb, what we aren't going to pay with a credit card, we are the payment (free SaaS, it is free because the product is you, remember?).
+We do not use Debian, we adopt Debian as life-style: do a "s/Debian/Apple/" and you see that the whole difference is a credit card. By rule of thumb, what we aren't going to pay with a credit card, we are the payment (free SaaS, it is free because the product is you, remember?).
 
-- It is heart touching, seeing people fighting for which symbols kneel in front of.
-
-And they call this "freedom". LOL
+It is heart touching, seeing people fighting for which symbols kneel in front of. And they call this "freedom". LOL
 
 ---
 
@@ -270,5 +268,5 @@ Conclusion? In extreme short form, the conclusion is a meme explained by a simpl
 
 - Debian, diversamente fascisti -- Antoine, 2026
 
-And s/he is right, not because pro-LLMs vote but because "moral superiority" + "consensus apology" = "silencing criticisms", therefore fascism in the long run.
+And s/he is right, not because pro-LLMs vote but because "moral superiority" + "consensus apology" = "silencing criticisms" leads to a form of fascism in the long run.
 
