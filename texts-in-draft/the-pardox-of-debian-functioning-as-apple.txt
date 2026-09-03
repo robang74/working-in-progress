@@ -270,3 +270,17 @@ Conclusion? In extreme short form, the conclusion is a meme explained by a simpl
 
 And s/he is right, not because pro-LLMs vote but because "moral superiority" + "consensus apology" = "silencing criticisms" leads to a form of fascism in the long run.
 
+---
+
+## NEWS
+
+2026-09-02 -- Debian 13 Is Taking Over 2,200+ Control Systems Across CERN
+
+CERN is moving its industrial computers and embedded systems to Debian 13, with over 2,200 devices targeted by year’s end.
+
+- https://linuxiac.com/debian-13-is-taking-over-2200-control-systems-across-cern/
+
+They finally won "their life's single best opportunity" because running the CERN infrastructure isn't for the faint of heart. Up to now, it was Red Hat and after RH quits, they moved to CentOS. There were few other alternatives out-there and the commercials are not the most privileged when hard science comes into the picture. So, it is time for Debian to be put under the test and by that test depends on their future, both of them, CERN and Debian, as well.
+
+May the CERN save Debian from the political sh*thole they have fallen into.
+
