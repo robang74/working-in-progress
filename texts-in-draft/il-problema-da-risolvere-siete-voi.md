@@ -113,3 +113,29 @@ The WHOLE problem is the addiction of our "top" class to rule others with the mo
 
 Spoiler: it works when others have been defrauded by their rights, otherwise not.
 
+---
+
+Proiettando questo scenario in avanti nelle prossime decadi, ammesso che sia possibile e a quali costi sociali, la Germania ha rinunciato al nucleare chiudendo le sue ultime tre centrali. La Francia ha dismesso gli impianti di auto-fertilizzazione (che sono anche quelli utili per mantenere gli armamenti nucleari) e l'Italia ha aperto, a dispetto dei due referendum, al nucleare civile.
+
+Ora, da un punto di vista militare-strateggico, significa che le uniche potenze nucleari nell'Europa sono Inghilterra, che ormai come chiaramente rivelato lo scandalo delle grooming gang che andavano avanti indisturbate dal 2001, è politicamente compromessa su entrambi i fronti arabo e ucraino, ed entrambi sono in conflitto fra loro per via di israele e low-cost long-range weapons dall'Ucraina che permette a fazioni come gli Houti di colpire i paesi arabi avanzati.
+
+Anche in questo contesto la distruzione della filiera produttiva in Ucraina da parte della Russia, ha temporaneamente evitato il conflitto negoziale ma in prospettiva futura quella tecnologia sarà comunque dispobile presso altri canali di fornitura, principalmente la Germania per i paesi compratori di sistemi di difesa "chiavi in mano" e dell'Italia per la componentistica (as usual).
+
+L'Inghilterra ha fatto la Brexit, quindi anche se fornisse un ombrello nucleare è politicamente fuori dal perimetro dell'Unione Europea. Se tale ombrello viene creato in seno all'Italia, considerata la nostra situazione anch'essa demograficamente compromessa, la questione del default del debito pubblico diventa "soluzione" per un stringente commissariamento che porti la classe dirigente ad essere ancora più lontana dalla società.
+
+Anche in questo caso però entrambi gli ombrelli nucleari in Europa (nord e sud), strategicamente ben posizionati in termini geografici, finirebbero comunque per essere fortemente condizionati dagli Stati Uniti perché sarebbe ingenuo dimenticare quanto Inghilterra e Italia siano tutt'oggi paesi satelliti degli USA nella NATO.
+
+Basti solo pensare che l'Italia già ospita basi militari USA dotate di armamenti nucleari su cui l'Italia, di fatto come la tragedia del Cermis ha dimostrato ancora prima di quella del DC9 di Ustica, non abbia alcuna sovranità nemmeno da essere informato a posteriori decenni dopo.
+
+Attualmente la linea di politica estera degli USA non allineata con quella dell'Unione Europea ammesso che la UE ne abbia una sua propria a parte essere politicamente schiacciata dalla relazione con l'Ucraina. Quindi al momento la UE è ostaggio di Zelensky, il quale è ostaggio della Russia, la quale tiene in ostaggio gli USA sul combustibile nucleare che serve ai datacenter che è l'unico business che può evitare il tracollo del debito pubblico americano.
+
+Quindi è corretto dire che il sistema è in liquidazione, nel mentre c'è solo liability transfer come sempre accade nei fallimenti, non per decidere l'esito ormai scontato, ma per decidere chi si troverà con il cerino in mano e ognuno in questa corsa contro il tempo liquida tutto il possibile che gli riesce di liquidare per non trovarsi con il cerino in mano. Un evergreen dei più tradizionali.
+
+L'ultima latente speranza degli italiani è saccheggiare il Vaticano per comprare il pane.
+
+Per quanto paia assurda questa conclusione, non lo è alla luce di un rivisitazione di quella che fu la rivoluzione francese. D'altronde per il 2030, una parte consistente di italiani sarà di fede islamica (un quarto o più) quindi non è fantascienza, è quello che sta accadendo in Francia dove il saccheggio dei negozi di lusso è il premio di partecipazione al conflitto in piazza.
+
+Chi lo paga questo premio? I bottegai in prima istanza e Macron come risarcimento elettorale.
+
+Acnche in questo contesto va in scena il più elementare degli schemi tradizionali: creare il problema (o lasciare che il problema si esprima nella sua manisfestazione più acuta) per vendere la soluzione come promessa elettorale. Ormai non si creano più problemi, emergono. Ormai non si vendono più soluzioni, si promettono. Più fallito di così un sistema, non saprei come definirlo.
+
