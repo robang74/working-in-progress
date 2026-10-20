@@ -87,7 +87,11 @@ Fra tutti i disagiati attualmente la nostra classe politica e dirigente sono fra
 
 ---
 
-Macron è andato in Arabia Saudita a vendere agli arabi la Francia così come Zelensky ha fatto con l'Ucraina in Unione Europea. Nessuna delle due transazioni ammette il successo, ma solo la temporanea salvezza dell'attuale classe dominante che sta liquidando TUTTO in cambio appunto della soppravivenza fisica che però non è comunque certa (senza anche la fuga, quindi la svalutazione dell'asset ceduto: morte per i fuggitivi).
+Macron è andato in Arabia Saudita a vendere agli arabi la Francia.
+
+- [Macron in tour](https://www.france24.com/en/live-news/20261019-macron-opens-gulf-tour-after-violent-protests-in-france) by France24 and [Macron cherche du carburant](https://www.lemonde.fr/international/article/2026/10/19/en-tournee-dans-le-golfe-persique-emmanuel-macron-cherche-une-issue-a-la-flambee-des-prix-du-carburant_6797585_3210.html) by Le Monde &nbsp; (2016-10-19)
+
+Così come Zelensky ha fatto con l'Ucraina in Unione Europea. Nessuna delle due transazioni ammette il successo, ma solo la temporanea salvezza dell'attuale classe dominante che sta liquidando TUTTO in cambio appunto della soppravivenza fisica che però non è comunque certa (senza anche la fuga, quindi la svalutazione dell'asset ceduto: morte per i fuggitivi).
 
 Hotel California: il sistema è in liquidazione e non ammette vie di fuga.
 
