@@ -58,3 +58,29 @@ Se è "relativo" intrinsecamente non esiste un sistema privilegiato, e quindi no
 - Allora piuttosto che perdere, la morte!
 
 Infatti anche al Kremlino, stanno valutando questa vostra "idea" però non si capisce perché "voi" fate casino e poi loro devono premere il "reset". Suicidatevi! 😁 
+
+---
+
+Qual'è la soluzione "on-going" della sinistra italiana dopo il fallimento evidente della "diversity is our strenght"?
+
+Fondamentalmente è quello di dare valore alle donne (bene) ma come?
+
+Trasferendo su di loro il controllo del valore che producono gli uomini (femminismo) e così quando sono "garantite" possono diventare mamme (riccattabili dal sistema, per definizione). Questa seconda parte interessa anche al governo "fascista" e quindi bonus bebè per 6 mesi che è ridicolo e alla fine interessa solo alle famiglie di immigrati.
+
+La donna così "emancipata dal patriarcato" chi si sceglie come compagno per diventare mamma?
+
+Il maschio "pater familia" che può permettersi di scegliere? No, è fuori portata. Quello che NON può permettersi di scegliere? No, è un perdente. Prende il nuovo arrivato, il vincitore etnico, quello "non sono bello ma spaccio".
+
+Quando il "vincitore etnico" si rende conto che la puerpera che ha partorito suo figlio ha dei diritti in Italia, torna al suo paese (re-immigrazione volontaria, la destra esulta) e nel suo paese vince il patriarcato islamico per una combinazione di 1. più mogli; 2. ripudio o divorzio; 3. sharia o corte pre-giudiziale contro le donne.
+
+---
+
+Quindi l'immigrazione l'hanno pagata i manovali, la re-immigrazione la pagano le puerpere femministe. Tutto molto bello, se non fosse un manicomio a cielo aperto!
+
+Perché il problema NON è cosa i singoli individui facciano della loro vita. La libertà delle scelte individuali dovrebbe essere un fondamentalele delle democrazie mature, in cui possono emergere dei trend sociali che possono essere anche ragionevoli in funzione di determinati fattori strutturali.
+
+Per esempio, la Germania ha supportato la maternità in modo strutturale per oltre 30 anni, la possibilità di fare più di 2.1 figli per coppia è stata una realtà sostenibile e come tale ha creato un trend sociale.
+
+La differenza insiste quando da trend emergente si osserva una moda che per definizione dovrebbe essere passeggera e invece crea delle situazioni di persistente disagio. Cosa fanno le persone serene? Vivono la loro vita. Cosa fanno le persone disagiate? Rompono il belino agli altri.
+
+Fra tutti i disagiati attualmente la nostra classe politica e dirigente sono fra quelli che rompono più di tutti il belino, perché sono disperati "relativamente" alla perdita dei loro privilegi. Il povero c'è abituato alla puzza della povertà, il ricco preferisce la morte alla povertà.
