@@ -96,3 +96,16 @@ Rispetto alla vendita dell'Ucraina alla UE che poi la UE dovrà pagare i danni d
 Mentre sul fronte Arabo, la Francia è una potenza nucleare, se vende tecnologia militare (franco-tedesca-italiana, spacciandola per Europea) agli arabi significa che, in seno alla NATO, dovrà sostituire il nucleare con il petrolio altrimenti sul lungo periodo Israele si trova ad affrontare una potenza nucleare araba slegata dal controllo USA.
 
 Anche in questo secondo scenario non c'è nessuna uscita, ma liquidazione.
+
+---
+
+Finally, the conclusion doesn't change, it stays the same since the beginning of my return in Italy: surrender or die.
+
+By the way, the ONLY reasonable criticism that I received about "surrender XOR die" is "Roberto, surrender IS die" (equivalence). My answer: it is not an algebraic equivalence but "almost, possibly, probably" and the sounding difference is that the first is negotiable, the second isn't.
+
+Spoiler: negotiate to win, shows that the message hasn't been understood, yet.
+
+And the message is barely simple: the system is terminal. Whoever doesn't like the diagnosys should leave the studio and seek another doctor and/or cure. The fatal mistake is that the problem has been created top-down, but the solution should be provided bottom-up.
+
+Whoever is asking to the "bottom" of the society which is the "solution" of the "problem" will receive the bare simple answer this document presents: the top is the problem. Sarcastically, it is nothing else than Spiderman's rule: "with great power, comes a great accountability".
+
