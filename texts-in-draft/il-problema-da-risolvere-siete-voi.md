@@ -71,7 +71,7 @@ La donna così "emancipata dal patriarcato" chi si sceglie come compagno per div
 
 Il maschio "pater familia" che può permettersi di scegliere? No, è fuori portata. Quello che NON può permettersi di scegliere? No, è un perdente. Prende il nuovo arrivato, il vincitore etnico, quello "non sono bello ma spaccio".
 
-Quando il "vincitore etnico" si rende conto che la puerpera che ha partorito suo figlio ha dei diritti in Italia, torna al suo paese (re-immigrazione volontaria, la destra esulta) e nel suo paese vince il patriarcato islamico per una combinazione di 1. più mogli; 2. ripudio o divorzio; 3. sharia o corte pre-giudiziale contro le donne.
+Quando il "vincitore etnico" si rende conto che la puerpera che ha partorito suo figlio ha dei diritti in Italia, torna al suo paese (re-immigrazione volontaria, la destra esulta) e nel suo paese vince il patriarcato islamico per una combinazione di 1. poligamia o patriarcato; 2. ripudio o divorzio; 3. sharia o corte pre-giudiziale contro le donne.
 
 ---
 
@@ -79,7 +79,7 @@ Quindi l'immigrazione l'hanno pagata i manovali, la re-immigrazione la pagano le
 
 Perché il problema NON è cosa i singoli individui facciano della loro vita. La libertà delle scelte individuali dovrebbe essere un fondamentalele delle democrazie mature, in cui possono emergere dei trend sociali che possono essere anche ragionevoli in funzione di determinati fattori strutturali.
 
-Per esempio, la Germania ha supportato la maternità in modo strutturale per oltre 30 anni, la possibilità di fare più di 2.1 figli per coppia è stata una realtà sostenibile e come tale ha creato un trend sociale.
+Per esempio, la Germania ha supportato la maternità in modo strutturale per oltre 30 anni, la possibilità di fare più di 2.1 figli per coppia (indicato come rapporto di proliferazione necessario per una demografia stabile) è stata una realtà sostenibile e come tale ha creato un trend sociale.
 
 La differenza insiste quando da trend emergente si osserva una moda che per definizione dovrebbe essere passeggera e invece crea delle situazioni di persistente disagio. Cosa fanno le persone serene? Vivono la loro vita. Cosa fanno le persone disagiate? Rompono il belino agli altri.
 
