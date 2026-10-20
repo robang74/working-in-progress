@@ -109,3 +109,7 @@ And the message is barely simple: the system is terminal. Whoever doesn't like t
 
 Whoever is asking to the "bottom" of the society which is the "solution" of the "problem" will receive the bare simple answer this document presents: the top is the problem. Sarcastically, it is nothing else than Spiderman's rule: "with great power, comes a great accountability".
 
+The WHOLE problem is the addiction of our "top" class to rule others with the money of others.
+
+Spoiler: it works when others have been defrauded by their rights, otherwise not.
+
