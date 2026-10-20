@@ -84,3 +84,15 @@ Per esempio, la Germania ha supportato la maternità in modo strutturale per olt
 La differenza insiste quando da trend emergente si osserva una moda che per definizione dovrebbe essere passeggera e invece crea delle situazioni di persistente disagio. Cosa fanno le persone serene? Vivono la loro vita. Cosa fanno le persone disagiate? Rompono il belino agli altri.
 
 Fra tutti i disagiati attualmente la nostra classe politica e dirigente sono fra quelli che rompono più di tutti il belino, perché sono disperati "relativamente" alla perdita dei loro privilegi. Il povero c'è abituato alla puzza della povertà, il ricco preferisce la morte alla povertà.
+
+---
+
+Macron è andato in Arabia Saudita a vendere agli arabi la Francia così come Zelensky ha fatto con l'Ucraina in Unione Europea. Nessuna delle due transazioni ammette il successo, ma solo la temporanea salvezza dell'attuale classe dominante che sta liquidando TUTTO in cambio appunto della soppravivenza fisica che però non è comunque certa (senza anche la fuga, quindi la svalutazione dell'asset ceduto: morte per i fuggitivi).
+
+Hotel California: il sistema è in liquidazione e non ammette vie di fuga.
+
+Rispetto alla vendita dell'Ucraina alla UE che poi la UE dovrà pagare i danni di guerra eventualmente anche alla Russia, il negoziato è quello di liberare i 300 miliardi congelati alla Russia per ricostruire l'Ucraina ma se la Russia prende il controllo militare (cosa possibile a marzo 2027), poi dirige la ricostruzione.
+
+Mentre sul fronte Arabo, la Francia è una potenza nucleare, se vende tecnologia militare (franco-tedesca-italiana, spacciandola per Europea) agli arabi significa che, in seno alla NATO, dovrà sostituire il nucleare con il petrolio altrimenti sul lungo periodo Israele si trova ad affrontare una potenza nucleare araba slegata dal controllo USA.
+
+Anche in questo secondo scenario non c'è nessuna uscita, ma liquidazione.
