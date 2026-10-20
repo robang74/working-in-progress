@@ -49,12 +49,12 @@ Il Fondo Monetario Internazionale ha affermato ufficialmente che il debito pubbl
 
 ...e però il paradigma della fiat-currency è imprescindibile perché altrimenti non vinciamo, anzi perdiamo e "noi" non possiamo perdere perché siamo i "vincenti" per auto-definizione.
 
-Beh, questo si chiama barare (a poker) e ciurlare nel manico (idiomatico). Se il "fairness" deve rientrare nei fondamentali, il barare è escluso a priori, quindi la pure fiat-currency.
+Beh, questo si chiama barare (a poker) e ciurlare nel manico (idiomatico). Se il "fairness" deve rientrare nei fondamentali, il barare è escluso a priori, quindi anche la pure fiat-currency.
 
-...e ma il fairness è "relativo" come la teoria di Einstein. Già ma anche le teorie relativistiche che non ammettono un sistema privilegiato sono consistenti, perché non ammettono un sistema privilegiato (oops!).
+...e ma il fairness è "relativo" come la teoria di Einstein. Già ma anche le teorie relativistiche che non ammettono un sistema privilegiato sono consistenti (covarianti), proprio perché non ammettono un sistema privilegiato (oops!).
 
 Se è "relativo" intrinsecamente non esiste un sistema privilegiato, e quindi non esiste il privilegio di creare moneta dal nulla (o sulla scommessa che qualcuno poi ripagherà quel debito sul quale la moneta è stata creata).
 
-Allora piuttosto che perdere, la morte!
+- Allora piuttosto che perdere, la morte!
 
-Infatti anche al Kremlino, stanno valutando questa vostra "idea" però non si capisce perché "voi" fate casino e loro devono premere il "reset". Suicidatevi! 😁 
+Infatti anche al Kremlino, stanno valutando questa vostra "idea" però non si capisce perché "voi" fate casino e poi loro devono premere il "reset". Suicidatevi! 😁 
