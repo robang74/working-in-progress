@@ -1,6 +1,7 @@
 ## IL PROBLEMA SIETE VOI!
 
-- Source: lnkd.in/p/djzxNbhQ (cfr. comments)
+- Source: [lnkd.in/p/djzxNbhQ](https://lnkd.in/p/dvcmP6vS) (cfr. comments)
+- Image: [ugcPost-7517299682361069569-kSSz](https://www.linkedin.com/posts/robertofoglietta_dont-forget-karl-marx-de-uk-and-friedrich-ugcPost-7517299682361069569-kSSz)
 
 ---
 
