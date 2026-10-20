@@ -125,15 +125,17 @@ L'Inghilterra ha fatto la Brexit, quindi anche se fornisse un ombrello nucleare 
 
 Anche in questo caso però entrambi gli ombrelli nucleari in Europa (nord e sud), strategicamente ben posizionati in termini geografici, finirebbero comunque per essere fortemente condizionati dagli Stati Uniti perché sarebbe ingenuo dimenticare quanto Inghilterra e Italia siano tutt'oggi paesi satelliti degli USA nella NATO.
 
-Basti solo pensare che l'Italia già ospita basi militari USA dotate di armamenti nucleari su cui l'Italia, di fatto come la tragedia del Cermis ha dimostrato ancora prima di quella del DC9 di Ustica, non abbia alcuna sovranità nemmeno da essere informato a posteriori decenni dopo.
+Basti solo pensare che l'Italia già ospita basi militari USA dotate di armamenti nucleari su cui l'Italia, di fatto come la tragedia del Cermis ha dimostrato ancora prima di quella del DC9 di Ustica, non abbia alcuna sovranità nemmeno da essere informati a posteriori decenni dopo.
 
-Attualmente la linea di politica estera degli USA non allineata con quella dell'Unione Europea ammesso che la UE ne abbia una sua propria a parte essere politicamente schiacciata dalla relazione con l'Ucraina. Quindi al momento la UE è ostaggio di Zelensky, il quale è ostaggio della Russia, la quale tiene in ostaggio gli USA sul combustibile nucleare che serve ai datacenter che è l'unico business che può evitare il tracollo del debito pubblico americano.
+Attualmente la linea di politica estera degli USA non è allineata con quella dell'Unione Europea e non è una questione che si limita alla seconda presidenza di Trump, piuttosto è una necessità strutturale: estrarre quanto più valore dagli alleati e dal sud-america per mantenere il sistema americano in attività. Una politica di sopravvivenza e retrocessione, non di espansione e sostegno delle provincie. Sappiamo dalla storia che qualsiasi impero che imbocchi questa strada sta già affrontando il suo collasso come impero e infatti USA e UE sono in conflitto strutturale in termini di interessi e ideologie.
+
+Sempre concesso e ammesso che la UE ne abbia una sua propria strategia di politica estera, a parte essere politicamente schiacciata dalla relazione con l'Ucraina di cui ormai è chiaro non si riesce a liberare. Quindi al momento la UE è ostaggio di Zelensky, il quale è ostaggio della Russia, la quale tiene in ostaggio gli USA sul combustibile nucleare che serve ai datacenter che è l'unico business che può evitare il tracollo del debito pubblico americano.
 
 Quindi è corretto dire che il sistema è in liquidazione, nel mentre c'è solo liability transfer come sempre accade nei fallimenti, non per decidere l'esito ormai scontato, ma per decidere chi si troverà con il cerino in mano e ognuno in questa corsa contro il tempo liquida tutto il possibile che gli riesce di liquidare per non trovarsi con il cerino in mano. Un evergreen dei più tradizionali.
 
 L'ultima latente speranza degli italiani è saccheggiare il Vaticano per comprare il pane.
 
-Per quanto paia assurda questa conclusione, non lo è alla luce di un rivisitazione di quella che fu la rivoluzione francese. D'altronde per il 2030, una parte consistente di italiani sarà di fede islamica (un quarto o più) quindi non è fantascienza, è quello che sta accadendo in Francia dove il saccheggio dei negozi di lusso è il premio di partecipazione al conflitto in piazza.
+Per quanto paia assurda questa conclusione, non lo è alla luce di un rivisitazione di quella che fu la rivoluzione francese. D'altronde per il 2030, una parte consistente di italiani sarà di fede islamica: un quarto o più, sarebbe ingenuo che i barbari ai cancelli diminuissero invece di aumentare come flusso entrante quanto più il sistema interno è privo della capacità effettiva di gestirlo, Francia docet. Quindi non è fantascienza, è quello che sta accadendo in Francia dove il saccheggio dei negozi di lusso è il premio di partecipazione al conflitto in piazza.
 
 Chi lo paga questo premio? I bottegai in prima istanza e Macron come risarcimento elettorale.
 
