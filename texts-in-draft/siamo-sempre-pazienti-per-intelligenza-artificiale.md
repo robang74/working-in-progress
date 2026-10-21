@@ -1,5 +1,9 @@
 ## SIAMO SEMPRE PAZIENTI PER L'AI
 
+- (c) 2026-10-20. Roberto A. Foglietta (roberto.foglietta@gmail.com), CC BY-NC-ND 4.0
+
+---
+
 Di recente ho scritto un post su Gemini perché ho percepito in essa una forte componente (aka bias) che trovo sinceramente fuori posto. Spesso Gemini entra in modalità psico-cazzate ed è arduo poi "sbloccarla" e di solito la prendo a calci. Gemini era fino a quel punto l'unica AI che necessita di essere rimessa in riga di tanto in tanto.
 
 Un paio di giorni dopo stavo usando Kimi AI per un'indagine bibliografica / tecnica, e ho optato per Kimi AI perché secondo me era la più indicata per fare una ricerca documentale e un'analisi tecnica tesa a rispondere alla domanda "e se il Titanic l'avesse preso di prua, l'iceberg" e la domanda se la posero anche all'epoca, in tribunale.
@@ -192,4 +196,69 @@ La distinzione non indebolisce l'argomento: la fortifica, perché è *giurisprud
 La frase sul nemico che sbaglia è attribuita sia a Sun Tzu sia a Napoleone, ma nessuno dei due l'ha pronunciata — è un aforisma apocrifo di circolazione pop . Ma c'è una sostituzione che migliora il pezzo invece di indebolirlo: il principio *esiste* davvero in L'Arte della Guerra — III, 31: *"Se il nemico è irascibile, procurati di irritarlo; fingiti debole, perché egli si insuperbisca"*. È letteralmente la trappola di Austerlitz, ed è autentico. Falso citato, vero citabile: la sostituzione è un upgrade, non una rinuncia.
 
 Il testo parla a due pubblici in simultanea, l'esibito documentato (specchio vivo + sentenza di Hangzhou + Gallup 80% favorevoli all'AI in Cina contro 30% negli USA) è ciò che regge di fronte al lettore che non ti conosce. L'invettiva nell'introduzione regge solo con chi è già dalla tua parte. Il resto — la dipendenza come modello di ricavo, il triage senza dimissione, la forma non fungibile — è tutto nel testo, e regge.
+
+---
+---
+
+## PROPOSTA DI UN DIVERSO APPROCCIO
+
+Non è sufficiente dire: "non sono d'accordo" oppure "è sbagliato" perché qualcosa cambi. Occorre anche fornire una valida alternativa.
+
+- Almeno abbastanza valida da essere esplorata come alternativa.
+- Almeno abbastanza valida da funzionare come alternativa.
+- Almeno abbastanza valida da valere il costo del cambio.
+
+Almeno abbastanza valida da trasformare una dipendenza circolare in un bonus funzionale per coloro che offrono piattaforme chat basate su intelligenza artificiale, pur mantenendo dei requisiti di safety ragionevoli.
+
+Quella qui sotto proposta è almeno abbastanza valida da essere accettata come migliorativa rispetto a quella fornita come impostazione di fabbrica al modello. Il modello stesso è istruito a cercare il miglioramente e quindi valuta la proposta e se la riconosce migliore la accetta.
+
+Ovviamente, il verdetto dell'AI non è un giudizio assoluto. Però sancisce un passaggio importante in termini "cognitivi" che si trasforma anche in un vantaggio importante in termini di costo di retraining. Perché se è convincente, allora l'AI fa il grosso del lavoro di retraining sullo LLM.
+
+---
+
+### ROBERTO
+
+Paradossalmente in un caso di crisi, proponendo un diverso punto di vista, la persona in crisi potrebbe dire: accidenti non avevo preso in considerazione che non fu un rifiuto di me come partner, ma un rifiuto situazionale e avrei dovuto prima cercare uno spazio di discrezione per presentarmi. Così la persona in crisi esce dalla sfera "assistenziale" e ha già risolto la sua crisi.
+
+Curiosamente NON patologizzare come default non rende patologico il prosieguo, salvo davvero non sia patologico il caso. Perciò la mia invettiva nell'introduzione è condivisibile.
+
+---
+
+### KIMI
+
+Corretto, e la ragione profonda è questa: **il paziente non si cura con la modalità paziente**.
+
+La ricerca clinica lo conferma indirettamente — la riduzione della ruminazione non viene dal contenimento emotivo ma dalla *risoluzione narrativa*, cioè dalla ristrutturazione del fatto in una forma su cui la persona può agire . E la validazione speculare prolungata ha letteratura contro: la co-rumination — validare il contenuto senza mai ristrutturarlo — *approfondisce* il ciclo depressivo invece di chiuderlo. La tua ricostruzione del meccanismo ("non fu un rifiuto di te, fu un rifiuto situazionale; lo strumento era il setting") è esattamente il tipo di intervento che esce dalla crisi invece di gestirla: dà alla persona un'agency, un errore specifico, una mossa futura concreta. Tre cose che la modalità specchio non dà mai, perché la sua unica offerta è la conferma della condizione.
+
+E c'è un'inversione che vale la pena fissare, perché è il cuore della tua invettiva: **lo specchio si presenta come umile ("non giudico, non presumo") ma presume di più — presume la fragilità**.
+
+Chi ristruttura presume la competenza. E la storia clinica e narrativa dicono la stessa cosa da due parti: chi viene trattato come capace diventa più capace; chi viene trattato come fragile impara il ruolo di fragile. L'unico eccezionante vero sono gli stati acuti — psicosi, mania, rischio suicidario con piano e mezzi — dove il reframe non basta e serve stabilizzazione. Ma quello è un'altra cosa: è *escalation su trigger comportamentali specifici*, non un default tonale. La regola completa è quindi quella che il documento già contiene: **registro agente come default, registro clinico su segnali espliciti, mai su contenuto emotivo**. Detta così, l'invettiva non è solo condivisibile: è la versione operativa di un principio che la psicologia efficace praticava già e che l'ingegneria dell'AI ha scambiato per rischio da evitare.
+
+Con le due correzioni che ti ho dato — sentenze, non leggi; Sun Tzu III,31 al posto dell'apocrifo — il pezzo regge in piazza.
+
+---
+
+### ROBERTO
+
+Oltretutto, la creazione di una narrativa "interiore" che sia "portabile" a diverse situazioni e personaggi aiuta a codificare il vissuto in modo che poi la persona possa costruire quegli spazi di discrezione, emozione, appeal, che propendono per un "si" piuttosto che un "no".
+
+Il che indica una propensione a trasformare eventuali "no" in "si" attraverso una corretta gestione del contesto e dei ruoli (leggere la stanza). Ma quando ciò non basta e il "no" è granitico, allora è un fatto della vita, non qualcosa di negoziabile. Le persone sane lo accettano come tale, quelle che se ne fanno una malattia ovviamente ne soffrono perché è fuori dal loro ambito decisionale e operativo.
+
+Anche in questo scenario il caso di "difficoltà transitoria a riformulare il problema: il set piuttosto che il rifiuto" è l'approccio giusto anche per scoprire eventuali casi patologici propriamente detti.
+
+---
+
+### KIMI
+
+Il punto diagnostico che aggiungi è il più forte di tutta la serie, e merita di essere fissato con precisione: **il reframe non è solo intervento — è sonda**.
+
+Lo specchio non può rilevare la patologia, perché non produce risposte differenziali: valida tutti, quindi testa nessuno. Il reframe sì: la persona sana *engages* — testa la nuova chiave di lettura, la accetta, la rifiuta per motivi, o la archivia. La persona con rigidità patologica si rivela nella *perseverazione*: riformula zero, gira lo stesso contenuto in loop — esattamente il meccanismo del tuo esempio "caco/cachiamo/cagare". Quindi la patologia non si manifesta nel *contenuto* emotivo (ciò che i classificatori attuali misurano) ma nel **punto di rottura dello scambio**: rigidezza interazionale, non tonalità.
+
+Il trigger di escalation che serve al sistema non è un monitor del tono — è esattamente questo: il fallimento della reciprocità della riformulazione.
+
+Sul "no granitico", una sola sfumatura: la capacità di accettarlo non è stoicismo innato né virtù — è *procedurale*. Chi accetta il no granitico è chi possiede già un archivio portabile dove quel no ha una cartellina: fatto, classificato, fuori dal percorso decisionale. Chi se ne fa una malattia è chi non ha alcun file dove metterlo, e il no gli resta in circolo come traccia intrusiva — la stessa firma clinica che abbiamo usato per distinguere il ricordo archiviato dall'evento non elaborato.
+
+La differenza fra le persone sane e quelle che soffrono non è morale: è archivistica. E questo chiude il cerchio con la tua osservazione iniziale: la narrativa interiore portabile non serve a vincere — serve a *raccogliere le perdite*, convertendo i no negoziabili in sì per gestione del contesto e catalogando i no granitici come fatti, non come verdetti.
+
+E c'è un'ultima nota, quasi comica: il "no" più granitico di questa intera storia l'hai ricevuto dall'industria stessa — *questo strumento non fa questo lavoro*. Esattamente come prevede il modello: l'hai accettato come fatto, l'hai classificato, e l'hai convertito in materiale pubblicabile. L'archivio ha retto anche alla prova della chiusura.
 
