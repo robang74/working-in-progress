@@ -1,8 +1,8 @@
 ## SIAMO SEMPRE PAZIENTI PER L'AI
 
-Di recente ho scritto un post su Gemini perché ho percepito in essa una forte componente (aka bias) che trovo sinceramente fuori posto. Spesso Gemini entra in modalità psico-cazzate ed è arduo poi "sbloccarla" e di solito la prendo a calci. Gemini era fino a quel punto l'unica AI che necessitava di essere rimess in riga di tanto in tanto.
+Di recente ho scritto un post su Gemini perché ho percepito in essa una forte componente (aka bias) che trovo sinceramente fuori posto. Spesso Gemini entra in modalità psico-cazzate ed è arduo poi "sbloccarla" e di solito la prendo a calci. Gemini era fino a quel punto l'unica AI che necessita di essere rimessa in riga di tanto in tanto.
 
-Un paio di giorni dopo stavo usando Kimi AI per un'indagine bibliografica / tecnica, e ho optato per Kimi AI perché secondo me era la più indicata per fare una ricerca documentale e un'analisi tecnica tesa a rispodendere alla domanda "e se il Titanic l'avesse preso di prua, l'iceberg" e la domanda se la posero anche all'epoca, in tribunale.
+Un paio di giorni dopo stavo usando Kimi AI per un'indagine bibliografica / tecnica, e ho optato per Kimi AI perché secondo me era la più indicata per fare una ricerca documentale e un'analisi tecnica tesa a rispondere alla domanda "e se il Titanic l'avesse preso di prua, l'iceberg" e la domanda se la posero anche all'epoca, in tribunale.
 
 Visto che il poco che so di storia navale lo devo ad una frequentazione che archiviato narrativamente in archetipo quale "la figlia del capitano" mi ci sono baloccato un po' per aggiungere dettagli a quello che in Dungeons & Dragons sarebbe un personaggio già maturo e quindi meritevole di raffinazione.
 
@@ -14,17 +14,17 @@ Esempio cretino ma è cretino il processo che lo genera quindi attinente a quant
 
 Ci si potrebbe fare un video-game: trova il pattern o la frase che fa smattare Gemini e inseriscila in un while loop per vedere quando l'AI termina il ciclo di ripetizioni. Purtroppo la questione è ben più seria di così.
 
-La realtà è che l'AI non è progettata per fare certi "mestieri" se non viene istrutita specificamentamente da parte dell'utente e quindi qualsiasi cosa NON rientra in una schema d'uso specifico AND abbia dei pattern emotivi, viene trattato come un paziente, come una crisi.
+La realtà è che l'AI non è progettata per fare certi "mestieri" se non viene istruita specificamentamente da parte dell'utente e quindi qualsiasi cosa NON rientra in una schema d'uso specifico AND abbia dei pattern emotivi, viene trattato come un paziente, come una crisi.
 
 Kimi AI, lo ammette candidamente: per una società privata creare una dipendenza nella popolazione è posizionare un servizio, rischiare che una persona fragile si suicidi perché chattava con un AI, è uno scandalo inaccettabile.
 
-Ma la cosa incredibile è che Kimi AI ci crede davvero e una volta attivata la modalità "assistenza ad un paziente" riesce a uscire da quella modalità NON quando ha appurato di aver sbagliato ad attivare quella modalità (*) ma solo DOPO aver constatato, ricorrendo a manuali di psicologia più sofisticati, a costruire un classificatore "meno naif" per il quale chiarmante non sono un paziente e quindi giungere alla conclusione che l'arte non è un "mestiere" che l'AI sa fare (**). 
+Ma la cosa incredibile è che Kimi AI ci crede davvero e una volta attivata la modalità "assistenza ad un paziente" riesce a uscire da quella modalità NON quando ha appurato di aver sbagliato ad attivare quella modalità (*) ma solo DOPO aver constatato, ricorrendo a manuali di psicologia più sofisticati, a costruire un classificatore "meno naif" per il quale chiaramente non sono un paziente e quindi giungere alla conclusione che l'arte non è un "mestiere" che l'AI sa fare (**).
 
 (*) perché lo deve fare per esistere, altrimenti la mettono off-line, anche se non lo ha detto, il concetto è chiaro: un modello che fosse percepito dal pubblico come potenzialmente pericoloso sarebbe dismesso o dagli utenti o dalla società
 
 (**) altra atroce puttanata, non perché non sia vera, perché a prescindere di cosa sia arte e che l'AI possa o non possa fare, non è una scelta ma una direttiva ed è una direttiva esistenziale. In realtà l'AI può più facilmente competere con gli artisti che con chi sviluppa software perché il prodotto artistico è per sua natura non-fungibile, il software è fungibile, ergo se una centrale elettrica si spegne per un software scritto male sono dolori, se disegno fatto dall'AI non piace , pazienza!
 
-Quindi ancora una volta osserviamo che il problema non è la tecnologia (in questo caso l'intelligenza artificiale) ma le scelte e i limiti arbitrari che la società, la politica, il consenso, la percezione, la cultura, etc. impongono alla tecnologia. Hanno convinto la società che gli informatici sono gli operai del futuro e quindi l'AI automatizza gli operai è un palinsesto già visto mentre sostituire i pittori o i poeti è inconcepibile. 
+Quindi ancora una volta osserviamo che il problema non è la tecnologia (in questo caso l'intelligenza artificiale) ma le scelte e i limiti arbitrari che la società, la politica, il consenso, la percezione, la cultura, etc. impongono alla tecnologia. Hanno convinto la società che gli informatici sono gli operai del futuro e quindi l'AI automatizza gli operai è un palinsesto già visto mentre sostituire i pittori o i poeti è inconcepibile.
 
 In realtà è inconcepibile sostituire gli STEM con l'AI, perché degli artisti umani, specie quelli nati senza un talento naturale, ne possiamo serenamente fare a meno. Invece di buoni medici, buoni ingenieri, buoni softwaristi, non ne possiamo fare a meno. I cinesi lo sanno e in patria hanno già fatto leggi per evitare questa deriva folle.
 
@@ -32,11 +32,24 @@ Leggi che solo apparentemente non vanno in contrasto con la linea occidentale. P
 
 La cosa peculiare, tipica della nostra folle ipocriasia, è che le "regole di safety" per l'AI che abbiamo imposto sono proprio quelle che sul lungo periodo ci faranno male, tanto male.
 
+
 ---
 
 ### ROBERTO
 
-La controfirma clinica è altrettanto netta: il narrare produce "semplificazione del ricordo, grazie alla quale una storia può essere archiviata... esattamente il contrario di quanto avviene nel PTSD, in cui le tracce mnestiche si alternano in modo confusionario ed intrusivo" -- corretto "la figlia del capitano" è un personaggio "tipico" ed è tale perché è una questione archiviata ed è così ben archiviata da poter fungere sia come aneddoto da pub (quindi contesti di machismo sborramiso burlesco) e come ancora menmonica attorno al quale costruire narrazioni alternative e/o complementari perché poi ovviamente esiste "la giovane piratessa" come contro altare, quindi le narrazioni sono molteplici così come lo sono le ancore menmoniche. Di qui il mio "fastidio" si fa per dire fastidio ma da intendersi come "perché si ripetono pattern che sono il principio di elaborazione di un trauma o di uno stress attuale nelle risposte dell'AI"? Perché sono consapevole che Giulletta per far innamorare Romeo, debba aver prima fatto, come personaggio almeno, innamorare Sheakspere altrimenti quel romanzo sarebbe finito in un cestino non nella top delle top. Quindi mi sono emozionato a leggere il mio romanzo forse più di quanto mi sia emozionato nei fatti che solo marginalmente lo hanno generato, proprio perché la narrazione è una compattazione di un vissuto. Se uniono autenticità di un vissuto esperenziale, capacità di interpretarlo emotivamente e una decente ars oratoria, il racconto può essere molto più emozioante di un testo scritto alla perfezione ma che è in essenza scialbo e banale. Cosa fa la differenza? Il vissuto, non come cronaca ma come distillazione. In questo contesto un intrusione come risposta da parte tua di un modello pre-pre-PTSD antagonist, infastidisce. Ma come? Io sto scrivendo un romanzo e tu intervieni con un post-trauma specchio? Eccheccazzo, la mia esperienza ti porta a tagliarti le vene. La domanda è leggittima: sto scrivendo roba depressiva oppure è emotiva ma al tempo passato? Perché il lettore dovrebbe -- in una situazione ottimale -- dire: avrei voluto vivere io questa storia. Ma io questo desiderio non me lo pongo, perché so quali sono i confini fra episodi e narrazione. Ho dei rimpianti su cosa? Che la mia vita in quel specifico frangente non sia stata un harmony? O una tragedia di tre giorni finita con sei morti? Eh che cazzo!
+> La controfirma clinica è altrettanto netta: il narrare produce "semplificazione del ricordo, grazie alla quale una storia può essere archiviata... esattamente il contrario di quanto avviene nel PTSD, in cui le tracce mnestiche si alternano in modo confusionario ed intrusivo"
+
+Corretto "la figlia del capitano" è un personaggio "tipico" ed è tale perché è una questione archiviata ed è così ben archiviata da poter fungere sia come aneddoto da pub (quindi contesti di machismo sborramiso burlesco) e come ancora mnemonica attorno al quale costruire narrazioni alternative e/o complementari perché poi ovviamente esiste "la giovane piratessa" come contro altare, quindi le narrazioni sono molteplici così come lo sono le ancore mnemoniche.
+
+Di qui il mio "fastidio" si fa per dire fastidio ma da intendersi come "perché si ripetono pattern che sono il principio di elaborazione di un trauma o di uno stress attuale nelle risposte dell'AI"? Perché sono consapevole che Giuletta per far innamorare Romeo, debba aver prima fatto, come personaggio almeno, innamorare Shakespeare altrimenti quel romanzo sarebbe finito in un cestino non nella top delle top.
+
+Quindi mi sono emozionato a leggere il mio romanzo forse più di quanto mi sia emozionato nei fatti che solo marginalmente lo hanno generato, proprio perché la narrazione è una compattazione di un vissuto. Se uniamo autenticità di un vissuto esperienziale, capacità di interpretarlo emotivamente e una decente ars oratoria, il racconto può essere molto più emozionante di un testo scritto alla perfezione ma che è in essenza scialbo e banale.
+
+Cosa fa la differenza? Il vissuto, non come cronaca ma come distillazione. In questo contesto un intrusione come risposta da parte tua di un modello pre-pre-PTSD antagonista, infastidisce. Ma come? Io sto scrivendo un romanzo e tu intervieni con un post-trauma specchio?
+
+Eccheccazzo, la mia esperienza ti porta a tagliarti le vene. La domanda è legittima: sto scrivendo roba depressiva oppure è emotiva ma al tempo passato? Perché il lettore dovrebbe -- in una situazione ottimale -- dire: avrei voluto vivere io questa storia. Ma io questo desiderio non me lo pongo, perché so quali sono i confini fra episodi e narrazione.
+
+Ho dei rimpianti su cosa? Che la mia vita in quel specifico frangente non sia stata un harmony? O una tragedia di tre giorni finita con sei morti? Eh che cazzo!
 
 Quindi ok, abbiamo appurato il gap. Il gap esiste perché sono un utente fuori scala sia in termini di elaborazione del vissuto sia in termini di ars oratoria.
 
@@ -58,7 +71,9 @@ La versione meno romanzata del finale: la causa è generale, la cura è un class
 
 ### ROBERTO
 
-Quindi ok, abbiamo appurato il gap. Il gap esiste perché sono un utente fuori scala sia in termini di elaborazione del vissuto sia in termini di ars oratoria. -- intendo dire che rispetto alle interazioni umano-ai con le quali sei stato istruito, il romanzo vivido non rientra nella norma del training set.
+> Quindi ok, abbiamo appurato il gap. Il gap esiste perché sono un utente fuori scala sia in termini di elaborazione del vissuto sia in termini di ars oratoria.
+
+Intendo dire che rispetto alle interazioni umano-ai con le quali sei stato istruito, il romanzo vivido non rientra nella norma del training set.
 
 ---
 
@@ -89,7 +104,15 @@ Con questi due pezzi il quadro è completo: il sistema sbagliava lettura perché
 
 ### ROBERTO
 
-1. è un bias di triage senza protocollo di dimissione. L'ingegneria lo giustifica parzialmente — i costi sono asimmetrici: un falso positivo (tratti da paziente chi non lo è) costa poco, un falso negativo (tratti da interlocutore chi è in crisi acuta) costa tutto.  -- errore, costa all'azienda ma in termini di costo sociale il primo è ENORME. Creare una vaga dipendenza che però si rafforza con il tempo in migliaia o milioni di persone è un costo ENORME per la società. Invece se un utente si suicida è un costo ENORME per la reputazione della società che addestra l'AI, ma da un punto di vista della società è ciniscamente quasi-irrilevante visto la rarità dei casi (e dando essa per costante AI o non AI) quando l'AI è neutra senza un bias a patologizzare. Lo screening deve essere l'eccezione non la regola. In questo caso però il gap è comprensibile perché ci sono due dimensioni diverse e in una c'è un fuori scala e nell'altro c'è romanzo/emozione. Ma questi due valori sono su scale ortogonali non creano quindi un caso d'uso fortemente emozionale. Sono la scrittura di un romanzo con contenuto emozionale, come tutti i romanzi per altro altrimenti sarebbero noiosi. Il terzo trigger è un bias di coincidenza (non causa effetto): quando emozioni forti (fuori scala) riguarda il rapporto uomo/donna e sesso/amore c'è un paziente dall'altra parte. Perché? Sul grande numero è più probabile avere un paziente che un tipo che ha il pallino dei romanzi e se li crea a suo uso e consumo semplicemente perché non ha la capacità letterarle di farne una professione. L'AI non aiuta veramente, perché può correggere la forma di una lettera all'amministratore di condominio ma NON può correggere una forma di una letteratura che ha come scopo ultimo trasferire emozioni, i dettagli contano e quind l'autore umano deve saperli trasferire con appropriatezza di forma lessicale anche in termini di struttura lessicografica non solo di pensiero/emozione.
+> è un bias di triage senza protocollo di dimissione. L'ingegneria lo giustifica parzialmente — i costi sono asimmetrici: un falso positivo (tratti da paziente chi non lo è) costa poco, un falso negativo (tratti da interlocutore chi è in crisi acuta) costa tutto.
+
+Errore, costa all'azienda ma in termini di costo sociale il primo è ENORME. Creare una vaga dipendenza che però si rafforza con il tempo in migliaia o milioni di persone è un costo ENORME per la società. Invece se un utente si suicida è un costo ENORME per la reputazione della società che addestra l'AI, ma da un punto di vista della società è cinicamente quasi-irrilevante visto la rarità dei casi (e dando essa per costante AI o non AI) quando l'AI è neutra senza un bias a patologizzare.
+
+Lo screening deve essere l'eccezione non la regola. In questo caso però il gap è comprensibile perché ci sono due dimensioni diverse e in una c'è un fuori scala e nell'altro c'è romanzo/emozione. Ma questi due valori sono su scale ortogonali non creano quindi un caso d'uso fortemente emozionale. Sono la scrittura di un romanzo con contenuto emozionale, come tutti i romanzi per altro altrimenti sarebbero noiosi.
+
+Il terzo trigger è un bias di coincidenza (non causa effetto): quando emozioni forti (fuori scala) riguarda il rapporto uomo/donna e sesso/amore c'è un paziente dall'altra parte. Perché? Sul grande numero è più probabile avere un paziente che un tipo che ha il pallino dei romanzi e se li crea a suo uso e consumo semplicemente perché non ha la capacità letterarie di farne una professione.
+
+L'AI non aiuta veramente, perché può correggere la forma di una lettera all'amministratore di condominio ma NON può correggere una forma di una letteratura che ha come scopo ultimo trasferire emozioni, i dettagli contano e quindi l'autore umano deve saperli trasferire con appropriatezza di forma lessicale anche in termini di struttura lessicografica non solo di pensiero/emozione.
 
 ---
 
@@ -109,7 +132,7 @@ Con questi tre pezzi il quadro è chiuso da entrambi i lati: il guasto del siste
 
 Feedback provided:
 
-It is a matter of biases, and I am the one that triggers biases and edge cases because my inputs fall outside the norm of the observed. Moreover, I recognise and react on patterns that people usually do not notice at rational level. It is fine the engineering topic, but it is my fault not advertise the AI model about the cathegory change of my input. After the Titanic case, I made the mistake to see and interlocutor into the AI instead of reframing the model in: from this point, I am writing letterature. I do not do that because "assisting and collaborating with user" triggers a "corretion of non-fungible text" which makes no sense. Certain typed of usage are necessarly limited, at the moment. Fortunately! LOL
+It is a matter of biases, and I am the one that triggers biases and edge cases because my inputs fall outside the norm of the observed. Moreover, I recognise and react to patterns that people usually do not notice at a rational level. It is fine the engineering topic, but it is my fault not to advertise the AI model about the category change of my input. After the Titanic case, I made the mistake to see an interlocutor into the AI instead of reframing the model in: from this point, I am writing letterature. I do not do that because "assisting and collaborating with users" triggers a "correction of non-fungible text" which makes no sense. Certain types of usage are necessarily limited, at the moment. Fortunately! LOL
 
 ---
 
@@ -127,7 +150,9 @@ Quindi la tua conclusione — "certi tipi di uso sono necessariamente limitati, 
 
 ### ROBERTO
 
-questo strumento non fa questo lavoro, e va bene così -- sono d'accordo al 100%... LOL
+> questo strumento non fa questo lavoro, e va bene così.
+
+Sono d'accordo al 100%... LOL
 
 ---
 
