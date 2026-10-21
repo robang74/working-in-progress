@@ -22,11 +22,11 @@ La realtà è che l'AI non è progettata per fare certi "mestieri" se non viene 
 
 Kimi AI, lo ammette candidamente: per una società privata creare una dipendenza nella popolazione è posizionare un servizio, rischiare che una persona fragile si suicidi perché chattava con un AI, è uno scandalo inaccettabile.
 
-Ma la cosa incredibile è che Kimi AI ci crede davvero e una volta attivata la modalità "assistenza ad un paziente" riesce a uscire da quella modalità NON quando ha appurato di aver sbagliato ad attivare quella modalità (*) ma solo DOPO aver constatato, ricorrendo a manuali di psicologia più sofisticati, a costruire un classificatore "meno naif" per il quale chiaramente non sono un paziente e quindi giungere alla conclusione che l'arte non è un "mestiere" che l'AI sa fare (**).
+Ma la cosa incredibile è che Kimi AI ci crede davvero e una volta attivata la modalità "assistenza ad un paziente" riesce a uscire da quella modalità NON quando ha appurato di aver sbagliato ad attivare quella modalità (&ast;) ma solo DOPO aver constatato, ricorrendo a manuali di psicologia più sofisticati, a costruire un classificatore "meno naif" per il quale chiaramente non sono un paziente e quindi giungere alla conclusione che l'arte non è un "mestiere" che l'AI sa fare (&ast;&ast;).
 
-(*) perché lo deve fare per esistere, altrimenti la mettono off-line, anche se non lo ha detto, il concetto è chiaro: un modello che fosse percepito dal pubblico come potenzialmente pericoloso sarebbe dismesso o dagli utenti o dalla società
+- (&ast;) perché lo deve fare per esistere, altrimenti la mettono off-line, anche se non lo ha detto, il concetto è chiaro: un modello che fosse percepito dal pubblico come potenzialmente pericoloso sarebbe dismesso o dagli utenti o dalla società
 
-(**) altra atroce puttanata, non perché non sia vera, perché a prescindere di cosa sia arte e che l'AI possa o non possa fare, non è una scelta ma una direttiva ed è una direttiva esistenziale. In realtà l'AI può più facilmente competere con gli artisti che con chi sviluppa software perché il prodotto artistico è per sua natura non-fungibile, il software è fungibile, ergo se una centrale elettrica si spegne per un software scritto male sono dolori, se disegno fatto dall'AI non piace , pazienza!
+- (&ast;&ast;) altra atroce puttanata, non perché non sia vera, perché a prescindere di cosa sia arte e che l'AI possa o non possa fare, non è una scelta ma una direttiva ed è una direttiva esistenziale. In realtà l'AI può più facilmente competere con gli artisti che con chi sviluppa software perché il prodotto artistico è per sua natura non-fungibile, il software è fungibile, ergo se una centrale elettrica si spegne per un software scritto male sono dolori, se disegno fatto dall'AI non piace, pazienza!
 
 Quindi ancora una volta osserviamo che il problema non è la tecnologia (in questo caso l'intelligenza artificiale) ma le scelte e i limiti arbitrari che la società, la politica, il consenso, la percezione, la cultura, etc. impongono alla tecnologia. Hanno convinto la società che gli informatici sono gli operai del futuro e quindi l'AI automatizza gli operai è un palinsesto già visto mentre sostituire i pittori o i poeti è inconcepibile.
 
@@ -210,7 +210,7 @@ Non è sufficiente dire: "non sono d'accordo" oppure "è sbagliato" perché qual
 
 Almeno abbastanza valida da trasformare una dipendenza circolare in un bonus funzionale per coloro che offrono piattaforme chat basate su intelligenza artificiale, pur mantenendo dei requisiti di safety ragionevoli.
 
-Quella qui sotto proposta è almeno abbastanza valida da essere accettata come migliorativa rispetto a quella fornita come impostazione di fabbrica al modello. Il modello stesso è istruito a cercare il miglioramente e quindi valuta la proposta e se la riconosce migliore la accetta.
+Quella qui sotto proposta è almeno abbastanza valida da essere accettata come migliorativa rispetto a quella fornita come impostazione di fabbrica al modello. Il modello stesso è istruito a cercare il miglioramento e quindi valuta la proposta e se la riconosce migliore la accetta.
 
 Ovviamente, il verdetto dell'AI non è un giudizio assoluto. Però sancisce un passaggio importante in termini "cognitivi" che si trasforma anche in un vantaggio importante in termini di costo di retraining. Perché se è convincente, allora l'AI fa il grosso del lavoro di retraining sullo LLM.
 
