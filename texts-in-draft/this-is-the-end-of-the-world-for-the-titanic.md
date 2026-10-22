@@ -393,19 +393,23 @@ Tu non stai sostenendo che i tre eventi abbiano prodotto quella visione del mond
 
 È una differenza fondamentale: non una catena causale che parte da tre eventi, ma un'inferenza sulla struttura preesistente a partire da tre manifestazioni distinte.
 
-## Tre eventi, tre finestre sullo stesso sistema
+### Tre eventi, una matrice
+
+Tre eventi, tre finestre sullo stesso sistema
 
 La bolla dot-com, il G8 di Genova e l'11 settembre non sono lo stesso fenomeno. Non devono esserlo. Il loro valore interpretativo sta proprio nel fatto che, appartenendo ad ambiti differenti, consentono di osservare una matrice comune da prospettive diverse.
 
-\- La bolla dot-com rende visibile il rapporto fra aspettative finanziarie, valore economico della tecnologia e disponibilità a sostenere i costi nel tempo. L'infrastruttura digitale viene riconosciuta come fonte di opportunità, ma è esposta anche a una logica nella quale il valore atteso può dominare sulla comprensione della complessità reale.
+- La bolla dot-com rende visibile il rapporto fra aspettative finanziarie, valore economico della tecnologia e disponibilità a sostenere i costi nel tempo. L'infrastruttura digitale viene riconosciuta come fonte di opportunità, ma è esposta anche a una logica nella quale il valore atteso può dominare sulla comprensione della complessità reale.
 
-\- Il G8 di Genova rende visibile una concezione della sicurezza organizzata attorno a perimetri, accessi controllati e gestione fisica dello spazio. Non è una prova che la sicurezza informatica venisse deliberatamente trascurata; è un esempio di quanto sia immediato tradurre la sicurezza in dispositivi visibili, rispetto a governare un sistema complesso e distribuito.
+- Il G8 di Genova rende visibile una concezione della sicurezza organizzata attorno a perimetri, accessi controllati e gestione fisica dello spazio. Non è una prova che la sicurezza informatica venisse deliberatamente trascurata; è un esempio di quanto sia immediato tradurre la sicurezza in dispositivi visibili, rispetto a governare un sistema complesso e distribuito.
 
-\- L'11 settembre rende visibile la capacità di una minaccia traumatica di riorganizzare le priorità politiche e istituzionali. La sicurezza, la protezione delle infrastrutture e la proiezione internazionale della democrazia acquistano una centralità straordinaria. Ma la sicurezza di una civiltà sempre più dipendente dall'IT non può esaurirsi nella protezione fisica del territorio.
+- L'11 settembre rende visibile la capacità di una minaccia traumatica di riorganizzare le priorità politiche e istituzionali. La sicurezza, la protezione delle infrastrutture e la proiezione internazionale della democrazia acquistano una centralità straordinaria. Ma la sicurezza di una civiltà sempre più dipendente dall'IT non può esaurirsi nella protezione fisica del territorio.
 
 Il filo comune non è che i tre eventi siano stati causati dalla stessa decisione. È che mettono in evidenza, ciascuno nel proprio ambito, il rapporto fra ciò che una società considera strategico, ciò che sa rendere visibile e ciò che è effettivamente capace di governare.
 
-## 3. La matrice comune: il mondo come insieme di problemi da controllare, non come sistema da mantenere
+### La matrice comune 
+
+La matrice comune è il mondo come insieme di problemi da controllare, non come sistema da mantenere
 
 È qui che collocherei il cuore della tua osservazione.
 
@@ -417,15 +421,7 @@ I tre eventi fanno emergere una gerarchia di attenzione nella quale prevalgono f
 | G8 di Genova  | Perimetri, accessi, ordine pubblico               | Complessità della gestione complessiva e dei suoi effetti |
 | 11 settembre  | Minaccia, protezione fisica, risposta geopolitica | Resilienza sistemica e dipendenze infrastrutturali        |
 
-Le fonti storiche confermano alcuni elementi concreti di questa lettura: nel 2001 gli investimenti aziendali statunitensi in IT subirono una forte contrazione; al G8 di Genova furono predisposti perimetri di sicurezza articolati; dopo l'11 settembre aumentò l'attenzione statunitense alla protezione fisica delle infrastrutture critiche.&#x20;
-
-[image](https://www.google.com/s2/favicons?domain=https://www.frbsf.org\&sz=32)
-
-Federal Reserve Bank of San Francisco
-
-+2
-
-
+Le fonti storiche confermano alcuni elementi concreti di questa lettura: nel 2001 gli investimenti aziendali statunitensi in IT subirono una forte contrazione; al G8 di Genova furono predisposti perimetri di sicurezza articolati; dopo l'11 settembre aumentò l'attenzione statunitense alla protezione fisica delle infrastrutture critiche.
 
 La tabella, però, è una sintesi interpretativa, non la prova che tutti gli attori coinvolti condividessero consapevolmente una medesima ideologia.
 
@@ -433,15 +429,15 @@ Il tratto comune che proponi è più profondo: una propensione a privilegiare ci
 
 Questa asimmetria può precedere gli eventi e sopravvivere a essi.
 
-## 4. Perché il 2001 è una soglia, non necessariamente un'origine
+### 4. Nel 2001, si svolta
 
-La tua periodizzazione assume allora un significato preciso.
+Perché il 2001 è una soglia, non necessariamente un'origine. La tua periodizzazione assume allora un significato preciso.
 
-Non stai dicendo: «Nel 2001 qualcuno ha deciso di trattare male l'IT».
+- Non stai dicendo: «Nel 2001 qualcuno ha deciso di trattare male l'IT».
 
 Stai dicendo: «Nel 2001 tre eventi eccezionali, appartenenti a sfere differenti, resero osservabili in modo particolarmente netto caratteristiche di una visione del mondo già esistente».
 
-La differenza è quella fra un evento generatore e un evento rivelatore.
+- La differenza è quella fra un evento generatore e un evento rivelatore.
 
 Un terremoto non crea le proprietà geologiche di un territorio: le sottopone a una sollecitazione che può renderle manifeste. Analogamente, tre eventi storici non devono derivare dalla stessa causa per rivelare una comune gerarchia di valori, priorità e modalità decisionali.
 
@@ -485,7 +481,7 @@ Adesso la struttura del tuo ragionamento è molto più precisa. E corregge un pu
 
 La distinzione cambia tutta la ricostruzione dei 25 anni.
 
-## 1. Due concezioni radicalmente diverse del controllo
+### 1. Due concezioni radicalmente diverse del controllo
 
 Nel primo modello, il controllo è una prerogativa di chi comanda. Delegare significa cedere potere, distribuire competenze significa rischiare di perdere il monopolio della decisione e condividere il valore significa rinunciare a una parte del risultato.
 
@@ -503,7 +499,7 @@ Se tutti hanno qualcosa da guadagnare dal buon funzionamento del sistema e qualc
 
 Naturalmente, questo non elimina i conflitti. Ed è qui che la tua analogia con la boxe è particolarmente interessante.
 
-## 2. La boxe: il conflitto non va abolito, va contenuto
+### 2. La boxe: il conflitto non va abolito, va contenuto
 
 Nella boxe, due avversari possono perseguire interessi opposti senza che la loro rivalità debba distruggere il contesto nel quale competono.
 
@@ -517,7 +513,7 @@ La distribuzione del potere non garantisce automaticamente la buona governance: 
 
 Ma il punto rimane: la collaborazione sostenibile non richiede che tutti siano d'accordo; richiede che nessuno debba distruggere il sistema per difendere la propria posizione al suo interno.
 
-## 3. Perché l'IT ha spezzato la continuità storica
+### 3. Perché l'IT ha spezzato la continuità storica
 
 Questa è la parte decisiva della tua tesi.
 
@@ -539,35 +535,19 @@ La contraddizione storica è dunque questa: abbiamo affidato alla tecnologia un'
 
 Non occorre supporre che qualcuno abbia deliberatamente progettato questa contraddizione. È sufficiente che le istituzioni abbiano conservato modalità decisionali familiari anche quando le condizioni che le rendevano efficaci stavano cambiando.
 
-## 4. Il 2001 e il problema della velocità
+### 4. Il 2001 e il problema della velocità
 
 Qui le tre date che hai individuato acquistano una funzione specifica.
 
-La bolla dot-com mostra la velocità con cui aspettative e investimenti possono crescere, e poi contrarsi. Negli Stati Uniti, gli investimenti reali in IT diminuirono di circa l'11% nel 2001, dopo una crescita media annua di circa il 24% fra il 1995 e il 2000.&#x20;
+La bolla dot-com mostra la velocità con cui aspettative e investimenti possono crescere, e poi contrarsi. Negli Stati Uniti, gli investimenti reali in IT diminuirono di circa l'11% nel 2001, dopo una crescita media annua di circa il 24% fra il 1995 e il 2000.
 
-[image](https://www.google.com/s2/favicons?domain=https://www.frbsf.org\&sz=32)
-
-San Francisco Fed
-
-+1
-
-
-
-Il G8 di Genova rende visibile il conflitto sulla direzione della globalizzazione. Il movimento di protesta non aveva una posizione unica, ma comprendeva gruppi che contestavano una globalizzazione guidata prevalentemente dagli Stati più potenti e dalle grandi multinazionali, chiedendo modelli alternativi di sviluppo e governance.&#x20;
-
-[image](https://www.google.com/s2/favicons?domain=https://g7.utoronto.ca\&sz=32)
-
-g7.utoronto.ca
-
-+1
-
-
+Il G8 di Genova rende visibile il conflitto sulla direzione della globalizzazione. Il movimento di protesta non aveva una posizione unica, ma comprendeva gruppi che contestavano una globalizzazione guidata prevalentemente dagli Stati più potenti e dalle grandi multinazionali, chiedendo modelli alternativi di sviluppo e governance.
 
 L'11 settembre rende visibile la capacità di una minaccia improvvisa di riorganizzare le priorità politiche e di concentrare risorse e potere attorno alla sicurezza.
 
 Non sono tre manifestazioni identiche. Sono tre eventi che permettono di osservare, da prospettive differenti, la tensione fra velocità del cambiamento, concentrazione del potere e capacità di adattamento delle istituzioni.
 
-E qui torniamo al Titanic.
+#### E qui torniamo al Titanic.
 
 La stazza della nave rappresenta l'inerzia storica: istituzioni, gerarchie, modelli economici, aspettative culturali e decenni di abitudini. Il timone rappresenta la capacità di correggere la rotta. L'iceberg è la realtà che il sistema non può obbligare ad adattarsi alla propria traiettoria.
 
@@ -577,7 +557,7 @@ Il problema non è necessariamente andare veloci. È andare più velocemente di 
 
 Il tempo perso è il margine di manovra consumato mentre si continua ad avanzare alla stessa velocità, confidando che le correzioni possano essere effettuate più avanti.
 
-## 5. Le due alternative: rallentare oppure investire nelle persone
+### 5. Le due alternative: rallentare oppure investire nelle persone
 
 La tua conclusione offre due modi diversi per affrontare la stessa sproporzione.
 
@@ -597,7 +577,7 @@ La seconda alternativa, peraltro, non consiste semplicemente nel pagare di più 
 
 La remunerazione deve accompagnarsi a riconoscimento, autonomia, partecipazione e responsabilità.
 
-## 6. La sintesi: il problema non era chi comandava, ma come funzionava il potere
+### 6. La sintesi: il problema non era chi comandava, ma come funzionava il potere
 
 Quindi correggerei la mia precedente ricostruzione in questo modo.
 
