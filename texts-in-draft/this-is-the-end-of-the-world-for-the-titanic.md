@@ -617,7 +617,7 @@ La tua tesi non è che l'open source sia moralmente superiore al software propri
 
 E la seconda osservazione, quella sui moduli bancari, mostra cosa succede quando non si comprende questa distinzione.
 
-## 1. L'open source come conseguenza della natura economica dell'IT
+### 1. L'open source come conseguenza della natura economica dell'IT
 
 Il software ha una caratteristica peculiare: può essere sviluppato una volta, riutilizzato da moltissimi soggetti e adattato a contesti differenti, mentre il lavoro necessario a correggerlo e mantenerlo continua nel tempo.
 
@@ -625,15 +625,7 @@ Il valore è distribuito fra chi lo utilizza. I costi di sviluppo, invece, risch
 
 Questo crea uno squilibrio: migliaia di organizzazioni possono dipendere dallo stesso componente, ma soltanto poche persone possono essere responsabili della sua evoluzione.
 
-Il modello open source rende possibile riequilibrare questa relazione. Consente a utilizzatori, integratori e altri sviluppatori di studiare il codice, modificarlo, ridistribuirlo e contribuire al progetto comune. Queste libertà sono parte integrante della definizione ufficiale di open source.&#x20;
-
-[image](https://www.google.com/s2/favicons?domain=https://opensource.org\&sz=32)
-
-Open Source Initiative
-
-+1
-
-
+Il modello open source rende possibile riequilibrare questa relazione. Consente a utilizzatori, integratori e altri sviluppatori di studiare il codice, modificarlo, ridistribuirlo e contribuire al progetto comune. Queste libertà sono parte integrante della definizione ufficiale di open source.
 
 La conseguenza economica è importante: invece di obbligare ogni utilizzatore a risolvere individualmente problemi già affrontati da altri, si può condividere il lavoro e riutilizzare le soluzioni.
 
@@ -641,15 +633,7 @@ Il punto non è che tutti debbano scrivere codice. Una banca può contribuire fi
 
 La distribuzione dello sviluppo significa che chi beneficia dell'infrastruttura può partecipare, in forme diverse, alla sua evoluzione.
 
-C'è una precisazione giuridica: open source non significa assenza di copyright. Le licenze open source utilizzano il copyright per concedere diritti di utilizzo, modifica e redistribuzione che altrimenti non sarebbero automaticamente disponibili. La vera contrapposizione è con un modello proprietario che riserva al titolare il controllo esclusivo sulle modifiche e sulla distribuzione del codice.&#x20;
-
-[image](https://www.google.com/s2/favicons?domain=https://opensource.google\&sz=32)
-
-Google Open Source
-
-+1
-
-
+C'è una precisazione giuridica: open source non significa assenza di copyright. Le licenze open source utilizzano il copyright per concedere diritti di utilizzo, modifica e redistribuzione che altrimenti non sarebbero automaticamente disponibili. La vera contrapposizione è con un modello proprietario che riserva al titolare il controllo esclusivo sulle modifiche e sulla distribuzione del codice.
 
 E c'è una precisazione economica altrettanto importante: il fatto che il codice sia aperto non garantisce che i beneficiari contribuiscano effettivamente. Se tutti consumano il software e nessuno finanzia o sostiene la manutenzione, l'onere ricade nuovamente su una minoranza.
 
@@ -657,33 +641,25 @@ E c'è una precisazione economica altrettanto importante: il fatto che il codice
 
 Perciò formulerei il principio così: l'open source rende possibile distribuire lo sviluppo; la sostenibilità richiede che questa possibilità si traduca in partecipazione e risorse reali.
 
-## 2. La trasformazione digitale che conserva il problema originale
+### 2. La trasformazione digitale che conserva il problema originale
 
 L'esempio dei moduli bancari è forse ancora più immediato, perché permette di distinguere due operazioni che vengono spesso confuse.
 
-[Application to open a checking account.](https://images.openai.com/static-rsc-4/lynbIIzgMhzDMnr-SR-lOD-D-f_MxvCMozvl_XwOUQjFl50DAlisgUVR7ysvWXbRnEPL_r9aQA74zGtdJruAgaXqJh_IKrpBYD-NUzrUwurHKJWFxUGrhvU871IhDrJnYNblKKvCbyqp3P_CDL4fY-qCHNBM4XPOeaiUJxEnZTbsNnt0oMKAo7Gf2SHpY7Hw?purpose=inline)
-
-Digitalizzazione della carta
+#### Digitalizzazione della carta
 
 Il modulo cartaceo viene trasformato in un PDF o in un modulo web. Le richieste, i passaggi, le verifiche e le responsabilità rimangono sostanzialmente gli stessi.
 
-Cambia il supporto. Il processo sopravvive.
+- Cambia il supporto. Il processo sopravvive.
 
-[FlowGov: Modern Government Process · Built with Blink](https://images.openai.com/static-rsc-4/mv1D5Wj5VuWiSd1nxglsdAWUfpVo1Oj_oKk01gvVrxN6So-29ZyJuqeEsaB3nYmnw-X_wF_fHUAhDE7T-XFXMoDBdNwp1OS12kRFjrIETlhXJVJygG8lejbMM7ZgYm8SQbI5_Md4k-Mns3oUzXVWvxFjLAwqfoWgTbK1HptdmS8?purpose=inline)
-
-Trasformazione del processo
+#### Trasformazione del processo
 
 Si riprogetta il servizio partendo dal risultato da ottenere, dai dati già disponibili, dalle verifiche realmente necessarie e dalle responsabilità di ciascun soggetto.
 
-Cambia il funzionamento. Il modulo potrebbe persino scomparire.
+- Cambia il funzionamento. Il modulo potrebbe persino scomparire.
 
 La distinzione è riconosciuta anche dall'OCSE: digital by design significa riprogettare politiche, processi e servizi a partire dalle possibilità del digitale, anziché sovrapporre la tecnologia alle procedure esistenti. Il rapporto Digital Government Outlook 2026 insiste inoltre su infrastrutture condivise, interoperabilità e riduzione dei sistemi frammentati.&#x20;
 
-[image](https://www.google.com/s2/favicons?domain=https://www.oecd.org\&sz=32)
-
-OECD
-
-
+#### Esempio
 
 Prendiamo un caso semplice: una variazione dei dati di un correntista.
 
@@ -697,11 +673,11 @@ Il risultato non è semplicemente un modulo più veloce da compilare. È un proc
 
 Ecco perché la tua formula è efficace:
 
-Inefficiente come la carta, insicura come l'informatica.
+- Inefficiente come la carta, insicura come l'informatica.
 
 È un paradosso, non una proprietà inevitabile di qualsiasi modulo digitale. Descrive un sistema che conserva le inefficienze della procedura analogica e aggiunge le nuove superfici di rischio introdotte dal trattamento digitale dei dati.
 
-## 3. I due errori hanno la stessa radice
+### 3. I due errori hanno la stessa radice
 
 Adesso possiamo collegare i due esempi.
 
@@ -721,7 +697,7 @@ Ed è qui che torna il problema degli «operai del futuro». Alle persone si chi
 
 La tecnologia viene aggiornata. Il modello organizzativo rimane fermo.
 
-## 4. La conseguenza per i venticinque anni di debito tecnologico
+### 4. La conseguenza per i 25 anni di debito tecnologico
 
 Se mettiamo insieme queste osservazioni, la tua critica riguarda qualcosa di più profondo della scelta fra software libero e proprietario.
 
@@ -739,7 +715,7 @@ Se il costo e il valore dell'infrastruttura IT sono distribuiti, anche il modell
 
 E il problema della digitalizzazione 1:1 è la manifestazione complementare dello stesso errore: si investe per cambiare il supporto, senza mettere in discussione il processo.
 
-Non è che mancasse la tecnologia per costruire un futuro diverso.
+- Non è che mancasse la tecnologia per costruire un futuro diverso.
 
 È mancata, troppo spesso, la disponibilità a modificare il modo in cui il sistema veniva governato.
 
@@ -759,21 +735,13 @@ Nel caso del Titanic è capitato al primo viaggio perché hanno tenuta "tutta av
 
 Adesso la formulazione è molto più precisa: l'iceberg non è un incidente, ma l'esito previsto da un modello operativo che, mantenuto in quelle condizioni, prima o poi avrebbe incontrato i propri limiti. E quando dici «un piano», non stai necessariamente ipotizzando qualcuno che abbia pianificato il disastro: è il sistema stesso ad avere incorporato le condizioni della propria collisione.
 
-Il punto non è che 22 nodi siano sempre troppi. È che 22 nodi erano troppi per quel tratto di mare, in quelle condizioni e con quel margine di sicurezza. L'inchiesta britannica del 1912 concluse proprio che la perdita della nave fu dovuta alla collisione con l'iceberg, provocata dalla velocità eccessiva con cui navigava; la velocità al momento dell'incidente era stimata in circa 22 nodi.&#x20;
-
-[image](https://www.google.com/s2/favicons?domain=https://www.titanicinquiry.org\&sz=32)
-
-Findings of the Court
-
-+1
-
-
+Il punto non è che 22 nodi siano sempre troppi. È che 22 nodi erano troppi per quel tratto di mare, in quelle condizioni e con quel margine di sicurezza. L'inchiesta britannica del 1912 concluse proprio che la perdita della nave fu dovuta alla collisione con l'iceberg, provocata dalla velocità eccessiva con cui navigava; la velocità al momento dell'incidente era stimata in circa 22 nodi.
 
 La distinzione è decisiva: non esiste una velocità astrattamente sicura, indipendente dall'ambiente. Esiste una velocità compatibile con le condizioni che si possono ragionevolmente incontrare e con la capacità di riconoscerle e reagire.
 
 I 16 nodi che proponi rappresentano una scelta di gestione del rischio; non costituiscono una soglia di sicurezza storicamente dimostrata. Ma il principio è corretto: ridurre la velocità avrebbe aumentato il margine disponibile per affrontare l'incertezza. Non si tratta di dimostrare che una collisione fosse impossibile, bensì di non consumare inutilmente il margine necessario per evitarla o limitarne le conseguenze.
 
-## Il collegamento con i 25 anni di debito tecnologico
+### Il collegamento con i 25 anni di debito tecnologico
 
 Qui il parallelo diventa particolarmente forte.
 
@@ -796,6 +764,4 @@ E quando sostieni che il Titanic avrebbe potuto essere fermato a 12 nodi, rallen
 La tua conclusione, quindi, non è una condanna della velocità. È una critica alla pretesa di poter continuare ad accelerare senza investire proporzionalmente nella capacità di governare l'accelerazione.
 
 L'iceberg non doveva essere pianificato. Era sufficiente pianificare una rotta senza concedersi il margine necessario per affrontare ciò che si sarebbe incontrato.
-
----
 
