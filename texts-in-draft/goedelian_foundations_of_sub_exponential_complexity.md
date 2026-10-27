@@ -3,6 +3,7 @@
 (c) 2026-10-27, Roberto A. Foglietta (roberto.foglietta@gmail.com),CC BY-NC-ND 4.0
 
 - https://share.gemini.google/SQGCglrMw7kX
+- https://chatgpt.com/share/6ae03ad2-4108-83ed-8104-06c8891e2835
 
 ## Executive Summary
 
