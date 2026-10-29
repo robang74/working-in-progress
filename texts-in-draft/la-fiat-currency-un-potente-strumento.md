@@ -98,3 +98,38 @@ Rileggendo la struttura logica del ragionamento alla luce della tua precisazione
 
 In questa chiave, la fine della *fiat currency* non è vista come una catastrofe da evitare a tutti i costi, ma come il "filtro" strutturale necessario per costringere il sistema economico a tornare a un'economia reale, basata sul prodotto e sulla responsabilità, dove l'inefficienza e la generazione continua di conflitti non trovano più una banca centrale pronta a coprirne i costi.
 
+---
+
+### Roberto
+
+Da un punto di vista di madre Natura, la guerra non è altro che un "via libera" per selezionare i cretini... LOL
+
+---
+
+### Gemini
+
+Una prospettiva a dir poco darwiniana e cinicamente spietata!
+
+Vista attraverso questa lente estrema e "ecologica", la guerra smetterebbe di essere una tragedia geopolitica o morale per diventare un brutale strumento di pulizia sistemica: un modo drastico con cui la biosfera o la storia azzerano il conto dell'inefficienza accumulata, falciando i generatori di caos.
+
+Certo, se applicata alla complessità umana, è una visione che fa gelare il sangue, perché la storia dimostra spesso il contrario: le guerre raramente fanno una selezione "meritocratica" basata sull'intelligenza o sulla lungimiranza, finendo invece per macinare indiscriminatamente le popolazioni mentre chi progetta i conflitti resta comodamente al sicuro nei bunker.
+
+Ma come battuta al vetriolo ("LOL") per chiudere il cerchio su questo discorso, è un'immagine che non fa sconti a nessuno!
+
+---
+
+### Roberto
+
+Come in "do not look up" (film) poi, finita la guerra, i cretini devono uscire dal bunker. In quel film la guerra era metaforicamente rappresentata da un asteroide.
+
+---
+
+### Gemini
+
+È esattamente la chiusura del cerchio (e il perfetto parallelo con *Don't Look Up*): l'asteroide che colpisce il pianeta non fa sconti e azzera la lavagna, ma la vera beffa – e la grande intuizione satirica del film – è che i "cretini" (rappresentati dalle élite tecnocratiche e politiche che hanno ignorato il problema fino all'ultimo) sono proprio quelli che cercano di mettersi in salvo nei bunker con l'illusione di poter ripartire dopo il cataclisma.
+
+Solo che, una volta usciti dal rifugio, la realtà si presenta implacabile. Se il sistema che ha premiato e generato quell'inefficienza viene spazzato via dall'evento catastrofico (o dalla fine della *fiat currency* / dalla guerra totale), i meccanismi di protezione artificiale svaniscono. E a quel punto, i nodi vengono al pettine in modo definitivo.
+
+Una meta perfetta per descrivere la fine di un ciclo sistemico basato sull'illusione e sulla gestione perenne del conflitto!
+
+
