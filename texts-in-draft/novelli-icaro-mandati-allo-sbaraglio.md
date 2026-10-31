@@ -129,3 +129,29 @@ Quindi le fiches sono fatte per sembrare giocattoli, e non dobloni d'oro. Eppure
 
 Quindi le "truffe" esistono a prescindere che vi siano truffatori propriamente detti. Non serve che qualcuno decida di truffare le persone, basta lasciarle fare nella loro grassa arrogante ignoranza e anzi incentivarle, ed è proprio così che il sistema diventa distopico, che tutto diventa IL bordello.
 
+---
+
+### Executive Summary
+
+Novelli Icaro mandati allo sbaraglio è un articolo che presenta la progressiva sostituzione della creazione e conservazione di valore reale con rappresentazioni economiche e finanziarie che possono continuare a essere premiate anche quando le condizioni materiali che dovrebbero sostenerle sono venute meno.
+
+La tesi non presuppone l'esistenza di un piano coordinato, di un'intenzione fraudolenta originaria o di un soggetto responsabile unico. Al contrario, descrive un meccanismo evolutivo nel quale:
+
+1. Pratiche e strumenti vengono introdotti per risolvere problemi concreti.
+2. Emergono effetti collaterali non necessariamente previsti.
+3. Alcuni attori scoprono che tali effetti possono essere economicamente vantaggiosi.
+4. Gli incentivi favoriscono la loro diffusione e istituzionalizzazione.
+5. Il risultato aggregato può diventare progressivamente disfunzionale, anche senza richiedere una regia centralizzata.
+
+Il fenomeno è osservabile nell'industria IT, nell'adozione dell'intelligenza artificiale, nella gestione delle competenze, nell'industrializzazione e nei modelli di investimento.
+
+La distinzione fondamentale è fra capacità di produrre risultati apparentemente misurabili e capacità di sostenere nel tempo le condizioni necessarie alla loro produzione.
+
+La disponibilità di capitale non equivale alla disponibilità di competenze. La scalabilità non equivale alla sostenibilità. La liquidità non equivale alla creazione di valore. La valutazione finanziaria non costituisce una verifica della solidità tecnologica, industriale o organizzativa.
+
+L'articolo introduce inoltre una riflessione istituzionale: nessuna forma di governo, modello economico o sistema di partecipazione è immune dalla degenerazione. La funzione dell'autorità può includere il ripristino dei vincoli della realtà quando gli interessi individuali producono conseguenze collettivamente distruttive, ma anche l'autorità deve rimanere soggetta a quei medesimi vincoli.
+
+La questione centrale non è individuare chi abbia progettato il sistema per ingannare, ma comprendere perché il sistema continui a premiare comportamenti che producono risultati ingannevoli, anche quando i loro effetti sono ormai osservabili.
+
+La domanda conclusiva riguarda quindi la capacità delle istituzioni economiche e finanziarie di riconoscere e correggere la dissociazione fra valore rappresentato e valore reale, prima che la correzione venga imposta dalle conseguenze materiali del loro stesso funzionamento.
+
