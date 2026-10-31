@@ -107,7 +107,7 @@ Anche in questo caso, l'illusione nasce da una truffa, il sistema delle consulen
 
 La truffa è cominciata quando il modo di piazzare il piede nella porta per vendere l'aspirapolvere si è trasformato in un modello di organizzare l'impresa perché a quel punto ammettere che là fuori in mezzo alle "risorse umane" vi erano degli "artisti nati" del software, ed è normale che fosse così visto che è successo con pennelli, violini e penna. Hanno ciurlato nel manico fino a fottere l'intero sistema dell'informatica: è magia, non è più Galileo Galilei.
 
-La retorica sarcastica al vetriolo di questo articolo non penso sia l'aspetto più devastante (disruption). Piuttosto quella di rivelare quali siano le implicazioni sociali e i meccanismi finanziari che muovo questa macchina, come long-term equity swap, per esempio.
+La retorica sarcastica al vetriolo di questo articolo non penso sia l'aspetto più devastante (disruption). Piuttosto quella di rivelare quali siano le implicazioni sociali e i meccanismi finanziari che muovo questa macchina, come il meccanismo del long-term equity swap, per esempio.
 
 Non è nemmeno necessario fornire una dimostrazione. Chi ha interesse su quelle posizioni ha certamente gli strumenti per creare quel tipo di progetto come fenomeno emergente e quindi spontaneo. Qualcun'altro lo farà per incentivi indipendenti, e poi è sufficiente supportare mediante influencer quel trend su quello specifico progetto.
 
