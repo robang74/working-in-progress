@@ -115,7 +115,7 @@ L'allineamento è sistemico. Perché i meccanismi degli incentivi sono sistemici
 
 ---
 
-### Esempio concreto
+### Un esempio concreto
 
 > Farei soltanto una distinzione: è documentabile l'effetto psicologico della separazione fra denaro e mezzo di pagamento; affermare che questa sia stata la ragione intenzionale per cui i casinò hanno introdotto le fiches richiederebbe una dimostrazione storica.
 
