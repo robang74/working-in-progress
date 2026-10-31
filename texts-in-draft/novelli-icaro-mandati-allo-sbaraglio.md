@@ -95,6 +95,10 @@ Anche qualora PhotoCraft giungesse ad una versione 1.0 in tempi strabiliantement
 
 Ma pochissimi di loro riusciranno ad ottenere qualcosa di diverso da una catastrofe, e a posteriori scopriremo che dietro ai progetti meglio riusciti o meno peggio falliti ci sono delle importanti realtà e capitali, che hanno comunque come obiettivo qualcosa di diverso dal prodotto finito. Perché PhotoCraft v1.0 non esiste come prodotto a se stante, esiste come caso studio, come marketing di un determinato strumento, come concorrente di Adobe e quindi degli swap azionari a lungo su quel titolo o derivati sul quel titolo.
 
+---
+
+### Il problema esiste
+
 Il problema non è che tutto questo esista, così come non è un problema che esista la prostituzione legale. Perché il concetto è il medesimo: l'illusione di una conquista facile. Il problema è che questo paradigma è inteso come universale e unico. Ossia, detto in altri termini, qualsiasi altro modello è soppresso come nemico del progresso. In effetti, il palloncino di IT è vulnerabile allo spillo della realtà, ed è un incubo quando il quartiere a luci rosse è il 99% e quello residenziale 1% invece che il viceversa.
 
 Il gioco d'azzardo, fare scommesse improbabili sul futuro, ha cessato di essere un'attività marginale che aveva senso quando quella marginalità poteva effettivamente generare un'innovazione o una scoperta importante, per serendipity o banale fortuna sfacciata. Perché è anche giusto che una civiltà progredita e opulenta che goda di un vistoso surplus, ne dedichi una briciola anche alle scommesse improbabili. Altra cosa è la ludopatia esistenziale.
@@ -102,4 +106,16 @@ Il gioco d'azzardo, fare scommesse improbabili sul futuro, ha cessato di essere 
 Anche in questo caso, l'illusione nasce da una truffa, il sistema delle consulenze ha cominciato a presentare senior scafati, gente che ribaltava i bytes a 13 anni, come senior senza competenza verticale. Cosa è accaduto? Le aziende hanno osservato un'illusione ottica: gente che non aveva mai visto gli internal del kernel, riuscire dove i loro ingegneri più esperti arrancavano da diversi o molti trimestri. Era una truffa? No, era un modo piazzare.
 
 La truffa è cominciata quando il modo di piazzare il piede nella porta per vendere l'aspirapolvere si è trasformato in un modello di organizzare l'impresa perché a quel punto ammettere che là fuori in mezzo alle "risorse umane" vi erano degli "artisti nati" del software, ed è normale che fosse così visto che è successo con pennelli, violini e penna. Hanno ciurlato nel manico fino a fottere l'intero sistema dell'informatica: è magia, non è più Galileo Galilei.
+
+La retorica sarcastica al vetriolo di questo articolo non penso sia l'aspetto più devastante (disruption). Piuttosto quella di rivelare quali siano le implicazioni sociali e i meccanismi finanziari che muovo questa macchina, come long-term equity swap, per esempio.
+
+Non è nemmeno necessario fornire una dimostrazione. Chi ha interesse su quelle posizioni ha certamente gli strumenti per creare quel tipo di progetto come fenomeno emergente e quindi spontaneo. Qualcun'altro lo farà per incentivi indipendenti, e poi è sufficiente supportare mediante influencer quel trend su quello specifico progetto.
+
+L'allineamento è sistemico. Perché i meccanismi degli incentivi sono sistemici. Non è un caso che i casinò usino le fiches ai tavoli. Non solo per "pulizia" e comodità, ma per far dimenticare ai giocatori che quel denaro che scommettono è frutto di una produzione (lavoro) e non plastica: della banconota conosciamo il valore in termini di borsa della spesa, la fische è un giocattolo.
+
+
+
+
+
+
 
