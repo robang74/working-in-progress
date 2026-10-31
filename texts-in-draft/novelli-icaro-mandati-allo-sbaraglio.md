@@ -113,3 +113,19 @@ Non è nemmeno necessario fornire una dimostrazione. Chi ha interesse su quelle 
 
 L'allineamento è sistemico. Perché i meccanismi degli incentivi sono sistemici. Non è un caso che i casinò usino le fiches ai tavoli. Non solo per "pulizia" e comodità, ma per far dimenticare ai giocatori che quel denaro che scommettono è frutto di una produzione (lavoro) e non plastica: della banconota conosciamo il valore in termini di borsa della spesa, la fiche è un giocattolo.
 
+---
+
+### Esempio concreto
+
+> Farei soltanto una distinzione: è documentabile l'effetto psicologico della separazione fra denaro e mezzo di pagamento; affermare che questa sia stata la ragione intenzionale per cui i casinò hanno introdotto le fiches richiederebbe una dimostrazione storica.
+
+Magari hanno introdotto le fiches da gioco solo per pulizia: molte banconote un tempo erano parecchio usurate. Le fiches permettevano immediato riconoscimento del valore al tavolo, velocizzano il gioco e diminuiscono le contese sull'uso del contante.
+
+Poi hanno capito che c'era qualcosa di più interessante nel concetto di gettone di plastica. Quindi quella parte come il "piede nella porta" non va letta come causa-effetto di un'intenzione preordinata ad un determinato fine. Piuttosto va letta come "abbiamo scoperto che la fiches" e la psicologia poi l'ha confermato: il giocatore perde il senso del valore.
+
+Alcune cose nascono spontaneamente, poi vengono incentivate. Quindi non serve cercare un piano, o una prova, o una regia: si osserva un fenomeno, si scopre che quel fenomeno genera effetti collaterali, qualcuno incentiva quegli effetti perché sono "utili" o "desiderabili" per chi li incentiva.
+
+Quindi le fiches sono fatte per sembrare giocattoli, e non dobloni d'oro. Eppure un casinò potrebbe presentarsi in termini di marketing e location come l'isola dei pirati ma non userebbe il conio dei dobloni o di qualsiasi altra moneta di valore per le fische, altrimenti scoprirebbe l'acqua fredda.
+
+Quindi le "truffe" esistono a prescindere che vi siano truffatori propriamente detti. Non serve che qualcuno decida di truffare le persone, basta lasciarle fare nella loro grassa arrogante ignoranza e anzi incentivarle, ed è proprio così che il sistema diventa distopico, che tutto diventa IL bordello.
+
