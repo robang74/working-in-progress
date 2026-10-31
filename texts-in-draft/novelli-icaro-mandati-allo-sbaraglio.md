@@ -111,11 +111,5 @@ La retorica sarcastica al vetriolo di questo articolo non penso sia l'aspetto pi
 
 Non è nemmeno necessario fornire una dimostrazione. Chi ha interesse su quelle posizioni ha certamente gli strumenti per creare quel tipo di progetto come fenomeno emergente e quindi spontaneo. Qualcun'altro lo farà per incentivi indipendenti, e poi è sufficiente supportare mediante influencer quel trend su quello specifico progetto.
 
-L'allineamento è sistemico. Perché i meccanismi degli incentivi sono sistemici. Non è un caso che i casinò usino le fiches ai tavoli. Non solo per "pulizia" e comodità, ma per far dimenticare ai giocatori che quel denaro che scommettono è frutto di una produzione (lavoro) e non plastica: della banconota conosciamo il valore in termini di borsa della spesa, la fische è un giocattolo.
-
-
-
-
-
-
+L'allineamento è sistemico. Perché i meccanismi degli incentivi sono sistemici. Non è un caso che i casinò usino le fiches ai tavoli. Non solo per "pulizia" e comodità, ma per far dimenticare ai giocatori che quel denaro che scommettono è frutto di una produzione (lavoro) e non plastica: della banconota conosciamo il valore in termini di borsa della spesa, la fiche è un giocattolo.
 
