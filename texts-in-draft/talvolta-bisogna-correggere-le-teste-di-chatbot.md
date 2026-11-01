@@ -79,10 +79,17 @@ Invece siamo di ancora qui, da capo. Come se non avessero imparato nulla, come s
 
 ### Conclusione sintetica personale
 
-La Russia non era un nemico per l'Ucraina e la Russia non ha mai avuto bisogno di annettere territori dell'Ucraina prima che il governo di Kiev diventasse nemica della Russia. Non ci vuole molto a scoprire che il problema è iniziato nel 2007 con la conferenza sulla sicurezza geopolitica tenutasi a Monaco di Baviera, e poi è diventato un qualcosa di concreto nel 2008 con la successiva conferenza di Budapest.
+La Russia non era un nemico per l'Ucraina e la Russia non ha mai avuto bisogno di annettere territori dell'Ucraina prima che il governo di Kiev diventasse nemica della Russia. Non ci vuole molto a scoprire che il problema è iniziato nel 2007 con la conferenza sulla sicurezza geopolitica tenutasi a Monaco di Baviera, e poi è diventato un qualcosa di concreto nel 2008 con la successiva conferenza di Bucarest.
 
 La crisi ucraina è il prodotto dell'azzardo morale dei subprime loans. Anche se le due cose appaiono scollegate e solo coincidenti in termini temporali, di fatto il problema di fondo rimaneva aperto: chi paga per quella bolla? Quella delle dot-com fu pagata con le spese per la sicurezza e la guerra al terrorismo post 9/11. Quelle dei subprime loans si prevedeva di mitigarla con l'aumento della bellica causato dalle frizioni fra NATO e Russia.
 
 La cosa però è scappata di mano perché la complessità delle relazioni fra Ucraina e Russia non ammettevano un approccio geopolitico semplificato in stile Risiko. Per essere totalmente esplicito: l'approccio semplificato alla Risiko non ha mai funzionato a parte guerre teatrali quali quella dell'Iraq. Perché già in contesti altrettanto limitati come l'intervento militare nella guerra civile post-Jugoslavia e quello in Libia, hanno creato seri problemi e una scia di lunghe ripercussioni nonostante la componente di intervento europea fosse quasi prevalente.
 
+- La caduta del regime iracheno nel 2003 fu relativamente rapida. La ricerca Costs of War della Brown University stima, considerando Iraq e Siria nel periodo 2003-2023, oltre 2.890 miliardi di dollari di costi e più di mezzo milione di morti. Sono cifre aggregate per entrambi i teatri, non attribuibili esclusivamente all'Iraq.
+
 Non che gli europei siano migliori o più forti nel fare la guerra. Siamo solo più avvezzi a scannarci tra noi e con le altre genti del Mediterraneo. In questo contesto "avvezzi" significa, anche ma non soltanto, capaci di percepire la complessità delle relazioni fra i popoli e non solo guardare i confini da un satellite o da una mappa. Oppure, cambiando prospettiva, noi europei non ci scanniamo per il vile denaro, lo facciamo da sempre per degli ideali. Partiamo al grido di Deus Vult e poi finiamo a Costantinopoli, non viceversa!
+
+- La IV crociata era stata organizzata per raggiungere l'Oriente e attaccare l'Egitto. I crociati si ritrovarono indebitati con Venezia per il trasporto navale. La deviazione verso Costantinopoli fu influenzata anche da accordi finanziari e dinastici con Alessio IV.
+
+- Nel 1204 conquistarono e saccheggiarono una città cristiana, la capitale dell'Impero bizantino. Le motivazioni sono ancora oggetto di discussione storiografica, ma il peso delle obbligazioni finanziarie è documentato.
+
