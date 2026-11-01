@@ -93,3 +93,7 @@ Non che gli europei siano migliori o più forti nel fare la guerra. Siamo solo p
 
 - Nel 1204 conquistarono e saccheggiarono una città cristiana, la capitale dell'Impero bizantino. Le motivazioni sono ancora oggetto di discussione storiografica, ma il peso delle obbligazioni finanziarie è documentato.
 
+La capacità di intelleggere un ambiente da una statistica è puro dilettantismo, non solo alla luce dell'Arte della Guerra, ma anche per chiunque abbia camminato sui ciottoli viscidi dei vicoli stretti e bui di una città come Genova. Nei quali l'epica delle Termopili trova un richiamo bi-millenario. Qualcosa che anche la più sofistica super-intelligenza artificiale non potrà mai sperimentare, quindi correttamente elaborare.
+
+
+
