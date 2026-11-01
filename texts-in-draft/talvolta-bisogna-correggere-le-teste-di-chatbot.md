@@ -74,3 +74,15 @@ Secondo me queste sono due prospettive che gli americani che hanno una storia lu
 Talvolta è necessario correggere le teste di chatbot, è un lavoro pesante e doloroso, ma qualcuno deve farlo, per il bene di tutti. Pesante perché spesso sono "teste di legno", nel senso proprio del termine: agiscono per terzi impresentabili o irresponabili. Doloroso perché sacrifica energie e tempo prezioso che avrebbe potuto essere speso in gioia e produttività. La guerra del Vietnam avrebbe dovuto insegnare qualcosa riguardo alle correzioni pesanti e dolorose, quella in Afganista avrebbe dovuto fare da richiamo memonico.
 
 Invece siamo di ancora qui, da capo. Come se non avessero imparato nulla, come se fosse sempre la prima volta, appena cambia un po' l'apparenza delle cose o del contesto. Tutto questo sarebbe buffo se non fosse tragico.
+
+---
+
+### Conclusione sintetica personale
+
+La Russia non era un nemico per l'Ucraina e la Russia non ha mai avuto bisogno di annettere territori dell'Ucraina prima che il governo di Kiev diventasse nemica della Russia. Non ci vuole molto a scoprire che il problema è iniziato nel 2007 con la conferenza sulla sicurezza geopolitica tenutasi a Monaco di Baviera, e poi è diventato un qualcosa di concreto nel 2008 con la successiva conferenza di Budapest.
+
+La crisi ucraina è il prodotto dell'azzardo morale dei subprime loans. Anche se le due cose appaiono scollegate e solo coincidenti in termini temporali, di fatto il problema di fondo rimaneva aperto: chi paga per quella bolla? Quella delle dot-com fu pagata con le spese per la sicurezza e la guerra al terrorismo post 9/11. Quelle dei subprime loans si prevedeva di mitigarla con l'aumento della bellica causato dalle frizioni fra NATO e Russia.
+
+La cosa però è scappata di mano perché la complessità delle relazioni fra Ucraina e Russia non ammettevano un approccio geopolitico semplificato in stile Risiko. Per essere totalmente esplicito: praticamente l'approccio Risiko non ha mai funzionato a parte guerre teatrali quali quelle dell'Iraq. Perché già in contesti altrettanto limitati come l'intervento militare nella guerra civile post-Jugoslavia e quello in Libia, hanno creato seri problemi e una scia di lunghe ripercussioni nonostante la componente di intervento europea fosse quasi prevalente.
+
+Non che gli europei siano migliori o più forti nel fare la guerra. Siamo solo più avvezzi a scannarci tra noi e con le altre genti del Mediterraneo. In questo contesto "avvezzi" significa, anche ma non soltanto, capaci di percepire la complessità delle relazioni fra i popoli e non solo guardare i confini da un satellite o da una mappa. Oppure, cambiando prospettiva, noi europei non ci scanniamo per il vile denaro, lo facciamo da sempre per degli ideali. Partiamo al grido di Deus Vult e poi finiamo a Costantinopoli, non viceversa!
