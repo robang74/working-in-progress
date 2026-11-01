@@ -95,5 +95,5 @@ Non che gli europei siano migliori o più forti nel fare la guerra. Siamo solo p
 
 La capacità di intelleggere un ambiente da una statistica è puro dilettantismo, non solo alla luce dell'Arte della Guerra, ma anche per chiunque abbia camminato sui ciottoli viscidi dei vicoli stretti e bui di una città come Genova. Nei quali l'epica delle Termopili trova un richiamo bi-millenario. Qualcosa che anche la più sofistica super-intelligenza artificiale non potrà mai sperimentare, quindi correttamente elaborare.
 
-
+Ergo, noi europei, e gli arabi affacciati sul Mediterraneo inclusi, sappiamo che la mappa non è il territorio da dieci volte più tempo dell'intera storia americana solo per aver camminato nei vicoli delle nostre città medioevali che furono costruite secondo le lezioni apprese in oltre 25 secoli di storia. Non deve perciò stupire che sia un po' arduo venirci a "raccontare" cosa sia la guerra, per giunta quando la si vuole fare a casa nostra!
 
