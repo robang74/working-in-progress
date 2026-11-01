@@ -1,6 +1,6 @@
 ## NOVELLI ICARO MANDATI ALLO SBARAGLIO
 
-- (c) 2026-10-31, Roberto A. Foglietta (roberto.foglietta@gmail.com),CC BY-NC-ND 4.0
+- (c) 2026-10-31, Roberto A. Foglietta (roberto.foglietta@gmail.com), CC BY-NC-ND 4.0
 
 Ragazzi, quando vi dicono: buttatevi che vi spuntano le ali...
 
