@@ -67,6 +67,10 @@ La gente ha dei sentimenti che talvolta sono confusi, altrevolte constrastanti e
 
 Secondo me queste sono due prospettive che gli americani che hanno una storia lunga meno tre secoli e tutto sommato poco identitaria hanno sottovalutato pesantemente. Poco identitaria, giacché sono eurepei partiti da molte nazioni otlreoceano che hanno dimenticato di esserlo a causa della distanza dalla madre patria e dai relativi legami familiari e nazionali.
 
+- Nel novembre 2021, il KIIS rilevava che il 43% degli intervistati ucraini aveva parenti stretti in Russia, percentuale che saliva oltre il 50% nel Sud e 53% nell'Est. Un ulteriore 14% aveva altri parenti in Russia.
+
+- Nel 2017, circa il 27% parlava prevalentemente russo e circa la metà degli intervistati erano bilingui. Però solo 6% desiderava l'unificazione con la Russia. Ciò dimostra che la complessità delle relazioni è stata ignorata.
+
 Talvolta è necessario correggere le teste di chatbot, è un lavoro pesante e doloroso, ma qualcuno deve farlo, per il bene di tutti. Pesante perché spesso sono "teste di legno", nel senso proprio del termine: agiscono per terzi impresentabili o irresponabili. Doloroso perché sacrifica energie e tempo prezioso che avrebbe potuto essere speso in gioia e produttività. La guerra del Vietnam avrebbe dovuto insegnare qualcosa riguardo alle correzioni pesanti e dolorose, quella in Afganista avrebbe dovuto fare da richiamo memonico.
 
 Invece siamo di ancora qui, da capo. Come se non avessero imparato nulla, come se fosse sempre la prima volta, appena cambia un po' l'apparenza delle cose o del contesto. Tutto questo sarebbe buffo se non fosse tragico.
