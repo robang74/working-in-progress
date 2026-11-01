@@ -1,0 +1,72 @@
+## Talvolta bisogna correggere le teste di chatbot
+
+- (c) 2026-11-01, Roberto A. Foglietta (roberto.foglietta@gmail.com), CC BY-NC-ND 4.0
+- 2nd edition: based on the LinkedIn [post](https://lnkd.in/p/dtgX6SMv) &nbsp; (2026-11-01)
+
+### Una ricostruzione ragionevole della telefonata
+
+> Alexander Stubb, il presidente finlandese dal sorriso telegenico, e Jonas Gahr Store, il navigato premier norvegese, avevano composto il prefisso di Mosca. Volevano parlare con l’uomo nero. Con Vladimir Putin. Il 27 ottobre 2026, lo chiamarono.
+> 
+> E dall’altro capo del filo, a quanto pare, non c’era un autocrate all’angolo pronto a implorare una tregua, ma un uomo che si è accomodato sulla sua poltrona al Cremlino e ha cominciato a parlare.
+>
+> A spiegare. A sezionare la storia, secolo dopo secolo, come un vecchio professore universitario che ha tutto il tempo del mondo e nessuna intenzione di farsi dettare la tabella di marcia dai suoi allievi.
+
+- Fonte del testo riportato: [tamagozine.org](https://tamagozine.org/2026/10/30/quel-telefono-squillato-a-mosca-ha-fatto-impazzire-leuropa/) articolo del Dott. Pasquale Di Matteo (2026-10-30)
+
+---
+
+### Quale sarebbe la lezione di storia medievale?
+
+La ricostruzione più plausibile non viene da una trascrizione della telefonata, che non abbiamo, ma da un testo che Putin ha pubblicato il 12 luglio 2021, intitolato On the Historical Unity of Russians and Ukrainians. È il documento nel quale ha sviluppato con maggiore sistematicità la propria interpretazione della storia comune russo-ucraina.
+
+Il punto di partenza è la Rus' di Kyiv (Rus' kieviana). La conclusione politica di Putin è che Russia, Bielorussia e Ucraina siano sostanzialmente un unico popolo e che il legame fra i due Paesi sia naturale, storico e che la separazione politica contemporanea sia una frattura artificiale, in larga parte provocata da soggetti esterni. Ma questa conclusione non deriva automaticamente dai fatti medievali. Questa però è la questione politica, non storica.
+
+---
+
+### La storia medievale appare più una metafora!
+
+Putin ha effettivamente esposto la propria interpretazione delle origini e delle cause del conflitto. Ma, secondo Stubb e Støre, lo ha fatto parlando degli eventi dal 2014 in poi, non tenendo una lezione sui popoli slavi del Medioevo.
+
+La sequenza che possiamo ricostruire è quindi:
+
+- 2014: Euromaidan e cambiamento di potere a Kyiv, annessione russa della Crimea e inizio della guerra nel Donbass da parte di Kyiv (&ast;).
+
+- 2014-2021: guerra civile a bassa intensità per trasformare progressivamente l'Ucraina in un Paese ostile alla Russia nonostante il sentimento della sua popolazione (&ast;).
+
+- 2022: operazione speciale intesa come invasione su larga scala dagli europei, richiami alle cause originarie e negoziati di Istanbul e di Bali (&ast;).
+
+- 2026: Putin ribadisce che una pace duratura deve soddisfare integralmente le richieste già esplicitate (&ast;).
+
+La storia medievale fornisce la cornice identitaria (&ast;). Gli eventi dal 2014 in avanti costituiscono invece la giustificazione politica e geopolitica immediata.
+
+(&ast;) points edited: la versione di ChatGPT era troppo edulcorata e in alcuni casi sbilanciata o incompleta rispetto ai fatti realmente dimostrabili anche solo attraverso articoli di cronaca.
+
+---
+
+### Fonti ed elaborazione del testo
+
+Fonti e ricerca ottenute tramite utilizzo di due AI, testo composto per sintesi ed editato dall'autore umano.
+
+~> lnkd.in/dpCFK2aH
+
+In particolare ChatGPT chiude con una chiosa tipica dell'umiltà epistemica, affermado che Putin può avere una rappresentazione storica coerente e articolata della propria posizione, ma la coerenza interna di una narrazione non dimostra la correttezza delle sue premesse né la legittimità delle conclusioni politiche che ne trae.
+
+Dimenticando il più elementare dei principi che hanno governato ogni tavolo di pace anche nelle ultime due guerre mondiali: la storia la scrivono i vincitori. Forse l'unica novità che potremmo eccepire a questo principio è che la versione moderna sia più simile a: la storia la continuano a scrivere i sopravvissuti.
+
+Personalmente sono stato in Ucraina nel 2017 e fra quelle genti il concetto di La Madre Russia (Matushka Rossiya) era molto sentito e alcuni piangevano all'idea che potesse esserci una guerra contro l'unità identitaria.
+
+---
+
+### Talvolta bisogna correggere le teste di chatbot
+
+Vedi, caro lettore che sei capitato su questo post, io credo di più a coloro che piangono per la perdita di qualcosa che a coloro che strillano entusiasti per andare in guerra. Perché la guerra non stabilisce chi è giusto, ridefinisce il potere e il potere ri/scrivere la storia soprattutto appoggiandosi ai miti che sono percepiti come intensi. Così è fatto l'essere umano.
+
+La Russia nel Donbass intervenne per difendere i cittadini russi così come fece in Crimea. La questione è che mentre la Crimea era strateggicamente legata alla Russia e quindi è stata relativamente facile da annettere mediante un referendum, il Donbass lo era molto meno, in quanto i cittadini russi del Donbass aveva relazioni commerciali principalmente con Kiev non con Mosca.
+
+La gente ha dei sentimenti che talvolta sono confusi, altrevolte constrastanti e talune volte molto chiari e precisi. Come sulla lingua russa parlata dal 90% degli ucraini, come la parentela con origini russe che in alcune zone arriva ad interessare un terzo degli ucraini. Insomma, la storia a partire da quella medioevale non si cancella con un paio di rivoluzioni politiche che intervengono nei palazzi del potere a Kyev.
+
+Secondo me queste sono due prospettive che gli americani che hanno una storia lunga meno tre secoli e tutto sommato poco identitaria hanno sottovalutato pesantemente. Poco identitaria, giacché sono eurepei partiti da molte nazioni otlreoceano che hanno dimenticato di esserlo a causa della distanza dalla madre patria e dai relativi legami familiari e nazionali.
+
+Talvolta è necessario correggere le teste di chatbot, è un lavoro pesante e doloroso, ma qualcuno deve farlo, per il bene di tutti. Pesante perché spesso sono "teste di legno", nel senso proprio del termine: agiscono per terzi impresentabili o irresponabili. Doloroso perché sacrifica energie e tempo prezioso che avrebbe potuto essere speso in gioia e produttività. La guerra del Vietnam avrebbe dovuto insegnare qualcosa riguardo alle correzioni pesanti e dolorose, quella in Afganista avrebbe dovuto fare da richiamo memonico.
+
+Invece siamo di ancora qui, da capo. Come se non avessero imparato nulla, come se fosse sempre la prima volta, appena cambia un po' l'apparenza delle cose o del contesto. Tutto questo sarebbe buffo se non fosse tragico.
