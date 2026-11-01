@@ -47,7 +47,7 @@ La storia medievale fornisce la cornice identitaria (&ast;). Gli eventi dal 2014
 
 Fonti e ricerca ottenute tramite utilizzo di due AI, testo composto per sintesi ed editato dall'autore umano.
 
-~> lnkd.in/dpCFK2aH
+- [Sessione ChatGPT](https://chatgpt.com/share/6ae75ce8-dad0-83ed-93c2-7ccf7a14f716) con i link alle fonti di riferimento, i due prompt e le due risposte. 
 
 In particolare ChatGPT chiude con una chiosa tipica dell'umiltà epistemica, affermado che Putin può avere una rappresentazione storica coerente e articolata della propria posizione, ma la coerenza interna di una narrazione non dimostra la correttezza delle sue premesse né la legittimità delle conclusioni politiche che ne trae.
 
