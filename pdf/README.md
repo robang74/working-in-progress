@@ -8,7 +8,7 @@
 
 ### Comparing Oehmke & Zawadowski vs. Foglietta
 
-> **Version 6 (integrated).** Consolidated rewrite of versions 1–5: all update rounds (satellite articles #350–#355; older articles #302, #090 introducing TCMO; excluded mid-series articles #352, #353) are merged into a single final-state document. No superseded material remains. Underlying analyses: `notes-oehmke-zawadowski-tragedy-of-complexity.md` (full structural analysis of the paper) and `notes-foglietta-tragedy-of-complexity.md` (full structural analyses of nine Foglietta articles and the extended informal theory, primitives T1–T23).
+> **Version 7.** Version 6 (integrated consolidation of all update rounds: satellites #350–#355; #302, #090/TCMO; excluded #352, #353) **plus §9**, integrating two external cross-reviews (Gemini; ChatGPT's edition-comparison in the working-in-progress repository): version-scope separation (2019 WP vs. 2026 publication), local-vs-equilibrium and relative-vs-absolute qualifications, epistemic labeling. No conclusion of v6 required reversal. Underlying analyses: `notes-oehmke-zawadowski-tragedy-of-complexity.md` (corrected) and `notes-foglietta-tragedy-of-complexity.md` (T1–T23).
 
 #### References
 
@@ -122,11 +122,8 @@ Chronology matters: the cost account (#090, 2017) *pre-dates* the tragedy articl
 Nine articles analyzed. Significance tiers:
 
 - **Theory core (indispensable):** #349 (statement), #354 (mechanisms T9–T12), #090 (cost account T16–T19), #355 (meta-level T13–T15).
-
 - **Methodological cluster:** the prompts page + #302 (embedded SoNia/AleX toolchain; Athens vs. modern contrast = purest statement of T18).
-
 - **Example tier (collapsible):** #350 + #351 (grand-strategy scenario + historical roots; keepers: T7 self-hosted versus, T8 budget-theater).
-
 - **Wrongly excluded:** #352 (T20–T22 + the fullest AI-research demonstration; more extension material than included #350) and #353 (T23, the only implemented institutional remedy). The rational editorial cut was to *merge* #350+#351 and *split* #352 — not to exclude.
 
 ---
@@ -134,3 +131,46 @@ Nine articles analyzed. Significance tiers:
 ### 8. Final synthesis
 
 > *The paper proves that competing suppliers of complexity/messages systematically distort what they offer when attention is a common resource — a static, rational-agent account of an unpriced externality. Foglietta's extended theory describes the entire market around that mechanism — rational and degraded suppliers (including AI), rational and collapsed audiences — and the cost account beneath it: agents skip the versus because mistake-ownership is individually expensive and collectively dilutable; the skipped versus compounds into a collective TCMO balance that surfaces as sudden catastrophe; organizations scale non-understanding faster than comprehension; and the remedies converge on one operation — re-pricing what was free. The paper formalizes the attention externality; the informal theory adds the mistake externality; and the Wales Act shows both pointing at the same instrument: make the agent face the cost they currently export.*
+
+
+---
+
+### 9. Version control and scope qualifications (cross-review integration)
+
+> This section consolidates two external reviews of the underlying analysis: a Gemini review of the paper notes (terminology-shift note; policy-remedy clarification; demand-theory emphasis) and a ChatGPT review (the edition-comparison document in the working-in-progress repository). The verdict of both: the analysis is sound; the required changes are **qualifications, not reversals**. None of the comparison's conclusions (§3–§8) is invalidated; several are sharpened.
+
+#### 9.1 Version scope of the paper analysis
+
+- **What this comparison analyzes** is the **2019 working paper**, line by line. All citations of propositions, thresholds, and figures refer to that version.
+
+- **The 2026 publication is a substantial revision, not a terminology refresh.** Per the publication record and the accessible October 2024 author manuscript: the attention curve is developed more explicitly and generally; the **proposition sequence changes**; applications are broadened (financial regulation, corporate communication); and the later **Proposition 2 has a different role** from the 2019 software-update result. Terminology shifts ("producers" → "suppliers", "effective attention" → "depth of understanding") are the visible tip of a deeper reorganization.
+
+- **Consequence for this document:** every claim attributed to "the published version" (§1 version note; C3) is **secondhand** (publication record/abstract), not line-by-line verified. The load-bearing claims — the attention externality mechanism, the message-supplier applications — are stable across versions; the proposition-level mappings are version-specific and marked as such.
+
+#### 9.2 Qualifications adopted from the cross-reviews
+
+1. **Local incentive vs. equilibrium outcome (Prop. 1).** The paper's own warning applies: Proposition 1 characterizes the *local* incentive to deviate from the planner's solution; the direction of the final equilibrium distortion can differ once other producers respond. Effect on the comparison: **I3 and C1 are unaffected** (both concern the existence and bidirectionality of the distortion, not its local direction), but any use of Prop. 1 as a *predictive* diagnostic for observed markets must carry the local-equilibrium caveat. Incorporated in the paper notes (Tag 1, essay).
+
+2. **Relative vs. absolute complexity.** The curse of variety and the complexity paradox describe complexity *relative to the planner's solution*; absolute complexity can move the other way (Fig. 2, p. 28). Effect: **I3 stands**, with the relative/absolute distinction now explicit (Tag 4). This actually *rhymes* with the informal theory's own distinction (Table 1's two axes; #352's diffusion-model ≠ functioning-model point).
+
+3. **The `t_i/c_i = 1` threshold is specification-specific** (evaluated at the planner's solution under the quadratic functional form). Effect: none on the comparison — the notes already flagged the threshold as model-specific; now grounded precisely.
+
+4. **Sufficient statistics ≠ established observables.** Lemma 1's quantities are analytical characterizations of the local distortion's direction, not validated empirical measures. Effect: **I5 stands as diagnostics-in-principle**; the demand-side red flags in the corpus (software-update feeling, skipped versus) remain the more operational diagnostics.
+
+5. **Demand-theory parallel, sharpened:** complexity is the **non-market price** of effective attention — set unilaterally by the supplier rather than cleared by a market — which is exactly why standard welfare properties fail. This strengthens I2's externality reading (already implicit in §3.5.3 of the notes).
+
+6. **Policy remedy, disambiguated:** the paper's objection to "reduce complexity" mandates is that complexity can be inefficiently *low* as well as too high (a blanket ceiling is counterproductive); the impracticality of tradable attention permits is a separate, implementational judgment. Both points now recorded distinctly (Tag 8).
+
+7. **Epistemic labeling discipline (ASSUMPTION / MODEL RESULT / ILLUSTRATION / EMPIRICAL EVIDENCE)** adopted in the paper notes' support check. Effect on the comparison: the mappings in §5 (phones, Brexit, media dumbing-down) are formally classified as **illustrations, not evidence** — which bounds the strength of C3 and the §5 cross-reading honestly, without weakening them (both sides of the comparison are theoretical frameworks; their confrontation is argument-against-argument, not evidence-against-evidence).
+
+#### 9.3 Net effect
+
+| Item | Effect of cross-review |
+|---|---|
+| Isomorphisms I1–I5 | Unchanged (I2, I3 sharpened per 9.2.2/9.2.5) |
+| Convergences C1–C6 | Unchanged in substance; C3 and C4/C5 explicitly bounded to illustration-level real-world mappings |
+| Divergences D1–D6 | Unchanged; D5 (statics vs. dynamics) gains support from the version note (the 2026 revision's broader generality still does not add intertemporal compounding) |
+| Collection assessment (§7) | Unchanged |
+| **Version hygiene** | New: 2019-WP analysis and 2026-published claims are now strictly separated throughout |
+
+No rewrite is required: the comparison's architecture (§1–§8) survived cross-examination intact, and §9 exists precisely so that future editions of the published paper can be analyzed separately without contaminating either layer.
