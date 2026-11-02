@@ -8,7 +8,7 @@
 
 ### Comparing Oehmke & Zawadowski vs. Foglietta
 
-> **Version 7.** Version 6 (integrated consolidation of all update rounds: satellites #350–#355; #302, #090/TCMO; excluded #352, #353) **plus §9**, integrating two external cross-reviews (Gemini; ChatGPT's edition-comparison in the working-in-progress repository): version-scope separation (2019 WP vs. 2026 publication), local-vs-equilibrium and relative-vs-absolute qualifications, epistemic labeling. No conclusion of v6 required reversal. Underlying analyses: `notes-oehmke-zawadowski-tragedy-of-complexity.md` (corrected) and `notes-foglietta-tragedy-of-complexity.md` (T1–T23).
+> **Version 8.** Version 6 (integrated consolidation of all update rounds: satellites #350–#355; #302, #090/TCMO; excluded #352, #353) **plus two rounds of cross-review integration**: (i) **§9** — the Gemini and ChatGPT edition-comparison reviews (version-scope separation 2019 WP vs. 2026 publication; local-vs-equilibrium and relative-vs-absolute qualifications; epistemic labeling); no conclusion of v6 required reversal; and (ii) **§10** — a human-readable distillation of an independent cross-assessment of the two authors' positions, incorporating its three precision corrections into the body (planner's-optimum boundary condition in the giving-up region; TCMO–λ as correspondence-not-equivalence; remedies as shared internalization principle, different instruments). Underlying analyses: `notes-oehmke-zawadowski-tragedy-of-complexity.md` (corrected) and `notes-foglietta-tragedy-of-complexity.md` (T1–T23).
 
 #### References
 
@@ -72,7 +72,7 @@ These survive every update round:
 
 - **C4. Remedy skepticism — doctrinal and instrumental.** Doctrinally: the paper rejects a blanket "reduce complexity" mandate (complexity can be too low); the corpus rejects one-word institutional fixes ("no magic word, not even 'democracy'"). Instrumentally: T23 (#353) supplies Foglietta's closest analogue to the paper's remedy — Wales' Senedd Cymru Act 2026, a legal mechanism that re-prices a previously free externality (the brazen lie). Both theories end at a **re-pricing operation**.
 
-- **C5. TCMO is the demand-side homologue of the paper's shadow price `λ`.** Suppliers persist in distorted complexity because they do not face the shadow cost of the attention they divert; agents persist in error because they do not face the total cost of the mistakes they externalize. The paper's planner ↔ Foglietta's consequence-coupled society; attention permits ↔ TCMO accounting. Both theories are, at bottom, theories of **unpriced externalities** — one in the attention market, one in the mistake market.
+- **C5. TCMO is the demand-side homologue of the paper's shadow price `λ`.** Suppliers persist in distorted complexity because they do not face the shadow cost of the attention they divert; agents persist in error because they do not face the total cost of the mistakes they externalize. The paper's planner ↔ Foglietta's consequence-coupled society; attention permits ↔ TCMO accounting. This is a **structural correspondence, not an equivalence**: `λ` and TCMO are not the same economic variable, and neither has been derived from the other. Both theories are, at bottom, theories of **unpriced externalities** — one in the attention market, one in the mistake market.
 
 - **C6. Occasional formalism.** #352's covariance argument (relativistic consistency forbids privileged frames; fiat seigniorage is a privileged frame) shows the informal theory can reason formally on demand — narrowing the genre divergence from "math vs. rhetoric" to "systematic formalism vs. occasional formal argument."
 
@@ -98,7 +98,7 @@ All divergences are now grounded in dated corpus articles:
 
 ### 5. Cross-reading
 
-**What the paper adds to the corpus.** Foglietta observes that debate is dumbed down and asks why the versus is skipped; the paper provides a candidate micro-foundation: when many message-suppliers compete for one audience's attention, equilibrium complexity is pushed toward intermediate levels, and the planner's optimum is never reached. The "curse of variety" (more goods ⇒ dumbing down) formalizes the complaint about proliferating online outlets; the complexity paradox formalizes the observation that more information-processing capacity has not produced more understanding. Even Foglietta's rhetorical strategy (hot examples, short punchy text) is what a supplier *should* do in the paper's equilibrium.
+**What the paper adds to the corpus.** Foglietta observes that debate is dumbed down and asks why the versus is skipped; the paper provides a candidate micro-foundation: when many message-suppliers compete for one audience's attention, equilibrium complexity is pushed toward intermediate levels, and the planner's optimum is generally not reached — with one explicit boundary condition: in the **giving-up region** (zero attention allocated) there is no externality and equilibrium *coincides* with the optimum (2019 §4; the 2026 abstract likewise says 'generally inefficient', not invariably). The "curse of variety" (more goods ⇒ dumbing down) formalizes the complaint about proliferating online outlets; the complexity paradox formalizes the observation that more information-processing capacity has not produced more understanding. Even Foglietta's rhetorical strategy (hot examples, short punchy text) is what a supplier *should* do in the paper's equilibrium.
 
 **What the corpus adds to the paper.** The paper assumes the consumer mechanically allocates attention optimally; it cannot explain why a whole society would stop valuing the *method* of understanding. The corpus supplies that demand-side failure (T1/T2), its incentive micro-foundation (T16: engaging the versus means personally owning mistake risk; conforming dilutes it across the crowd), the cost account of the whole process (TCMO: the skipped versus compounds into a collective balance that surfaces as sudden catastrophe), the organizational scaling law (T20), the remedy space (coupling restoration: Pikalevo, re-scholarization, participation, speech-coupling), and the AI-turn of the whole problem (T13–T15).
 
@@ -122,15 +122,18 @@ Chronology matters: the cost account (#090, 2017) *pre-dates* the tragedy articl
 Nine articles analyzed. Significance tiers:
 
 - **Theory core (indispensable):** #349 (statement), #354 (mechanisms T9–T12), #090 (cost account T16–T19), #355 (meta-level T13–T15).
+
 - **Methodological cluster:** the prompts page + #302 (embedded SoNia/AleX toolchain; Athens vs. modern contrast = purest statement of T18).
+
 - **Example tier (collapsible):** #350 + #351 (grand-strategy scenario + historical roots; keepers: T7 self-hosted versus, T8 budget-theater).
+
 - **Wrongly excluded:** #352 (T20–T22 + the fullest AI-research demonstration; more extension material than included #350) and #353 (T23, the only implemented institutional remedy). The rational editorial cut was to *merge* #350+#351 and *split* #352 — not to exclude.
 
 ---
 
 ### 8. Final synthesis
 
-> *The paper proves that competing suppliers of complexity/messages systematically distort what they offer when attention is a common resource — a static, rational-agent account of an unpriced externality. Foglietta's extended theory describes the entire market around that mechanism — rational and degraded suppliers (including AI), rational and collapsed audiences — and the cost account beneath it: agents skip the versus because mistake-ownership is individually expensive and collectively dilutable; the skipped versus compounds into a collective TCMO balance that surfaces as sudden catastrophe; organizations scale non-understanding faster than comprehension; and the remedies converge on one operation — re-pricing what was free. The paper formalizes the attention externality; the informal theory adds the mistake externality; and the Wales Act shows both pointing at the same instrument: make the agent face the cost they currently export.*
+> *The paper proves that competing suppliers of complexity/messages systematically distort what they offer when attention is a common resource — a static, rational-agent account of an unpriced externality. Foglietta's extended theory describes the entire market around that mechanism — rational and degraded suppliers (including AI), rational and collapsed audiences — and the cost account beneath it: agents skip the versus because mistake-ownership is individually expensive and collectively dilutable; the skipped versus compounds into a collective TCMO balance that surfaces as sudden catastrophe; organizations scale non-understanding faster than comprehension; and the remedies converge on one operation — re-pricing what was free. The paper formalizes the attention externality; the informal theory adds the mistake externality; and the Wales Act shows both converging on one **internalization principle** — make the agent face the cost they currently export — through *different* instruments (pricing diverted attention vs. imposing consequences on damaging speech); the shared principle is stronger and more defensible than claiming a shared instrument.*
 
 
 ---
@@ -174,3 +177,53 @@ Nine articles analyzed. Significance tiers:
 | **Version hygiene** | New: 2019-WP analysis and 2026-published claims are now strictly separated throughout |
 
 No rewrite is required: the comparison's architecture (§1–§8) survived cross-examination intact, and §9 exists precisely so that future editions of the published paper can be analyzed separately without contaminating either layer.
+
+---
+
+### 10. Synthesis — the positions of the two authors (readable distillation)
+
+> Register note: this closing section is deliberately written in a more human-readable voice than the ledger sections above. It distills an independent cross-assessment of the two authors' positions, and incorporates its three precision demands (§9.2 boundary conditions; C5 correspondence-not-equivalence; common remedy principle, different instruments), which have been applied to the body of this document.
+
+#### 10.1 How the relationship evolved
+
+The comparison has moved through three stages:
+
+1. **Complementary perspectives** on the attention economy (paper = supply side, article = demand side).
+
+2. **A formal economic mechanism versus a broader theory** of epistemic and institutional failure (after the satellite articles).
+
+3. **Two partially overlapping explanatory frameworks**, one of which can supply mechanisms the other deliberately leaves outside its scope (after the TCMO layer and the version corrections).
+
+The authors are no longer best described as approaching the same problem from opposite sides. They are describing **different layers of a related systemic failure**.
+
+#### 10.2 Where they meet
+
+The fundamental commonality is not simply that attention is scarce. It is that **agents can rationally pursue locally advantageous strategies that produce collectively dysfunctional outcomes**. The paper establishes this as an attention externality inside a specified economic model; Foglietta attempts to explain how a society can reproduce and amplify dysfunctional behavior even when its members have access to more information, more processing capacity, and more sophisticated tools. The descriptions meet at the level of incentives and externalities, from different starting assumptions.
+
+#### 10.3 The asymmetry of strengths
+
+There is no reason to conceal the asymmetry — these are different kinds of strength, not interchangeable measures of quality:
+
+| Dimension | Oehmke–Zawadowski | Foglietta |
+|---|---|---|
+| Primary object | Complexity and attention | Understanding and responsibility |
+| Main mechanism | Attention externality | Mistake externality |
+| Agent model | Rational optimization | Rational, avoidant, and degraded agents |
+| Time | Primarily equilibrium analysis | Accumulation, latency, correction |
+| Scale | Supplier–receiver relationships | Individual to institutional and civilizational |
+| Analytical tool | Mathematical economics | Structural, comparative, causal reasoning |
+| Current limitation | Restricted scope of modeled behavior | Insufficient formalization and empirical validation |
+
+The useful relationship follows: **Zawadowski provides mathematical discipline against which Foglietta's intuitions can be tested; Foglietta supplies phenomena and mechanisms that can motivate extensions of the economic model.**
+
+#### 10.4 Foglietta inside his own phenomenon
+
+The self-referential observation (§1, §5) is the most interesting discovery of the comparison. Foglietta explicitly states that theoretical explanations attract less attention than controversial examples — so he deliberately chooses attention-catching entry points. In Zawadowski's framework, **that makes Foglietta himself a supplier competing for scarce attention**. The productive paradox: he criticizes the simplification of public reasoning; to get an audience to examine that problem, he uses simplified, attention-catching entry points; he then tries to recover the complexity those entry points concealed. This is a strategy for entering the attention market without surrendering the objective of understanding — but it carries an obligation: *the examples must eventually open the debate rather than predetermine its conclusion.* The OK/KO self-review of the France–Germany argument demonstrates the author applying his own method to his own claims. This is where the two works become genuinely interesting together: **Zawadowski explains why Foglietta needs that rhetorical strategy; Foglietta asks what happens after the attention has been captured.**
+
+#### 10.5 The closing question
+
+Zawadowski explains why the market for understanding can produce the wrong product. Foglietta asks why society increasingly stops demanding that the product be understood in the first place. The question their confrontation leaves open:
+
+> *What happens when the supplier, the receiver, and the institution responsible for correcting their mistakes all become subject to the same incentive to avoid understanding?*
+
+That is where Foglietta's extended framework goes beyond the economic paper — and where it has the most work left to do to become a fully specified, independently testable theory.
