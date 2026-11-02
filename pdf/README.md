@@ -1,6 +1,6 @@
 # Comparing "The Tragedy of Complexity": Oehmke & Zawadowski vs. Foglietta
 
-> **Version 4** — updated after structural analysis of Foglietta's four satellite articles (#350, #351, #354, #355) and two older articles (#302, #090 — the latter introducing TCMO). Sections 6–7 record how that analysis changed the convergence/divergence ledger. Underlying analyses: `notes-oehmke-zawadowski-tragedy-of-complexity.md`, `notes-foglietta-tragedy-of-complexity.md` (extended theory with primitives T7–T19).
+> **Version 5** — updated after structural analysis of the four satellite articles (#350–#355), the two older articles (#302, #090 — TCMO), and the two excluded mid-series articles (#352, #353). Sections 6–8 record how that analysis changed the convergence/divergence ledger. Underlying analyses: `notes-oehmke-zawadowski-tragedy-of-complexity.md`, `notes-foglietta-tragedy-of-complexity.md` (extended theory with primitives T7–T23).
 
 ---
 
@@ -125,3 +125,28 @@ T16–T19 now give the D1–D4 divergences a documented pedigree:
 
 > *The paper proves that competing suppliers of complexity/messages systematically distort what they offer when attention is a common resource — a static, rational-agent account of an unpriced externality. Foglietta's extended theory describes the entire market around that mechanism — rational and degraded suppliers (including AI), rational and collapsed audiences — and, beneath it, the cost account that sustains the whole configuration: agents skip the versus because mistake-ownership is individually expensive and collectively dilutable; the skipped versus compounds into a collective TCMO balance that surfaces as sudden catastrophe; and the only durable remedy is re-coupling decisions to their consequences. The paper formalizes the attention externality; the informal theory adds the mistake externality — and the two are homologous: `λ` prices diverted attention, TCMO prices externalized error.*
 
+---
+
+## 8. THIRD UPDATE — The two excluded articles (#352, #353): T20–T23
+
+> Published between #351 and #354 but left out of Foglietta's collection. Analysis verdict: **both deserve inclusion — #352 carries more extension material than included #350; #353 is small but closes a load-bearing gap in the remedy layer** (exclusion was likely editorial: length and register, not insignificance).
+
+### 8.1 What the excluded articles add
+
+- **#352 — *Il problema da risolvere siete voi*** (sprawling; four articles fused into one): (i) **T20 — non-scalability of understanding** ("N × not understanding a damn thing = not understanding a damn thing": 400 → 4K → 40K pages) — the organizational face of emergent dysfunction; the model has no organizations, so no counterpart exists on the paper's side. (ii) **T21 — asymmetric fractal replacement** ("metastasis" strategy: diffusion model ≠ functioning model) — the corpus's only operational remedy for agents too small to confront a system frontally. (iii) **T22 — the covariance argument against fiat privilege** (relativistic consistency forbids privileged frames; seigniorage is a privileged frame) — Foglietta's rare move into formal reasoning, landing exactly on D2 (represented vs. real value); it even speaks TCMO natively ("liability transfer as in all bankruptcies… not to hold the hot potato"). (iv) The corpus's fullest AI-assisted research demonstration (85 sources / 35 selected / two AIs) on nuclear policy — T13/T14 at full scale. Caveat: its demographics polemic is its least method-guarded passage.
+
+- **#353 — *La spudorata menzogna merita l'ardito furore*** (short): **T23 — speech-coupling as an institutional remedy**, with a working precedent: Wales' Senedd Cymru Act 2026 (removal of politicians for lying) — the first *implemented* re-pricing of discourse in the corpus. Plus the shameless lie as the terminal form of simplification (T1 degenerating into T11), and the self-deception substrate (post-hoc whys; continuous self-lying) grounding T16/T19 psychologically.
+
+### 8.2 Ledger effects
+
+- **C4/C5 (deepened, remedy convergence).** T23 is Foglietta's closest analogue to the paper's remedy: the Wales Act is a legal mechanism that re-prices a previously free externality (the brazen lie) — structurally the same operation as the paper's regulation that internalizes the shadow cost of attention, and as TCMO accounting. The remedy convergence is no longer only *doctrinal* (both reject naive mandates) but **instrumental**: both theories end at a pricing/coupling mechanism, and Foglietta's side now has a real-world instance.
+
+- **C6 (new, stylistic).** T22 shows the informal theory can, on demand, reason formally (a coherence argument in the paper's own style) — narrowing the genre divergence from "math vs. rhetoric" to "systematic formalism vs. occasional formal argument."
+
+- **D-series (extended).** T20 adds a clean new entry: organizations as non-understanding multipliers have no representation in a model of individual producers; and T21 (operational strategy) has no counterpart in a model without agency types or coalitions.
+
+- **Collection-composition insight.** The included set is strong on diagnosis and mechanism (#349, #354, #355) but under-weights the remedy and organization layers; the two excluded articles carry exactly those. The rational cut was to merge #350+#351 and split #352 — not to exclude.
+
+### 8.3 Final synthesis (v5)
+
+> *The paper proves that competing suppliers of complexity/messages systematically distort what they offer when attention is a common resource — a static, rational-agent account of an unpriced externality. Foglietta's extended theory describes the entire market around that mechanism — rational and degraded suppliers (including AI), rational and collapsed audiences — and the cost account beneath it: agents skip the versus because mistake-ownership is individually expensive and collectively dilutable; the skipped versus compounds into a collective TCMO balance that surfaces as sudden catastrophe; organizations scale non-understanding faster than comprehension; and the remedies converge on one operation — re-pricing what was free: the paper would price diverted attention (permits), the informal theory prices externalized error (TCMO accounting, decision–consequence coupling, and now the speech-coupling precedent of the Wales Act). The paper formalizes the attention externality; the informal theory adds the mistake externality; and T23 shows both pointing at the same instrument — make the agent face the cost they currently export.*
