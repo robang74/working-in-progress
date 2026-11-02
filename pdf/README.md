@@ -28,7 +28,7 @@
 
 - #090 -- [L'importanza del TCMO](090-l-importanza-del-tcmo.md) &nbsp; (2017-10-13)
 
-- tool -- [A collection of useful prompts](collection-of-useful-prompts-by-raf.md) &nbsp; (2025-12-23)
+- tools -- [A collection of useful prompts](collection-of-useful-prompts-by-raf.md) &nbsp; (2025-12-23)
 
 ---
 
