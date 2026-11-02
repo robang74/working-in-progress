@@ -1,11 +1,11 @@
-# Structural Synthetic Analysis — "The Tragedy of Complexity" (R. A. Foglietta, 2026)
+## Structural Synthetic Analysis — "The Tragedy of Complexity" (R. A. Foglietta, 2026)
 
 > Method: Foglietta's *Structural Synthetic Analysis* prompt (skeleton scan → forward index with `[?→]` tags → backward resolution → synthesis → essay).
 > Document analyzed: `/mnt/agents/upload/349-the-tragedy-of-complexity.pdf` — release 2026-10-11, rev. 7; 1st edition transcribed from a LinkedIn post published 2026-10-11; 2nd edition adds "Three examples at higher scale". CC BY-NC-ND 4.0, © 2026 Roberto A. Foglietta.
 
 ---
 
-## Step 1 — Full Skeleton Scan
+### Step 1 — Full Skeleton Scan
 
 - **Header/meta** — release 2026-10-11, rev. 7, translations EN·DE·FR·ES
 - **Premise** — why examples beat general theory in divulgation; definition: progressive narrowing of the space where debate/investigation/understanding is believed necessary; 1st vs. 2nd edition division of labor
@@ -41,7 +41,7 @@
 
 ---
 
-## Steps 2–3 — Forward Index with `[?→]` Tags, Resolved by Backward Pass
+### Steps 2–3 — Forward Index with `[?→]` Tags, Resolved by Backward Pass
 
 | # | Concept (first appearance) | Tag | Resolution |
 |---|---|---|---|
@@ -60,7 +60,7 @@
 
 ---
 
-## Step 4 — Synthesis (section titles + keyword summaries)
+### Step 4 — Synthesis (section titles + keyword summaries)
 
 - **Premise** — divulgation logic: hot examples > abstract theory; thesis: narrowing of the perceived space of debatable/understandable; two editions = {skipping the VS, contents of the skipped VS}.
 - **EU as Monetary Jail** — euro as German credibility pooled with French discipline; too-big-to-fail France; Berlin as reluctant rescue backstop; reader comments extend to Italy/Spain/Greece, gold reserves, de-industrialisation.
@@ -81,7 +81,7 @@
 
 ---
 
-## Step 5 — Analytical Essay
+### Step 5 — Analytical Essay
 
 The article is built as an induction machine. Its premise states the rule of the game: since a general/theoretical approach cannot seize attention, the thesis will be assembled from maximally contentious examples — the euro, green energy, Russian biosecurity, American energy purchases. The move is self-aware: the rhetorical strategy exemplifies its own object. Attention is the scarce currency, examples are the competing products, and the article selects for "attention-catching" ones. In the vocabulary of the economic paper it shares a title with, Foglietta is describing the demand side of the attention market while Oehmke and Zawadowski model the supply side.
 
@@ -95,24 +95,23 @@ The coda compresses the thesis to its epistemic floor: opinions are cheap, under
 
 ---
 
-## Supplement — Consistency / Support Check (per prompt #4)
+### Supplement — Consistency / Support Check (per prompt #4)
 
 - **As-reported factual claims** (not independently verified here): Bundesbank sovereign–bank-nexus report (Sept 2026); Eurostat 2025 (France deficit 5.1% GDP, debt 115.6%; Italy 137.1%; Greece 146.1%; Spain 100.7%); Reuters Oct 2026 on the >150 bp Franco-German spread; US diesel figures (3.7M bpd consumption; 2.25M bbl ≈ 16 h; 36M bbl < 10 days).
 - **Internally consistent**: the OK/KO self-review genuinely constrains the EU claim; the three examples map cleanly onto the announced {domain, scenario, time} triad; the Premise's promise (2nd edition shows what the skipped versus contains) is discharged by the coda.
 - **Unsupported by design**: the Siberia biowarfare reading is explicitly offered as a *scenario to be validated*, not a conclusion — consistent with the method, but readers should note the evidentiary weight is near zero; likewise the "Great Evil Enemy" psychology is asserted, not argued.
 - **Genre note**: this is divulgation/commentary (CC BY-NC-ND), not peer-reviewed research; its "prompts" framing (Further Explanations) doubles as usage instructions for AI-assisted self-review — the article carries its own toolchain.
 
-
 ---
 
-# EXTENSION — The Four Satellite Articles (#350, #351, #354, #355)
+## EXTENSION — The Four Satellite Articles (#350, #351, #354, #355)
 
 > Analysis performed with the same Structural Synthetic Analysis method. Main question: do these articles **extend** the informal theory of #349, or are they merely **explanatory examples**?
 > Verdict: **#350 and #351 = worked examples (collapsible into one) with two minor structural innovations; #354 and #355 = genuine theory extensions.**
 
-## A. Article-by-article findings
+### A. Article-by-article findings
 
-### #350 — *Il Terrore dell'invasione Russa* (2026-10-16, rev. 5) — **WORKED EXAMPLE** (+ 2 innovations)
+#### #350 — *Il Terrore dell'invasione Russa* (2026-10-16, rev. 5) — **WORKED EXAMPLE** (+ 2 innovations)
 
 **Skeleton**: (1) L'incubo dell'Unione Europea — a monocausal chain: Kiev's strikes on Yandex datacenters → NATO meeting of 32 military representatives → plans for Ukrainian short-range missiles (whose production chain Moscow damaged) → German industrial electronics inside long-range drones → German industry as Europe's locomotive → "green" markets (fiat currency needs production as collateral); Siemens' datacenter portfolio twins the datacenter and weapons businesses; the dream: Kiev did R&D, Germany produces, Russia must buy — "a tiger on a leash"; the Trump diesel deal as sanctions exception with Musk in an antagonist role; the inversion: if Russia wins crushingly, it would not ask for printed fiat but for **ownership of German industry** — "that would be a real Russian invasion in free-market terms". (2) An embedded adversarial note: "Monocausal chain… ten plausible links composed together are not a mechanism — they're a Just-So story… Never naming the rival hypothesis is the milder form of the tragedy the article diagnoses" — with the author's rebuttal (a chain-of-causations based on trilateral UAE talks where intentions leak). (3) L'incubo degli USA — the counterfactual Euro-Russian common market (EU + East + Russia + Canada) as the real "nightmare"; US policy since 2001 (security-selling, extractive HR model); the underestimated European nobility turning the quasi-theatrical NATO–Russia proxy contest into a real war ("pernicious envy since the Tsars"); Goya: "Il sonno della ragione genera mostri". (4) Factual premise-timeline: Sept 25–28, 2026 trilateral technical talks proposed in UAE (Peskov confirms); Lavrov–Wadephul at the UN — first Russia–Germany foreign ministers' meeting since Jan 18, 2022. (5) "They have the budget" — the 22/09 USA–Denmark Greenland agreement (excluding Russia and China) as a device to push Europe into an *open-field Arctic war*; 5-step chain: Greenland agreement → open RU–NATO war → EU political theater collapses → US exit from Ukraine → "Game Over, bye bye Mr. Z".
 
@@ -124,7 +123,7 @@ The coda compresses the thesis to its epistemic floor: opinions are cheap, under
 
 **Verdict**: a worked example at the war-economy scale (the Siberia "scenario" slot of #349 enlarged to grand strategy), self-declared as such. Collapsible with #351.
 
-### #351 — *Do not forget the roots* (2026-10-18, rev. 6) — **WORKED EXAMPLE / appendix** (minimal extension)
+#### #351 — *Do not forget the roots* (2026-10-18, rev. 6) — **WORKED EXAMPLE / appendix** (minimal extension)
 
 **Skeleton**: (1) The 1871 satirical map — Russia already depicted as a monster oppressing Poland; "the hate for Russia has been fabricated before the Soviet Union". (2) Roots inventory: Communism as a brainchild of two Prussian philosophers sponsored by England ("we created our worst enemies trying to win over them"); the USA as our own product (sigils on the $1 bill); Islamist terrorism "harder to prove" but Israel as a UK creation (1953, continuation of the Nazi Madagascar plan); Churchill destroying the USSR alliance that had destroyed 80%+ of Germany's military capability. (3) The Luciani→Wojtyla transition, Banco Ambrosiano/IOR, Calvi's "improbable suicide". (4) Vermeer's Girl vs the Parisian shoplady — the idealized figure forced outside the frame into unvarnished reality. (5) Closing question: Christian non-enforcement of religious law vs Islam's self-and-other enforcement — "what IF coherent social systems would be more powerful than dual-standard ones?"
 
@@ -132,13 +131,13 @@ The coda compresses the thesis to its epistemic floor: opinions are cheap, under
 
 **Verdict**: supplies the *time/roots* dimension missing from #350; essentially one article with it (scenario + roots).
 
-### #354 — *Novelli Icaro mandati allo sbaraglio* (2026-10-31, rev. 10) — **GENUINE THEORY EXTENSION**
+#### #354 — *Novelli Icaro mandati allo sbaraglio* (2026-10-31, rev. 10) — **GENUINE THEORY EXTENSION**
 
 **Skeleton**: (1) Theranos/Holmes video — numbers without a product ("Non lo so"). (2) Case analysis: entry barrier quantified as a *number* (capital) while ignoring feasibility, time, organization, QA; Spoiler #1 — a barrier that is only a number without a PoC is "certainly a fraud"; Spoiler #2 — ignoring the prototype became fashionable because in IT the prototype is cheap (MVP, mocked data, beta on users' backs). (3) **Software Bias table**: bits (zero marginal cost, fast mockup, "fake it till you make it", "move fast and break things") vs atoms (physics/chemistry constraints, clinical/regulatory validation, zero error tolerance, "breaking things means killing"). (4) The Internet apocalypse = 25 years of technical debt since the 2001 dot-com burst; failed India outsourcing; the AI bet amplified instead of solving; certificates with "private key number 4", CVSS 9–10 vulnerabilities in essential components; the washing-machine-chip mockery inverted — rocket physics and washing-machine chips are "the only two components that guarantee delivery". (5) **Idiozia terminale**: confusing the description of reality with reality, the map with the territory, the entry *cost* with the entry *path*; "in the best case they are terminal cretins; in the worst, cretins manipulated as puppets". (6) The AI bet — PhotoCraft (AI-built Photoshop clone in Rust; repo 2026-09-30, one-shot v0.1.0 on 2026-10-02, 2.4k tickets); true cost unknowable (preparation ≫ the 24h first run — CERN analogy); token-paid wannabe entrepreneurs; projects as marketing/case-studies for swap positions on Adobe. (7) **Il problema esiste**: the paradigm claims universality and suppresses alternatives ("enemy of progress"); red-light district 99% vs residential 1%; "ludopatia esistenziale"; the consultancy trick of selling no-vertical-competence "seniors". (8) **Casino chips**: money/value separation discovered as a side effect, then incentivized — "truffe esistono a prescindere che vi siano truffatori" (fraud exists regardless of whether fraudsters exist); no plan or director needed — observe, discover side effects, incentivize them. (9) **AI-written parody Executive Summary**: the 5-step emergent mechanism — practices introduced for concrete problems → unforeseen side effects → actors discover the side effects are profitable → incentives spread and institutionalize them → aggregate dysfunction **without any centralized direction**. (10) **Lo stato perfetto** (Popper: builders of paradise build hell); Pikalevo 2009 — Putin's brutal restoration of a real constraint (plants must run, salaries paid); the risk of personal arbitrariness; no magic word ("democracy" included, maybe "partecipazione"); mature society = conserves the capacity to recognize and correct errors. (11) **Capire invece di credere**: teach experimental physics — gravity cannot be negotiated; the Icarus chronology: dream (8 AD) → Wright (1903) → commercial flight (1914) → KLM (1919) → sustainable low-cost (Ryanair, 1985) — timescale realism would have mitigated Theranos; 2nd edition: remedy = re-scholarising people, "a defective-product recall" for US college tuition.
 
 **Verdict**: this article converts several observations of #349 into **mechanisms**:
 
-### #355 — *Talvolta bisogna correggere le teste di chatbot* (2026-11-01, rev. 2) — **META-LEVEL EXTENSION**
+#### #355 — *Talvolta bisogna correggere le teste di chatbot* (2026-11-01, rev. 2) — **META-LEVEL EXTENSION**
 
 **Skeleton**: (1) A "reasonable reconstruction" of the 2026-10-27 Stubb–Støre–Putin phone call (sourced from a tamagozine.org article by P. Di Matteo) — Putin as the professor dissecting history century by century. (2) The likely source: Putin's 2021-07-12 essay "On the Historical Unity of Russians and Ukrainians" — Kyivan Rus' frame; conclusion (one people, artificial separation) does not derive automatically from medieval facts — "this is the political question, not the historical one". (3) Per Stubb and Støre, Putin actually spoke of events **from 2014 onward**; the reconstructed sequence: Euromaidan/Crimea/Donbass (\*) → 2014–2021 low-intensity civil war (\*) → 2022 "special operation" and Istanbul/Bali talks (\*) → 2026 restated peace conditions (\*); medieval history as identity frame (\*). (4) **Provenance**: sources and research via two AI sessions (ChatGPT); the human author edited the AI text — the (\*) points were corrected because "ChatGPT's version was too edulcorated and in some cases unbalanced or incomplete relative to demonstrable facts"; ChatGPT's own closing caveat — internal coherence of a narrative does not prove the correctness of its premises — is quoted, then countered ("history is written by the winners… the modern version: by the survivors"). (5) Author's 2017 Ukraine experience; KIIS Nov 2021 data: 43% of Ukrainians with close relatives in Russia (>50% South, 53% East), +14% other relatives; ~27% predominantly Russian-speaking, ~half bilingual; **only 6% desired unification with Russia** — "this shows that the complexity of the relations was ignored". (6) Title section: correcting chatbots' heads is "heavy and painful work… but someone must do it" — wooden heads "acting for thirds"; Vietnam and Afghanistan should have been the mnemonic recalls. (7) Personal synthesis: Russia was not an enemy of Ukraine and never needed annexation before Kyiv's government became an enemy; the problem began at Munich 2007 and became concrete at Bucharest 2008; the Ukraine crisis as the product of subprime moral hazard (dot-com bubble paid with post-9/11 security spending; subprime to be mitigated by NATO–Russia friction warfare) that "got out of hand because the complexity of the relations did not admit a Risk-style simplification"; Iraq 2003 as the theatrical exception; Brown University Costs of War (2003–2023, Iraq+Syria): >$2,890B, >500k deaths; Europeans as Mediterranean veterans — Deus Vult → Constantinople; the IV Crusade (1204) deviation driven by debts to Venice; intelligence-from-statistics vs walking Genoa's alleys — "something even the most sophisticated super-intelligence will never experience, therefore correctly process".
 
@@ -146,7 +145,7 @@ The coda compresses the thesis to its epistemic floor: opinions are cheap, under
 
 ---
 
-## B. The informal theory, extended (v2)
+### B. The informal theory, extended (v2)
 
 Core of #349 (unchanged): T1 skipped versus / stadium fanaticism; T2 forgotten method (hypothesis→thesis→confutation→correction "not even contemplated"); T3 scale invariance with {domain, scenario, time} dimensions; T4 institutionalized fallacies (overgeneralization, coincidence≠causation); T5 iceberg structure ("how many aspects have we ignored?"); T6 self-referential method (OK/KO self-review; AI as 3rd-party PoV).
 
@@ -169,11 +168,11 @@ Core of #349 (unchanged): T1 skipped versus / stadium fanaticism; T2 forgotten m
 
 ---
 
-# EXTENSION II — Two Earlier Articles (#302, #090) and the TCMO Primitive
+## EXTENSION II — Two Earlier Articles (#302, #090) and the TCMO Primitive
 
 > #302 (2025-03-03, rev. 12) belongs to the *methodological cluster* (it embeds the SoNia/AleX prompt-toolchain alongside the prompts page). #090 (2017-10-31; II ed. 2024-12-22, rev. 17) predates #349 by nine years and supplies what the informal theory was missing: **the cost account of the tragedy**. Together they extend the theory with primitives T16–T19.
 
-## A. #302 — *Politics and Democracy for Dummies* — WORKED EXAMPLE (political-theory scale) + method showcase
+### A. #302 — *Politics and Democracy for Dummies* — WORKED EXAMPLE (political-theory scale) + method showcase
 
 **Skeleton**: (1) Meme on "idiot ← idiōtēs = private person, not interested in politics" → etymological chain: politics ← politēs (citizen) ← polis (city as social space, agorà); demos ≠ all people (women, slaves, non-citizens excluded); citizenship earned (Starship Troopers, Sparta, Athens — via art, philosophy, science; hand-work excluded unless art/engineering). (2) What politics *was*: deciding WHO does WHAT with consequence-coupling — "those voting for war were going to war; those voting for cleaning the streets paid for it." (3) Conclusion: modern democracy reduced to "WHO should f*ck all of US in our names because a vast number of ignorant people voted by their guts (or traded their votes for a piece of bread)". (4) ChatGPT/SoNia embedded peer-review session — AleX (academic reviewer) vs SoNia (divulgation companion); the machine gives 75% educational value, then contradicts that rating when asked about social impact; the author documents the self-contradiction. (5) Ober/Balzan critique (via Gemini/Katia): Ober's "consent" model of Athenian democracy as the *dominant* mode is an overgeneralization of a specific case (the 3%-rule fallacy pattern, T4, at academic scale); the 4-dummies model as the operational definition (who is in/who is out) vs Ober's internal governance dynamics; structural hypocrisy when the model meets foreign policy; representative democracy that "must be imposed with force" because it cannot seduce ("seduction vs rape"); the "Accusa di Ingenuità" as a rhetorical trap analyzed and turned back; the author disputes the AI's conclusion that the Balzan prize was alignment rather than merit.
 
@@ -181,11 +180,11 @@ Core of #349 (unchanged): T1 skipped versus / stadium fanaticism; T2 forgotten m
 
 **Contributions**: worked example at the political-theory scale; etymological deconstruction as a versus-restoring technique; one more documented instance of machine self-contradiction under re-prompting (T13 data point).
 
-## B. #090 — *L'importanza del TCMO* — **FOUNDATIONAL EXTENSION** (pre-dates #349; the cost account)
+### B. #090 — *L'importanza del TCMO* — **FOUNDATIONAL EXTENSION** (pre-dates #349; the cost account)
 
 **Skeleton**: (1) Definition: **TCMO = Total Cost of Mistake Ownership = the total cost of the perseverance of a mistake** — cumulative in time like compound interest on unpaid debt; "lies and cunning: easy to obtain, hard to repay". (2) Anthropocentric obstacles: education punishes error (the Dutch counter-example: prisons nearly useless); opportunistic instinct — energy-saving evolved, social opportunism → grouping, ecological opportunism (Bezos: "We are social animals rather than truth seekers"); linear thinking (speed over precision; short-horizon gain/loss comparisons); limited probabilistic cognition (loss aversion, immediacy bias — "egg today over chicken tomorrow", weakness at compound probabilities, confirmation bias — "così fan tutti", "abbiamo sempre fatto così"); optimism and denial (losses attributed externally — scapegoat, sacrificial lamb "placating the gods' anger"; scaricabarile; sunk cost as the *rationalized positive* form of the same evasion); persistence and repetition (evolution trained head-butting, not deep thought — the Rita Mae Brown/Narcotics Anonymous "insanity" quote). (3) Why predominant now: global economy on a finite spherical planet — "the others are us" (Karma); polluting a river = dumping your TCMO on the collectivity; open systems absorb insults until a sudden state change; beyond the breaking point, exponential processes evade both prediction and reaction. (4) Illusion of control: perception is logarithmic (decibels), prediction is linear; the log trick fails against cumulative-exponential processes. (5) Closed vs open systems: lies fail in small tight communities (low latency) *and* in a hyper-connected globe — both behave closed; the variable is latency T0→TR (the '80s three-card trick at highway rest stops vs. antibiotic-resistant bacteria ping-pong between Indian farms and us); the growing ball: ping-pong → tennis → billiard → bowling; the denial ladder: anomaly → "rare" → frequent (Gaussian gives way to heavy tails) → "siamo fottuti, tutti insieme" → deny the interpretation, deny science, superstition (the Dec-2024 UFO-meme wave as the tell). (6) Conclusion: `outcome = Σ TCM_iO` and, with innovation, `outcome = Σ TCM_iO + TCI_i`; error is relative (correct within a scenario, wrong in another); **TCMO arises from the divergence between the decision model and the real model, diverging exponentially**; only chaos theory addresses open systems (weather forecasts: accurate short-term, useless long-term); recursive methodologies needed (project-management series); speculation: TCMO-aversion is evolutionarily generic, hence a candidate measurable cause of the Fermi paradox.
 
-## C. How TCMO impacts the informal theory — new primitives
+### C. How TCMO impacts the informal theory — new primitives
 
 - **T16 — Mistake-ownership avoidance is the incentive micro-foundation of the skipped versus.** Why does an individual skip the versus? Because engaging it means *personally owning* the risk of being wrong, while allegiance *dilutes* mistake-ownership across the crowd ("social animals rather than truth seekers"). Stadium fanaticism = a TCMO-dilution device; Marcus Aurelius' 10,000 worthless opinions = zero-TCMO opinions. The tragedy of complexity is, at the individual level, a **risk-transfer strategy**: engage → own the mistake alone; conform → export the TCMO to the collective account. #349 described the behavior (T1); #090 supplies its cost logic.
 - **T17 — The tragedy compounds; catastrophe is a latency phenomenon.** The skipped versus is not a static inefficiency — each instance deposits TCMO into a collective balance (the "stratified layers of lies" of #349 are literally the accumulated account; the iceberg's submerged mass is the balance sheet). While the system looks open, the account accrues silently; then a state change occurs and "the iceberg hits… outside our imagination" — the #090 ball (ping-pong → tennis → billiard → bowling) is the dynamics of that moment. Denial follows a predictable ladder (anomaly → normalization → heavy tails → denial of interpretation → superstition), which is the emotional choreography of T11 (terminal alienation) at civilizational scale.
@@ -193,18 +192,18 @@ Core of #349 (unchanged): T1 skipped versus / stadium fanaticism; T2 forgotten m
 - **T19 — The scapegoat is the psychological default of TCMO accounting.** #090 names the mechanism behind #349's coping device: dissociation from accumulated losses produces the capro espiatorio/agnello sacrificale — "the Great Evil Enemy" is the narrative form of an unpaid TCMO balance. This closes the loop with T10 (no conspirators needed): the conspiracy belief is not an accident but the *attractor* of broken mistake-ownership accounting.
 - **T3+ — Scale extension (speculative).** #090's Fermi-paradox speculation extends T3 (scale invariance) to the anthropic scale: if TCMO-aversion is generic to natural-selection intelligence, the tragedy of complexity becomes a candidate filter. Recorded as speculation, not doctrine.
 
-## D. Impact on the comparison with the economic paper
+### D. Impact on the comparison with the economic paper
 
 TCMO is the demand-side homologue of the paper's shadow price `λ`. The paper: suppliers persist in distorted complexity because they do not face the shadow cost of the attention they divert (the planner internalizes it; permits would price it). #090: agents persist in error because they do not face the total cost of the mistakes they externalize (a TCMO-owning society would price it). The paper's planner ↔ Foglietta's decision–consequence coupling; attention permits ↔ TCMO accounting. The gap the paper cannot close with TCMO: the model is static and mistake-free (v is real, agents optimize correctly), so it has no representation of compounding error costs, latency, or denial dynamics — T16–T19 are precisely the layers D1–D4 of the divergence ledger, now grounded in a 2017 proto-theory that *pre-dates* the tragedy article. Chronology note: #090 (2017) → #349 (2026) → satellites (2025–2026) means the cost account was the seed, not the corollary.
 
 
 ---
 
-# EXTENSION III — The Two Excluded Articles (#352, #353): verdicts
+## EXTENSION III — The Two Excluded Articles (#352, #353): verdicts
 
 > Published between #351 (10-18) and #354 (10-31) but left out of the collection. Question: examples, extensions, or skippable? **Answer: both deserve a position; #352 contains extension material comparable to or greater than #350's; #353 is the smallest of the six but closes a real gap.** Exclusion was likely editorial (length, register), not insignificance.
 
-## A. #352 — *Il Problema da risolvere siete voi* (2026-10-20, rev. 4) — **EXTENSION** (sprawling) — deserves inclusion, ≥ #350
+### A. #352 — *Il Problema da risolvere siete voi* (2026-10-20, rev. 4) — **EXTENSION** (sprawling) — deserves inclusion, ≥ #350
 
 **Skeleton**: (1) The statistical-mechanism society: a brutal 100%-honest system would be intolerable; a system that *statistically* tends to fairness over a short horizon + karma-risk is "alienated on both scales"; pharmacopea principle (small dose = medicine, large = poison; war vs. G8 Genova) — "we forgot the fundamentals of the pharmacopea". (2) The cancer/metastasis strategy: a hyperthrophic system is doomed to collapse but can still do tabula rasa before collapsing (Germany 2022 — derail by the flanks, not head-on); "we can be a metastasis that stops the cancer," replacing locally and fractally, the rest collapsing by gravity; **the diffusion model and the functioning model need not coincide** ("deployment controllato a zone"); humans have far more refined agency than a cell. (3) The think-tank irony: a QA professional entering a think tank whose processing capacity remains "communism is evil"-level; Marx's writings "prejudicially polluted by 1800s aristocratic rhetoric"; **N × 'not understanding a damn thing' = 'not understanding a damn thing'**; Draghi 400 pages → "Dragone" 4K → 40K in a think tank — more people, more mess; "Spoiler: il problema siete voi!". (4) The fiat-covariance argument: IMF admits public debt is a global problem = admission of the pure fiat-currency model's failure; but the paradigm is "indispensable because we are the winners by self-definition" = cheating at poker; fairness relativism answered with physics: covariant (relativistic) theories are consistent *because* they admit no privileged frame — if fairness is relative, no privileged system exists, **therefore no privilege of creating money from nothing**. (5) The demographics polemic: feminism-as-value-transfer creating blackmailable guaranteed mothers; baby bonus; the "ethnic winner" who re-emigrates once the puerpera's rights become apparent; "the immigration was paid by the laborers, the re-immigration will be paid by the feminist new mothers — beautiful, if it weren't an open-air madhouse"; trends vs. fashions; Germany's 30-year structural motherhood support as sustainable trend; the political class "disagreeable" out of desperation over lost privilege. (6) "Surrender XOR die": Macron selling France to the Saudis, Zelensky selling Ukraine to the EU — "neither transaction admits success, only the temporary salvation of the ruling class liquidating everything"; Hotel California; the objection "surrender IS die" answered: "not an algebraic equivalence but 'almost, possibly, probably' — the difference is that the first is negotiable, the second isn't"; **"the problem was created top-down, but the solution should be provided bottom-up… whoever asks the bottom for the solution receives the bare answer: the top is the problem"**; Spiderman's rule; the hostage chain (EU→Zelensky→Russia→US datacenter nuclear fuel); **"liability transfer as in all bankruptcies… each one liquidates everything possible to not end up holding the hot potato"** — the TCMO vocabulary in the author's own words. (7) "Il danno della politica sul nucleare": AI-assisted research block (85 sources consulted, 35 selected, two AIs — one collection, one elaboration): Italy (€11B decommissioning at 32% after 40 years; carbon intensity 2–6× French for four decades; structural gas dependence; the 2026 return limited to SMR — costliest per kWh, available after 2033, big plants excluded by law; the 2011 referendum as protest vote); Germany (deferred compound damage on 2030 industrial capacity; Merkel, not the Greens); France (2015–2017 signal politics froze the pipeline; EPR2 slipped to 2038); the double-standard point: nuclear's complication is visible because it is traced, "and this capacity we use only for nuclear".
 
@@ -217,7 +216,7 @@ TCMO is the demand-side homologue of the paper's shadow price `λ`. The paper: s
 
 **Verdict**: contains more extension material than #350 (which was included); likely excluded for length and register (four articles fused into one: strategy, polemic, geopolitics, research report). Would have merited splitting rather than excluding.
 
-## B. #353 — *La spudorata menzogna merita l'ardito furore* (2026-10-23, rev. 2) — **MINOR EXTENSION** — deserves a position as the missing remedy instance
+### B. #353 — *La spudorata menzogna merita l'ardito furore* (2026-10-23, rev. 2) — **MINOR EXTENSION** — deserves a position as the missing remedy instance
 
 **Skeleton**: (1) Wales: the Senedd Cymru (Member Accountability and Elections) Act 2026 (March 2026) — the first legal mechanism to remove politicians **for lying to citizens**. (2) The lie as intimacy: the 2012 anecdote (collaborators feared the fury that followed only *blatant* lies); humans lie continuously; "when we don't know, we invent; our whys are built post-hoc; our entire narrative is a lie built for our own use, inevitably peddled to others"; metacognition named as the positive counterpart and explicitly deferred. (3) The unacceptable lie: the one that offends the interlocutor's intelligence — presuming the audience too stupid and passive to reject brazen falsity; "if you think we're all fools, you've got the wrong job"; the politician who must accompany "cretin children to the toilet" should have been a school assistant.
 
@@ -228,7 +227,7 @@ TCMO is the demand-side homologue of the paper's shadow price `λ`. The paper: s
 
 **Verdict**: the shortest and least architectural of the six, but it closes a genuine gap — every remedy in the corpus was behavioral or educational until this one, which is *legal* and *real*. Skippable only if the series is strictly "theory + big examples"; unjustified if the series aims to cover the remedy space.
 
-## C. Revised assessment of the collection
+### C. Revised assessment of the collection
 
 - **Theory-core articles** (indispensable): #349 (statement), #354 (mechanisms T9–T12), #090 (cost account T16–T19, the seed), #355 (meta-level T13–T15).
 - **Example-tier** (useful, collapsible): #350 + #351 (scenario + roots; #350's self-hosted versus and budget-theater are the keepers).

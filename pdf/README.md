@@ -1,10 +1,16 @@
-# Comparing "The Tragedy of Complexity": Oehmke & Zawadowski vs. Foglietta
+## Comparing "The Tragedy of Complexity": Oehmke & Zawadowski vs. Foglietta
+
+- [The Tragedy of Complexity by Foglietta](https://github.com/robang74/working-in-progress/blob/main/pdf/The-Tragedy-of-Complexity-with-Examples-and-AI-prompts.pdf) &nbsp; (2026)
+    - [Structural Synthetic Analysis](https://github.com/robang74/working-in-progress/blob/main/pdf/notes-foglietta-tragedy-of-complexity.md)
+
+- [The Tragedy of Complexity by Oehmke & Zawadowski](https://github.com/robang74/working-in-progress/blob/main/pdf/The-Tragedy-of-Complexity-in-Economics-by-Zawadowski.pdf) &nbsp; (2019)
+    - [Structural Synthetic Analysis](https://github.com/robang74/working-in-progress/blob/main/pdf/notes-zawadowski-tragedy-of-complexity.md)
 
 > **Version 6 (integrated).** Consolidated rewrite of versions 1–5: all update rounds (satellite articles #350–#355; older articles #302, #090 introducing TCMO; excluded mid-series articles #352, #353) are merged into a single final-state document. No superseded material remains. Underlying analyses: `notes-oehmke-zawadowski-tragedy-of-complexity.md` (full structural analysis of the paper) and `notes-foglietta-tragedy-of-complexity.md` (full structural analyses of nine Foglietta articles and the extended informal theory, primitives T1–T23).
 
 ---
 
-## 1. Same subject?
+### 1. Same subject?
 
 **Partially — and the overlap is deeper than a first reading suggests.** The two works share a title and a master intuition: *complexity is not the tragedy; the tragedy is a systematic distortion in how agents handle complexity when attention is scarce.* Their relationship is best stated at the end of the full analysis (§7), but the starting asymmetry is:
 
@@ -18,7 +24,7 @@ Each text also *performs* its own diagnosis. The paper's medium is the attention
 
 ---
 
-## 2. Structural isomorphisms (the stable core)
+### 2. Structural isomorphisms (the stable core)
 
 These survive every update round:
 
@@ -34,7 +40,7 @@ These survive every update round:
 
 ---
 
-## 3. Convergences — final-state ledger (C1–C6)
+### 3. Convergences — final-state ledger (C1–C6)
 
 - **C1. No villains required.** The paper's agents are rational and the tragedy is still generic — the mechanism never needed bad intentions. Foglietta originally diagnosed a *psychological* coping device ("we need to believe there is a Great Evil Enemy… because we cannot accept that we are facing the consequences of our own decisions"); the corpus then converted this into a mechanism (#354, T10: side effects discovered → incentivized → institutionalized — "truffe esistono a prescindere che vi siano truffatori") and explained the belief itself (#090, T19: the scapegoat is the attractor of unpaid TCMO balances). The two theories meet from opposite directions at **systemic dysfunction without conspiracy**.
 
@@ -50,7 +56,7 @@ These survive every update round:
 
 ---
 
-## 4. Divergences — final-state ledger (D1–D6)
+### 4. Divergences — final-state ledger (D1–D6)
 
 All divergences are now grounded in dated corpus articles:
 
@@ -68,7 +74,7 @@ All divergences are now grounded in dated corpus articles:
 
 ---
 
-## 5. Cross-reading
+### 5. Cross-reading
 
 **What the paper adds to the corpus.** Foglietta observes that debate is dumbed down and asks why the versus is skipped; the paper provides a candidate micro-foundation: when many message-suppliers compete for one audience's attention, equilibrium complexity is pushed toward intermediate levels, and the planner's optimum is never reached. The "curse of variety" (more goods ⇒ dumbing down) formalizes the complaint about proliferating online outlets; the complexity paradox formalizes the observation that more information-processing capacity has not produced more understanding. Even Foglietta's rhetorical strategy (hot examples, short punchy text) is what a supplier *should* do in the paper's equilibrium.
 
@@ -76,7 +82,7 @@ All divergences are now grounded in dated corpus articles:
 
 ---
 
-## 6. The extended informal theory — primitive map
+### 6. The extended informal theory — primitive map
 
 | Tier | Primitives | Content | Source |
 |---|---|---|---|
@@ -89,7 +95,7 @@ Chronology matters: the cost account (#090, 2017) *pre-dates* the tragedy articl
 
 ---
 
-## 7. Collection assessment
+### 7. Collection assessment
 
 Nine articles analyzed. Significance tiers:
 
@@ -103,6 +109,6 @@ Nine articles analyzed. Significance tiers:
 
 ---
 
-## 8. Final synthesis
+### 8. Final synthesis
 
 > *The paper proves that competing suppliers of complexity/messages systematically distort what they offer when attention is a common resource — a static, rational-agent account of an unpriced externality. Foglietta's extended theory describes the entire market around that mechanism — rational and degraded suppliers (including AI), rational and collapsed audiences — and the cost account beneath it: agents skip the versus because mistake-ownership is individually expensive and collectively dilutable; the skipped versus compounds into a collective TCMO balance that surfaces as sudden catastrophe; organizations scale non-understanding faster than comprehension; and the remedies converge on one operation — re-pricing what was free. The paper formalizes the attention externality; the informal theory adds the mistake externality; and the Wales Act shows both pointing at the same instrument: make the agent face the cost they currently export.*

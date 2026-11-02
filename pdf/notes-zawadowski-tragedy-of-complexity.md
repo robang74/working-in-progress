@@ -1,4 +1,4 @@
-# Structural Synthetic Analysis — "The Tragedy of Complexity" (Oehmke & Zawadowski, 2019 WP)
+## Structural Synthetic Analysis — "The Tragedy of Complexity" (Oehmke & Zawadowski, 2019 WP)
 
 > Method: Foglietta's *Structural Synthetic Analysis* prompt (skeleton scan → forward index with `[?→]` tags → backward resolution → synthesis → essay).
 > Document analyzed: `/mnt/agents/upload/Zawadowski.pdf` — working paper version, September 6, 2019 (published version: *Management Science*, online June 1, 2026, with revisions: "suppliers", "depth of understanding", extended applications).
@@ -6,7 +6,7 @@
 
 ---
 
-## Step 1 — Full Skeleton Scan
+### Step 1 — Full Skeleton Scan
 
 - **Abstract** — premise, attention externality, three main results, complexity paradox, curse of variety
 - **1. Introduction** — motivation; literature positioning (obfuscation vs. value-enhancing complexity; Becker 1965; Sims 1998/2003; Bordalo et al. 2016)
@@ -31,7 +31,7 @@
 
 ---
 
-## Steps 2–3 — Forward Index with `[?→]` Tags, Resolved by Backward Pass
+### Steps 2–3 — Forward Index with `[?→]` Tags, Resolved by Backward Pass
 
 | # | Concept (first appearance) | Tag | Resolution |
 |---|---|---|---|
@@ -50,7 +50,7 @@
 
 ---
 
-## Step 4 — Synthesis (section titles + keyword summaries)
+### Step 4 — Synthesis (section titles + keyword summaries)
 
 - **Abstract** — complexity ⇄ value vs. attention; common-resource externality; intermediate-complexity distortion; paradox + curse of variety.
 - **1. Introduction** — puzzle (overcomplicated phones/regulation vs. dumbed-down politics/MBA); novelty: complexity as value-enhancing, cost = attention; three results; literature split (obfuscation vs. attention).
@@ -71,7 +71,7 @@
 
 ---
 
-## Step 5 — Analytical Essay
+### Step 5 — Analytical Essay
 
 The paper's engine is a single wedge between two first-order conditions. A consumer with a hard time budget `T` equates the marginal value of attention across goods; producers, each extracting a share `θ_i` of their good's value, choose complexity while internalizing the consumer's response `t_i(c)`. The planner differs only by also counting how that response reallocates attention across *all* goods. Because total attention is fixed, the producer's privately optimal wedge `∂t_i/∂c_i` — the attention-grabbing effect — is an externality by construction: it is positive when the consumer digs in (complexity and attention are complements), negative when she gives up.
 
@@ -83,7 +83,7 @@ The closing sections convert the local externality into global statements. With 
 
 ---
 
-## Supplement — Novelty / Consistency / Support Check (per prompt #4)
+### Supplement — Novelty / Consistency / Support Check (per prompt #4)
 
 - **Novelty claim**: complexity as *potentially value-enhancing* with the cost borne as an attention externality, rather than obfuscation (Carlin 2009; Piccione–Spiegler 2012; Spiegler 2016) — supported by the literature split drawn in §1.
 - **Supported**: hump-shaped attention and the giving-up region require separability of `v` in complexity and understanding plus bounded value at infinite depth (fn. 13) — conditions stated explicitly.
