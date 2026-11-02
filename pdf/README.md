@@ -1,10 +1,12 @@
-## Comparing "The Tragedy of Complexity": Oehmke & Zawadowski vs. Foglietta
+## The Tragedy of Complexity
 
 - [The Tragedy of Complexity by Foglietta](https://github.com/robang74/working-in-progress/blob/main/pdf/The-Tragedy-of-Complexity-with-Examples-and-AI-prompts.pdf) &nbsp; (2026)
     - [Structural Synthetic Analysis](https://github.com/robang74/working-in-progress/blob/main/pdf/notes-foglietta-tragedy-of-complexity.md) &nbsp; (notes)
 
 - [The Tragedy of Complexity by Oehmke & Zawadowski](https://github.com/robang74/working-in-progress/blob/main/pdf/The-Tragedy-of-Complexity-in-Economics-by-Zawadowski.pdf) &nbsp; (2019)
     - [Structural Synthetic Analysis](https://github.com/robang74/working-in-progress/blob/main/pdf/notes-zawadowski-tragedy-of-complexity.md) &nbsp; (notes)
+
+### Comparing Oehmke & Zawadowski vs. Foglietta
 
 > **Version 6 (integrated).** Consolidated rewrite of versions 1–5: all update rounds (satellite articles #350–#355; older articles #302, #090 introducing TCMO; excluded mid-series articles #352, #353) are merged into a single final-state document. No superseded material remains. Underlying analyses: `notes-oehmke-zawadowski-tragedy-of-complexity.md` (full structural analysis of the paper) and `notes-foglietta-tragedy-of-complexity.md` (full structural analyses of nine Foglietta articles and the extended informal theory, primitives T1–T23).
 
