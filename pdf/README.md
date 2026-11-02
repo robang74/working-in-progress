@@ -1,6 +1,6 @@
 # Comparing "The Tragedy of Complexity": Oehmke & Zawadowski vs. Foglietta
 
-> **Version 3** — updated after structural analysis of Foglietta's four satellite articles (#350, #351, #354, #355), which he proposed as explanatory examples. Section 6 records how that analysis changed the convergence/divergence ledger. Underlying analyses: `notes-oehmke-zawadowski-tragedy-of-complexity.md`, `notes-foglietta-tragedy-of-complexity.md` (incl. the extended theory v2, primitives T7–T15).
+> **Version 4** — updated after structural analysis of Foglietta's four satellite articles (#350, #351, #354, #355) and two older articles (#302, #090 — the latter introducing TCMO). Sections 6–7 record how that analysis changed the convergence/divergence ledger. Underlying analyses: `notes-oehmke-zawadowski-tragedy-of-complexity.md`, `notes-foglietta-tragedy-of-complexity.md` (extended theory with primitives T7–T19).
 
 ---
 
@@ -57,7 +57,7 @@ Each text also *performs* its own diagnosis. The paper's medium is the attention
 
 ---
 
-## 5. Summary (pre-satellites)
+## 5. Summary (pre-satellites — superseded by §6–7)
 
 The two works are **not** the same subject, but they are **the two halves of one subject**: the paper proves that when attention is a common resource, competing suppliers systematically distort the complexity of what they offer; the article documents the audience-side rot that lets the distortion go unpunished.
 
@@ -95,6 +95,33 @@ The two works are **not** the same subject, but they are **the two halves of one
 
 - **Weakened: "the article assumes the externality is priced in."** v2 credited Foglietta with a demand-side failure the paper must assume away; T8 (budget-theater simplification, #350) and T10 (emergent institutionalization, #354) show Foglietta now also theorizes *supply-side* incentive structures — procurement budgets manufacturing conflict narratives — which sit much closer to the paper's own mechanism than anything in #349 did.
 
-### 6.4 Revised synthesis (one line)
+---
 
-> *The paper proves that competing suppliers of complexity/messages systematically distort what they offer when attention is a common resource; Foglietta's extended theory now describes the entire market around that mechanism — rational and degraded suppliers (including AI), rational and collapsed audiences, the institutional side effects that connect them without any conspiracy, and the educational/authoritative remedies that can re-anchor the system to reality. The paper remains the only formalized mechanism; the article is no longer merely the demand-side lament, but the surrounding account the model assumes away.*
+## 7. SECOND UPDATE — TCMO (#090) and the political-scale example (#302)
+
+> Triggered by two older articles. **#302 — *Politics and Democracy for Dummies* (2025-03-03)**: worked example at the political-theory scale, part of the *methodological cluster* (it embeds the SoNia/AleX peer-review toolchain, and documents the machine contradicting its own quality rating on re-prompting — another T13 data point). **#090 — *L'importanza del TCMO* (2017; II ed. 2024-12-22)**: not an example at all — the **foundational cost account, written nine years before #349**. TCMO = *Total Cost of Mistake Ownership* = "the total cost of the perseverance of a mistake," cumulative like compound interest on unpaid debt, arising from the divergence between the decision model and the real model, and discharged onto whoever does not own the decision. Chronology matters: the cost account was the **seed**, the tragedy article the **flowering**.
+
+### 7.1 Convergences — deepened again
+
+- **C5 (new, structural). TCMO is the demand-side homologue of the paper's shadow price `λ`.** The paper: suppliers persist in distorted complexity because they do not face the shadow cost of the attention they divert; the planner internalizes it; tradable permits would price it. Foglietta: agents persist in error because they do not face the total cost of the mistakes they externalize; decision–consequence coupling would price it. **The paper's planner ↔ Foglietta's consequence-coupled society; attention permits ↔ TCMO accounting.** Both theories are, at bottom, theories of *unpriced externalities* — one in the attention market, one in the mistake market — and both remedies are re-pricing operations.
+
+- **C1 (deepened). No villains required — now with a mechanism for the villain-belief itself.** #090's scapegoat analysis (T19: dissociation from accumulated losses generates the capro espiatorio) explains *why* the Great Evil Enemy belief is the attractor of unpaid TCMO balances. The paper never needed villains; Foglietta now explains why audiences nonetheless manufacture them.
+
+- **C4 (deepened). Remedy skepticism — now unified.** #302 supplies the coupling argument in its purest historical form (Athens: "those voting for war were going to war" vs. modern representation: "who should f*ck all of us in our names"), and T18 unifies Foglietta's whole remedy layer — Pikalevo (forced re-coupling), re-scholarization (individual TCMO accounting), "partecipazione" (coupling by construction) — as one principle: **restore decision–consequence coupling**. The paper's warning against a naive "reduce complexity" mandate and #354's "no magic word, not even democracy" are the same principle seen from the supply and the institutional side.
+
+### 7.2 Divergences — confirmed and grounded
+
+T16–T19 now give the D1–D4 divergences a documented pedigree:
+
+- **D1 (supply-side irrationality)** ← T16's converse: the paper's rational agents never face TCMO at all (no mistakes exist in the model); Foglietta's agents are *defined* by mistake-ownership avoidance (the skipped versus as risk-transfer).
+
+- **D2 (fictional value)** ← T17's accounting: the paper's `v_i` is always real surplus; TCMO is precisely the ledger of represented-vs-real divergence (#354's Theranos/fiat material), which the model cannot record.
+
+- **D3/D4 (domain boundaries, tacit complexity)** ← unchanged, but now integrated: TCMO dumping works only where latency hides it (open-system illusion), and embodied knowledge (T15) is the part of the ledger no statistical accounting reaches.
+
+- **The paper's statics vs. the theory's dynamics** — the sharpest formal gap: the model has no intertemporal compounding, so it cannot represent TCMO's core phenomenon (the growing ball, the latency-to-state-change, the denial ladder). The giving-up region is the only dynamic the paper has; TCMO supplies the missing ones.
+
+### 7.3 Revised synthesis (final)
+
+> *The paper proves that competing suppliers of complexity/messages systematically distort what they offer when attention is a common resource — a static, rational-agent account of an unpriced externality. Foglietta's extended theory describes the entire market around that mechanism — rational and degraded suppliers (including AI), rational and collapsed audiences — and, beneath it, the cost account that sustains the whole configuration: agents skip the versus because mistake-ownership is individually expensive and collectively dilutable; the skipped versus compounds into a collective TCMO balance that surfaces as sudden catastrophe; and the only durable remedy is re-coupling decisions to their consequences. The paper formalizes the attention externality; the informal theory adds the mistake externality — and the two are homologous: `λ` prices diverted attention, TCMO prices externalized error.*
+
