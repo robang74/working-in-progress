@@ -1,12 +1,32 @@
 ## Comparing "The Tragedy of Complexity": Oehmke & Zawadowski vs. Foglietta
 
 - [The Tragedy of Complexity by Foglietta](https://github.com/robang74/working-in-progress/blob/main/pdf/The-Tragedy-of-Complexity-with-Examples-and-AI-prompts.pdf) &nbsp; (2026)
-    - [Structural Synthetic Analysis](https://github.com/robang74/working-in-progress/blob/main/pdf/notes-foglietta-tragedy-of-complexity.md)
+    - [Structural Synthetic Analysis](https://github.com/robang74/working-in-progress/blob/main/pdf/notes-foglietta-tragedy-of-complexity.md) &nbsp; (notes)
 
 - [The Tragedy of Complexity by Oehmke & Zawadowski](https://github.com/robang74/working-in-progress/blob/main/pdf/The-Tragedy-of-Complexity-in-Economics-by-Zawadowski.pdf) &nbsp; (2019)
-    - [Structural Synthetic Analysis](https://github.com/robang74/working-in-progress/blob/main/pdf/notes-zawadowski-tragedy-of-complexity.md)
+    - [Structural Synthetic Analysis](https://github.com/robang74/working-in-progress/blob/main/pdf/notes-zawadowski-tragedy-of-complexity.md) &nbsp; (notes)
 
 > **Version 6 (integrated).** Consolidated rewrite of versions 1–5: all update rounds (satellite articles #350–#355; older articles #302, #090 introducing TCMO; excluded mid-series articles #352, #353) are merged into a single final-state document. No superseded material remains. Underlying analyses: `notes-oehmke-zawadowski-tragedy-of-complexity.md` (full structural analysis of the paper) and `notes-foglietta-tragedy-of-complexity.md` (full structural analyses of nine Foglietta articles and the extended informal theory, primitives T1–T23).
+
+#### References
+
+- #349 -- [The Tragedy of Complexity](349-the-tragedy-of-complexity.md) &nbsp; (2026-10-11)
+
+- #350 -- [Il Terrore dell'invasione Russa](350-il-terrore-dell-invasione-russa.md) &nbsp; (2026-10-16)
+
+- #351 -- [Do not forget the roots](351-do-not-forget-the-roots.md) &nbsp; (2026-10-18)
+
+- #352 -- [Il problema da risolvere siete voi!](352-il-problema-da-risolvere-siete-voi.md) &nbsp; (2026-10-20)
+
+- #353 -- [La spudorata menzogna merita l'ardito furore](353-la-spudorata-menzogna-merita-l-ardito-furore.md) &nbsp; (2026-10-23)
+
+- #354 -- [Novelli Icaro mandati allo sbaraglio](354-novelli-icaro-mandati-allo-sbaraglio.md) &nbsp; (2026-10-31)
+
+- #302 -- [Politics and democracy for dummies](302-politics-and-democracy-for-dummies.md) &nbsp; (2025-03-03)
+
+- #090 -- [L'importanza del TCMO](090-l-importanza-del-tcmo.md) &nbsp; (2017-10-13)
+
+- tool -- [A collection of useful prompts](collection-of-useful-prompts-by-raf.md) &nbsp; (2025-12-23)
 
 ---
 
