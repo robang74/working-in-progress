@@ -2,7 +2,9 @@
 
 > Method: Foglietta's *Structural Synthetic Analysis* prompt (skeleton scan → forward index with `[?→]` tags → backward resolution → synthesis → essay).
 > Document analyzed: `/mnt/agents/upload/Zawadowski.pdf` — working paper version, September 6, 2019 (published version: *Management Science*, online June 1, 2026, with revisions: "suppliers", "depth of understanding", extended applications).
-> 46 pp.: main text pp. 1–30, References pp. 31–32, Appendix A (proofs) pp. 33–42, Appendix B (microfoundation) pp. 43–45.
+> 45 numbered pp. (46 PDF pages incl. cover): main text pp. 1–30, References pp. 31–32, Appendix A (proofs) pp. 33–42, Appendix B (microfoundation) pp. 43–45.
+>
+> **Scope note (version control).** This analysis covers the 2019 working paper only. The published version is not a terminology refresh: per the publication record and the accessible October 2024 author manuscript, it substantially reorganizes and generalizes the presentation (attention curve developed more explicitly, changed proposition sequence, broadened applications to financial regulation and corporate communication), and the later Proposition 2 has a **different role** from the 2019 software-update result. Statements about the 2026 version here are secondhand (publication record / abstract), not line-by-line verified. Do not mix results across versions; a separate structural analysis of the published version would be required.
 
 ---
 
@@ -35,16 +37,16 @@
 
 | # | Concept (first appearance) | Tag | Resolution |
 |---|---|---|---|
-| 1 | "attention externality" (Abstract, Intro) | `[?→]` | §3.4, Prop. 1: sign of distortion = sign of `∂t_i/∂c_i`; Lemma 1: four equivalent statistics |
+| 1 | "attention externality" (Abstract, Intro) | `[?→]` | §3.4, Prop. 1: **local** incentive, evaluated at the planner's solution, has the sign of `∂t_i/∂c_i`; Lemma 1: four equivalent characterizations. Not the direction of the final equilibrium distortion — strategic feedback can reverse it (paper's own warning) |
 | 2 | "software update effect" (Intro; §3.4 heading) | `[?→]` | Prop. 2: producer overcomplicates iff `∂ṽ_i/∂c_i < 0` at fixed attention (Excel anecdote) |
 | 3 | "complexity paradox" (Abstract/Intro) | `[?→]` | Prop. 5(ii): abundant `T` ⇒ `c^e > c*`; more processing capacity can *cause* excess complexity |
-| 4 | "curse of variety" (Abstract/Intro) | `[?→]` | Prop. 5(iv): larger `N` ⇒ inefficient simplification; MBA vs. PhD course example |
+| 4 | "curse of variety" (Abstract/Intro) | `[?→]` | Prop. 5(iv): larger `N` ⇒ goods too simple **relative to the planner's solution**; absolute complexity may even rise (Fig. 2 / p. 28); MBA vs. PhD course example |
 | 5 | "categorization of goods" (Abstract) | `[?→]` | Table 1 + Prop. 6: four cells (absolute {simple, complex} × relative {too simple, too complex}) |
 | 6 | Does the surplus share `θ_i` drive the distortion? (§3.4, equal-θ case) | `[?→]` | Prop. 5: ranking independent of `θ`; Prop. 6(iii): heterogeneity in `θ` *does* shift absolute complexity |
 | 7 | Why no externality if attention were purchasable? (§3.5.1) | `[?→]` | Lemma 1(ii): externality works through `∂λ/∂c_i`; fixed `λ` ⇒ no externality |
 | 8 | Policy remedy (fn. 8) | `[?→]` | "Reduce complexity" mandates are wrong (complexity can be too low); ideal = internalize shadow cost, e.g. tradable attention permits (deemed impractical) |
 | 9 | Very complex goods nobody understands (Intro) | `[?→]` | §4 giving-up region: consumer sets `t_i = 0`; no externality; equilibrium = planner there (fn. 12–13) |
-| 10 | Threshold `t_i/c_i = 1` (Prop. 4) | `[?→]` | fn. 14: `t_i/c_i = 1` means the consumer realizes half of the potential benefit `δ_i` of understanding |
+| 10 | Threshold `t_i/c_i = 1` (Prop. 4) | `[?→]` | fn. 14: at `t_i/c_i = 1` the consumer realizes half of `δ_i`. Note: the ratio is evaluated at the **planner's solution** (`t_i*/c_i*`), and the value 1 is an artifact of the specific functional form — a specification result, not a universal empirical boundary |
 | 11 | Asymmetric complexity for identical goods (§5.1 end) | `[?→]` | High `δ`, small `T`: one good simple/unattended, one complex/attended; equilibrium does not pin down which |
 | 12 | Spence-quality intuition vs. here (fn. on (14); App. B) | `[?→]` | Appendix B multiplicative value `v_1(x)·v_2(c, t/c)` kills the Spence term; extra monopoly distortions are orthogonal |
 
@@ -75,7 +77,7 @@
 
 The paper's engine is a single wedge between two first-order conditions. A consumer with a hard time budget `T` equates the marginal value of attention across goods; producers, each extracting a share `θ_i` of their good's value, choose complexity while internalizing the consumer's response `t_i(c)`. The planner differs only by also counting how that response reallocates attention across *all* goods. Because total attention is fixed, the producer's privately optimal wedge `∂t_i/∂c_i` — the attention-grabbing effect — is an externality by construction: it is positive when the consumer digs in (complexity and attention are complements), negative when she gives up.
 
-The paper's central move is to sign this externality with observable sufficient statistics (Lemma 1): the direction of distortion equals the sign of the response of the shadow price of attention `∂λ/∂c_i`, of the fixed-λ attention response, and of the cross-partial of value with respect to complexity and attention. This yields two diagnostics with immediate real-world texture. Proposition 2 — the "software update effect" — says a producer overcomplicates exactly when a user holding her time constant would feel the product got worse (the Excel complaint). Proposition 4 says goods the consumer understands well (`t_i/c_i > 1`) are precisely the ones pushed into excess complexity, while poorly understood goods are dumbed down: distortion toward intermediate complexity, because intermediate goods are where attention is contested. Well-understood smartphones and checking accounts bloat; intricate policy debates are flattened by media and politicians.
+The paper's central move is to sign this externality with equivalent sufficient-statistic characterizations of the *direction of the local distortion* (Lemma 1) — analytical, not established empirical, observables: the direction of distortion equals the sign of the response of the shadow price of attention `∂λ/∂c_i`, of the fixed-λ attention response, and of the cross-partial of value with respect to complexity and attention. This yields two diagnostics with immediate real-world texture. Proposition 2 — the "software update effect" — says a producer overcomplicates exactly when a user holding her time constant would feel the product got worse (the Excel complaint). Proposition 4 says goods the consumer understands well (`t_i/c_i > 1`) are precisely the ones pushed into excess complexity, while poorly understood goods are dumbed down: distortion toward intermediate complexity, because intermediate goods are where attention is contested. Well-understood smartphones and checking accounts bloat; intricate policy debates are flattened by media and politicians.
 
 Retrospectively, everything in the introduction's shopping list of puzzles is resolved by the equal-`θ` simplification of §3.4 and then refined: the "complexity paradox" (Proposition 5(ii): abundant attention makes excess complexity *more* likely, since equilibrium complexity crosses the separating hyperplane `c = T/N`) and the "curse of variety" (Proposition 5(iv): more goods per unit attention force simplification, echoing online media dumbing-down). The commons analogy is sharpened rather than merely invoked (Proposition 3): whatever the direction of the complexity distortion, the common resource — attention — is always overused, `λ^e > λ^*`. The demand-theory reading (§3.5.3) reveals the deeper structure: complexity is the *price* producers set for the good of understanding, a price the consumer cannot shop around for, which is why the market analogue of a Slutsky decomposition misfires.
 
@@ -84,6 +86,8 @@ The closing sections convert the local externality into global statements. With 
 ---
 
 ### Supplement — Novelty / Consistency / Support Check (per prompt #4)
+
+**Epistemic labeling scheme** (applied throughout this analysis): **ASSUMPTION** = condition imposed by the model; **MODEL RESULT** = proposition/deduction from the assumptions; **ILLUSTRATION** = example used to explain or apply the framework; **EMPIRICAL EVIDENCE** = independently supported observation/measurement. Guardrail: model results do not become empirical confirmations of real-world phenomena merely by illustration; the paper is a theoretical framework, and all of its mappings (smartphones, Brexit, MBA/PhD courses) are ILLUSTRATIONS.
 
 - **Novelty claim**: complexity as *potentially value-enhancing* with the cost borne as an attention externality, rather than obfuscation (Carlin 2009; Piccione–Spiegler 2012; Spiegler 2016) — supported by the literature split drawn in §1.
 - **Supported**: hump-shaped attention and the giving-up region require separability of `v` in complexity and understanding plus bounded value at infinite depth (fn. 13) — conditions stated explicitly.
