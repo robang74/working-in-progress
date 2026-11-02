@@ -12,23 +12,23 @@
 
 #### References
 
-- #349 -- [The Tragedy of Complexity](349-the-tragedy-of-complexity.md) &nbsp; (2026-10-11)
+- #349 -- [The Tragedy of Complexity](https://robang74.github.io/roberto-a-foglietta/html/349-the-tragedy-of-complexity.html) &nbsp; (2026-10-11)
 
-- #350 -- [Il Terrore dell'invasione Russa](350-il-terrore-dell-invasione-russa.md) &nbsp; (2026-10-16)
+- #350 -- [Il Terrore dell'invasione Russa](https://robang74.github.io/roberto-a-foglietta/html/350-il-terrore-dell-invasione-russa.html) &nbsp; (2026-10-16)
 
-- #351 -- [Do not forget the roots](351-do-not-forget-the-roots.md) &nbsp; (2026-10-18)
+- #351 -- [Do not forget the roots](https://robang74.github.io/roberto-a-foglietta/html/351-do-not-forget-the-roots.html) &nbsp; (2026-10-18)
 
-- #352 -- [Il problema da risolvere siete voi!](352-il-problema-da-risolvere-siete-voi.md) &nbsp; (2026-10-20)
+- #352 -- [Il problema da risolvere siete voi!](https://robang74.github.io/roberto-a-foglietta/html/352-il-problema-da-risolvere-siete-voi.html) &nbsp; (2026-10-20)
 
-- #353 -- [La spudorata menzogna merita l'ardito furore](353-la-spudorata-menzogna-merita-l-ardito-furore.md) &nbsp; (2026-10-23)
+- #353 -- [La spudorata menzogna merita l'ardito furore](https://robang74.github.io/roberto-a-foglietta/html/353-la-spudorata-menzogna-merita-l-ardito-furore.html) &nbsp; (2026-10-23)
 
-- #354 -- [Novelli Icaro mandati allo sbaraglio](354-novelli-icaro-mandati-allo-sbaraglio.md) &nbsp; (2026-10-31)
+- #354 -- [Novelli Icaro mandati allo sbaraglio](https://robang74.github.io/roberto-a-foglietta/html/354-novelli-icaro-mandati-allo-sbaraglio.html) &nbsp; (2026-10-31)
 
-- #302 -- [Politics and democracy for dummies](302-politics-and-democracy-for-dummies.md) &nbsp; (2025-03-03)
+- #302 -- [Politics and democracy for dummies](https://robang74.github.io/roberto-a-foglietta/html/302-politics-and-democracy-for-dummies.html) &nbsp; (2025-03-03)
 
-- #090 -- [L'importanza del TCMO](090-l-importanza-del-tcmo.md) &nbsp; (2017-10-13)
+- #090 -- [L'importanza del TCMO](https://robang74.github.io/roberto-a-foglietta/html/090-l-importanza-del-tcmo.html) &nbsp; (2017-10-13)
 
-- tools -- [A collection of useful prompts](collection-of-useful-prompts-by-raf.md) &nbsp; (2025-12-23)
+- tools -- [A collection of useful prompts](https://robang74.github.io/chatbots-for-fun/html/collection-of-useful-prompts-by-raf.html) &nbsp; (2025-12-23)
 
 ---
 
