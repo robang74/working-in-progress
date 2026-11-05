@@ -765,3 +765,91 @@ La tua conclusione, quindi, non è una condanna della velocità. È una critica 
 
 L'iceberg non doveva essere pianificato. Era sufficiente pianificare una rotta senza concedersi il margine necessario per affrontare ciò che si sarebbe incontrato.
 
+---
+
+### Linux CVE-2026-98432 or a backdoor?
+
+Every Linux system which includes Android Smartphone has a root remotable backdoor inside since 2016. This is another way to see the same thing from the perspective of who knew the purpose in advance of that change (or got it soon after its introduction).
+
+Isn't an affirmation, it is a plausible scenario, it is a legit question.
+
+Another legit question is about the Open Source paradigm: many eyes watching the source code brings in more security because vulnerabilities are discovered faster and got fixed. It seems rational, so has it failed?
+
+In short because "The Tragedy of Commons": everybody takes AS-IS and few pay attention, or developers, or reviewers. The gatekeepers are more interested in the bureaucratic aspects, while janitors about code readability and maintainability. And developers are more focused on features and testing.
+
+Insecurity by complexity, never has been taken in account. And this aspect is related to big tech companies and national security agencies. The first are focused on profit, the former are focused on certifications. None of them care about the "what if" and this is where the Tragedy of Complexity kicks into the Tragedy of Commons.
+
+- Two sides of the same coin.
+
+How much artificial intelligence creates this problem? The answer relies on the "unreleased AI model" which inspected public code. Those kinds of models are also inspecting proprietary code. The incentives are asymmetric: a company should pay for inspection and allow the access while inspecting the kernel brings in a proof-of-concept, a study case, something that the marketing needs to push big companies to open their wallet.
+
+- Look, the kernel has 9.8 breach: are your OS also? Pay to check.
+
+The AI did not change the paradigm nor falsified it. AI added those eyes that companies and agencies never paid for having humans watching the code. Or they paid not as much as needed or without planning wisely. Open Source fails? It isn't a tragedy, after all. They are just hobbyists, not a profitable company. Azure, Amazon, Google, etc. are profitable companies which leverage Open Source.
+
+The Open Source paradigm isn't wrong. The "greedy is good", creates the Tragedy of Commons. The AI revealed the Tragedy of Complexity. The original sin is rotted in having imposed a single business paradigm by the suppression of every other alternative.
+
+In short, the Tragedy of Commons in Open Source did not happen for an accident but was planned: they would find out by themselves, and in the meantime we took. Great, so what is missing here? The TCMO (total cost of a mistake ownership) which in short it means: the Tragedy of Commons isn't a destiny but a warning. It happened once, then the lesson should have been learned not exploited by free riding.
+
+---
+
+## Complessità e tecnologia, moltiplicano
+
+La tecnologia quando estremamente evoluta rispetto a coloro che la osservano senza comprenderla appare più come una magia che come un meccanismo. In questa prospettiva la digitalizzazione sembrava essere la soluzione giusta per la gestione della complessità crescente in un mondo globalizzato e già dotato di telecomunicazione digitali. 
+
+Invece la tecnologia, aumenta la complessità e la rende meno gestibile per via dei ristretti tempi di risposta che impone. Non solo la complessità aumenta ma anche il traffico e la mole di dati. Anche in assenza di intelligenza artificiale, un contenuto che viaggia in rete genera altri contenuti e la c.d. viralità è solo uno specifico fenomeno di questa cascata informativa, nel quale una parte, detta meme, del contenuto originale si propaga come fosse una costante.
+
+Nella comunicazione di massa le altre costanti sono i personaggi e le sorgenti. Il problema politico nasce dal fatto che le "sorgenti" della comunicazione di massa di tipo "social" non sono necessariamente testate giornalistiche costituite o influencer registrati in determinati albi sottoposti a verifica professionale o deontologica, e a criteri di opportunità.
+
+In questo contesto non si ristabilisce l'equità delle opinioni che per altro sarebbe una tragedia e neppure il principio di attrazione verso i contenuti (content is the king) ma si crea un baccano nel quale i paranoici pensano possano nascondersi nemici immaginari ma molto più spesso, come lo scandalo di Cambridge Analytica ha dimostrato, manipolazioni ordite a nostro uso e consumo.
+
+---
+
+### Come nasce l'incubo in stile 1984
+
+- Source: https://lnkd.in/p/d5w5GAbn
+
+Un cretino qualsiasi può comprare un'auto usata per poche migliaia di euro e schiantarsi contro una folla. É già successo. Paradossalmente un arma da fuoco con 15 proiettili potrebbe fare meno morti. Generalmente no, e il "costo per danno" è più pericoloso quindi le armi da fuoco sono normate con restrizioni superiori alla vendita di auto.
+
+Vi sembra un confronto cretino? Lo è, in effetti. Ma chi si occupa di "security" in termini perimetrali e poi viene "assurto nell'alto dei cieli" della cybersecurity porta con se questo paradigma e così chiunque abbia più di €10k (o €5k) che possa prelevare in contanti diventa un elemento di rischio per la società.
+
+Chi invece ha aziende e 350 milioni di credito verso le banche può fare la qualsiasi cosa perché "ha troppo da perdere" quando nella realtà ha la capacità effettiva e immediata di trasferirsi alle Cayman. Epperò non succede... già chiedetevi perché? Spesso la risposta è più "cretina" di quello che s'immagina: perché fuori dalla loro bolla esistenziale non sanno nemmeno allacciarsi i mocassini (che non hanno stringhe, appunto).
+
+Non fa ridere, ma proprio per niente. Anche se la battuta è spassosissima! 😁 
+
+---
+
+### Palantir & Co. sono imbarazzanti
+
+- Source: https://lnkd.in/p/dtgTQwjv
+
+Perché Palantir è imbarazzante per qualsiasi paese democratico? Palantir non è un problema in se stesso, è solo una tecnologia che permette cose. Come questa tecnologia viene usata dipende da chi lo usa. Allora perché Palantir è imbarazzante per qualsiasi paese democratico?
+
+Perché Palantir crea l'illusione del controllo e chi lo usa è vittima di questa illusione. Il problema politico ENORME che si sta prospettando non è scoprire che Palantir e tecnologie simili sono state usate per alterare la democrazia, violare la privacy, e i diritti delle persone in genere. Perché tutto questo si faceva anche prima di Palantir & Co.
+
+Palantir è imbarazzante perché dimostra che la democrazia rappresentativa non è mai stata quello che diceva di essere ma solo una vergognosa impostura del tipo le televendita di Wanna Marchi & Co. alla quale per altro hanno recentemente da, giustamente, un premio per essere stata una pioniera della democrazia rappresentativa (scoperta della sua vera natura).
+
+- https://lnkd.in/d6PPi7wX (democracy for dummies)
+
+Palantir è imbarazzante perché dimostra che la privacy non è mai esistita. Prima di Internet c'era il gossip ma se anche fosse "privacy online", quella è morta quando abbiamo cominciato ad usare Internet per incontrare ragazze con le quali poi avevamo relazioni o anche più banalmente ci presentiamo con un'identità.
+
+Perché fosse possibile che Internet rispettasse la privacy era necessario che TUTTI lo usassero SEMPRE come un mezzo anonimo e come può immaginare questo non era possibile. Quindi Palantir non ha tolto nulla, ha aggiunto l'illusione del controllo.
+
+Il problema politico ENORME è di negare che esiste una regia. Un problema che hanno le persone che si sono comprate l'illusione del controllo. Perché chiunque altro abbia un cervello funzionante sa che la regia non è altro che quello che Palantir ha reso evidente. Se anche esistessero persone tanto folli da cercare di "essere la regia" si troverebbero a vivere la trama di Jurassic Park: l'euforia, il disastro, il chaos e poi la fuga o la morte.
+
+- Ecco, "noi" puntiamo sulla loro morte, ma non una qualsiasi, tutti.
+
+Per questo abbiamo eletto a nostro supremo vate ispirazionale Morticia, perché è bella, è affascinante, è dark, ma soprattutto dice a Fester, che in quella scena soffre della sindrome dell'impostore: noi pasteggiamo felicemente di coloro che desideravano assoggettarci, e non è tanto per dire.
+
+Ecco fondamentalmente, questa è la parte imbarazzante di Palantir, non quella di aver cambiato qualcosa, ma di aver dato al personaggio di Morticia il ruolo di un novello Che Guevara ma senza il pietoso strascico del comunismo al seguito. Un personaggio che taglia la testa e rimette il resto nel vaso. Così come fosse contare, le teste cadute, senza lo sforzo di contarle davvero, perché fin da principio irrilevanti.
+
+---
+
+### Spoiler
+
+Hanno ragione gli Addams e alla fine prevalgono.
+
+> [INFO]
+> 
+> Morticia è madre Natura quando fa selezione tramite il chaos di coloro che lo hanno generato invocando strumenti tecnologici troppo potenti e complessità troppo elevate per le loro piccole menti.
+
