@@ -48,7 +48,7 @@ Relativamente pochi adottano la pratica di usare admin per poi fare su/do. La ra
 
 Qui cominciano i sudori freddi e la necessità di ridimensionare il problema per calmare i clienti in panico. I sistemi embedded fra cui SCADA e IoT, così come i router (OpenWRT) adottano l'approccio Alpine (generalmente o su richiesta) perché usare la chiave crittofrafica per root è decisamente più sicuro, più comodo e in linea con l'amministrazione delle flotte. Cioè la stessa configurazione che Alpine ha scelto!
 
----
+<br>
 
 ## THIS BUG IS LIKE A JOKE!
 
@@ -83,4 +83,72 @@ All of this whatever my name (copyleft is based on copyright, for those who even
 - Spoiler: reality never allows free rides, but TCMO applies.
 
 TCMO means Total Cost of an Ownership Mistake, aka cumulative debt generates negative interests by network externalities (complexity unchallenged) and the cost increases exponentially in time. Guess what? Reality never negotiates the bill, also.
+
+---
+
+### LINUX CVE-2026-98432 OR A BACKDOOR?
+
+- [LinkedIn post](https://lnkd.in/p/dr3HsUjm) &nsbp; (2026-11-05)
+
+Every Linux system which includes Android Smartphone has a root remotable backdoor inside since 2016. This is another way to see the same thing from the perspective of who knew the purpose in advance of that change (or got it soon after its introduction).
+
+Isn't an affirmation, it is a plausible scenario, it is a legit question.
+
+Another legit question is about the Open Source paradigm: many eyes watching the source code brings in more security because vulnerabilities are discovered faster and got fixed. It seems rational, so has it failed?
+
+- https://lnkd.in/p/df7GkY_w (post that explain why not)
+
+In short because "The Tragedy of Commons": everybody takes AS-IS and few pay attention, or developers, or reviewers. The gatekeepers are more interested in the bureaucratic aspects, while janitors about code readability and maintainability. And developers are more focused on features and testing.
+
+Insecurity by complexity, never has been taken in account. And this aspect is related to big tech companies and national security agencies. The first are focused on profit, the former are focused on certifications. None of them care about the "what if" and this is where the Tragedy of Complexity kicks into the Tragedy of Commons.
+
+- Two sides of the same coin.
+
+How much artificial intelligence creates this problem? The answer relies on the "unreleased AI model" which inspected public code. Those kinds of models are also inspecting proprietary code. The incentives are asymmetric: a company should pay for inspection and allow the access while inspecting the kernel brings in a proof-of-concept, a study case, something that the marketing needs to push big companies to open their wallet.
+
+- Look, the kernel has 9.8 breach: are your OS also? Pay to check.
+
+ The AI did not change the paradigm nor falsified it. AI added those eyes that companies and agencies never paid for having humans watching the code. Or they paid not as much as needed or without planning wisely. Open Source fails? It isn't a tragedy, after all. They are just hobbyists, not a profitable company. Azure, Amazon, Google, etc. are profitable companies which leverage Open Source.
+
+The Open Source paradigm isn't wrong. The "greedy is good", creates the Tragedy of Commons. The AI revealed the Tragedy of Complexity. The original sin is rotted in having imposed a single business paradigm by the suppression of every other alternative.
+
+In short, the Tragedy of Commons in Open Source did not happen for an accident but was planned: they would find out by themselves, and in the meantime we took. Great, so what is missing here? The TCMO (total cost of a mistake ownership) which in short it means: the Tragedy of Commons isn't a destiny but a warning. It happened once, then the lesson should have been learned not exploited by free riding.
+
+---
+
+### THE PHP PATCH JUST CAME OUT
+
+- [LinkedIn post](https://lnkd.in/p/df7GkY_w) &nsbp; (2026-10-21)
+
+And that's when the real danger begins because everyone able to understand the difference between the old codebase and the new one has received the minimum necessary information to understand the underlying vulnerability.
+
+Is this a failure of Open Source? Wasn't it more secure because many eyes watching the code make the code more secure? The first question's answer is the second question. They take the code without contributing to it, without even inspecting it. Who are they?
+
+The Dutch parliament, the Dutch national cyber agency and Finland's central government have pulled websites offline ahead of the PHP patch. They took AS-IS and then deployed AS-IS.
+
+Politics do it as usual but the national cybersecurity agency? Aren't they paid to inspect code before deploying it? They don't because their HR policy is politics-biased and politics never promotes by merit, never supports participation.
+
+Politics counts votes therefore creates and supports vote collectors which are in charge of winning elections and have no clue about what is necessary to make the system work, the system on which they sit.
+
+In the last 25 years everything was working, apparently. Because the least-effort as IT policy (aka IT people as blue-collars) never hits a real war nor a people insurrection, none of any kind apart from staged crysis.
+
+The 25 years IT debt that accumulates is just the tip of the iceberg, not the event nor the cause. The root cause is having ignored the problem for so long that the problem hits like a huge immense iceberg.
+
+In Italy we have an old saying that recites: "finché la barca va, lasciala andare" which translated is "until the ship goes, let it go" but the correct translation in English is "only dead fishes always follow the flow".
+
+That's it, my dear dead fishes. 🤗 🍌
+
+<br>
+
+## Il mercato non comprende l'IT
+
+- [LinkedIn post](https://lnkd.in/p/db9t93U3) &nsbp; (2026-11-05)
+
+Lenovo ThinkPlus FU100, cifratura AES-256 ma dati in chiaro su microSD.
+
+Un ricercatore ha smontato una chiavetta USB con lettore di impronte digitali prodotta da Lenovo, scoprendo che, nonostante la promessa di cifratura AES-256, i file sono leggibili su una comune scheda SD accessibile a chiunque abbia fisicamente il dispositivo. 
+
+Lenovo ha confermato che la stessa architettura è condivisa dai modelli FU200, TU800 e TSD303. L'azienda ha pubblicato l'avviso LEN-210545 il 13 gennaio 2026.
+
+Sintesi: prezzo premium, impronte digitali, cifratura top-civile, la apri e la leggi con un comunissimo lettore di carte microsd. Il mercato si orienta rispetto ai consumatori, necessariamente. Sarebbe sciocco pensare altrimenti.
 
