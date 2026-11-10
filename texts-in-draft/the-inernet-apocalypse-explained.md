@@ -1,6 +1,6 @@
 ## THE INTERNET APOCALYPSE, EXPLAINED
 
-- (c) 2026-10-20. Roberto A. Foglietta (roberto.foglietta@gmail.com), CC BY-NC-ND 4.0
+- (c) 2026-10-20, Roberto A. Foglietta (roberto.foglietta@gmail.com), CC BY-NC-ND 4.0
 - Created by a copy-n-paste composition of previously written documents in draft stage
 
 ---

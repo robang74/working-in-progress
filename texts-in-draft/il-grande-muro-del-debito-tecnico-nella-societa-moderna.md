@@ -1,5 +1,7 @@
 ## Il debito tecnico ha impattato sull'IoT
 
+- (c) 2026-11-08, Roberto A. Foglietta (roberto.foglietta@gmail.com), CC BY-NC-ND 4.0
+
 Articolo scritto come composizione di alcuni miei post pubblicati su LinkedIn relativi all'argomento ossia alle implicazioni sull'industria IT (terminologia usata in maniera sarcastica, non realistica, per definire i limiti del modello industriale quando applicato ad un ambito ad esso incompatibile come la scienza dell'informazione e alla tecnologia informatica) e sull'illusione che una società iper-tecnologica potesse essere sostenibile nonostante un debito tecnico immenso che giorno dopo giorno stiamo retrodatando fino alla causa primaria che fu il burst della bolla delle dot-com nel 2001 e quindi con l'introduzione del paradigma industriale nello sviluppo software.
 
 Una risposta sbagliata e applicata ad un settore che però era estraneo alla radice del problema: l'avidità dei mercati per un settore in forte espansione ma trainato da società che non avevano le capacità manageriali per gestirlo. In estrema sintesi la questione è stata ridotta al solito paradigma top-down: se gli informatici obbedissero al mercato come gli operai sulla linea di produzione, l'avidità dei mercati non avrebbe creato l'evento del 2001. La realtà sta invece dimostrando che anche cercando di sostituire gli informatici con i robot (le AI), il problema si ripropone tale e quale: il mercato NON ha le competenze per giudicare la tecnologia.
