@@ -1,4 +1,4 @@
-TRUMP SENZA MAGGIORANZA
+### TRUMP SENZA MAGGIORANZA
 
 Trump non ha più la maggioranza (dopo le midterm elections) quindi potrebbe ratificare un trattato di pace ma non avrebbe la forza di difenderlo nemmeno nei prossimi due anni, che è il minimo sindacale. Meno è un cessate il fuoco e sappiamo che i russi non prevedono quell'opzione. Ognuno ne tragga le conseguenze, perché negarlo sarebbe assurdo.
 
@@ -18,7 +18,7 @@ Perché in quel conflitto si contano circa un paio di milioni di morti (totale a
 
 ---
 
-IL TRILATERALE IN CINA
+### IL TRILATERALE IN CINA
 
 Il dialogo è un rapporto paritetico. La guerra mira necessariamente all'opposto, è un rapporto di forza. D'altronde non si può pensare di sconfiggere la Russia a chiacchiere e like: l'arroganza di essere noi a decidere per gli altri è il nostro Karma. Armatevi e partite, dunque!
 
@@ -38,7 +38,7 @@ Mentre l'Iran è ancora una spina nel fianco USA, i quali però già nel 2025 ha
 
 ---
 
-TRE NOTE INTERESSANTI
+### TRE NOTE INTERESSANTI
 
 > Christine Lagarde lascerà la presidenza della BCE il 7 febbraio 2027, con quasi nove mesi di anticipo rispetto alla scadenza naturale del suo mandato, prevista per il 31 ottobre 2027.
 
@@ -49,4 +49,8 @@ TRE NOTE INTERESSANTI
 Guardando a queste note, direi che la vittoria dei Democratici americani abbia deciso le sorti del prossimo assetto geopolitico. Forse rimane da decidere le sorti di Nvidia rispetto al suo board, ma senza le fonderie di chips a Taiwan è solo un'IP-company fino a nuova industrializzazione e Israele come il medio-oriente non è il posto più sicuro dove ricominciare a costruirne di nuove.
 
 Mentre in Europa discutono ancora come se la questione fosse da salotto mentre le reti elettriche sono a rischio di black-out sistemico e la telefonia mobile 2G/3G affetta ancora da SS7. Sotto questo aspetto non mi stupisce che la direttrice della Banca Centrale Europea abbia optato per un'uscita di scena preventivamente sei settimane prima dell'inizio della primavera.
+
+---
+
+- (c) 2026-11-08, Roberto A. Foglietta (roberto.foglietta@gmail.com), CC BY-NC-ND 4.0
 
