@@ -6,7 +6,7 @@ Infatti l'Europa sta delegando a Macron un tale ruolo, ma sappiamo che le pretes
 
 Ora, stante che i negoziati erano stati programmati post-midterm e si sono tenuti comunque nonostante l'esito delle elezioni europee, cosa potrebbero aver negoziato? Si sono parlati, Zelensky il primo giorno ha puntato tutto sulla tenuta del fronte nel Donbass, e già questo ci fa capire che non c'era alcuna sostanza, ma show.
 
-Perché certamente il Donbass è stato una delle cause scatenanti in quanto a differenza della Crimea che era in maggioranza russofona ed economicamente legata più alla Russia che all'Ucraina, il Donbass russofono era fortemente legato a Kiev in termini di economia ma si consideri che nel 2007, quasi il 90% degli ucraini parlava russo come seconda o prima lingua.
+Perché certamente il Donbass è stato una delle cause scatenanti in quanto a differenza della Crimea che era in maggioranza russofona ed economicamente legata più alla Russia che all'Ucraina, il Donbass russofono era fortemente legato a Kiev in termini di economia ma si consideri che nel 2007, quasi il 90% degli ucraini parlava russo come seconda o prima lingua. [¹]
 
 In questo contesto, sono i legami economici che determinano spinte separatiste oppure viceversa conservative. Ovvio che se il russo come seconda lingua ufficiale viene cancellato e sul Donbass Kiev spara, è chiaro che entrambi i legami si rompono. Parlare di integrità dei confini, da parte di Kiev, in questo scenario non è nemmeno demagogia ma propaganda verso paesi esteri perché in patria non regge.
 
@@ -51,6 +51,10 @@ Guardando a queste note, direi che la vittoria dei Democratici americani abbia d
 Mentre in Europa discutono ancora come se la questione fosse da salotto mentre le reti elettriche sono a rischio di black-out sistemico e la telefonia mobile 2G/3G affetta ancora da SS7. Sotto questo aspetto non mi stupisce che la direttrice della Banca Centrale Europea abbia optato per un'uscita di scena preventivamente sei settimane prima dell'inizio della primavera.
 
 ---
+
+### FOOTNOTES & COPYRIGHT
+
+1. [Talvolta bisogna correggere le teste di chatbot](https://robang74.github.io/roberto-a-foglietta/html/355-talvolta-bisogna-correggere-le-teste-di-chatbot.html#talvolta-bisogna-correggere-le-teste-di-chatbot) -- La ligua e i rapporti con la Russia nell'Ucraina pre-Zelensky
 
 - (c) 2026-11-08, Roberto A. Foglietta (roberto.foglietta@gmail.com), CC BY-NC-ND 4.0
 
