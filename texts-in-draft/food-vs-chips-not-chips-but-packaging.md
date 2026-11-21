@@ -43,6 +43,8 @@ L'analogia con FICO ci permette di osservare un pattern ricorrente che converge 
 
 - Non possono chiudere l'INPS, quindi la svuotano, mandando in bancarotta le casse previdenziali di categoria. A quel punto dovranno essere accorpati con l'INPS che andrà in fallimento, di fatto anche se non giuridicamente parlando.
 
+> FICO Eataly World (Fabbrica Italiana Contadina) a Bologna è stato sviluppato principalmente tramite il Fondo PAI (Parchi Agroalimentari Italiani), istituito e gestito da [Prelios SGR](https://prelios.com/it/news/prelios-sgr-lancia-il-fondo-pai-lo-sviluppo-del-progetto-fico-eataly-world). Le casse di previdenza private di categoria professionale che hanno sottoscritto quote del Fondo PAI, in ordine di esposizione: Fondazione Enpam (ente previdenziale di medici e odontoiatri) per €14 milioni, Cassa Forense (cassa di previdenza degli avvocati) per €10 milioni, Epap (ente di previdenza dei pluriiscritti) per 8 milioni. Nel complesso, gli enti previdenziali privati hanno sottoscritto circa il 38% del Fondo PAI, pari a circa €48 milioni di euro su un investimento immobiliare complessivo di circa €120 milioni.
+
 - Analogamente faranno con Cassa Depositi e Prestiti (CDP), il forziere dello Stato dopo che la Banca d'Italia è confluita nel regime bancario europeo, passando per PostePay (capitale separato) tramite carte intestate a stranieri usate fraudolarmente come reddito di criminanza (anche e sopratutto da italiani), che sarà integrata nel capitale di BancoPoste (digitalizzata fraud-friendly e partner bancario di Deutsche Bank con almeno €981 milioni in titoli tossici), che confluirà in CDP che alla fine pagherà per INPS e garantirà per tutti i prestiti presi dalla BCE grazie alla mangnaminità dell'Unione Europea.
 
 * [La cartolarizzazione del lavoratore](https://robang74.github.io/roberto-a-foglietta/html/linkedin/la-cartolarizzazione-del-lavoratore-roberto-a-foglietta.html) anche su [LinkedIn]() &nbsp; (2017-10-27)
@@ -51,5 +53,33 @@ L'analogia con FICO ci permette di osservare un pattern ricorrente che converge 
 
 * [Assalto alle Poste, la grande rapina, p.2](https://robang74.github.io/roberto-a-foglietta/html/linkedin/assalto-alle-poste-la-grande-rapina-p2-roberto-a-foglietta-nz7uf.html) anche su [LinkedIn]() &nbsp; (2024-01-26)
 
-In estrema sintesi, il sistema è in liquidazione coatta e da parecchi anni, non da ieri. Non penso serva aggiungere altro, anche se probabilmente altro sarà aggiunto.
+Immediatamente dopo la "Cartolarizzazione del lavoratore" ci sarebbe stato da scrivere un articolo sulla gestione e recupero forzoso del credito insoluto e/o a rischio che quando il creditore di prima istanza va in forte sofferenza, ripulisce i bilanci cedendolo a società private.
+
+Società che formalmente registrate come opertori finanziari si affidano a sub-appaltatori di non specchiata onestà i quali in genere sfruttano la delega del recupero credito forzoso per aggredire il patrimonio delle persone, anche giuridiche, attigue al debitore e in questo contesto emerge la logica estrema della socializzazione delle perdite.
+
+Perché vengono coinvolti in maniera spietata e fraudolenta chiunque, dalla gestione dei condomini, ai vicini, ai colleghi, ai manager, chiunque inclusi omonimi totalmente estranei e geograficamente separati. Non rimangono estranei gli avvocati e per estensione sia il mondo giudiziario, sia quello amministrativo e anche i sindacati.
+
+Fra tutte, spiccano particolarmente le cooperative sociali (e la gestione del servizio di ambulanze mediche) che spesso si avvalgono di manovalanza a basso costo fornita dai servizi sociali anche dei criminali da riabilitare. Lo stesso Silvio Berlusconi fu punito con questa forma di "partecipazione sociale" al fine di riabilitazione.
+
+Qualsiasi relazione possa esistere o anche solo essere supposta, diventa un veicolo per costruire schemi di Ponzi al fine specifico di aumentare la massa di coloro che potrebbero contribuire all'estinzione del debito primario. L'informatica ha infatti permesso di potenziare enormemente la capacità di infiltrazione sia fra privati, aziende, e pubbliche amministrazioni.
+
+Un debito che in realtà non si estingue mai, qualora già in principio non fosse stato creato per frode o truffa. Perché dietro a queste dinamiche, c'è la macchina finanziaria che fornisce voti ai candidati politici, quelli che non vi aderiscono hanno zero probabilità di essere eletti, spesso anche i non eletti vengono sistematicamente truffati.
+
+Quindi è un ciclo infinito di costruzione e distruzione di relazioni, e relative società che producono cartolarizzazioni e coperture di serietà, che fondamentalmente si basa sulla concessione di prebende attraverso complicate, opache e spesso fraudolente relazioni fra "persone rilevanti" e riciclaggio di denaro.
+
+* [Italia: fuga di cervelli e falso documentale](https://robang74.github.io/roberto-a-foglietta/html/330-italia-fuga-di-cervelli-e-falso-documentale.html) &nbsp; (2025-07-01)
+
+Il "sistema italia" è una iattura che perseguita i cittadini anche quanto emigrano, specialmente se rimangono nell'ambito dell'Unione Europea, perché non dimentichiamolo che noi abbiamo esportato il nostro modello all'Europa, altrimenti gli altri politicanti non avrebbero potuto competere.
+
+* [The paper money is financial communism](https://robang74.github.io/roberto-a-foglietta/html/278-the-paper-money-is-financial-communism.html) &nbsp; (2024-07-31)
+
+Un'esportazione, quella del "modello italico" che ha conquistato non solo la politica europea ma anche la sua finanza ai vertici. Perché non dimentichiamoci che è Mario Draghi fu governatore della BCE e firmo di suo pugno lo sdoganamento del quantitative easing come politica monetaria.
+
+Con Draghi alla BCE e poi durante la pandemia del Covid-19, il "modello italico" ha dominato da dietro le quinte la politica e la finanza dell'Unione Europea in tripudio infinito di creazione di linee di credito atte a generare nuova liquidità, gratificare le borse.
+
+Fra i tanti disastri, il QE decennale ha creato un nuovo picco di inflazione dei prezzi al consumo che aumentando il PIL supporta il concetto di "sostenibilità" del debito pubblico, se non fosse che questo in Italia è cresciuto più della produzione.
+
+La guerra da vincere contro la Russia in poche settimane con le sanzioni e due cannonate ben piazziate era la pianificazione del traferimento del debito insolubile internamente. Un evergreen di ogni impero coloniale. Peccato che la realtà avesse altri piani.
+
+In estrema sintesi, il sistema è -- ormai ufficialmente, guardando i listini di borsa e i dati delle Camere di Commercio -- in liquidazione coatta e da parecchi anni, non da ieri. Non penso serva aggiungere altro, anche se probabilmente altro sarà aggiunto.
 
