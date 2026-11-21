@@ -47,12 +47,14 @@ L'analogia con FICO ci permette di osservare un pattern ricorrente che converge 
 
 - Analogamente faranno con Cassa Depositi e Prestiti (CDP), il forziere dello Stato dopo che la Banca d'Italia è confluita nel regime bancario europeo, passando per PostePay (capitale separato) tramite carte intestate a stranieri usate fraudolarmente come reddito di criminanza (anche e sopratutto da italiani), che sarà integrata nel capitale di BancoPoste (digitalizzata fraud-friendly e partner bancario di Deutsche Bank con almeno €981 milioni in titoli tossici), che confluirà in CDP che alla fine pagherà per INPS e garantirà per tutti i prestiti presi dalla BCE grazie alla mangnaminità dell'Unione Europea.
 
-* [La cartolarizzazione del lavoratore](https://robang74.github.io/roberto-a-foglietta/html/linkedin/la-cartolarizzazione-del-lavoratore-roberto-a-foglietta.html) anche su [LinkedIn]() &nbsp; (2017-10-27)
+* [La cartolarizzazione del lavoratore](https://robang74.github.io/roberto-a-foglietta/html/linkedin/la-cartolarizzazione-del-lavoratore-roberto-a-foglietta.html) anche su [LinkedIn](https://www.linkedin.com/pulse/la-cartolarizzazione-del-lavoratore-roberto-a-foglietta/) &nbsp; (2017-10-27)
+    - *L'articolo parte da un caso di cronaca su un'assunzione fittizia per denunciare la «cartolarizzazione del lavoratore» e del suo curriculum, vista come strumento per stornare risorse aziendali, ottenere indebiti vantaggi o gestire il personale come merce anziché come capitale umano. Attraverso digressioni storiche e giuridiche — dai romani al capitalismo moderno, fino alla depenalizzazione del falso in scrittura privata e di alcuni illeciti sul lavoro — l'autore lega il fenomeno a dinamiche di abuso gestionale e a una scarsa valorizzazione delle competenze reali.*
 
-* [Assalto alle Poste, la grande rapina](https://robang74.github.io/roberto-a-foglietta/html/linkedin/assalto-alle-poste-la-grande-rapina-roberto-a-foglietta.html) anche su [LinkedIn]() &nbsp; (2018-12-27)
+* [Assalto alle Poste, la grande rapina](https://robang74.github.io/roberto-a-foglietta/html/linkedin/assalto-alle-poste-la-grande-rapina-roberto-a-foglietta.html) anche su [LinkedIn](https://www.linkedin.com/pulse/assalto-alle-poste-la-grande-rapina-roberto-a-foglietta/) &nbsp; (2018-12-27)
+    - *L'articolo critica in chiave polemica l'ipotesi di impiegare Cassa Depositi e Prestiti e il circuito legato a Poste Italiane in operazioni di venture capital e sostegno a start-up innovative, ritenendo improprio mescolare il risparmio tradizionale con investimenti ad alto rischio. Richiamando anche vicende come il salvataggio di Alitalia e la concessione ad Amazon per le consegne, l'autore mette in guardia contro l'elevato tasso di fallimento delle start-up, il rischio di dispersione del valore e la perdita di tutela per i risparmiatori.*
 
-* [Assalto alle Poste, la grande rapina, p.2](https://robang74.github.io/roberto-a-foglietta/html/linkedin/assalto-alle-poste-la-grande-rapina-p2-roberto-a-foglietta-nz7uf.html) anche su [LinkedIn]() &nbsp; (2024-01-26)
-
+* [Assalto alle Poste, la grande rapina, p.2](https://robang74.github.io/roberto-a-foglietta/html/linkedin/assalto-alle-poste-la-grande-rapina-p2-roberto-a-foglietta-nz7uf.html) anche su [LinkedIn](https://www.linkedin.com/pulse/assalto-alle-poste-la-grande-rapina-p2-roberto-a-foglietta-nz7uf/) &nbsp; (2024-01-26)
+    - *Questo secondo articolo riprende la critica sui rischi di snaturamento di Poste Italiane avviata nel testo precedente, spostando però il focus dall'impiego nel venture capital all'ipotesi di cessione di quote azionarie ai privati e al ruolo dell'azienda nel dibattito sull'identità digitale. L'autore denuncia il rischio di spingere l'ente verso logiche più commerciali e meno pubbliche, esaminando i rapporti tra politica, autonomia gestionale, centralizzazione dei dati personali e sicurezza informatica.*
 ---
 
 LIQUIDAZIONE TOTALE
@@ -116,6 +118,7 @@ Inutile dire che tanto la Cancel Culture, quanto l'ideologia Woke (incluso Frida
 Perché fondamentalmente tutti questi movimenti come lo è stato il Movimento 5 Stelle, sono buonissimi per sembrare benpensanti in un salotto di società, ma in realtà sono oscenità di propaganda, un insulto al buon senso e l'apice della violenza del doppio standard.
 
 * [Novelli Icaro mandati allo sbaraglio](https://robang74.github.io/roberto-a-foglietta/html/354-novelli-icaro-mandati-allo-sbaraglio.html) &nbsp; (2026-10-31)
+    - *L'articolo critica in modo pungente la cultura del fake it till you make it e la trasposizione acritica dei modelli del software e della finanza speculativa a settori vincolati da leggi fisiche, chimiche, industriali e regolatorie. Partendo dal caso Theranos e toccando debito tecnico, uso dell'intelligenza artificiale nello sviluppo software, dinamiche di mercato e tempi storici dell'innovazione, l'autore sostiene che il distacco tra rappresentazione finanziaria e realtà materiale porti a derive sistemiche che finiscono per scontrarsi con i limiti oggettivi del reale.*
 
 Per capire quanto questa mentalità della "confezione  sopra la sostanza" sia devastante, non servono voli pindarici, basta osservare gli effetti sull'impresa, che dovrebbe essere il motore della produzione di valore, e l'accoppiata Holmes / Theranos è un eccellente caso scuola.
 
