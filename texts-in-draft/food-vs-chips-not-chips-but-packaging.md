@@ -53,6 +53,10 @@ L'analogia con FICO ci permette di osservare un pattern ricorrente che converge 
 
 * [Assalto alle Poste, la grande rapina, p.2](https://robang74.github.io/roberto-a-foglietta/html/linkedin/assalto-alle-poste-la-grande-rapina-p2-roberto-a-foglietta-nz7uf.html) anche su [LinkedIn]() &nbsp; (2024-01-26)
 
+---
+
+LIQUIDAZIONE TOTALE
+
 Immediatamente dopo la "Cartolarizzazione del lavoratore" ci sarebbe stato da scrivere un articolo sulla gestione e recupero forzoso del credito insoluto e/o a rischio che quando il creditore di prima istanza va in forte sofferenza, ripulisce i bilanci cedendolo a società private.
 
 Società che formalmente registrate come opertori finanziari si affidano a sub-appaltatori di non specchiata onestà i quali in genere sfruttano la delega del recupero credito forzoso per aggredire il patrimonio delle persone, anche giuridiche, attigue al debitore e in questo contesto emerge la logica estrema della socializzazione delle perdite.
@@ -73,6 +77,10 @@ Il "sistema italia" è una iattura che perseguita i cittadini anche quanto emigr
 
 * [The paper money is financial communism](https://robang74.github.io/roberto-a-foglietta/html/278-the-paper-money-is-financial-communism.html) &nbsp; (2024-07-31)
 
+---
+
+IL MODELLO ITALICO
+
 Un'esportazione, quella del "modello italico" che ha conquistato non solo la politica europea ma anche la sua finanza ai vertici. Perché non dimentichiamoci che è Mario Draghi fu governatore della BCE e firmo di suo pugno lo sdoganamento del quantitative easing come politica monetaria.
 
 Con Draghi alla BCE e poi durante la pandemia del Covid-19, il "modello italico" ha dominato da dietro le quinte la politica e la finanza dell'Unione Europea in tripudio infinito di creazione di linee di credito atte a generare nuova liquidità, gratificare le borse.
@@ -80,6 +88,38 @@ Con Draghi alla BCE e poi durante la pandemia del Covid-19, il "modello italico"
 Fra i tanti disastri, il QE decennale ha creato un nuovo picco di inflazione dei prezzi al consumo che aumentando il PIL supporta il concetto di "sostenibilità" del debito pubblico, se non fosse che questo in Italia è cresciuto più della produzione.
 
 La guerra da vincere contro la Russia in poche settimane con le sanzioni e due cannonate ben piazziate era la pianificazione del traferimento del debito insolubile internamente. Un evergreen di ogni impero coloniale. Peccato che la realtà avesse altri piani.
+
+* [Talvolta bisogna correggere le teste di chatbot](https://robang74.github.io/roberto-a-foglietta/html/355-talvolta-bisogna-correggere-le-teste-di-chatbot.html) &nbsp; (2026-11-01)
+
+* [Outlook sul trilaterale in Cina](https://github.com/robang74/working-in-progress/blob/main/texts-in-draft/trump-senza-maggioranza-trilaterale-in-cina.md#il-trilaterale-in-cina) &nbsp; (2026-11-08)
+
+---
+
+LA CURA DA CAVALLO
+
+Trasparenza. In Unione Sovietica la chiamarono Glasnost e dopo l'incidente di Chernobyl hanno deciso che era indispensabile per la Perestroika (cambiamento). Penso che si ricordi che è venuto giù tutta l'URSS nel giro di sei anni.
+
+Cinque anni e un mese per la precisione dalla fine della prima fase dell'inchiesta interna su Chernobyl (durata 4 mesi) alla dissoluzione dell'URSS: 26 aprile 1986 + 4 mesi al 25 dicembre 1991 (ufficializzata in occidente il 31 dicembre 1991, ossia al suo completamento in 6
+giorni).
+
+L'Unione Sovietica iniziò con la rivoluzione di ottobre del 1917 (7 novembre secondo il nostro calendario) ed è durata 74 anni. Abbiamo appena fatto in tempo ad accorgercene (muro di Berlino, 9
+novembre 1989)  che stava collassando, che era già finita.
+
+Tutti gli imperi sono eterni, fino alla settimana prima della loro caduta (semcit.) poi improvvisamente ci si accorge che tutto quanto è umano ha un'inizio e una fine. Ma c'è un aspetto particolarmente drammatico: per fare chiarezza servono persone lucide, intelligenti e radicalmente oneste che siano abbastanza coraggiose da affrontare la "libertà di parola" concessa dal sistema.
+
+Inutile dire che tanto la Cancel Culture, quanto l'ideologia Woke (incluso Friday for Future abbandonato per il più divisivo Free Palestine), poi l'odio e la guerra contro la Russia hanno fornito eccezionali strumenti per emarginare queste "menti pericolose".
+
+Perché fondamentalmente tutti questi movimenti come lo è stato il Movimento 5 Stelle, sono buonissimi per sembrare benpensanti in un salotto di società, ma in realtà sono oscenità di propaganda, un insulto al buon senso e l'apice della violenza del doppio standard.
+
+* [Novelli Icaro mandati allo sbaraglio](https://robang74.github.io/roberto-a-foglietta/html/354-novelli-icaro-mandati-allo-sbaraglio.html) &nbsp; (2026-10-31)
+
+Per capire quanto questa mentalità della "confezione  sopra la sostanza" sia devastante, non servono voli pindarici, basta osservare gli effetti sull'impresa, che dovrebbe essere il motore della produzione di valore, e l'accoppiata Holmes / Theranos è un eccellente caso scuola.
+
+Da Greta Thunberg a Elizabeth Holmes, il passo è breve. Da raccogliere fondi per una causa a fare la medesima cosa per vendere un prodotto reale che dovrebbe funzionare. Il basso è breve, quel poco che è l'alzarsi dalla poltrona delle chiacchiere a cercare di cucinare un piatta di pasta.
+
+---
+
+CONCLUSIONE
 
 In estrema sintesi, il sistema è -- ormai ufficialmente, guardando i listini di borsa e i dati delle Camere di Commercio -- in liquidazione coatta e da parecchi anni, non da ieri. Non penso serva aggiungere altro, anche se probabilmente altro sarà aggiunto.
 
