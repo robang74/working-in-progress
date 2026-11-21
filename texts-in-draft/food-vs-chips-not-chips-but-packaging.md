@@ -32,10 +32,10 @@ FOOD VS CHIPS
 Come se non sapessi cos'era FICO Eataly World a Bologna (è stato inaugurato per la prima volta il 15 novembre 2017) già 4 mesi dopo la sua inaugurazione (apertura al pubblico).
 
 * [176-Quella_gran_patacca_di_FICO.pdf](https://raw.githubusercontent.com/robang74/roberto-a-foglietta/refs/heads/main/pdf.todo/176-Quella_gran_patacca_di_FICO.pdf) &nbsp; (2018-03-15)
-    - L'articolo tratta in chiave critica la vicenda FICO e, più in generale, il rapporto tra marketing urbano, istituzioni e cittadinanza. Attraverso una narrazione informale, sarcastica e volutamente accessibile, l’autore mette in discussione l’efficacia reale del progetto, i suoi costi e le sue ricadute sul territorio, invitando a leggere oltre l’immagine promozionale per coglierne le contraddizioni tra obiettivi dichiarati e risultati percepiti.
+    - *L'articolo tratta in chiave critica la vicenda FICO e, più in generale, il rapporto tra marketing urbano, istituzioni e cittadinanza. Attraverso una narrazione informale, sarcastica e volutamente accessibile, l'autore mette in discussione l'efficacia reale del progetto, i suoi costi e le sue ricadute sul territorio, invitando a leggere oltre l'immagine promozionale per coglierne le contraddizioni tra obiettivi dichiarati e risultati percepiti.*
 
 * [178-L_insostenibile_leggerezza_di_FICO.pdf](https://raw.githubusercontent.com/robang74/roberto-a-foglietta/refs/heads/main/pdf.todo/178-L_insostenibile_leggerezza_di_FICO.pdf) &nbsp; (2018-03-24)
-    - Questo secondo articolo riprende la critica all'operazione FICO (Fabbrica Italiana Contadina) già avviata in quello precedente, approfondendone però gli aspetti più strettamente economici e finanziari. L’autore analizza il modello imprenditoriale, i finanziamenti pubblici e privati e l'eccessivo tono celebrativo del progetto rispetto alla reale situazione dell'agroalimentare italiano, mettendo in dubbio la sostenibilità dell'iniziativa, la sua trasparenza e gli effettivi benefici per piccoli produttori e consumatori.
+    - *Questo secondo articolo riprende la critica all'operazione FICO (Fabbrica Italiana Contadina) già avviata in quello precedente, approfondendone però gli aspetti più strettamente economici e finanziari. L'autore analizza il modello imprenditoriale, i finanziamenti pubblici e privati e l'eccessivo tono celebrativo del progetto rispetto alla reale situazione dell'agroalimentare italiano, mettendo in dubbio la sostenibilità dell'iniziativa, la sua trasparenza e gli effettivi benefici per piccoli produttori e consumatori.*
 
 L'analogia con FICO ci permette di osservare un pattern ricorrente che converge con altre decisioni "particolari" come il reddito di cittadinanza (2018 erogato 2019), resilienza Covid (2019 erogato 2020), super-bonus edilizio (2020 erogato 2021), finanziamento all'Ucraina (1° erogato nel 2022), etc. e qual'è questa convergenza?
 
@@ -72,10 +72,12 @@ Un debito che in realtà non si estingue mai, qualora già in principio non foss
 Quindi è un ciclo infinito di costruzione e distruzione di relazioni, e relative società che producono cartolarizzazioni e coperture di serietà, che fondamentalmente si basa sulla concessione di prebende attraverso complicate, opache e spesso fraudolente relazioni fra "persone rilevanti" e riciclaggio di denaro.
 
 * [Italia: fuga di cervelli e falso documentale](https://robang74.github.io/roberto-a-foglietta/html/330-italia-fuga-di-cervelli-e-falso-documentale.html) &nbsp; (2025-07-01)
+    - *L'articolo esamina in chiave critica e polemica il declino della competitività industriale italiana e la fuga di cervelli, collegandoli a una carenza di competenze STEM e a una gestione del rischio ridotta a mera conformità formale e "falso documentale". Prendendo spunto da episodi recenti — come il cedimento dell'insegna sulla torre Generali a Milano e la vicenda dei componenti difettosi legati a Leonardo e Boeing — l'autore sostiene che il ricorso a coperture assicurative e a controlli solo cartacei mascheri una deriva sistemica e una scarsa aderenza alla realtà.*
 
 Il "sistema italia" è una iattura che perseguita i cittadini anche quanto emigrano, specialmente se rimangono nell'ambito dell'Unione Europea, perché non dimentichiamolo che noi abbiamo esportato il nostro modello all'Europa, altrimenti gli altri politicanti non avrebbero potuto competere.
 
 * [The paper money is financial communism](https://robang74.github.io/roberto-a-foglietta/html/278-the-paper-money-is-financial-communism.html) &nbsp; (2024-07-31)
+    - *L'articolo — ampliato in più edizioni con digressioni storiche e aggiornamenti geopolitici — definisce «comunismo finanziario» l'espansione monetaria tramite valuta fiat, quantitative easing e cartolarizzazione, sostenendo che concentri il controllo delle risorse a scapito dell'economia reale e della scarsità materiale. Nelle edizioni successive l'autore collega questo impianto teorico alla tassazione delle plusvalenze non realizzate, al peso di energia e semiconduttori (tra Taiwan, Medio Oriente e filiere globali) e alle conseguenze geopolitiche della rimozione di Maduro in Venezuela sul debito e sull'assetto del dollaro.*
 
 ---
 
@@ -90,8 +92,10 @@ Fra i tanti disastri, il QE decennale ha creato un nuovo picco di inflazione dei
 La guerra da vincere contro la Russia in poche settimane con le sanzioni e due cannonate ben piazziate era la pianificazione del traferimento del debito insolubile internamente. Un evergreen di ogni impero coloniale. Peccato che la realtà avesse altri piani.
 
 * [Talvolta bisogna correggere le teste di chatbot](https://robang74.github.io/roberto-a-foglietta/html/355-talvolta-bisogna-correggere-le-teste-di-chatbot.html) &nbsp; (2026-11-01)
+    - *L'articolo prende spunto da una telefonata tra i leader di Finlandia e Norvegia e Putin per criticare le narrazioni semplificate sul conflitto russo-ucraino, sia quelle istituzionali sia quelle prodotte dall'intelligenza artificiale. Attraverso una riflessione polemica e storica — che intreccia radici medievali, dinamiche linguistiche e familiari, conferenze del 2007-2008 e ripercussioni finanziarie dei subprime — l'autore contesta gli approcci geopolitici riduttivi e rivendica il peso dell'esperienza storica e territoriale europea rispetto a letture astratte o algoritmiche.*
 
-* [Outlook sul trilaterale in Cina](https://github.com/robang74/working-in-progress/blob/main/texts-in-draft/trump-senza-maggioranza-trilaterale-in-cina.md#il-trilaterale-in-cina) &nbsp; (2026-11-08)
+* [Trump senza maggioranza e trilaterale in Cina](https://github.com/robang74/working-in-progress/blob/main/texts-in-draft/trump-senza-maggioranza-trilaterale-in-cina.md#il-trilaterale-in-cina) &nbsp; (2026-11-08)
+    - *L'articolo analizza in chiave polemica e sarcastica l'assetto geopolitico ed economico successivo alle midterm americane, collegando Ucraina, Unione Europea, Cina, semiconduttori e sicurezza infrastrutturale in un'unica lettura sistemica. Attraverso un registro diretto e provocatorio, l'autore mette in discussione la tenuta politica ed istituzionale dei principali attori occidentali — dalla debolezza post-elettorale di Trump alle divisioni interne dell'UE e alla legittimità di Kiev — spostando il baricentro strategico verso Pechino, il controllo delle filiere tecnologiche e le vulnerabilità strutturali europee, accostate anche all'uscita anticipata di Christine Lagarde dalla BCE.*
 
 ---
 
