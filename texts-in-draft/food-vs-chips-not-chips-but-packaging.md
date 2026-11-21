@@ -31,8 +31,11 @@ FOOD VS CHIPS
 
 Come se non sapessi cos'era FICO Eataly World a Bologna (è stato inaugurato per la prima volta il 15 novembre 2017) già 4 mesi dopo la sua inaugurazione (apertura al pubblico).
 
-- [176-Quella_gran_patacca_di_FICO.pdf](https://raw.githubusercontent.com/robang74/roberto-a-foglietta/refs/heads/main/pdf.todo/176-Quella_gran_patacca_di_FICO.pdf) &nbsp; (15 marzo 2018)
+* [176-Quella_gran_patacca_di_FICO.pdf](https://raw.githubusercontent.com/robang74/roberto-a-foglietta/refs/heads/main/pdf.todo/176-Quella_gran_patacca_di_FICO.pdf)   (15 marzo 2018)
+    - L'articolo tratta in chiave critica la vicenda FICO e, più in generale, il rapporto tra marketing urbano, istituzioni e cittadinanza. Attraverso una narrazione informale, sarcastica e volutamente accessibile, l’autore mette in discussione l’efficacia reale del progetto, i suoi costi e le sue ricadute sul territorio, invitando a leggere oltre l’immagine promozionale per coglierne le contraddizioni tra obiettivi dichiarati e risultati percepiti.
 
-- [178-L_insostenibile_leggerezza_di_FICO.pdf](https://raw.githubusercontent.com/robang74/roberto-a-foglietta/refs/heads/main/pdf.todo/178-L_insostenibile_leggerezza_di_FICO.pdf) &nbsp; (24 marzo 2018)
+* [178-L_insostenibile_leggerezza_di_FICO.pdf](https://raw.githubusercontent.com/robang74/roberto-a-foglietta/refs/heads/main/pdf.todo/178-L_insostenibile_leggerezza_di_FICO.pdf)   (24 marzo 2018)
+    - Questo secondo articolo riprende la critica all'operazione FICO (Fabbrica Italiana Contadina) già avviata in quello precedente, approfondendone però gli aspetti più strettamente economici e finanziari. L’autore analizza il modello imprenditoriale, i finanziamenti pubblici e privati e l'eccessivo tono celebrativo del progetto rispetto alla reale situazione dell'agroalimentare italiano, mettendo in dubbio la sostenibilità dell'iniziativa, la sua trasparenza e gli effettivi benefici per piccoli produttori e consumatori.
 
 Non penso serva aggiungere altro, anche se probabilmente altro sarà aggiunto.
+
