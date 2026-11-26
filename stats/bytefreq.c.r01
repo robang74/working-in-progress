@@ -1,0 +1,146 @@
+/*
+ * (C) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2
+ *
+ * Compile: gcc -O2 -g0 -s -Wall -Wextra -Werror bytefreq.c -o bytefreq
+ *
+ * Usage: ./bytefreq [size-length] < input.bin
+ */
+
+#define _POSIX_C_SOURCE 200809L
+
+#include <errno.h>
+#include <inttypes.h>
+#include <limits.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
+#ifndef DEFAULT_BUF_SIZE
+#define DEFAULT_BUF_SIZE (32u * 1024u) /* 32 KiB */
+#endif
+
+#define BYTE_VALUES 256u
+#define TOP_N 16u
+
+typedef struct {
+    unsigned char value;
+    size_t count;
+} byte_freq_t;
+
+/* Sort by count descending; tie-break by byte value ascending. */
+static int cmp_freq_desc(const void *a, const void *b) {
+    const byte_freq_t *fa = (const byte_freq_t *)a;
+    const byte_freq_t *fb = (const byte_freq_t *)b;
+
+    if (fa->count > fb->count) {
+        return -1;
+    }
+    if (fa->count < fb->count) {
+        return 1;
+    }
+    if (fa->value < fb->value) {
+        return -1;
+    }
+    if (fa->value > fb->value) {
+        return 1;
+    }
+    return 0;
+}
+
+static int parse_buf_size(const char *arg, size_t *out_size) {
+    if (arg == NULL || *arg == '\0') {
+        return -1;
+    }
+
+    errno = 0;
+    char *endptr = NULL;
+    unsigned long long parsed = strtoull(arg, &endptr, 10);
+    if (errno != 0 || endptr == arg || *endptr != '\0') {
+        return -1;
+    }
+    if (parsed == 0ULL || parsed > (unsigned long long)SIZE_MAX) {
+        return -1;
+    }
+
+    *out_size = (size_t)parsed;
+    return 0;
+}
+
+static ssize_t read_full(int fd, unsigned char *buf, size_t len) {
+    size_t total = 0;
+
+    while (total < len) {
+        ssize_t n = read(fd, buf + total, len - total);
+        if (n < 0) {
+            if (errno == EINTR) {
+                continue;
+            }
+            return -1;
+        }
+        if (n == 0) {
+            break; /* EOF before filling full buffer */
+        }
+        total += (size_t)n;
+    }
+
+    return (ssize_t)total;
+}
+
+int main(int argc, char *argv[]) {
+    size_t buf_size = (size_t)DEFAULT_BUF_SIZE;
+
+    if (argc > 2) {
+        fprintf(stderr, "Usage: %s [buffer_size_in_bytes]\n", argv[0]);
+        return EXIT_FAILURE;
+    }
+
+    if (argc == 2) {
+        if (parse_buf_size(argv[1], &buf_size) != 0) {
+            fprintf(stderr, "Invalid buffer size: '%s' (must be a positive integer)\n", argv[1]);
+            return EXIT_FAILURE;
+        }
+    }
+
+    unsigned char *buf = malloc(buf_size);
+    if (buf == NULL) {
+        perror("malloc");
+        return EXIT_FAILURE;
+    }
+
+    /* Unsigned vector of 256 elements keeping the count for each byte value (0..255). */
+    size_t counts[BYTE_VALUES] = {0};
+
+    ssize_t bytes_read = read_full(STDIN_FILENO, buf, buf_size);
+    if (bytes_read < 0) {
+        perror("read");
+        free(buf);
+        return EXIT_FAILURE;
+    }
+
+    for (size_t i = 0; i < (size_t)bytes_read; i++) {
+        counts[buf[i]]++;
+    }
+
+    byte_freq_t ranked[BYTE_VALUES];
+    for (size_t v = 0; v < BYTE_VALUES; v++) {
+        ranked[v].value = (unsigned char)v;
+        ranked[v].count = counts[v];
+    }
+
+    qsort(ranked, BYTE_VALUES, sizeof(ranked[0]), cmp_freq_desc);
+
+    printf("Read %zd bytes (buffer size: %zu bytes). Top %u byte values:\n",
+           bytes_read, buf_size, TOP_N);
+    for (size_t i = 0; i < TOP_N; i++) {
+        printf("%2zu. byte 0x%02X (%3u): %zu\n",
+               i + 1,
+               (unsigned int)ranked[i].value,
+               (unsigned int)ranked[i].value,
+               ranked[i].count);
+    }
+
+    free(buf);
+    return EXIT_SUCCESS;
+}

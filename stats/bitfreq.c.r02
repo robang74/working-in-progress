@@ -1,0 +1,216 @@
+/*
+ * (C) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2
+ *
+ * Compile: gcc -O2 -g0 -s -Wall -Wextra -Werror bitfreq.c -o bitfreq
+ *
+ * Usage: ./bitfreq [buffer_size_in_bytes] < input.bin > output.bin
+ */
+
+#define _POSIX_C_SOURCE 200809L
+
+#include <errno.h>
+#include <inttypes.h>
+#include <limits.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+#if CHAR_BIT != 8
+#error "bitfreq requires 8-bit bytes"
+#endif
+
+#ifndef DEFAULT_BUF_SIZE
+#define DEFAULT_BUF_SIZE (32u * 1024u) /* 32 KiB */
+#endif
+
+#if DEFAULT_BUF_SIZE == 0
+#error "DEFAULT_BUF_SIZE must be greater than zero"
+#endif
+
+#define NUM_CHUNKS 256u
+#define NUM_PASSES 8u
+
+static int parse_buf_size(const char *arg, size_t *out_size)
+{
+    const unsigned char *p;
+    char *endptr;
+    uintmax_t parsed;
+
+    if (arg == NULL || *arg == '\0')
+        return -1;
+
+    for (p = (const unsigned char *)arg; *p != '\0'; p++) {
+        if (*p < '0' || *p > '9')
+            return -1;
+    }
+
+    errno = 0;
+    endptr = NULL;
+    parsed = strtoumax(arg, &endptr, 10);
+    if (errno != 0 || endptr == arg || *endptr != '\0' ||
+        parsed == 0 || parsed > (uintmax_t)SIZE_MAX)
+        return -1;
+
+    *out_size = (size_t)parsed;
+    return 0;
+}
+
+static int read_full(int fd, unsigned char *buf, size_t len, size_t *out_read)
+{
+    size_t total = 0;
+
+    while (total < len) {
+        size_t request = len - total;
+        ssize_t n;
+
+        if (request > (size_t)SSIZE_MAX)
+            request = (size_t)SSIZE_MAX;
+
+        n = read(fd, buf + total, request);
+        if (n < 0) {
+            if (errno == EINTR)
+                continue;
+            return -1;
+        }
+        if (n == 0)
+            break;
+
+        total += (size_t)n;
+    }
+
+    *out_read = total;
+    return 0;
+}
+
+static int write_full(int fd, const unsigned char *buf, size_t len)
+{
+    size_t total = 0;
+
+    while (total < len) {
+        size_t request = len - total;
+        ssize_t n;
+
+        if (request > (size_t)SSIZE_MAX)
+            request = (size_t)SSIZE_MAX;
+
+        n = write(fd, buf + total, request);
+        if (n < 0) {
+            if (errno == EINTR)
+                continue;
+            return -1;
+        }
+        if (n == 0) {
+            errno = EIO;
+            return -1;
+        }
+
+        total += (size_t)n;
+    }
+
+    return 0;
+}
+
+static void get_chunk_bounds(size_t total_len, size_t chunk_idx,
+                             size_t *out_start, size_t *out_end)
+{
+    size_t base_len = total_len / NUM_CHUNKS;
+    size_t start = chunk_idx * base_len;
+    size_t end = (chunk_idx + 1u == NUM_CHUNKS) ? total_len : (start + base_len);
+
+    *out_start = start;
+    *out_end = end;
+}
+
+int main(int argc, char *argv[])
+{
+    size_t buf_size = (size_t)DEFAULT_BUF_SIZE;
+    size_t n_read = 0;
+    unsigned char *buf = NULL;
+
+    static const unsigned char bit_masks[NUM_PASSES] = {
+        0x80u, 0x40u, 0x20u, 0x10u, 0x08u, 0x04u, 0x02u, 0x01u
+    };
+
+    if (argc > 2) {
+        fprintf(stderr, "Usage: %s [buffer_size_in_bytes]\n", argv[0]);
+        return EXIT_FAILURE;
+    }
+
+    if (argc == 2 && parse_buf_size(argv[1], &buf_size) != 0) {
+        fprintf(stderr,
+                "Invalid buffer size: '%s' (must be a positive decimal integer)\n",
+                argv[1]);
+        return EXIT_FAILURE;
+    }
+
+    buf = malloc(buf_size);
+    if (buf == NULL) {
+        perror("malloc");
+        return EXIT_FAILURE;
+    }
+
+    if (read_full(STDIN_FILENO, buf, buf_size, &n_read) != 0) {
+        perror("read");
+        free(buf);
+        return EXIT_FAILURE;
+    }
+
+    for (unsigned int pass = 0; pass < NUM_PASSES; pass++) {
+        unsigned char mask = bit_masks[pass];
+
+        for (size_t c = 0; c < NUM_CHUNKS; c++) {
+            size_t start = 0;
+            size_t end = 0;
+            size_t chunk_len = 0;
+            size_t ones = 0;
+            size_t zeros = 0;
+            unsigned int most_freq_bit = 0;
+            size_t most_freq_count = 0;
+
+            get_chunk_bounds(n_read, c, &start, &end);
+            chunk_len = end - start;
+
+            for (size_t i = start; i < end; i++) {
+                if ((buf[i] & mask) != 0)
+                    ones++;
+                else
+                    zeros++;
+            }
+
+            if (ones + zeros != chunk_len) {
+                fprintf(stderr,
+                        "Internal count mismatch on pass %u chunk %zu: ones=%zu zeros=%zu len=%zu\n",
+                        pass + 1u, c + 1u, ones, zeros, chunk_len);
+                free(buf);
+                return EXIT_FAILURE;
+            }
+
+            if (ones > zeros) {
+                most_freq_bit = 1u;
+                most_freq_count = ones;
+                for (size_t i = start; i < end; i++)
+                    buf[i] ^= mask;
+            } else {
+                most_freq_bit = 0u;
+                most_freq_count = zeros;
+            }
+
+            if (fprintf(stderr, "%d: %d, %8zu\n",
+                        (int)(pass + 1u), (int)most_freq_bit, most_freq_count) < 0) {
+                fprintf(stderr, "Error writing diagnostics to stderr\n");
+                free(buf);
+                return EXIT_FAILURE;
+            }
+        }
+    }
+
+    if (write_full(STDOUT_FILENO, buf, n_read) != 0) {
+        perror("write");
+        free(buf);
+        return EXIT_FAILURE;
+    }
+
+    free(buf);
+    return EXIT_SUCCESS;
+}

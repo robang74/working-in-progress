@@ -1,0 +1,202 @@
+/*
+ * (C) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2
+ *
+ * Compile: gcc -O2 -g0 -s -Wall -Wextra -Werror bytefreq.c -o bytefreq
+ *
+ * Usage: ./bytefreq [size-length] < input.bin > output.bin
+ */
+
+#define _POSIX_C_SOURCE 200809L
+
+#include <errno.h>
+#include <limits.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
+#ifndef DEFAULT_BUF_SIZE
+#define DEFAULT_BUF_SIZE (32u * 1024u) /* 32 KiB */
+#endif
+
+#define BYTE_VALUES 256u
+#define CHUNK_DIV 8u
+
+static int parse_buf_size(const char *arg, size_t *out_size) {
+    if (arg == NULL || *arg == '\0') {
+        return -1;
+    }
+
+    errno = 0;
+    char *endptr = NULL;
+    unsigned long long parsed = strtoull(arg, &endptr, 10);
+    if (errno != 0 || endptr == arg || *endptr != '\0') {
+        return -1;
+    }
+    if (parsed == 0ULL || parsed > (unsigned long long)SIZE_MAX) {
+        return -1;
+    }
+
+    *out_size = (size_t)parsed;
+    return 0;
+}
+
+static ssize_t read_full(int fd, unsigned char *buf, size_t len) {
+    size_t total = 0;
+
+    while (total < len) {
+        ssize_t n = read(fd, buf + total, len - total);
+        if (n < 0) {
+            if (errno == EINTR) {
+                continue;
+            }
+            return -1;
+        }
+        if (n == 0) {
+            break; /* EOF before filling full buffer */
+        }
+        total += (size_t)n;
+    }
+
+    return (ssize_t)total;
+}
+
+static int write_full(int fd, const unsigned char *buf, size_t len) {
+    size_t total = 0;
+
+    while (total < len) {
+        ssize_t n = write(fd, buf + total, len - total);
+        if (n < 0) {
+            if (errno == EINTR) {
+                continue;
+            }
+            return -1;
+        }
+        total += (size_t)n;
+    }
+
+    return 0;
+}
+
+/* Find most frequent byte in buf[start .. end), tie-breaking by smallest value. */
+static unsigned char find_most_frequent(const unsigned char *buf, size_t start, size_t end) {
+    size_t counts[BYTE_VALUES] = {0};
+
+    for (size_t i = start; i < end; i++) {
+        counts[buf[i]]++;
+    }
+
+    unsigned char best_val = 0;
+    size_t best_cnt = counts[0];
+    for (size_t v = 1; v < BYTE_VALUES; v++) {
+        if (counts[v] > best_cnt) {
+            best_cnt = counts[v];
+            best_val = (unsigned char)v;
+        }
+    }
+
+    return best_val;
+}
+
+/* Shift buf[start .. end) modulo 256 so that `orig` becomes `0`. */
+static void shift_range_to_zero(unsigned char *buf, size_t start, size_t end, unsigned char orig) {
+    for (size_t i = start; i < end; i++) {
+        buf[i] = (unsigned char)((buf[i] - orig) & 0xFFu);
+    }
+}
+
+/* Compute start/end offsets for `part_idx` (0..parts-1) inside [range_start, range_end).
+ * Standard parts get `base_len = len / parts`; the final part gets the remainder. */
+static void get_part_bounds(size_t range_start, size_t range_end,
+                            size_t part_idx, size_t parts,
+                            size_t *out_start, size_t *out_end, size_t *out_len) {
+    size_t total_len = range_end - range_start;
+    size_t base_len = total_len / parts;
+    size_t start = range_start + part_idx * base_len;
+    size_t end = (part_idx + 1 == parts) ? range_end : (start + base_len);
+
+    *out_start = start;
+    *out_end = end;
+    *out_len = end - start;
+}
+
+int main(int argc, char *argv[]) {
+    size_t buf_size = (size_t)DEFAULT_BUF_SIZE;
+
+    if (argc > 2) {
+        fprintf(stderr, "Usage: %s [buffer_size_in_bytes]\n", argv[0]);
+        return EXIT_FAILURE;
+    }
+
+    if (argc == 2) {
+        if (parse_buf_size(argv[1], &buf_size) != 0) {
+            fprintf(stderr, "Invalid buffer size: '%s' (must be a positive integer)\n", argv[1]);
+            return EXIT_FAILURE;
+        }
+    }
+
+    unsigned char *buf = malloc(buf_size);
+    if (buf == NULL) {
+        perror("malloc");
+        return EXIT_FAILURE;
+    }
+
+    ssize_t bytes_read = read_full(STDIN_FILENO, buf, buf_size);
+    if (bytes_read < 0) {
+        perror("read");
+        free(buf);
+        return EXIT_FAILURE;
+    }
+
+    size_t n_read = (size_t)bytes_read;
+
+    /* Round 1: full buffer [0, n_read) -> 1 line on stderr */
+    if (n_read > 0) {
+        unsigned char orig1 = find_most_frequent(buf, 0, n_read);
+        shift_range_to_zero(buf, 0, n_read, orig1);
+        fprintf(stderr, "%02d: %3u -> %3u\n", 1, (unsigned int)orig1, 0u);
+    } else {
+        fprintf(stderr, "%02d: %3u -> %3u\n", 1, 0u, 0u);
+    }
+
+    /* Round 2: split into 8 chunks -> 8 lines on stderr */
+    size_t r2_start[CHUNK_DIV];
+    size_t r2_end[CHUNK_DIV];
+    size_t r2_len[CHUNK_DIV];
+
+    for (size_t i = 0; i < CHUNK_DIV; i++) {
+        get_part_bounds(0, n_read, i, CHUNK_DIV, &r2_start[i], &r2_end[i], &r2_len[i]);
+        unsigned char orig2 = (r2_len[i] > 0) ? find_most_frequent(buf, r2_start[i], r2_end[i]) : 0u;
+        if (r2_len[i] > 0) {
+            shift_range_to_zero(buf, r2_start[i], r2_end[i], orig2);
+        }
+        fprintf(stderr, "%02d: %3u -> %3u (chunk %02zu: %zu bytes)\n",
+                2, (unsigned int)orig2, 0u, i + 1, r2_len[i]);
+    }
+
+    /* Round 3: split each of the 8 chunks into 8 sub-chunks (64 total) -> 64 lines on stderr */
+    size_t sub_idx = 0;
+    for (size_t i = 0; i < CHUNK_DIV; i++) {
+        for (size_t j = 0; j < CHUNK_DIV; j++) {
+            size_t s_start, s_end, s_len;
+            get_part_bounds(r2_start[i], r2_end[i], j, CHUNK_DIV, &s_start, &s_end, &s_len);
+            unsigned char orig3 = (s_len > 0) ? find_most_frequent(buf, s_start, s_end) : 0u;
+            if (s_len > 0) {
+                shift_range_to_zero(buf, s_start, s_end, orig3);
+            }
+            sub_idx++;
+            fprintf(stderr, "%02d: %3u -> %3u (chunk %02zu: %zu bytes)\n",
+                    3, (unsigned int)orig3, 0u, sub_idx, s_len);
+        }
+    }
+
+    if (write_full(STDOUT_FILENO, buf, n_read) < 0) {
+        perror("write");
+        free(buf);
+        return EXIT_FAILURE;
+    }
+
+    free(buf);
+    return EXIT_SUCCESS;
+}

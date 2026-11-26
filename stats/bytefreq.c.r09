@@ -1,0 +1,333 @@
+/*
+ * (C) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2
+ *
+ * Compile: gcc -O2 -g0 -s -Wall -Wextra -Werror bytefreq.c -o bytefreq
+ *
+ * Usage: ./bytefreq [buffer_size_in_bytes] < input.bin > output.bin
+ */
+/*
+ *
+ * 1st pass: whole buffer -> mode to 0, record & clear 0x80
+ * 2nd pass: 8 chunks     -> mode to 0, check 0x80 (warn), record & clear 0x40
+ * 3rd pass: 64 chunks    -> mode to 0, check 0x80 (warn), record 0x40/0x20 & clear 0x20
+ */
+
+#define _POSIX_C_SOURCE 200809L
+
+#include <errno.h>
+#include <inttypes.h>
+#include <limits.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+#if CHAR_BIT != 8
+#error "bytefreq requires 8-bit bytes"
+#endif
+
+#ifndef DEFAULT_BUF_SIZE
+#define DEFAULT_BUF_SIZE (32u * 1024u) /* 32 KiB */
+#endif
+
+#if DEFAULT_BUF_SIZE == 0
+#error "DEFAULT_BUF_SIZE must be greater than zero"
+#endif
+
+#define BYTE_VALUES 256u
+#define CHUNK_DIV 8u
+
+#define BIT_80 0x80u
+#define BIT_40 0x40u
+#define BIT_20 0x20u
+
+static int parse_buf_size(const char *arg, size_t *out_size)
+{
+    const unsigned char *p;
+    char *endptr;
+    uintmax_t parsed;
+
+    if (arg == NULL || *arg == '\0')
+        return -1;
+
+    for (p = (const unsigned char *)arg; *p != '\0'; p++) {
+        if (*p < '0' || *p > '9')
+            return -1;
+    }
+
+    errno = 0;
+    endptr = NULL;
+    parsed = strtoumax(arg, &endptr, 10);
+    if (errno != 0 || endptr == arg || *endptr != '\0' ||
+        parsed == 0 || parsed > (uintmax_t)SIZE_MAX)
+        return -1;
+
+    *out_size = (size_t)parsed;
+    return 0;
+}
+
+static int read_full(int fd, unsigned char *buf, size_t len, size_t *out_read)
+{
+    size_t total = 0;
+
+    while (total < len) {
+        size_t request = len - total;
+        ssize_t n;
+
+        if (request > (size_t)SSIZE_MAX)
+            request = (size_t)SSIZE_MAX;
+
+        n = read(fd, buf + total, request);
+        if (n < 0) {
+            if (errno == EINTR)
+                continue;
+            return -1;
+        }
+        if (n == 0)
+            break;
+
+        total += (size_t)n;
+    }
+
+    *out_read = total;
+    return 0;
+}
+
+static int write_full(int fd, const unsigned char *buf, size_t len)
+{
+    size_t total = 0;
+
+    while (total < len) {
+        size_t request = len - total;
+        ssize_t n;
+
+        if (request > (size_t)SSIZE_MAX)
+            request = (size_t)SSIZE_MAX;
+
+        n = write(fd, buf + total, request);
+        if (n < 0) {
+            if (errno == EINTR)
+                continue;
+            return -1;
+        }
+        if (n == 0) {
+            errno = EIO;
+            return -1;
+        }
+
+        total += (size_t)n;
+    }
+
+    return 0;
+}
+
+/* Find most frequent byte in buf[start .. end), tie-breaking by smallest value. */
+static unsigned char find_most_frequent(const unsigned char *buf,
+                                        size_t start, size_t end)
+{
+    size_t counts[BYTE_VALUES] = {0};
+    unsigned int best_val = 0;
+    size_t best_count;
+    size_t i;
+    unsigned int v;
+
+    for (i = start; i < end; i++)
+        counts[buf[i]]++;
+
+    best_count = counts[0];
+    for (v = 1; v < BYTE_VALUES; v++) {
+        if (counts[v] > best_count) {
+            best_count = counts[v];
+            best_val = v;
+        }
+    }
+
+    return (unsigned char)best_val;
+}
+
+/* Shift buf[start .. end) modulo 256 so that `orig` becomes `0`. */
+static void shift_range_to_zero(unsigned char *buf,
+                                size_t start, size_t end,
+                                unsigned char orig)
+{
+    size_t i;
+
+    for (i = start; i < end; i++)
+        buf[i] = (unsigned char)(buf[i] - orig);
+}
+
+/* Return 1 if any byte in buf[start .. end) has `mask` set, else 0. */
+static unsigned int any_bit_set(const unsigned char *buf,
+                                size_t start, size_t end,
+                                unsigned char mask)
+{
+    size_t i;
+
+    for (i = start; i < end; i++) {
+        if ((buf[i] & mask) != 0)
+            return 1u;
+    }
+
+    return 0u;
+}
+
+/* Clear `mask` on all bytes in buf[start .. end). */
+static void clear_bit_mask(unsigned char *buf,
+                           size_t start, size_t end,
+                           unsigned char mask)
+{
+    size_t i;
+    unsigned char keep = (unsigned char)(~mask);
+
+    for (i = start; i < end; i++)
+        buf[i] = (unsigned char)(buf[i] & keep);
+}
+
+/* Partition [range_start, range_end) into `parts` segments; last gets remainder. */
+static void get_part_bounds(size_t range_start, size_t range_end,
+                            size_t part_idx, size_t parts,
+                            size_t *out_start, size_t *out_end,
+                            size_t *out_len)
+{
+    size_t total_len = range_end - range_start;
+    size_t base_len = total_len / parts;
+    size_t start = range_start + part_idx * base_len;
+    size_t end = (part_idx + 1 == parts) ? range_end : start + base_len;
+
+    *out_start = start;
+    *out_end = end;
+    *out_len = end - start;
+}
+
+int main(int argc, char *argv[])
+{
+    size_t buf_size = (size_t)DEFAULT_BUF_SIZE;
+    size_t n_read = 0;
+    unsigned char *buf;
+    size_t r2_start[CHUNK_DIV];
+    size_t r2_end[CHUNK_DIV];
+    size_t r2_len[CHUNK_DIV];
+    size_t i;
+    size_t sub_idx = 0;
+
+    if (argc > 2) {
+        fprintf(stderr, "Usage: %s [buffer_size_in_bytes]\n", argv[0]);
+        return EXIT_FAILURE;
+    }
+
+    if (argc == 2 && parse_buf_size(argv[1], &buf_size) != 0) {
+        fprintf(stderr,
+                "Invalid buffer size: '%s' (must be a positive decimal integer)\n",
+                argv[1]);
+        return EXIT_FAILURE;
+    }
+
+    buf = malloc(buf_size);
+    if (buf == NULL) {
+        perror("malloc");
+        return EXIT_FAILURE;
+    }
+
+    if (read_full(STDIN_FILENO, buf, buf_size, &n_read) != 0) {
+        perror("read");
+        free(buf);
+        return EXIT_FAILURE;
+    }
+
+    /* 1st pass: whole buffer -> mode to 0, record & clear 0x80 */
+    {
+        unsigned char orig = 0;
+        unsigned int bit80 = 0;
+
+        if (n_read > 0) {
+            orig = find_most_frequent(buf, 0, n_read);
+            shift_range_to_zero(buf, 0, n_read, orig);
+            bit80 = any_bit_set(buf, 0, n_read, BIT_80);
+            clear_bit_mask(buf, 0, n_read, BIT_80);
+        }
+
+        if (fprintf(stderr,
+                    "01: %3u -> %3u (%zu bytes, bit0x80=%u, clr=0x80)\n",
+                    (unsigned int)orig, 0u, n_read, bit80) < 0)
+            goto stderr_error;
+    }
+
+    /* 2nd pass: 8 chunks -> mode to 0, warn if 0x80 != 0, record & clear 0x40 */
+    for (i = 0; i < CHUNK_DIV; i++) {
+        unsigned char orig = 0;
+        unsigned int bit80 = 0;
+        unsigned int bit40 = 0;
+
+        get_part_bounds(0, n_read, i, CHUNK_DIV,
+                        &r2_start[i], &r2_end[i], &r2_len[i]);
+        if (r2_len[i] > 0) {
+            orig = find_most_frequent(buf, r2_start[i], r2_end[i]);
+            shift_range_to_zero(buf, r2_start[i], r2_end[i], orig);
+            bit80 = any_bit_set(buf, r2_start[i], r2_end[i], BIT_80);
+            if (bit80 != 0) {
+                if (fprintf(stderr,
+                            "WARNING pass 02 chunk %02zu: bit 0x80 is non-zero after normalization\n",
+                            i + 1) < 0)
+                    goto stderr_error;
+            }
+            bit40 = any_bit_set(buf, r2_start[i], r2_end[i], BIT_40);
+            clear_bit_mask(buf, r2_start[i], r2_end[i], BIT_40);
+        }
+
+        if (fprintf(stderr,
+                    "02: %3u -> %3u (chunk %02zu: %zu bytes, bit0x80=%u, bit0x40=%u, clr=0x40)\n",
+                    (unsigned int)orig, 0u, i + 1, r2_len[i], bit80, bit40) < 0)
+            goto stderr_error;
+    }
+
+    /* 3rd pass: 64 sub-chunks -> mode to 0, warn if 0x80 != 0, record 0x40/0x20 & clear 0x20 */
+    for (i = 0; i < CHUNK_DIV; i++) {
+        size_t j;
+
+        for (j = 0; j < CHUNK_DIV; j++) {
+            size_t start, end, len;
+            unsigned char orig = 0;
+            unsigned int bit80 = 0;
+            unsigned int bit40 = 0;
+            unsigned int bit20 = 0;
+
+            get_part_bounds(r2_start[i], r2_end[i], j, CHUNK_DIV,
+                            &start, &end, &len);
+            sub_idx++;
+
+            if (len > 0) {
+                orig = find_most_frequent(buf, start, end);
+                shift_range_to_zero(buf, start, end, orig);
+                bit80 = any_bit_set(buf, start, end, BIT_80);
+                if (bit80 != 0) {
+                    if (fprintf(stderr,
+                                "WARNING pass 03 chunk %02zu: bit 0x80 is non-zero after normalization\n",
+                                sub_idx) < 0)
+                        goto stderr_error;
+                }
+                bit40 = any_bit_set(buf, start, end, BIT_40);
+                bit20 = any_bit_set(buf, start, end, BIT_20);
+                clear_bit_mask(buf, start, end, BIT_20);
+            }
+
+            if (fprintf(stderr,
+                        "03: %3u -> %3u (chunk %02zu: %zu bytes, bit0x80=%u, bit0x40=%u, bit0x20=%u, clr=0x20)\n",
+                        (unsigned int)orig, 0u, sub_idx, len, bit80, bit40, bit20) < 0)
+                goto stderr_error;
+        }
+    }
+
+    if (write_full(STDOUT_FILENO, buf, n_read) != 0) {
+        perror("write");
+        free(buf);
+        return EXIT_FAILURE;
+    }
+
+    free(buf);
+    return EXIT_SUCCESS;
+
+stderr_error:
+    fprintf(stderr, "Error writing diagnostics to stderr\n");
+    free(buf);
+    return EXIT_FAILURE;
+}

@@ -1,0 +1,336 @@
+/*
+ * (C) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2
+ *
+ * Compile: gcc -O2 -g0 -s -Wall -Wextra -Werror bytefreq.c -o bytefreq
+ *
+ * Usage: ./bytefreq [buffer_size_in_bytes] < input.bin > output.bin
+ */
+
+/*
+ * Passes: 64 -> 32 -> 16 -> 8 -> 4 -> 2 chunks (mode to 0, check & clear
+ * bits 0x80, 0x40, 0x20, 0x10, 0x08, 0x04), then verify 2-bit range (0..3)
+ * and pack four 2-bit values per byte on stdout.
+ */
+
+#define _POSIX_C_SOURCE 200809L
+
+#include <errno.h>
+#include <inttypes.h>
+#include <limits.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+#if CHAR_BIT != 8
+#error "bytefreq requires 8-bit bytes"
+#endif
+
+#ifndef DEFAULT_BUF_SIZE
+#define DEFAULT_BUF_SIZE (32u * 1024u) /* 32 KiB */
+#endif
+
+#if DEFAULT_BUF_SIZE == 0
+#error "DEFAULT_BUF_SIZE must be greater than zero"
+#endif
+
+#define BYTE_VALUES 256u
+
+#define BIT_80 0x80u
+#define BIT_40 0x40u
+#define BIT_20 0x20u
+#define BIT_10 0x10u
+#define BIT_08 0x08u
+#define BIT_04 0x04u
+
+static int parse_buf_size(const char *arg, size_t *out_size)
+{
+    const unsigned char *p;
+    char *endptr;
+    uintmax_t parsed;
+
+    if (arg == NULL || *arg == '\0')
+        return -1;
+
+    for (p = (const unsigned char *)arg; *p != '\0'; p++) {
+        if (*p < '0' || *p > '9')
+            return -1;
+    }
+
+    errno = 0;
+    endptr = NULL;
+    parsed = strtoumax(arg, &endptr, 10);
+    if (errno != 0 || endptr == arg || *endptr != '\0' ||
+        parsed == 0 || parsed > (uintmax_t)SIZE_MAX)
+        return -1;
+
+    *out_size = (size_t)parsed;
+    return 0;
+}
+
+static int read_full(int fd, unsigned char *buf, size_t len, size_t *out_read)
+{
+    size_t total = 0;
+
+    while (total < len) {
+        size_t request = len - total;
+        ssize_t n;
+
+        if (request > (size_t)SSIZE_MAX)
+            request = (size_t)SSIZE_MAX;
+
+        n = read(fd, buf + total, request);
+        if (n < 0) {
+            if (errno == EINTR)
+                continue;
+            return -1;
+        }
+        if (n == 0)
+            break;
+
+        total += (size_t)n;
+    }
+
+    *out_read = total;
+    return 0;
+}
+
+static int write_full(int fd, const unsigned char *buf, size_t len)
+{
+    size_t total = 0;
+
+    while (total < len) {
+        size_t request = len - total;
+        ssize_t n;
+
+        if (request > (size_t)SSIZE_MAX)
+            request = (size_t)SSIZE_MAX;
+
+        n = write(fd, buf + total, request);
+        if (n < 0) {
+            if (errno == EINTR)
+                continue;
+            return -1;
+        }
+        if (n == 0) {
+            errno = EIO;
+            return -1;
+        }
+
+        total += (size_t)n;
+    }
+
+    return 0;
+}
+
+/* Find most frequent byte in buf[start .. end), tie-breaking by smallest value. */
+static unsigned char find_most_frequent(const unsigned char *buf,
+                                        size_t start, size_t end)
+{
+    size_t counts[BYTE_VALUES] = {0};
+    unsigned int best_val = 0;
+    size_t best_count;
+    size_t i;
+    unsigned int v;
+
+    for (i = start; i < end; i++)
+        counts[buf[i]]++;
+
+    best_count = counts[0];
+    for (v = 1; v < BYTE_VALUES; v++) {
+        if (counts[v] > best_count) {
+            best_count = counts[v];
+            best_val = v;
+        }
+    }
+
+    return (unsigned char)best_val;
+}
+
+/* Shift buf[start .. end) modulo 256 so that `orig` becomes `0`. */
+static void shift_range_to_zero(unsigned char *buf,
+                                size_t start, size_t end,
+                                unsigned char orig)
+{
+    size_t i;
+
+    for (i = start; i < end; i++)
+        buf[i] = (unsigned char)(buf[i] - orig);
+}
+
+/* Return 1 if any byte in buf[start .. end) has `mask` set, else 0. */
+static unsigned int any_bit_set(const unsigned char *buf,
+                                size_t start, size_t end,
+                                unsigned char mask)
+{
+    size_t i;
+
+    for (i = start; i < end; i++) {
+        if ((buf[i] & mask) != 0)
+            return 1u;
+    }
+
+    return 0u;
+}
+
+/* Clear `mask` on all bytes in buf[start .. end). */
+static void clear_bit_mask(unsigned char *buf,
+                           size_t start, size_t end,
+                           unsigned char mask)
+{
+    size_t i;
+    unsigned char keep = (unsigned char)(~mask);
+
+    for (i = start; i < end; i++)
+        buf[i] = (unsigned char)(buf[i] & keep);
+}
+
+/* Partition [range_start, range_end) into `parts` segments; last gets remainder. */
+static void get_part_bounds(size_t range_start, size_t range_end,
+                            size_t part_idx, size_t parts,
+                            size_t *out_start, size_t *out_end,
+                            size_t *out_len)
+{
+    size_t total_len = range_end - range_start;
+    size_t base_len = total_len / parts;
+    size_t start = range_start + part_idx * base_len;
+    size_t end = (part_idx + 1 == parts) ? range_end : start + base_len;
+
+    *out_start = start;
+    *out_end = end;
+    *out_len = end - start;
+}
+
+static int run_chunk_pass(unsigned char *buf, size_t n_read,
+                          unsigned int pass_num, size_t num_chunks,
+                          unsigned char bit_mask, const char *bit_name)
+{
+    size_t i;
+
+    for (i = 0; i < num_chunks; i++) {
+        size_t start, end, len;
+        unsigned char orig = 0;
+        unsigned int bit_set = 0;
+
+        get_part_bounds(0, n_read, i, num_chunks, &start, &end, &len);
+        if (len > 0) {
+            orig = find_most_frequent(buf, start, end);
+            shift_range_to_zero(buf, start, end, orig);
+            bit_set = any_bit_set(buf, start, end, bit_mask);
+            clear_bit_mask(buf, start, end, bit_mask);
+        }
+
+        if (fprintf(stderr,
+                    "%02u: %3u -> %3u (chunk %02zu: %zu bytes, %s=%u, clr=%s)\n",
+                    pass_num, (unsigned int)orig, 0u,
+                    i + 1, len, bit_name, bit_set, bit_name) < 0)
+            return -1;
+    }
+
+    return 0;
+}
+
+/* Pack 2-bit values (0..3) into bytes: (v0 << 6) | (v1 << 4) | (v2 << 2) | v3.
+ * Any trailing unused 2-bit lanes in the final byte remain 0. */
+static size_t pack_2bit(const unsigned char *in, size_t n_in, unsigned char *out)
+{
+    size_t out_idx = 0;
+    size_t i = 0;
+
+    while (i < n_in) {
+        unsigned char b0 = (unsigned char)(in[i] & 0x03u);
+        unsigned char b1 = (i + 1 < n_in) ? (unsigned char)(in[i + 1] & 0x03u) : 0u;
+        unsigned char b2 = (i + 2 < n_in) ? (unsigned char)(in[i + 2] & 0x03u) : 0u;
+        unsigned char b3 = (i + 3 < n_in) ? (unsigned char)(in[i + 3] & 0x03u) : 0u;
+
+        out[out_idx++] = (unsigned char)((b0 << 6) | (b1 << 4) | (b2 << 2) | b3);
+        i += 4;
+    }
+
+    return out_idx;
+}
+
+int main(int argc, char *argv[])
+{
+    size_t buf_size = (size_t)DEFAULT_BUF_SIZE;
+    size_t n_read = 0;
+    unsigned char *buf = NULL;
+    unsigned char *packed = NULL;
+    size_t packed_len = 0;
+
+    static const size_t pass_chunks[6] = {64u, 32u, 16u, 8u, 4u, 2u};
+    static const unsigned char pass_masks[6] = {
+        BIT_80, BIT_40, BIT_20, BIT_10, BIT_08, BIT_04
+    };
+    static const char *const pass_names[6] = {
+        "0x80", "0x40", "0x20", "0x10", "0x08", "0x04"
+    };
+
+    if (argc > 2) {
+        fprintf(stderr, "Usage: %s [buffer_size_in_bytes]\n", argv[0]);
+        return EXIT_FAILURE;
+    }
+
+    if (argc == 2 && parse_buf_size(argv[1], &buf_size) != 0) {
+        fprintf(stderr,
+                "Invalid buffer size: '%s' (must be a positive decimal integer)\n",
+                argv[1]);
+        return EXIT_FAILURE;
+    }
+
+    buf = malloc(buf_size);
+    if (buf == NULL) {
+        perror("malloc");
+        return EXIT_FAILURE;
+    }
+
+    if (read_full(STDIN_FILENO, buf, buf_size, &n_read) != 0) {
+        perror("read");
+        free(buf);
+        return EXIT_FAILURE;
+    }
+
+    for (size_t p = 0; p < 6u; p++) {
+        if (run_chunk_pass(buf, n_read, (unsigned int)(p + 1u),
+                           pass_chunks[p], pass_masks[p], pass_names[p]) != 0)
+            goto stderr_error;
+    }
+
+    /* Verify all values fit in 2 bits (0..3) */
+    if (any_bit_set(buf, 0, n_read, (unsigned char)(~0x03u)) != 0) {
+        fprintf(stderr, "Error: values outside 2-bit range (0..3) remain\n");
+        free(buf);
+        return EXIT_FAILURE;
+    }
+
+    packed_len = (n_read + 3u) / 4u;
+    if (packed_len > 0) {
+        packed = malloc(packed_len);
+        if (packed == NULL) {
+            perror("malloc");
+            free(buf);
+            return EXIT_FAILURE;
+        }
+
+        packed_len = pack_2bit(buf, n_read, packed);
+        if (write_full(STDOUT_FILENO, packed, packed_len) != 0) {
+            perror("write");
+            free(packed);
+            free(buf);
+            return EXIT_FAILURE;
+        }
+    }
+
+    fprintf(stderr, "Packed %zu input bytes into %zu output bytes (2-bit verified)\n",
+            n_read, packed_len);
+
+    free(packed);
+    free(buf);
+    return EXIT_SUCCESS;
+
+stderr_error:
+    fprintf(stderr, "Error writing diagnostics to stderr\n");
+    free(packed);
+    free(buf);
+    return EXIT_FAILURE;
+}

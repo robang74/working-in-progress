@@ -1,0 +1,285 @@
+/*
+ * (C) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2
+ *
+ * Compile: gcc -O2 -g0 -s -Wall -Wextra -Werror bytefreq.c -o bytefreq
+ *
+ * Usage: ./bytefreq [buffer_size_in_bytes] < input.bin > output.bin
+ *
+ * Reads at most one buffer, translates the most frequent byte in the whole
+ * buffer to zero, then repeats the operation on 8 chunks and 64 subchunks.
+ * Diagnostic information is written to stderr; transformed bytes go to stdout.
+ */
+
+#define _POSIX_C_SOURCE 200809L
+
+#include <errno.h>
+#include <inttypes.h>
+#include <limits.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+#if CHAR_BIT != 8
+#error "bytefreq requires 8-bit bytes"
+#endif
+
+#ifndef DEFAULT_BUF_SIZE
+#define DEFAULT_BUF_SIZE (32u * 1024u) /* 32 KiB */
+#endif
+
+#if DEFAULT_BUF_SIZE == 0
+#error "DEFAULT_BUF_SIZE must be greater than zero"
+#endif
+
+#define BYTE_VALUES 256u
+#define CHUNK_DIV 8u
+
+static int parse_buf_size(const char *arg, size_t *out_size)
+{
+    const unsigned char *p;
+    char *endptr;
+    uintmax_t parsed;
+
+    if (arg == NULL || *arg == '\0')
+        return -1;
+
+    /* Accept decimal digits only: no sign, whitespace, or trailing text. */
+    for (p = (const unsigned char *)arg; *p != '\0'; p++) {
+        if (*p < '0' || *p > '9')
+            return -1;
+    }
+
+    errno = 0;
+    endptr = NULL;
+    parsed = strtoumax(arg, &endptr, 10);
+    if (errno != 0 || endptr == arg || *endptr != '\0' ||
+        parsed == 0 || parsed > (uintmax_t)SIZE_MAX)
+        return -1;
+
+    *out_size = (size_t)parsed;
+    return 0;
+}
+
+/* Read up to len bytes. EOF before len is not an error. */
+static int read_full(int fd, unsigned char *buf, size_t len, size_t *out_read)
+{
+    size_t total = 0;
+
+    while (total < len) {
+        size_t request = len - total;
+        ssize_t n;
+
+        if (request > (size_t)SSIZE_MAX)
+            request = (size_t)SSIZE_MAX;
+
+        n = read(fd, buf + total, request);
+        if (n < 0) {
+            if (errno == EINTR)
+                continue;
+            return -1;
+        }
+        if (n == 0)
+            break;
+
+        total += (size_t)n;
+    }
+
+    *out_read = total;
+    return 0;
+}
+
+static int write_full(int fd, const unsigned char *buf, size_t len)
+{
+    size_t total = 0;
+
+    while (total < len) {
+        size_t request = len - total;
+        ssize_t n;
+
+        if (request > (size_t)SSIZE_MAX)
+            request = (size_t)SSIZE_MAX;
+
+        n = write(fd, buf + total, request);
+        if (n < 0) {
+            if (errno == EINTR)
+                continue;
+            return -1;
+        }
+        if (n == 0) {
+            errno = EIO;
+            return -1;
+        }
+
+        total += (size_t)n;
+    }
+
+    return 0;
+}
+
+/* Find the most frequent byte in buf[start .. end).
+ * Ties are resolved in favour of the numerically smallest byte value. */
+static unsigned char find_most_frequent(const unsigned char *buf,
+                                        size_t start, size_t end)
+{
+    size_t counts[BYTE_VALUES] = {0};
+    unsigned int best_val = 0;
+    size_t best_count;
+    size_t i;
+    unsigned int v;
+
+    for (i = start; i < end; i++)
+        counts[buf[i]]++;
+
+    best_count = counts[0];
+    for (v = 1; v < BYTE_VALUES; v++) {
+        if (counts[v] > best_count) {
+            best_count = counts[v];
+            best_val = v;
+        }
+    }
+
+    return (unsigned char)best_val;
+}
+
+/* Translate buf[start .. end) modulo 256 so orig becomes zero. */
+static void shift_range_to_zero(unsigned char *buf,
+                                size_t start, size_t end,
+                                unsigned char orig)
+{
+    size_t i;
+
+    for (i = start; i < end; i++)
+        buf[i] = (unsigned char)(buf[i] - orig);
+}
+
+/* Split [range_start, range_end) into equal base parts; the final part
+ * receives the remainder. The caller supplies a valid part_idx. */
+static void get_part_bounds(size_t range_start, size_t range_end,
+                            size_t part_idx, size_t parts,
+                            size_t *out_start, size_t *out_end,
+                            size_t *out_len)
+{
+    size_t total_len = range_end - range_start;
+    size_t base_len = total_len / parts;
+    size_t start = range_start + part_idx * base_len;
+    size_t end = (part_idx + 1 == parts) ? range_end : start + base_len;
+
+    *out_start = start;
+    *out_end = end;
+    *out_len = end - start;
+}
+
+static int report_translation(unsigned int round, unsigned char orig,
+                              size_t chunk_number, size_t chunk_len,
+                              int has_chunk)
+{
+    if (has_chunk) {
+        return fprintf(stderr, "%02u: %3u -> %3u (chunk %02zu: %zu bytes)\n",
+                       round, (unsigned int)orig, 0u,
+                       chunk_number, chunk_len) < 0 ? -1 : 0;
+    }
+
+    return fprintf(stderr, "%02u: %3u -> %3u\n",
+                   round, (unsigned int)orig, 0u) < 0 ? -1 : 0;
+}
+
+int main(int argc, char *argv[])
+{
+    size_t buf_size = (size_t)DEFAULT_BUF_SIZE;
+    size_t n_read = 0;
+    unsigned char *buf;
+    size_t r2_start[CHUNK_DIV];
+    size_t r2_end[CHUNK_DIV];
+    size_t r2_len[CHUNK_DIV];
+    size_t i;
+    size_t sub_idx = 0;
+
+    if (argc > 2) {
+        fprintf(stderr, "Usage: %s [buffer_size_in_bytes]\n", argv[0]);
+        return EXIT_FAILURE;
+    }
+
+    if (argc == 2 && parse_buf_size(argv[1], &buf_size) != 0) {
+        fprintf(stderr,
+                "Invalid buffer size: '%s' (must be a positive decimal integer)\n",
+                argv[1]);
+        return EXIT_FAILURE;
+    }
+
+    buf = malloc(buf_size);
+    if (buf == NULL) {
+        perror("malloc");
+        return EXIT_FAILURE;
+    }
+
+    if (read_full(STDIN_FILENO, buf, buf_size, &n_read) != 0) {
+        perror("read");
+        free(buf);
+        return EXIT_FAILURE;
+    }
+
+    /* Round 1: the complete input buffer. */
+    {
+        unsigned char orig = n_read > 0
+                           ? find_most_frequent(buf, 0, n_read) : 0;
+
+        if (n_read > 0)
+            shift_range_to_zero(buf, 0, n_read, orig);
+        if (report_translation(1, orig, 0, 0, 0) != 0)
+            goto stderr_error;
+    }
+
+    /* Round 2: divide the complete buffer into 8 chunks. */
+    for (i = 0; i < CHUNK_DIV; i++) {
+        unsigned char orig;
+
+        get_part_bounds(0, n_read, i, CHUNK_DIV,
+                        &r2_start[i], &r2_end[i], &r2_len[i]);
+        orig = r2_len[i] > 0
+             ? find_most_frequent(buf, r2_start[i], r2_end[i]) : 0;
+
+        if (r2_len[i] > 0)
+            shift_range_to_zero(buf, r2_start[i], r2_end[i], orig);
+
+        if (report_translation(2, orig, i + 1, r2_len[i], 1) != 0)
+            goto stderr_error;
+    }
+
+    /* Round 3: divide each round-2 chunk into 8 subchunks (64 total). */
+    for (i = 0; i < CHUNK_DIV; i++) {
+        size_t j;
+
+        for (j = 0; j < CHUNK_DIV; j++) {
+            size_t start;
+            size_t end;
+            size_t len;
+            unsigned char orig;
+
+            get_part_bounds(r2_start[i], r2_end[i], j, CHUNK_DIV,
+                            &start, &end, &len);
+            orig = len > 0 ? find_most_frequent(buf, start, end) : 0;
+
+            if (len > 0)
+                shift_range_to_zero(buf, start, end, orig);
+
+            sub_idx++;
+            if (report_translation(3, orig, sub_idx, len, 1) != 0)
+                goto stderr_error;
+        }
+    }
+
+    if (write_full(STDOUT_FILENO, buf, n_read) != 0) {
+        perror("write");
+        free(buf);
+        return EXIT_FAILURE;
+    }
+
+    free(buf);
+    return EXIT_SUCCESS;
+
+stderr_error:
+    fprintf(stderr, "Error writing diagnostics to stderr\n");
+    free(buf);
+    return EXIT_FAILURE;
+}
