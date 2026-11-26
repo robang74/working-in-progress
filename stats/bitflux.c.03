@@ -1,0 +1,521 @@
+/*
+ * (C) 2026, Roberto A. Foglietta <roberto.foglietta@gmail.com>, GPLv2
+ *
+ * Compile: gcc -O2 -g0 -s -Wall -Wextra -Werror bitflux.c -o bitflux
+ *
+ * Usage: ./bitflux [-s size] [-n 0..3] [-t 0.0..1.0] [-r] [-N num] < input.bin > output.bin
+ *
+ *   -s <size>       Buffer size in bytes (positive decimal integer, default 32768)
+ *   -n <0..3>       Normalization bitmask: 0=none (default), 1=pre, 2=post, 3=both
+ *   -t <threshold>  Y threshold in [0.0, 1.0] (default 0.75)
+ *   -r              Remove (skip emitting) bit planes with Y >= threshold
+ *   -N <num>        Repeat the full process num times in-memory before output (default 1)
+ */
+
+#define _POSIX_C_SOURCE 200809L
+
+#include <errno.h>
+#include <inttypes.h>
+#include <limits.h>
+#include <math.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+#if CHAR_BIT != 8
+#error "bitflux requires 8-bit bytes"
+#endif
+
+#ifndef DEFAULT_BUF_SIZE
+#define DEFAULT_BUF_SIZE (32u * 1024u) /* 32 KiB */
+#endif
+
+#if DEFAULT_BUF_SIZE == 0
+#error "DEFAULT_BUF_SIZE must be greater than zero"
+#endif
+
+#define BYTE_VALUES 256u
+#define WINDOW_SIZE 256u
+#define NUM_PASSES 8u
+#define DEFAULT_Y_THRESHOLD 0.75
+#define DEFAULT_REPEAT_COUNT 1u
+
+#define NORM_NONE 0u
+#define NORM_PRE  1u
+#define NORM_POST 2u
+#define NORM_BOTH 3u
+
+typedef struct {
+    unsigned int pass_idx;      /* 0..7 */
+    unsigned char mask;         /* 0x80 .. 0x01 */
+    size_t count;               /* n chunks */
+    double y;                   /* count / num_chunks */
+    int over_threshold;         /* 1 if y >= threshold */
+} layer_info_t;
+
+static void print_usage(const char *prog, FILE *out)
+{
+    fprintf(out,
+            "Usage: %s [-s size] [-n 0..3] [-t 0.0..1.0] [-r] [-N num] < input.bin > output.bin\n",
+            prog);
+}
+
+static int parse_size_arg(const char *arg, size_t *out_size)
+{
+    const unsigned char *p;
+    char *endptr;
+    uintmax_t parsed;
+
+    if (arg == NULL || *arg == '\0')
+        return -1;
+
+    for (p = (const unsigned char *)arg; *p != '\0'; p++) {
+        if (*p < '0' || *p > '9')
+            return -1;
+    }
+
+    errno = 0;
+    endptr = NULL;
+    parsed = strtoumax(arg, &endptr, 10);
+    if (errno != 0 || endptr == arg || *endptr != '\0' ||
+        parsed == 0 || parsed > (uintmax_t)SIZE_MAX)
+        return -1;
+
+    *out_size = (size_t)parsed;
+    return 0;
+}
+
+static int parse_norm_mode(const char *arg, unsigned int *out_mode)
+{
+    if (arg == NULL || arg[0] < '0' || arg[0] > '3' || arg[1] != '\0')
+        return -1;
+
+    *out_mode = (unsigned int)(arg[0] - '0');
+    return 0;
+}
+
+static int parse_threshold(const char *arg, double *out_thresh)
+{
+    char *endptr;
+    double val;
+
+    if (arg == NULL || *arg == '\0')
+        return -1;
+
+    errno = 0;
+    endptr = NULL;
+    val = strtod(arg, &endptr);
+    if (errno != 0 || endptr == arg || *endptr != '\0' ||
+        !isfinite(val) || val < 0.0 || val > 1.0)
+        return -1;
+
+    *out_thresh = val;
+    return 0;
+}
+
+static int read_full(int fd, unsigned char *buf, size_t len, size_t *out_read)
+{
+    size_t total = 0;
+
+    while (total < len) {
+        size_t request = len - total;
+        ssize_t n;
+
+        if (request > (size_t)SSIZE_MAX)
+            request = (size_t)SSIZE_MAX;
+
+        n = read(fd, buf + total, request);
+        if (n < 0) {
+            if (errno == EINTR)
+                continue;
+            return -1;
+        }
+        if (n == 0)
+            break;
+
+        total += (size_t)n;
+    }
+
+    *out_read = total;
+    return 0;
+}
+
+static int write_full(int fd, const unsigned char *buf, size_t len)
+{
+    size_t total = 0;
+
+    while (total < len) {
+        size_t request = len - total;
+        ssize_t n;
+
+        if (request > (size_t)SSIZE_MAX)
+            request = (size_t)SSIZE_MAX;
+
+        n = write(fd, buf + total, request);
+        if (n < 0) {
+            if (errno == EINTR)
+                continue;
+            return -1;
+        }
+        if (n == 0) {
+            errno = EIO;
+            return -1;
+        }
+
+        total += (size_t)n;
+    }
+
+    return 0;
+}
+
+/* Find most frequent byte in buf[start .. end), tie-breaking by smallest value. */
+static unsigned char find_most_frequent(const unsigned char *buf,
+                                        size_t start, size_t end)
+{
+    size_t counts[BYTE_VALUES] = {0};
+    unsigned int best_val = 0;
+    size_t best_count;
+    size_t i;
+    unsigned int v;
+
+    for (i = start; i < end; i++)
+        counts[buf[i]]++;
+
+    best_count = counts[0];
+    for (v = 1; v < BYTE_VALUES; v++) {
+        if (counts[v] > best_count) {
+            best_count = counts[v];
+            best_val = v;
+        }
+    }
+
+    return (unsigned char)best_val;
+}
+
+/* Shift buf[start .. end) modulo 256 so that `orig` becomes `0`. */
+static void shift_range_to_zero(unsigned char *buf,
+                                size_t start, size_t end,
+                                unsigned char orig)
+{
+    size_t i;
+
+    for (i = start; i < end; i++)
+        buf[i] = (unsigned char)(buf[i] - orig);
+}
+
+/* Extract bit `mask` from each byte in buf[0 .. n_len) and pack 8 bits/byte. */
+static size_t pack_bit_plane(const unsigned char *buf, size_t n_len,
+                             unsigned char mask, unsigned char *out)
+{
+    size_t out_idx = 0;
+    size_t i = 0;
+
+    while (i < n_len) {
+        unsigned char byte = 0;
+        unsigned int bit;
+
+        for (bit = 0; bit < 8u && (i + bit) < n_len; bit++) {
+            if ((buf[i + bit] & mask) != 0)
+                byte = (unsigned char)(byte | (1u << (7u - bit)));
+        }
+
+        out[out_idx++] = byte;
+        i += 8u;
+    }
+
+    return out_idx;
+}
+
+static int run_single_cycle(unsigned char *buf, size_t n_len,
+                            unsigned int iter_num, unsigned int repeat_count,
+                            unsigned int norm_mode, double threshold,
+                            int remove_planes, const char *thresh_tag,
+                            unsigned char **out_stream, size_t *out_stream_len)
+{
+    size_t num_chunks = (n_len + WINDOW_SIZE - 1u) / WINDOW_SIZE;
+    size_t plane_bytes = (n_len + 7u) / 8u;
+    size_t active_planes = 0;
+    size_t max_out_cap = 0;
+    size_t out_len = 0;
+    unsigned char *plane_buf = NULL;
+    unsigned char *assembled = NULL;
+    unsigned char pre_norm_val = 0;
+    unsigned char post_norm_val = 0;
+    layer_info_t layers[NUM_PASSES];
+
+    static const unsigned char bit_masks[NUM_PASSES] = {
+        0x80u, 0x40u, 0x20u, 0x10u, 0x08u, 0x04u, 0x02u, 0x01u
+    };
+
+    *out_stream = NULL;
+    *out_stream_len = 0;
+
+    if (repeat_count > 1u) {
+        if (fprintf(stderr, "--- iteration %u/%u (in: %zu bytes) ---\n",
+                    iter_num, repeat_count, n_len) < 0)
+            return -1;
+    }
+
+    for (unsigned int p = 0; p < NUM_PASSES; p++) {
+        layers[p].pass_idx = p;
+        layers[p].mask = bit_masks[p];
+        layers[p].count = 0;
+        layers[p].y = 0.0;
+        layers[p].over_threshold = 0;
+    }
+
+    /* 1. Evaluate and apply first average-to-zero (pre-norm) if requested. */
+    if ((norm_mode & NORM_PRE) != 0u) {
+        if (n_len > 0) {
+            pre_norm_val = find_most_frequent(buf, 0, n_len);
+            shift_range_to_zero(buf, 0, n_len, pre_norm_val);
+        }
+        if (fprintf(stderr, "pre-norm: %u\n", (unsigned int)pre_norm_val) < 0)
+            return -1;
+    }
+
+    /* 2. Main bit-plane passes across fixed 256-byte chunks. */
+    for (unsigned int pass = 0; pass < NUM_PASSES; pass++) {
+        unsigned char mask = bit_masks[pass];
+        size_t ones_majority_chunks = 0;
+
+        for (size_t start = 0; start < n_len; start += WINDOW_SIZE) {
+            size_t end = start + WINDOW_SIZE;
+            size_t ones = 0;
+            size_t zeros = 0;
+
+            if (end > n_len)
+                end = n_len;
+
+            for (size_t i = start; i < end; i++) {
+                if ((buf[i] & mask) != 0)
+                    ones++;
+                else
+                    zeros++;
+            }
+
+            if (ones > zeros) {
+                ones_majority_chunks++;
+                for (size_t i = start; i < end; i++)
+                    buf[i] ^= mask;
+            }
+        }
+
+        layers[pass].count = ones_majority_chunks;
+        layers[pass].y = (num_chunks > 0)
+            ? ((double)ones_majority_chunks / (double)num_chunks)
+            : 0.0;
+        layers[pass].over_threshold = (layers[pass].y >= threshold) ? 1 : 0;
+
+        if (fprintf(stderr, "pass %u (0x%02x): n=%zu/%zu, Y=%.4f%s\n",
+                    pass + 1u,
+                    (unsigned int)mask,
+                    layers[pass].count,
+                    num_chunks,
+                    layers[pass].y,
+                    layers[pass].over_threshold ? thresh_tag : "") < 0)
+            return -1;
+    }
+
+    /* Sort bit layers in descending order of Y (tie-break by pass order). */
+    for (size_t i = 0; i < NUM_PASSES; i++) {
+        for (size_t j = i + 1u; j < NUM_PASSES; j++) {
+            if (layers[j].y > layers[i].y ||
+                (layers[j].y == layers[i].y && layers[j].pass_idx < layers[i].pass_idx)) {
+                layer_info_t tmp = layers[i];
+                layers[i] = layers[j];
+                layers[j] = tmp;
+            }
+        }
+    }
+
+    if ((norm_mode & NORM_POST) != 0u) {
+        if (n_len > 0) {
+            post_norm_val = find_most_frequent(buf, 0, n_len);
+            shift_range_to_zero(buf, 0, n_len, post_norm_val);
+        }
+        if (fprintf(stderr, "post-norm: %u\n", (unsigned int)post_norm_val) < 0)
+            return -1;
+    }
+
+    for (size_t i = 0; i < NUM_PASSES; i++) {
+        if (!(remove_planes && layers[i].over_threshold))
+            active_planes++;
+    }
+
+    if (plane_bytes > 0) {
+        plane_buf = malloc(plane_bytes);
+        if (plane_buf == NULL) {
+            perror("malloc");
+            return -1;
+        }
+    }
+
+    if (active_planes > 0 && plane_bytes > 0) {
+        if (active_planes > SIZE_MAX / plane_bytes) {
+            fprintf(stderr, "Output stream size overflow\n");
+            free(plane_buf);
+            return -1;
+        }
+        max_out_cap = active_planes * plane_bytes;
+        assembled = malloc(max_out_cap);
+        if (assembled == NULL) {
+            perror("malloc");
+            free(plane_buf);
+            return -1;
+        }
+    }
+
+    for (size_t i = 0; i < NUM_PASSES; i++) {
+        if (remove_planes && layers[i].over_threshold) {
+            if (fprintf(stderr, "skip plane pass %u (0x%02x), Y=%.4f [removed]\n",
+                        layers[i].pass_idx + 1u,
+                        (unsigned int)layers[i].mask,
+                        layers[i].y) < 0) {
+                free(assembled);
+                free(plane_buf);
+                return -1;
+            }
+            continue;
+        }
+
+        if (plane_bytes > 0) {
+            size_t packed_len = pack_bit_plane(buf, n_len, layers[i].mask, plane_buf);
+            for (size_t k = 0; k < packed_len; k++)
+                assembled[out_len++] = plane_buf[k];
+        }
+
+        if (fprintf(stderr, "emit plane pass %u (0x%02x), Y=%.4f, %zu bytes\n",
+                    layers[i].pass_idx + 1u,
+                    (unsigned int)layers[i].mask,
+                    layers[i].y,
+                    plane_bytes) < 0) {
+            free(assembled);
+            free(plane_buf);
+            return -1;
+        }
+    }
+
+    free(plane_buf);
+
+    if (fprintf(stderr, "iter %u stream: %zu bytes (from %zu bytes)\n",
+                iter_num, out_len, n_len) < 0) {
+        free(assembled);
+        return -1;
+    }
+
+    *out_stream = assembled;
+    *out_stream_len = out_len;
+    return 0;
+}
+
+int main(int argc, char *argv[])
+{
+    size_t buf_size = (size_t)DEFAULT_BUF_SIZE;
+    unsigned int norm_mode = NORM_NONE;
+    double threshold = DEFAULT_Y_THRESHOLD;
+    int remove_planes = 0;
+    size_t repeat_count = (size_t)DEFAULT_REPEAT_COUNT;
+    size_t n_read = 0;
+    unsigned char *buf = NULL;
+    char thresh_tag[32];
+    int opt;
+
+    while ((opt = getopt(argc, argv, "s:n:t:rN:h")) != -1) {
+        switch (opt) {
+        case 's':
+            if (parse_size_arg(optarg, &buf_size) != 0) {
+                fprintf(stderr,
+                        "Invalid buffer size: '%s' (must be a positive decimal integer)\n",
+                        optarg);
+                return EXIT_FAILURE;
+            }
+            break;
+        case 'n':
+            if (parse_norm_mode(optarg, &norm_mode) != 0) {
+                fprintf(stderr,
+                        "Invalid normalization mode: '%s' (must be 0..3)\n",
+                        optarg);
+                return EXIT_FAILURE;
+            }
+            break;
+        case 't':
+            if (parse_threshold(optarg, &threshold) != 0) {
+                fprintf(stderr,
+                        "Invalid threshold: '%s' (must be a finite number in 0.0..1.0)\n",
+                        optarg);
+                return EXIT_FAILURE;
+            }
+            break;
+        case 'r':
+            remove_planes = 1;
+            break;
+        case 'N':
+            if (parse_size_arg(optarg, &repeat_count) != 0) {
+                fprintf(stderr,
+                        "Invalid repeat count: '%s' (must be a positive decimal integer)\n",
+                        optarg);
+                return EXIT_FAILURE;
+            }
+            break;
+        case 'h':
+            print_usage(argv[0], stdout);
+            return EXIT_SUCCESS;
+        default:
+            print_usage(argv[0], stderr);
+            return EXIT_FAILURE;
+        }
+    }
+
+    if (optind < argc) {
+        print_usage(argv[0], stderr);
+        return EXIT_FAILURE;
+    }
+
+    if (repeat_count > (size_t)UINT_MAX) {
+        fprintf(stderr, "Repeat count too large\n");
+        return EXIT_FAILURE;
+    }
+
+    snprintf(thresh_tag, sizeof(thresh_tag), " [Y>=%.2f]", threshold);
+
+    buf = malloc(buf_size);
+    if (buf == NULL) {
+        perror("malloc");
+        return EXIT_FAILURE;
+    }
+
+    if (read_full(STDIN_FILENO, buf, buf_size, &n_read) != 0) {
+        perror("read");
+        free(buf);
+        return EXIT_FAILURE;
+    }
+
+    for (size_t r = 0; r < repeat_count; r++) {
+        unsigned char *next_buf = NULL;
+        size_t next_len = 0;
+
+        if (run_single_cycle(buf, n_read,
+                             (unsigned int)(r + 1u),
+                             (unsigned int)repeat_count,
+                             norm_mode, threshold, remove_planes, thresh_tag,
+                             &next_buf, &next_len) != 0) {
+            free(buf);
+            return EXIT_FAILURE;
+        }
+
+        free(buf);
+        buf = next_buf;
+        n_read = next_len;
+    }
+
+    if (write_full(STDOUT_FILENO, buf, n_read) != 0) {
+        perror("write");
+        free(buf);
+        return EXIT_FAILURE;
+    }
+
+    free(buf);
+    return EXIT_SUCCESS;
+}
